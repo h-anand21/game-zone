@@ -8,7 +8,7 @@ import { validateAndCalculateHit } from '../game/hit-validation.js';
 import { FreeForAllMode } from '../modes/free-for-all.js';
 import type { IGameMode } from '../modes/game-mode.interface.js';
 import type { RoomSnapshot } from '../protocol/fps-events.js';
-import { logger } from '../utils/logger.js';
+import { reportMatchResultToExpress } from '../services/express-reporter.js';
 
 const SPAWN_POINTS = [
   { x: -10, y: 1, z: -10 },
@@ -85,14 +85,30 @@ export class FPSRoom {
     this.snapshotInterval = setInterval(() => this.broadcastSnapshot(), 1000 / 20);
   }
 
-  stopMatch() {
+import { reportMatchResultToExpress } from '../services/express-reporter.js';
+
+  stopMatch(winnerId?: string) {
+    if (this.state === 'ENDED') return;
     this.state = 'ENDED';
+
     if (this.tickInterval) clearInterval(this.tickInterval);
     if (this.snapshotInterval) clearInterval(this.snapshotInterval);
     this.tickInterval = null;
     this.snapshotInterval = null;
+
     logger.info(`🏁 FPS Match ended in Room ${this.id}`);
+
+    // Transmit match results to Express backend
+    reportMatchResultToExpress({
+      matchId: this.id,
+      map: this.map,
+      mode: this.mode.id,
+      durationSeconds: Math.ceil((Date.now() - this.startTime) / 1000),
+      winnerId,
+      players: Array.from(this.players.values()),
+    });
   }
+
 
   handleHit(attackerId: string, targetId: string, weaponId: string, isHeadshot: boolean) {
     if (this.state !== 'ACTIVE') return;

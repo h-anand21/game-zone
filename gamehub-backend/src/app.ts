@@ -16,6 +16,7 @@ import { processOfflineSync } from './controllers/sync.controller.js';
 import { getRemoteConfig } from './controllers/config.controller.js';
 import { getFriends, sendFriendRequest, acceptFriendRequest } from './controllers/friends.controller.js';
 import { getGameLeaderboard } from './controllers/leaderboards.controller.js';
+import { submitFpsMatchResult, getActiveFpsRooms } from './controllers/battle.controller.js';
 
 export const app = express();
 
@@ -47,6 +48,10 @@ app.post('/api/v1/friends/request', authenticateToken, sendFriendRequest);
 app.post('/api/v1/friends/accept/:requestId', authenticateToken, acceptFriendRequest);
 
 app.get('/api/v1/leaderboards/:gameId', getGameLeaderboard);
+
+app.get('/api/v1/battle/rooms', getActiveFpsRooms);
+app.post('/api/v1/battle/matches/:matchId/result', submitFpsMatchResult);
+
 
 // 404 & Global Error Handling
 app.use(notFoundHandler);
