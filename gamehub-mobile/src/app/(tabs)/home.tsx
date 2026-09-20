@@ -83,7 +83,9 @@ export default function HomeScreen() {
           <Pressable
             key={game.id}
             style={({ pressed }) => [styles.featuredCard, pressed && styles.pressed]}
+            onPress={() => router.push(`/games/${game.id}`)}
           >
+
             <Text style={styles.featuredIcon}>{game.icon}</Text>
             <Text style={styles.featuredName}>{game.name}</Text>
             <Text style={styles.featuredCategory}>{game.category}</Text>

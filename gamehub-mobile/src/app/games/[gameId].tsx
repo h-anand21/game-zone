@@ -14,10 +14,12 @@ export default function GameScreen() {
   const { gameId } = useLocalSearchParams<{ gameId: string }>();
   const router = useRouter();
 
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
 
-  const gameConfig = getGameById(gameId);
-  const registeredGame = gameId ? getRegisteredGame(gameId) : undefined;
+
+  const cleanGameId = gameId ? gameId.toLowerCase() : '';
+  const gameConfig = getGameById(cleanGameId);
+  const registeredGame = cleanGameId ? getRegisteredGame(cleanGameId) : undefined;
 
   if (!gameConfig) {
     return (

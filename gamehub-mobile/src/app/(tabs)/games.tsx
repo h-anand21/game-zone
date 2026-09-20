@@ -4,13 +4,16 @@
 
 import { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, TextInput } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Colors, Spacing, BorderRadius, Typography, Shadows, CATEGORY_COLORS } from '@/constants/theme';
 import { GAME_REGISTRY, GAME_CATEGORIES } from '@/constants/games';
 import type { GameCategory } from '@/constants/types';
 
 export default function GamesScreen() {
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<GameCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
 
   const filteredGames = useMemo(() => {
     let games = GAME_REGISTRY;
@@ -95,7 +98,9 @@ export default function GamesScreen() {
           <Pressable
             key={game.id}
             style={({ pressed }) => [styles.gameCard, pressed && styles.pressed]}
+            onPress={() => router.push(`/games/${game.id}`)}
           >
+
             <View style={[styles.gameIconWrapper, { backgroundColor: CATEGORY_COLORS[game.category] + '20' }]}>
               <Text style={styles.gameIcon}>{game.icon}</Text>
             </View>
