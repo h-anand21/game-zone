@@ -1,34 +1,43 @@
 // ============================================================
-// GameHub Mobile — Game Registry & XP Engine Unit Test
+// GameHub Mobile — Game Registry Verification Test
 // ============================================================
 
-import { ALL_GAMES } from '../src/constants/games';
+import { GAME_REGISTRY } from '../src/constants/games';
 
-describe('Game Registry & Category Verification', () => {
-  it('should have exactly 35 games registered', () => {
-    expect(ALL_GAMES.length).toBe(35);
-  });
+export function runGameRegistryTests() {
+  console.log('[Test] Running Game Registry Verification...');
 
-  it('should have unique IDs for all 35 games', () => {
-    const ids = ALL_GAMES.map((g) => g.id);
-    const uniqueIds = new Set(ids);
-    expect(uniqueIds.size).toBe(35);
-  });
+  // 1. Total games count
+  if (GAME_REGISTRY.length !== 35) {
+    throw new Error(`Expected 35 games, found ${GAME_REGISTRY.length}`);
+  }
 
-  it('should contain all 6 categories', () => {
-    const categories = new Set(ALL_GAMES.map((g) => g.category));
-    expect(categories.has('brain')).toBe(true);
-    expect(categories.has('reflex')).toBe(true);
-    expect(categories.has('arcade')).toBe(true);
-    expect(categories.has('classic')).toBe(true);
-    expect(categories.has('party')).toBe(true);
-    expect(categories.has('battle')).toBe(true);
-  });
+  // 2. Unique IDs check
+  const ids = GAME_REGISTRY.map((g) => g.id);
+  const uniqueIds = new Set(ids);
+  if (uniqueIds.size !== 35) {
+    throw new Error('Duplicate game IDs found in registry');
+  }
 
-  it('should have 30 non-FPS games available and 5 FPS battle modes', () => {
-    const nonFps = ALL_GAMES.filter((g) => g.category !== 'battle');
-    const fps = ALL_GAMES.filter((g) => g.category === 'battle');
-    expect(nonFps.length).toBe(30);
-    expect(fps.length).toBe(5);
-  });
-});
+  // 3. Category counts
+  const categories = new Set(GAME_REGISTRY.map((g) => g.category));
+  const expectedCategories = ['brain', 'reflex', 'arcade', 'classic', 'party', 'battle'];
+  for (const cat of expectedCategories) {
+    if (!categories.has(cat as any)) {
+      throw new Error(`Missing category: ${cat}`);
+    }
+  }
+
+  // 4. Non-FPS vs FPS count
+  const nonFps = GAME_REGISTRY.filter((g) => g.category !== 'battle');
+  const fps = GAME_REGISTRY.filter((g) => g.category === 'battle');
+  if (nonFps.length !== 30 || fps.length !== 5) {
+    throw new Error(`Expected 30 non-FPS & 5 FPS modes, got ${nonFps.length} & ${fps.length}`);
+  }
+
+  console.log('✅ Game Registry Verification Passed: All 35 games valid (30 non-FPS + 5 FPS modes)');
+  return true;
+}
+
+// Execute test
+runGameRegistryTests();
