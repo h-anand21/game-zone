@@ -103,10 +103,18 @@ wss.on('connection', (ws: WebSocket) => {
   });
 });
 
+server.on('error', (err: any) => {
+  if (err.code === 'EADDRINUSE') {
+    logger.error(`❌ Port ${env.PORT} is already in use by another terminal or process. Please close any previous terminal running on port ${env.PORT}.`);
+    process.exit(1);
+  }
+});
+
 server.listen(env.PORT, () => {
   logger.info(`🔥 GameHub Authoritative FPS Realtime Server listening on port ${env.PORT} [${env.NODE_ENV}]`);
   logger.info(`⚡ FPS WebSocket endpoint active at /ws/fps`);
 });
+
 
 // Graceful Shutdown
 async function gracefulShutdown(signal: string) {

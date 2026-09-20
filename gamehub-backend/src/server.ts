@@ -6,11 +6,24 @@ import { app } from './app.js';
 import { env } from './config/env.js';
 import { logger } from './utils/logger.js';
 import { pool } from './config/database.js';
+import { createServer } from 'http';
 import { initCasualSocketServer } from './socket/casual-socket.js';
 
-const server = app.listen(env.PORT, () => {
+const server = createServer(app);
+
+
+server.on('error', (err: any) => {
+  if (err.code === 'EADDRINUSE') {
+    logger.error(`❌ Port ${env.PORT} is already in use by another terminal. Please close the previous terminal running on port ${env.PORT}.`);
+    process.exit(1);
+  }
+});
+
+server.listen(env.PORT, () => {
   logger.info(`🚀 GameHub Backend HTTP Server running on port ${env.PORT} [${env.NODE_ENV}]`);
 });
+
+
 
 initCasualSocketServer(server);
 logger.info(`⚡ GameHub Casual Multiplayer WebSocket Server initialized at /ws/casual`);
