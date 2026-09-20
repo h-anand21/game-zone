@@ -7,8 +7,8 @@ import { FPSPlayer } from '../game/player.js';
 import { validateAndCalculateHit } from '../game/hit-validation.js';
 import { FreeForAllMode } from '../modes/free-for-all.js';
 import type { IGameMode } from '../modes/game-mode.interface.js';
-import type { RoomSnapshot } from '../protocol/fps-events.js';
 import { reportMatchResultToExpress } from '../services/express-reporter.js';
+import { logger } from '../utils/logger.js';
 
 const SPAWN_POINTS = [
   { x: -10, y: 1, z: -10 },
@@ -85,9 +85,8 @@ export class FPSRoom {
     this.snapshotInterval = setInterval(() => this.broadcastSnapshot(), 1000 / 20);
   }
 
-import { reportMatchResultToExpress } from '../services/express-reporter.js';
-
   stopMatch(winnerId?: string) {
+
     if (this.state === 'ENDED') return;
     this.state = 'ENDED';
 
