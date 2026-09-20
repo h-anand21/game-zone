@@ -36,7 +36,7 @@ export class UserRepository {
     username?: string;
   }): Promise<void> {
     const sets: string[] = [];
-    const values: unknown[] = [];
+    const values: (string | number | null)[] = [];
 
     if (updates.displayName !== undefined) {
       sets.push('display_name = ?');

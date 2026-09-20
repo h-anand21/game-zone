@@ -5,9 +5,12 @@
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
+import { useProfileStore, useAuthStore } from '@/store';
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { displayName, username, avatarUrl, xp, level, coins, totalGamesPlayed, achievementCount } = useProfileStore();
+  const { isGuest } = useAuthStore();
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -22,31 +25,31 @@ export default function ProfileScreen() {
       {/* Avatar & Name */}
       <View style={styles.profileCard}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>G</Text>
+          <Text style={styles.avatarText}>{displayName.charAt(0).toUpperCase()}</Text>
         </View>
-        <Text style={styles.displayName}>Guest Player</Text>
-        <Text style={styles.username}>@guest</Text>
+        <Text style={styles.displayName}>{displayName}</Text>
+        <Text style={styles.username}>@{username}</Text>
         <View style={styles.levelBadge}>
-          <Text style={styles.levelText}>Level 1</Text>
+          <Text style={styles.levelText}>Level {level}</Text>
         </View>
       </View>
 
       {/* Stats Grid */}
       <View style={styles.statsGrid}>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>0</Text>
+          <Text style={styles.statValue}>{xp}</Text>
           <Text style={styles.statLabel}>Total XP</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>0</Text>
+          <Text style={styles.statValue}>{coins}</Text>
           <Text style={styles.statLabel}>Coins</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>0</Text>
+          <Text style={styles.statValue}>{totalGamesPlayed}</Text>
           <Text style={styles.statLabel}>Games Played</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>0</Text>
+          <Text style={styles.statValue}>{achievementCount}</Text>
           <Text style={styles.statLabel}>Achievements</Text>
         </View>
       </View>

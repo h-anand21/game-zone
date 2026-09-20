@@ -13,14 +13,14 @@ export const GAME_REGISTRY: GameConfig[] = [
   {
     id: 'mind-lock', name: 'Mind Lock', category: 'brain',
     offline: true, multiplayer: false, route: '/games/mind-lock',
-    icon: '🧠', status: 'coming-soon', gameVersion: '1.0.0', scoreVersion: 'v1',
+    icon: '🧠', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
     validation: { maxScore: 10000, minDuration: 3, maxDuration: 300 },
     saveSupport: 'background', description: 'Remember and reproduce patterns',
   },
   {
     id: 'find-one', name: 'Find One', category: 'brain',
     offline: true, multiplayer: false, route: '/games/find-one',
-    icon: '🔍', status: 'coming-soon', gameVersion: '1.0.0', scoreVersion: 'v1',
+    icon: '🔍', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
     validation: { maxScore: 10000, minDuration: 3, maxDuration: 300 },
     saveSupport: 'none', description: 'Spot the odd one out',
   },
@@ -41,7 +41,7 @@ export const GAME_REGISTRY: GameConfig[] = [
   {
     id: 'number-rush', name: 'Number Rush', category: 'brain',
     offline: true, multiplayer: false, route: '/games/number-rush',
-    icon: '🔢', status: 'coming-soon', gameVersion: '1.0.0', scoreVersion: 'v1',
+    icon: '🔢', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
     validation: { maxScore: 50000, minDuration: 5, maxDuration: 120 },
     saveSupport: 'none', description: 'Quick math challenges',
   },
@@ -115,7 +115,7 @@ export const GAME_REGISTRY: GameConfig[] = [
   {
     id: 'snake', name: 'Snake', category: 'arcade',
     offline: true, multiplayer: false, route: '/games/snake',
-    icon: '🐍', status: 'coming-soon', gameVersion: '1.0.0', scoreVersion: 'v1',
+    icon: '🐍', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
     validation: { maxScore: 100000, minDuration: 5, maxDuration: 3600 },
     saveSupport: 'none', description: 'Classic Snake — eat, grow, survive',
   },
@@ -233,7 +233,7 @@ export const GAME_REGISTRY: GameConfig[] = [
   {
     id: 'tic-tac-toe', name: 'Tic Tac Toe', category: 'party',
     offline: true, multiplayer: true, route: '/games/tic-tac-toe',
-    icon: '❌', status: 'coming-soon', gameVersion: '1.0.0', scoreVersion: 'v1',
+    icon: '❌', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
     validation: { maxScore: 100, minDuration: 5, maxDuration: 300 },
     saveSupport: 'none', description: 'Classic X and O',
   },

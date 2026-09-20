@@ -6,6 +6,8 @@ node_modules/
 # Expo
 .expo/
 dist/
+dist_test/
+dist*/
 *.jks
 *.p8
 *.p12

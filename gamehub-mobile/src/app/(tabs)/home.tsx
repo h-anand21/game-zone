@@ -6,9 +6,11 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Colors, Spacing, BorderRadius, Typography, Shadows } from '@/constants/theme';
 import { GAME_REGISTRY, GAME_CATEGORIES } from '@/constants/games';
+import { useProfileStore } from '@/store';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { level, xp, coins, totalGamesPlayed } = useProfileStore();
 
   const featuredGames = GAME_REGISTRY.filter(
     (g) => g.status === 'available' || g.status === 'coming-soon'
@@ -39,19 +41,19 @@ export default function HomeScreen() {
       {/* Stats Summary */}
       <View style={styles.statsRow}>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>0</Text>
+          <Text style={styles.statValue}>{level}</Text>
           <Text style={styles.statLabel}>Level</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>0</Text>
+          <Text style={styles.statValue}>{xp}</Text>
           <Text style={styles.statLabel}>XP</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>0</Text>
+          <Text style={styles.statValue}>{coins}</Text>
           <Text style={styles.statLabel}>Coins</Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statValue}>0</Text>
+          <Text style={styles.statValue}>{totalGamesPlayed}</Text>
           <Text style={styles.statLabel}>Games</Text>
         </View>
       </View>
