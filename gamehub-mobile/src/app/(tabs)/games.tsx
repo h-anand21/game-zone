@@ -4,13 +4,12 @@
 
 import { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, TextInput } from 'react-native';
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import { Colors, Spacing, BorderRadius, Typography, Shadows, CATEGORY_COLORS } from '@/constants/theme';
 import { GAME_REGISTRY, GAME_CATEGORIES } from '@/constants/games';
 import type { GameCategory } from '@/constants/types';
 
 export default function GamesScreen() {
-  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<GameCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 

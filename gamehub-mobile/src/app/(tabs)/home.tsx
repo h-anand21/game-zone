@@ -3,13 +3,12 @@
 // ============================================================
 
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { useRouter } from 'expo-router';
+import { router } from 'expo-router';
 import { Colors, Spacing, BorderRadius, Typography, Shadows } from '@/constants/theme';
 import { GAME_REGISTRY, GAME_CATEGORIES } from '@/constants/games';
 import { useProfileStore } from '@/store';
 
 export default function HomeScreen() {
-  const router = useRouter();
   const { level, xp, coins, totalGamesPlayed } = useProfileStore();
 
   const featuredGames = GAME_REGISTRY.filter(

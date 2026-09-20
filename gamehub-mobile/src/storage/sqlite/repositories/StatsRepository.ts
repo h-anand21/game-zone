@@ -5,6 +5,8 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 import { Tables, type GameStatsRow } from '../schema';
 
+import { generateUUID } from '@/utils/uuid';
+
 export class StatsRepository {
   constructor(private db: SQLiteDatabase) {}
 
@@ -33,7 +35,7 @@ export class StatsRepository {
 
     if (!existing) {
       // Insert new stats row
-      const id = crypto.randomUUID?.() ?? `stats-${params.gameId}-${Date.now()}`;
+      const id = generateUUID();
       await this.db.runAsync(
         `INSERT INTO ${Tables.GAME_STATS} (id, game_id, games_played, wins, losses, draws, best_score, total_score, updated_at)
          VALUES (?, ?, 1, ?, ?, ?, ?, ?, datetime('now'))`,
