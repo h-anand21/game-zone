@@ -5,7 +5,7 @@
 import type { Request, Response } from 'express';
 import { db } from '../config/database.js';
 import { matches, matchPlayers, gameStats, users } from '../db/schema.js';
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql, and } from 'drizzle-orm';
 
 export interface PlayerMatchResult {
   userId: string;
@@ -17,22 +17,18 @@ export interface PlayerMatchResult {
 
 export async function submitFpsMatchResult(req: Request, res: Response) {
   try {
-    const { matchId, gameId = 'fps-arena', mode = 'free-for-all', map = 'FPS_Factory', durationSeconds = 600, winnerId, results } = req.body;
+    const { matchId, gameId = 'fps-arena', mode = 'free-for-all', winnerId, results } = req.body;
 
-    if (!matchId || !Array.isArray(results)) {
-      return res.status(400).json({ success: false, message: 'matchId and results array required' });
+    if (!Array.isArray(results)) {
+      return res.status(400).json({ success: false, message: 'results array required' });
     }
 
     // 1. Create match record
     await db.insert(matches).values({
-      id: matchId,
       gameId,
       mode,
-      map,
-      duration: durationSeconds,
-      winnerId: winnerId || null,
       status: 'completed',
-    }).onConflictDoNothing();
+    });
 
     // 2. Insert match players & update user stats
     for (const playerResult of results as PlayerMatchResult[]) {
@@ -40,20 +36,20 @@ export async function submitFpsMatchResult(req: Request, res: Response) {
 
       // Insert match_player
       await db.insert(matchPlayers).values({
-        matchId,
+        matchId: matchId || undefined,
         userId: playerResult.userId,
         kills: playerResult.kills || 0,
         deaths: playerResult.deaths || 0,
         score: playerResult.score || 0,
-        isWinner: !!playerResult.isWinner,
-      }).onConflictDoNothing();
+        won: !!playerResult.isWinner,
+      });
 
       // Upsert game_stats for FPS
       const xpEarned = (playerResult.kills * 20) + (playerResult.isWinner ? 100 : 25);
       const coinsEarned = (playerResult.kills * 5) + (playerResult.isWinner ? 50 : 10);
 
       const existingStats = await db.query.gameStats.findFirst({
-        where: (gs, { and, eq }) => and(eq(gs.userId, playerResult.userId), eq(gs.gameId, gameId)),
+        where: and(eq(gameStats.userId, playerResult.userId), eq(gameStats.gameId, gameId)),
       });
 
       if (existingStats) {
@@ -91,7 +87,6 @@ export async function submitFpsMatchResult(req: Request, res: Response) {
     return res.status(200).json({
       success: true,
       data: {
-        matchId,
         message: 'FPS match results processed successfully',
       },
     });

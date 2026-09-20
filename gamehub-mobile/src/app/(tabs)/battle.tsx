@@ -19,15 +19,16 @@ const FPS_MODES = [
 export default function BattleScreen() {
   const [selectedMode, setSelectedMode] = useState<string>('free-for-all');
   const [launching, setLaunching] = useState<boolean>(false);
-  const { user } = useAuthStore();
+  const { guestId, cloudUserId } = useAuthStore();
 
   const handleLaunchMatch = async () => {
     setLaunching(true);
     try {
       const modeObj = FPS_MODES.find((m) => m.id === selectedMode);
       const res = await UnityBridgeService.launchFpsMatch({
-        userId: user?.id || 'guest_player',
-        username: user?.username || 'Guest',
+        userId: cloudUserId || guestId || 'guest_player',
+        username: cloudUserId ? 'CloudPlayer' : 'GuestPlayer',
+
         mode: modeObj?.name || 'Free For All',
         map: 'FPS_Factory',
       });
