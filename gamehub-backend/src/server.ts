@@ -6,10 +6,14 @@ import { app } from './app.js';
 import { env } from './config/env.js';
 import { logger } from './utils/logger.js';
 import { pool } from './config/database.js';
+import { initCasualSocketServer } from './socket/casual-socket.js';
 
 const server = app.listen(env.PORT, () => {
   logger.info(`🚀 GameHub Backend HTTP Server running on port ${env.PORT} [${env.NODE_ENV}]`);
 });
+
+initCasualSocketServer(server);
+logger.info(`⚡ GameHub Casual Multiplayer WebSocket Server initialized at /ws/casual`);
 
 // Graceful Shutdown System
 async function gracefulShutdown(signal: string) {

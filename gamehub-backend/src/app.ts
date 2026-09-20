@@ -14,6 +14,8 @@ import { registerGuest, linkAccount } from './controllers/auth.controller.js';
 import { submitScore } from './controllers/scores.controller.js';
 import { processOfflineSync } from './controllers/sync.controller.js';
 import { getRemoteConfig } from './controllers/config.controller.js';
+import { getFriends, sendFriendRequest, acceptFriendRequest } from './controllers/friends.controller.js';
+import { getGameLeaderboard } from './controllers/leaderboards.controller.js';
 
 export const app = express();
 
@@ -39,6 +41,12 @@ app.post('/api/v1/auth/link', authenticateToken, linkAccount);
 
 app.post('/api/v1/scores', authenticateToken, submitScore);
 app.post('/api/v1/sync', authenticateToken, processOfflineSync);
+
+app.get('/api/v1/friends', authenticateToken, getFriends);
+app.post('/api/v1/friends/request', authenticateToken, sendFriendRequest);
+app.post('/api/v1/friends/accept/:requestId', authenticateToken, acceptFriendRequest);
+
+app.get('/api/v1/leaderboards/:gameId', getGameLeaderboard);
 
 // 404 & Global Error Handling
 app.use(notFoundHandler);
