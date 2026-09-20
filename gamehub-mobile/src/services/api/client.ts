@@ -138,13 +138,18 @@ class ApiClient {
   }
 }
 
-// Singleton API client — configured at app startup
-// Base URL comes from EXPO_PUBLIC_API_URL env var
+let authToken: string | null = null;
+
+export function setAuthToken(token: string | null) {
+  authToken = token;
+}
+
 const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5000';
 
 export const apiClient = new ApiClient({
   baseUrl: API_BASE_URL,
-  // Token and refresh will be wired up in Phase 7
+  getToken: () => authToken,
 });
 
 export default apiClient;
+
