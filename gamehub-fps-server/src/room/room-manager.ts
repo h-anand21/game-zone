@@ -3,27 +3,28 @@
 // ============================================================
 
 import { FPSRoom } from './fps-room.js';
-import { FreeForAllMode } from '../modes/free-for-all.js';
+import { createGameModeInstance } from '../services/matchmaker.js';
 import type { WebSocket } from 'ws';
 
 class RoomManager {
   private rooms = new Map<string, FPSRoom>();
 
-  getOrCreateRoom(roomId?: string): FPSRoom {
+  getOrCreateRoom(roomId?: string, modeId = 'free-for-all', mapName = 'FPS_Factory'): FPSRoom {
     if (roomId && this.rooms.has(roomId)) {
       return this.rooms.get(roomId)!;
     }
 
-    // Find waiting room
+    // Find waiting room matching mode
     for (const room of this.rooms.values()) {
-      if (room.state === 'WAITING' && room.players.size < room.mode.maxPlayers) {
+      if (room.state === 'WAITING' && room.mode.id === modeId && room.players.size < room.mode.maxPlayers) {
         return room;
       }
     }
 
     // Create new room
     const newRoomId = roomId || `room_${Math.random().toString(36).substring(2, 9)}`;
-    const newRoom = new FPSRoom(newRoomId, 'FPS_Factory', new FreeForAllMode());
+    const modeInstance = createGameModeInstance(modeId);
+    const newRoom = new FPSRoom(newRoomId, mapName, modeInstance);
     this.rooms.set(newRoomId, newRoom);
     return newRoom;
   }

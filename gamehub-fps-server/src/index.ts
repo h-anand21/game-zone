@@ -41,12 +41,13 @@ wss.on('connection', (ws: WebSocket) => {
 
       switch (type) {
         case 'JOIN_MATCH': {
-          const { userId, username, roomId } = msg;
+          const { userId, username, roomId, mode, map } = msg;
           const playerId = userId || `p_${Math.random().toString(36).substring(2, 8)}`;
           const playerName = username || 'Player';
 
-          currentRoom = roomManager.getOrCreateRoom(roomId);
+          currentRoom = roomManager.getOrCreateRoom(roomId, mode || 'free-for-all', map || 'FPS_Factory');
           currentPlayerId = playerId;
+
 
           const player = currentRoom.addPlayer(playerId, playerName, ws);
 
