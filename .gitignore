@@ -59,7 +59,9 @@ gamehub-fps/Recordings/
 gamehub-fps/[Aa]ssets/AssetStoreTools*
 *.csproj
 *.sln
+*.slnx
 *.suo
+
 *.tmp
 *.user
 *.userprefs
