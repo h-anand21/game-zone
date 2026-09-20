@@ -1,0 +1,86 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Expo
+.expo/
+dist/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+ios/
+android/
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Unity
+gamehub-fps/Library/
+gamehub-fps/Temp/
+gamehub-fps/Obj/
+gamehub-fps/Build/
+gamehub-fps/Builds/
+gamehub-fps/Logs/
+gamehub-fps/UserSettings/
+gamehub-fps/MemoryCaptures/
+gamehub-fps/Recordings/
+gamehub-fps/[Aa]ssets/AssetStoreTools*
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.unitypackage
+
+# Build outputs
+build/
+*.apk
+*.aab
+*.ipa
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Misc
+*.log
+README.md
+docs/

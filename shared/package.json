@@ -1,0 +1,17 @@
+{
+  "name": "@gamehub/shared",
+  "version": "1.0.0",
+  "description": "Shared contracts, enums, game IDs, and protocol definitions for GameHub",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "rimraf": "^6.0.0"
+  },
+  "license": "MIT"
+}

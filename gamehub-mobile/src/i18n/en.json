@@ -1,0 +1,46 @@
+{
+  "app": {
+    "name": "GameHub",
+    "tagline": "35 Games • One Platform"
+  },
+  "tabs": {
+    "home": "Home",
+    "games": "Games",
+    "battle": "Battle",
+    "friends": "Friends",
+    "profile": "Profile"
+  },
+  "common": {
+    "play": "Play Now",
+    "comingSoon": "Coming Soon",
+    "back": "Go Back",
+    "settings": "Settings",
+    "search": "Search games...",
+    "noResults": "No games found",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "ok": "OK"
+  },
+  "profile": {
+    "guest": "Guest Player",
+    "level": "Level",
+    "xp": "XP",
+    "coins": "Coins",
+    "gamesPlayed": "Games Played",
+    "achievements": "Achievements",
+    "createAccount": "Create Account",
+    "guestNote": "Playing as guest. Create a cloud account to sync your progress across devices."
+  },
+  "categories": {
+    "all": "All",
+    "brain": "Brain",
+    "reflex": "Reflex",
+    "arcade": "Arcade",
+    "classic": "Classic",
+    "battle": "Battle",
+    "party": "Party"
+  }
+}
