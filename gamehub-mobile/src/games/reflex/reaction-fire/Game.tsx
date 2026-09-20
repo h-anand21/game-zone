@@ -19,7 +19,7 @@ export const ReactionFireGame: React.FC<ReactionFireProps> = ({ onFinish, isPaus
   const [state, setState] = useState<ReactionState>('WAITING');
   const [reactionTime, setReactionTime] = useState<number | null>(null);
   const startTimeRef = useRef<number>(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     startTest();

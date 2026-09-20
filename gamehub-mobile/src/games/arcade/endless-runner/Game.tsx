@@ -3,7 +3,7 @@
 // ============================================================
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, type DimensionValue } from 'react-native';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import { getInitialRunnerState, updateRunnerStep } from './logic';
 import type { Lane, RunnerState } from './types';
@@ -42,7 +42,7 @@ export const EndlessRunnerGame: React.FC<EndlessRunnerProps> = ({ onFinish, isPa
     setRunnerState((prev) => ({ ...prev, playerLane: targetLane }));
   };
 
-  const laneXOffsets = ['15%', '50%', '85%'];
+  const laneXOffsets: DimensionValue[] = ['15%', '50%', '85%'];
 
   return (
     <View style={styles.container}>

@@ -90,17 +90,16 @@ export const QuizBattleGame: React.FC<QuizBattleProps> = ({ onFinish, isPaused }
           const isSelected = selectedIndex === idx;
           const isCorrect = idx === currentQ.correctIndex;
 
-          let btnStyle = styles.optionBtn;
-          if (selectedIndex !== null) {
-            if (isCorrect) btnStyle = { ...styles.optionBtn, ...styles.correctBtn };
-            else if (isSelected) btnStyle = { ...styles.optionBtn, ...styles.wrongBtn };
-          }
-
           return (
             <Pressable
               key={idx}
               disabled={selectedIndex !== null}
-              style={({ pressed }) => [btnStyle, pressed && styles.pressed]}
+              style={({ pressed }) => [
+                styles.optionBtn,
+                selectedIndex !== null && isCorrect && styles.correctBtn,
+                selectedIndex !== null && isSelected && !isCorrect && styles.wrongBtn,
+                pressed && styles.pressed,
+              ]}
               onPress={() => handleOptionPress(idx)}
             >
               <Text style={styles.optionText}>{opt}</Text>
