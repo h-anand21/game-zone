@@ -100,6 +100,8 @@ import { QuizBattleGame } from './party/quiz-battle/Game';
 
 import { GUESS_THE_DRAWING_CONFIG } from './party/guess-the-drawing/config';
 import { GuessTheDrawingGame } from './party/guess-the-drawing/Game';
+import { BattleArenaGame } from './battle/BattleArenaGame';
+import { getGameById } from '@/constants/games';
 
 export interface GameRegistryEntry {
   config: GameConfig;
@@ -150,6 +152,13 @@ export const GAME_COMPONENT_REGISTRY: Record<string, GameRegistryEntry> = {
   'air-hockey': { config: AIR_HOCKEY_CONFIG, component: AirHockeyGame },
   'quiz-battle': { config: QUIZ_BATTLE_CONFIG, component: QuizBattleGame },
   'guess-the-drawing': { config: GUESS_THE_DRAWING_CONFIG, component: GuessTheDrawingGame },
+
+  // Battle Arena 3D FPS (5)
+  'fps-ffa': { config: getGameById('fps-ffa')!, component: BattleArenaGame },
+  'fps-tdm': { config: getGameById('fps-tdm')!, component: BattleArenaGame },
+  'fps-gun-game': { config: getGameById('fps-gun-game')!, component: BattleArenaGame },
+  'fps-capture-point': { config: getGameById('fps-capture-point')!, component: BattleArenaGame },
+  'fps-duel': { config: getGameById('fps-duel')!, component: BattleArenaGame },
 };
 
 export function getRegisteredGame(gameId: string): GameRegistryEntry | undefined {
