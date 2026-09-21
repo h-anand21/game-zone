@@ -43,7 +43,7 @@ export default function UsernameScreen() {
   const handleContinue = () => {
     if (!username.trim() || error) return;
     setDisplayName(username.trim());
-    router.push('/onboarding/avatar');
+    router.push('/onboarding/avatar' as any);
   };
 
   const handleSuggestion = (name: string) => {

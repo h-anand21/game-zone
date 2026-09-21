@@ -26,6 +26,8 @@ interface ProfileState {
   addXp: (amount: number) => Promise<void>;
   addCoins: (amount: number) => Promise<void>;
   updateDisplayName: (name: string) => Promise<void>;
+  setDisplayName: (name: string) => void;
+  setAvatarUrl: (url: string) => void;
   refresh: () => Promise<void>;
 }
 
@@ -102,6 +104,14 @@ export const useProfileStore = create<ProfileState>((set, get) => ({
     } catch (error) {
       console.error('[Profile] Update name failed:', error);
     }
+  },
+
+  setDisplayName: (name: string) => {
+    set({ displayName: name });
+  },
+
+  setAvatarUrl: (url: string) => {
+    set({ avatarUrl: url });
   },
 
   refresh: async () => {

@@ -59,7 +59,7 @@ export default function WelcomeScreen() {
 
       {/* CTA Buttons */}
       <Animated.View style={[styles.ctaContainer, { opacity: fadeAnim }]}>
-        <TouchableOpacity style={styles.primaryBtn} onPress={() => router.push('/onboarding/username')}>
+        <TouchableOpacity style={styles.primaryBtn} onPress={() => router.push('/onboarding/username' as any)}>
           <Text style={styles.primaryBtnText}>Get Started 🚀</Text>
         </TouchableOpacity>
 
