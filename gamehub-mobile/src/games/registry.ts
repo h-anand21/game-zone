@@ -100,8 +100,22 @@ import { QuizBattleGame } from './party/quiz-battle/Game';
 
 import { GUESS_THE_DRAWING_CONFIG } from './party/guess-the-drawing/config';
 import { GuessTheDrawingGame } from './party/guess-the-drawing/Game';
-import { BattleArenaGame } from './battle/BattleArenaGame';
-import { getGameById } from '@/constants/games';
+
+// ── 6. Battle Arena FPS Games (5) ───────────────────────────
+import { FFA_CONFIG } from './battle/free-for-all/config';
+import { FreeForAllGame } from './battle/free-for-all/Game';
+
+import { TDM_CONFIG } from './battle/team-deathmatch/config';
+import { TeamDeathmatchGame } from './battle/team-deathmatch/Game';
+
+import { GUN_GAME_CONFIG } from './battle/gun-game/config';
+import { GunGame } from './battle/gun-game/Game';
+
+import { CAPTURE_POINT_CONFIG } from './battle/capture-point/config';
+import { CapturePointGame } from './battle/capture-point/Game';
+
+import { DUEL_CONFIG } from './battle/duel/config';
+import { DuelGame } from './battle/duel/Game';
 
 export interface GameRegistryEntry {
   config: GameConfig;
@@ -153,12 +167,12 @@ export const GAME_COMPONENT_REGISTRY: Record<string, GameRegistryEntry> = {
   'quiz-battle': { config: QUIZ_BATTLE_CONFIG, component: QuizBattleGame },
   'guess-the-drawing': { config: GUESS_THE_DRAWING_CONFIG, component: GuessTheDrawingGame },
 
-  // Battle Arena 3D FPS (5)
-  'fps-ffa': { config: getGameById('fps-ffa')!, component: BattleArenaGame },
-  'fps-tdm': { config: getGameById('fps-tdm')!, component: BattleArenaGame },
-  'fps-gun-game': { config: getGameById('fps-gun-game')!, component: BattleArenaGame },
-  'fps-capture-point': { config: getGameById('fps-capture-point')!, component: BattleArenaGame },
-  'fps-duel': { config: getGameById('fps-duel')!, component: BattleArenaGame },
+  // Battle Arena (5 Unique Battle Modes)
+  'fps-ffa': { config: FFA_CONFIG, component: FreeForAllGame },
+  'fps-tdm': { config: TDM_CONFIG, component: TeamDeathmatchGame },
+  'fps-gun-game': { config: GUN_GAME_CONFIG, component: GunGame },
+  'fps-capture-point': { config: CAPTURE_POINT_CONFIG, component: CapturePointGame },
+  'fps-duel': { config: DUEL_CONFIG, component: DuelGame },
 };
 
 export function getRegisteredGame(gameId: string): GameRegistryEntry | undefined {
