@@ -42,12 +42,13 @@ export function getLevelFromXP(totalXP: number): LevelInfo {
   }
 
   const isMaxLevel = level >= MAX_LEVEL;
-  const xpForCurrentLevel = LEVEL_THRESHOLDS[level] || 0;
+  const xpForCurrentLevel = level > 0 ? (LEVEL_THRESHOLDS[level] || 0) : 0;
+  const xpFloor = level > 1 ? (LEVEL_THRESHOLDS[level - 1] || 0) : 0;
   const xpForNextLevel = isMaxLevel ? xpForCurrentLevel : (LEVEL_THRESHOLDS[level + 1] || xpForCurrentLevel);
-  const xpProgress = totalXP - xpForCurrentLevel;
-  const xpNeeded = xpForNextLevel - totalXP;
-  const levelRange = xpForNextLevel - xpForCurrentLevel;
-  const progressPercent = levelRange > 0 ? Math.min(100, Math.floor((xpProgress / levelRange) * 100)) : 100;
+  const xpProgress = Math.max(0, totalXP - xpFloor);
+  const xpNeeded = Math.max(0, xpForNextLevel - totalXP);
+  const levelRange = xpForCurrentLevel - xpFloor;
+  const progressPercent = levelRange > 0 ? Math.max(0, Math.min(100, Math.floor(((totalXP - xpFloor) / levelRange) * 100))) : (totalXP >= xpForCurrentLevel ? 100 : 0);
 
   return {
     level,
