@@ -78,6 +78,10 @@ export default function BattleScreen() {
                 {launching ? 'Connecting...' : '🚀 Launch Unity 3D Engine'}
               </Text>
             </TouchableOpacity>
+
+            <TouchableOpacity style={styles.unityPlayBtn} onPress={() => router.push('/battle/lobby' as any)}>
+              <Text style={styles.unityPlayText}>🌐 Browse Online Rooms</Text>
+            </TouchableOpacity>
           </View>
         </View>
 

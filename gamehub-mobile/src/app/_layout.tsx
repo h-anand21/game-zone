@@ -81,32 +81,12 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
-          name="onboarding/welcome"
+          name="onboarding"
           options={{ headerShown: false, animation: 'fade' }}
         />
         <Stack.Screen
-          name="onboarding/username"
+          name="battle"
           options={{ headerShown: false, animation: 'slide_from_right' }}
-        />
-        <Stack.Screen
-          name="onboarding/avatar"
-          options={{ headerShown: false, animation: 'slide_from_right' }}
-        />
-        <Stack.Screen
-          name="battle/lobby"
-          options={{ headerShown: false, animation: 'slide_from_right' }}
-        />
-        <Stack.Screen
-          name="battle/rooms"
-          options={{ headerShown: false, animation: 'slide_from_right' }}
-        />
-        <Stack.Screen
-          name="battle/matchmaking"
-          options={{ headerShown: false, animation: 'fade' }}
-        />
-        <Stack.Screen
-          name="battle/result"
-          options={{ headerShown: false, animation: 'slide_from_bottom' }}
         />
       </Stack>
     </>
