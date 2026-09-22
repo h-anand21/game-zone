@@ -4,7 +4,21 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 
-const SOCKET_URL = process.env.EXPO_PUBLIC_WS_URL ?? 'ws://localhost:5000/ws/casual';
+import Constants from 'expo-constants';
+
+function getSocketUrl(): string {
+  if (process.env.EXPO_PUBLIC_WS_URL) return process.env.EXPO_PUBLIC_WS_URL;
+  try {
+    const debuggerHost = Constants.expoConfig?.hostUri ?? (Constants as any).manifest2?.extra?.expoGo?.debuggerHost;
+    if (debuggerHost) {
+      const ip = debuggerHost.split(':')[0];
+      return `ws://${ip}:5000/ws/casual`;
+    }
+  } catch {}
+  return 'ws://localhost:5000/ws/casual';
+}
+
+const SOCKET_URL = getSocketUrl();
 
 export interface RoomPlayer {
   id: string;

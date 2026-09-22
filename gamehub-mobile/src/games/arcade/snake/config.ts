@@ -17,7 +17,7 @@ export const SNAKE_CONFIG: GameConfig = {
   scoreVersion: 'v1',
   validation: {
     maxScore: 50000,
-    minDuration: 3,
+    minDuration: 1,
     maxDuration: 3600,
   },
   saveSupport: 'background',

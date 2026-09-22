@@ -144,7 +144,24 @@ export function setAuthToken(token: string | null) {
   authToken = token;
 }
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:5000';
+// Auto-detect dev machine IP for Android (localhost doesn't work on physical device)
+function getApiBaseUrl(): string {
+  if (process.env.EXPO_PUBLIC_API_URL) {
+    return process.env.EXPO_PUBLIC_API_URL;
+  }
+  // In dev, use the same IP as Metro bundler
+  try {
+    const Constants = require('expo-constants').default;
+    const debuggerHost = Constants.expoConfig?.hostUri ?? Constants.manifest2?.extra?.expoGo?.debuggerHost;
+    if (debuggerHost) {
+      const ip = debuggerHost.split(':')[0];
+      return `http://${ip}:5000`;
+    }
+  } catch {}
+  return 'http://localhost:5000';
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 export const apiClient = new ApiClient({
   baseUrl: API_BASE_URL,
