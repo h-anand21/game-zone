@@ -57,6 +57,14 @@ export type {
   ServerMatchStartEvent, ServerMatchEndEvent, ServerPlayerDisconnectedEvent,
   ServerPlayerReconnectedEvent, ServerErrorEvent, ServerEvent,
 } from './protocol/fps-events';
+export type {
+  CasualCreateRoomEvent, CasualJoinRoomEvent, CasualLeaveRoomEvent,
+  CasualMakeMoveEvent, CasualGameOverEvent, CasualChatEvent, CasualClientEvent,
+  CasualRoomCreatedEvent, CasualRoomJoinedEvent, CasualPlayerJoinedEvent,
+  CasualPlayerLeftEvent, CasualMoveMadeEvent, CasualGameResultEvent,
+  CasualRoomClosedEvent, CasualChatMessageEvent, CasualErrorEvent, CasualServerEvent,
+  CasualPlayer, CasualRoomState,
+} from './protocol/casual-events';
 
 // Validation
 export { SCORE_VALIDATION_RULES } from './validation/score-rules';
