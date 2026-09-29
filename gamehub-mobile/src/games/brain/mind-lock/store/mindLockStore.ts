@@ -544,6 +544,10 @@ export const useMindLockStore = create<MindLockStoreState>((set, get) => ({
 
   loadPersistedData: async () => {
     try {
+      // Clear legacy demo data keys from previous runs
+      AsyncStorage.removeItem('@mind_lock_state_v1').catch(() => {});
+      AsyncStorage.removeItem('@mind_lock_state_v2').catch(() => {});
+
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       if (data) {
         const parsed = JSON.parse(data);
@@ -561,6 +565,7 @@ export const useMindLockStore = create<MindLockStoreState>((set, get) => ({
       }
     } catch {}
   },
+
 
   savePersistedData: async () => {
     try {
