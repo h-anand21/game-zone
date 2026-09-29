@@ -1,12 +1,5 @@
 // ============================================================
-// GameHub — Mind Lock Types
+// GameHub — Mind Lock Types Re-export
 // ============================================================
 
-export type PadColor = 'red' | 'blue' | 'green' | 'yellow';
-
-export interface PadConfig {
-  id: PadColor;
-  color: string;
-  activeColor: string;
-  soundFreq: number;
-}
+export * from './types/index';

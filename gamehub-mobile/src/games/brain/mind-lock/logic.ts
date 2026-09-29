@@ -3,12 +3,45 @@
 // ============================================================
 
 import type { PadColor, PadConfig } from './types';
+import { MLColors } from './theme';
 
 export const PADS: PadConfig[] = [
-  { id: 'red', color: '#EF4444', activeColor: '#F87171', soundFreq: 261 },
-  { id: 'blue', color: '#3B82F6', activeColor: '#60A5FA', soundFreq: 329 },
-  { id: 'green', color: '#10B981', activeColor: '#34D399', soundFreq: 392 },
-  { id: 'yellow', color: '#F59E0B', activeColor: '#FBBF24', soundFreq: 523 },
+  {
+    id: 'red',
+    color: MLColors.padRed,
+    activeColor: MLColors.padRedActive,
+    glowColor: MLColors.padRedGlow,
+    soundFreq: 261,
+    label: 'RED',
+    symbol: 'lightning',
+  },
+  {
+    id: 'blue',
+    color: MLColors.padBlue,
+    activeColor: MLColors.padBlueActive,
+    glowColor: MLColors.padBlueGlow,
+    soundFreq: 329,
+    label: 'BLUE',
+    symbol: 'waves',
+  },
+  {
+    id: 'green',
+    color: MLColors.padGreen,
+    activeColor: MLColors.padGreenActive,
+    glowColor: MLColors.padGreenGlow,
+    soundFreq: 392,
+    label: 'GREEN',
+    symbol: 'leaf',
+  },
+  {
+    id: 'yellow',
+    color: MLColors.padYellow,
+    activeColor: MLColors.padYellowActive,
+    glowColor: MLColors.padYellowGlow,
+    soundFreq: 523,
+    label: 'YELLOW',
+    symbol: 'star',
+  },
 ];
 
 export function getRandomPad(): PadColor {
