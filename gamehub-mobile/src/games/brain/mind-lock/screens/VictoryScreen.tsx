@@ -16,7 +16,8 @@ import { ProgressBar } from '../components/ProgressBar';
 import { useMindLockStore } from '../store/mindLockStore';
 
 export const VictoryScreen: React.FC = () => {
-  const { score, round, currentStreak, profile, startGame, setScreen } = useMindLockStore();
+  const { score, round, currentStreak, profile, activeLevelId, startLevel, startGame, setScreen } = useMindLockStore();
+
 
   return (
     <View style={styles.container}>
