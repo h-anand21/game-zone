@@ -1,89 +1,9 @@
 // ============================================================
-// Mind Lock — Procedural Audio Service (100% Code-Generated Tones)
+// Mind Lock — Sound Audio Service (Crash-Proof Synthesizer)
 // ============================================================
 
-import { Audio } from 'expo-av';
+import { Platform } from 'react-native';
 import type { PadColor } from '../types';
-
-// Fast Base64 encoder for binary audio buffers
-const B64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-function bytesToBase64(bytes: Uint8Array): string {
-  let result = '';
-  const len = bytes.length;
-  for (let i = 0; i < len; i += 3) {
-    const b1 = bytes[i];
-    const b2 = i + 1 < len ? bytes[i + 1] : 0;
-    const b3 = i + 2 < len ? bytes[i + 2] : 0;
-
-    result += B64_CHARS[b1 >> 2];
-    result += B64_CHARS[((b1 & 3) << 4) | (b2 >> 4)];
-    result += i + 1 < len ? B64_CHARS[((b2 & 15) << 2) | (b3 >> 6)] : '=';
-    result += i + 2 < len ? B64_CHARS[b3 & 63] : '=';
-  }
-  return result;
-}
-
-// Procedural WAV sound synthesizer
-function generateToneDataUri(freq: number, duration: number = 0.16, waveType: 'sine' | 'square' = 'sine'): string {
-  try {
-    const sampleRate = 11025;
-    const numSamples = Math.floor(sampleRate * duration);
-    const dataSize = numSamples * 2;
-    const fileSize = 44 + dataSize;
-    const buffer = new ArrayBuffer(fileSize);
-    const view = new DataView(buffer);
-
-    // RIFF chunk descriptor
-    view.setUint32(0, 0x52494646, false); // "RIFF"
-    view.setUint32(4, fileSize - 8, true);
-    view.setUint32(8, 0x57415645, false); // "WAVE"
-
-    // "fmt " sub-chunk
-    view.setUint32(12, 0x666d7420, false); // "fmt "
-    view.setUint32(16, 16, true);          // Subchunk1Size (16 for PCM)
-    view.setUint16(20, 1, true);           // AudioFormat (1 = PCM)
-    view.setUint16(22, 1, true);           // NumChannels (1 = Mono)
-    view.setUint32(24, sampleRate, true);  // SampleRate
-    view.setUint32(28, sampleRate * 2, true); // ByteRate
-    view.setUint16(32, 2, true);           // BlockAlign
-    view.setUint16(34, 16, true);          // BitsPerSample
-
-    // "data" sub-chunk
-    view.setUint32(36, 0x64617461, false); // "data"
-    view.setUint32(40, dataSize, true);
-
-    // Generate samples with envelope decay
-    for (let i = 0; i < numSamples; i++) {
-      const t = i / sampleRate;
-      const decay = Math.max(0, 1 - (i / numSamples) * 0.9);
-      let s = 0;
-      if (waveType === 'square') {
-        s = Math.sin(2 * Math.PI * freq * t) >= 0 ? 0.4 : -0.4;
-      } else {
-        s = Math.sin(2 * Math.PI * freq * t) * 0.6;
-      }
-      view.setInt16(44 + i * 2, Math.floor(s * decay * 32767), true);
-    }
-
-    const bytes = new Uint8Array(buffer);
-    return `data:audio/wav;base64,${bytesToBase64(bytes)}`;
-  } catch {
-    return '';
-  }
-}
-
-// Pre-cached procedural tones
-const TONES: Record<string, string> = {
-  red: generateToneDataUri(261.63, 0.18),    // C4 note
-  blue: generateToneDataUri(329.63, 0.18),   // E4 note
-  green: generateToneDataUri(392.00, 0.18),  // G4 note
-  yellow: generateToneDataUri(523.25, 0.18), // C5 note
-  button: generateToneDataUri(440.00, 0.08), // Short click
-  correct: generateToneDataUri(587.33, 0.25),// High harmonic
-  wrong: generateToneDataUri(130.81, 0.28, 'square'), // Low buzz
-  victory: generateToneDataUri(659.25, 0.35),
-  unlock: generateToneDataUri(783.99, 0.30),
-};
 
 export class MindLockAudio {
   private static soundEnabled = true;
@@ -102,44 +22,54 @@ export class MindLockAudio {
     this.musicVolume = Math.max(0, Math.min(1, volume));
   }
 
-  private static async playTone(toneUri: string) {
-    if (!this.soundEnabled || !toneUri) return;
+  // Pure Web Audio API tone synthesizer (Web Browser)
+  private static playWebTone(freq: number, duration: number = 0.16) {
+    if (!this.soundEnabled || Platform.OS !== 'web' || typeof window === 'undefined') return;
     try {
-      const { sound } = await Audio.Sound.createAsync(
-        { uri: toneUri },
-        { shouldPlay: true, volume: 0.8 }
-      );
-      sound.setOnPlaybackStatusUpdate((status) => {
-        if (status.isLoaded && status.didJustFinish) {
-          sound.unloadAsync().catch(() => {});
-        }
-      });
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      gain.gain.setValueAtTime(0.3 * this.musicVolume, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + duration);
     } catch {}
   }
 
   public static async playPad(color: PadColor) {
-    const uri = TONES[color];
-    if (uri) await this.playTone(uri);
+    const freqs: Record<PadColor, number> = {
+      red: 261.63,
+      blue: 329.63,
+      green: 392.00,
+      yellow: 523.25,
+    };
+    this.playWebTone(freqs[color] || 440, 0.2);
   }
 
   public static async playButton() {
-    await this.playTone(TONES.button);
+    this.playWebTone(440, 0.08);
   }
 
   public static async playCorrect() {
-    await this.playTone(TONES.correct);
+    this.playWebTone(587.33, 0.25);
   }
 
   public static async playWrong() {
-    await this.playTone(TONES.wrong);
+    this.playWebTone(130.81, 0.3);
   }
 
   public static async playVictory() {
-    await this.playTone(TONES.victory);
+    this.playWebTone(659.25, 0.4);
   }
 
   public static async playUnlock() {
-    await this.playTone(TONES.unlock);
+    this.playWebTone(783.99, 0.35);
   }
 }
 
