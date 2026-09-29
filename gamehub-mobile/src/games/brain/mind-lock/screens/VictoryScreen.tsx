@@ -114,23 +114,30 @@ export const VictoryScreen: React.FC = () => {
         {/* Action Buttons */}
         <View style={styles.actionsContainer}>
           <PrimaryButton
-            title="PLAY AGAIN"
+            title={activeLevelId ? `NEXT LEVEL ${activeLevelId + 1}` : 'PLAY AGAIN'}
             size="lg"
-            onPress={() => startGame()}
+            onPress={() => {
+              if (activeLevelId && activeLevelId < 10) {
+                startLevel(activeLevelId + 1);
+              } else {
+                startGame();
+              }
+            }}
           />
           <View style={styles.subActionsRow}>
+            <SecondaryButton
+              title="LEVEL MAP"
+              onPress={() => setScreen('levels')}
+              style={styles.actionBtn}
+            />
             <SecondaryButton
               title="HOME"
               onPress={() => setScreen('home')}
               style={styles.actionBtn}
             />
-            <SecondaryButton
-              title="VIEW STATS"
-              onPress={() => setScreen('statistics')}
-              style={styles.actionBtn}
-            />
           </View>
         </View>
+
       </ScrollView>
     </View>
   );
