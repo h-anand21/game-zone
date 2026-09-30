@@ -11,10 +11,13 @@ import {
   Pressable,
   useWindowDimensions,
   Image,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
 import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FOColors, FORadius, FOSpacing, FOTypography } from '../theme';
 import {
   GameLogo,
@@ -23,6 +26,7 @@ import {
   FoxIllustration,
   CategoryCard,
   StatCard,
+  CategorySelectionModal,
 } from '../components';
 import { useFindOneStore } from '../store/findOneStore';
 import { CATEGORIES_DATA } from '../logic';
@@ -30,7 +34,17 @@ import type { CategoryType } from '../types';
 
 export const HomeScreen: React.FC = () => {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+
+  const topInset = Math.max(
+    insets.top,
+    Platform.OS === 'android' ? (StatusBar.currentHeight || 28) : 20,
+    16
+  );
+  const bottomInset = Math.max(insets.bottom, 16);
+
   const {
     stats,
     profile,

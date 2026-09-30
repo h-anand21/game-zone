@@ -12,11 +12,16 @@ import type {
 } from './types';
 
 export const CATEGORIES_DATA: CategoryInfo[] = [
-  { id: 'animals', name: 'Animals', icon: '🐼', color: '#3BE35A', unlocked: true },
-  { id: 'clothes', name: 'Clothes', icon: '👕', color: '#2488FF', unlocked: true },
-  { id: 'food', name: 'Food', icon: '🍔', color: '#FF9F1A', unlocked: true },
-  { id: 'vehicles', name: 'Vehicles', icon: '🚗', color: '#FF4B4B', unlocked: true },
-  { id: 'characters', name: 'Characters', icon: '🧢', color: '#8A4BFF', unlocked: true },
+  { id: 'animals', name: 'Animals', icon: '🐼', color: '#3BE35A', unlocked: true, description: 'Pandas, Foxes, Bears, Koalas, Ducks & more', pairsCount: 5 },
+  { id: 'clothes', name: 'Clothes', icon: '👕', color: '#2488FF', unlocked: true, description: 'Hoodies, Coats, Sneakers, Caps & more', pairsCount: 4 },
+  { id: 'food', name: 'Food', icon: '🍔', color: '#FF9F1A', unlocked: true, description: 'Donuts, Burgers, Pizzas, Tacos & more', pairsCount: 4 },
+  { id: 'vehicles', name: 'Vehicles', icon: '🚗', color: '#FF4B4B', unlocked: true, description: 'Cars, Trucks, Planes, Rockets & more', pairsCount: 4 },
+  { id: 'characters', name: 'Characters', icon: '🧢', color: '#8A4BFF', unlocked: true, description: 'Ninjas, Wizards, Pirates, Heroes & more', pairsCount: 4 },
+];
+
+export const ALL_CATEGORIES_DATA: CategoryInfo[] = [
+  { id: 'all', name: 'All / Random', icon: '🎲', color: '#FFD700', unlocked: true, description: 'Mix of all 5 categories for ultimate visual perception challenge', pairsCount: 21 },
+  ...CATEGORIES_DATA,
 ];
 
 export const CHARACTER_PAIRS: CharacterPair[] = [

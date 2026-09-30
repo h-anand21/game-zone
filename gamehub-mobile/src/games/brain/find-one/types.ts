@@ -2,7 +2,7 @@
 // Find One — Type Definitions
 // ============================================================
 
-export type CategoryType = 'animals' | 'clothes' | 'food' | 'vehicles' | 'characters';
+export type CategoryType = 'all' | 'animals' | 'clothes' | 'food' | 'vehicles' | 'characters';
 
 export type GridSize = 4 | 5 | 6;
 
@@ -21,6 +21,8 @@ export interface CategoryInfo {
   icon: string;
   color: string;
   unlocked: boolean;
+  description?: string;
+  pairsCount?: number;
 }
 
 export interface CharacterAsset {
