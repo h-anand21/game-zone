@@ -51,7 +51,7 @@ export const FindOneApp: React.FC<FindOneAppProps> = ({ onExit, onFinishGame }) 
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={FOColors.background} />
+      <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       {renderScreen()}
     </View>
   );

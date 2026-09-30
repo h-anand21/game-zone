@@ -9,9 +9,12 @@ import {
   StyleSheet,
   ScrollView,
   useWindowDimensions,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FOColors, FORadius, FOSpacing } from '../theme';
 import {
   GameButton,
@@ -24,6 +27,14 @@ import { useFindOneStore } from '../store/findOneStore';
 import { calculateAccuracy } from '../logic';
 
 export const NewBestScreen: React.FC = () => {
+  const insets = useSafeAreaInsets();
+  const topInset = Math.max(
+    insets.top,
+    Platform.OS === 'android' ? (StatusBar.currentHeight || 28) : 20,
+    16
+  );
+  const bottomInset = Math.max(insets.bottom, 16);
+
   const {
     score,
     previousBest,
@@ -47,7 +58,13 @@ export const NewBestScreen: React.FC = () => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingTop: topInset + 12,
+            paddingBottom: bottomInset + 32,
+          },
+        ]}
       >
         {/* ── King Panda Mascot with Crown ── */}
         <View style={styles.topSection}>

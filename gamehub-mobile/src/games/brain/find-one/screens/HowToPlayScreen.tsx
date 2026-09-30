@@ -10,9 +10,12 @@ import {
   ScrollView,
   Pressable,
   useWindowDimensions,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FOColors, FORadius, FOSpacing } from '../theme';
 import {
   GameLogo,
@@ -24,6 +27,14 @@ import { useFindOneStore } from '../store/findOneStore';
 
 export const HowToPlayScreen: React.FC = () => {
   const { setScreen, startGame } = useFindOneStore();
+  const insets = useSafeAreaInsets();
+
+  const topInset = Math.max(
+    insets.top,
+    Platform.OS === 'android' ? (StatusBar.currentHeight || 28) : 20,
+    16
+  );
+  const bottomInset = Math.max(insets.bottom, 16);
 
   return (
     <LinearGradient
@@ -31,7 +42,7 @@ export const HowToPlayScreen: React.FC = () => {
       style={styles.container}
     >
       {/* ── Top Header with Back Button ── */}
-      <View style={styles.topHeader}>
+      <View style={[styles.topHeader, { paddingTop: topInset + 6 }]}>
         <Pressable
           onPress={() => setScreen('home')}
           style={styles.backBtn}
@@ -48,7 +59,10 @@ export const HowToPlayScreen: React.FC = () => {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: bottomInset + 32 },
+        ]}
       >
         {/* ── 3 Steps Row: LOOK -> FIND -> TAP ── */}
         <LinearGradient

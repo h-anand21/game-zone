@@ -68,7 +68,13 @@ export const HomeScreen: React.FC = () => {
     >
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingTop: topInset + 6,
+            paddingBottom: bottomInset + 32,
+          },
+        ]}
       >
         {/* ── Top Header Row ── */}
         <View style={styles.headerRow}>
@@ -237,7 +243,11 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.categoriesSection}>
           <View style={styles.categoriesHeader}>
             <Text style={styles.categoriesTitle}>CATEGORIES</Text>
-            <Pressable>
+            <Pressable
+              onPress={() => setShowCategoryModal(true)}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              style={({ pressed }) => pressed && { opacity: 0.7 }}
+            >
               <Text style={styles.categoriesMore}>More ›</Text>
             </Pressable>
           </View>
@@ -256,6 +266,12 @@ export const HomeScreen: React.FC = () => {
           </View>
         </View>
       </ScrollView>
+
+      {/* Category Selection Modal */}
+      <CategorySelectionModal
+        visible={showCategoryModal}
+        onClose={() => setShowCategoryModal(false)}
+      />
     </LinearGradient>
   );
 };

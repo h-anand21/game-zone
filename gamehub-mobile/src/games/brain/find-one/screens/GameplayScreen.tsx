@@ -9,8 +9,11 @@ import {
   StyleSheet,
   Pressable,
   useWindowDimensions,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FOColors, FORadius, FOSpacing } from '../theme';
 import {
   GameGrid,
@@ -23,6 +26,14 @@ import { useFindOneStore } from '../store/findOneStore';
 export const GameplayScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const gridRef = useRef<GameGridRef>(null);
+  const insets = useSafeAreaInsets();
+
+  const topInset = Math.max(
+    insets.top,
+    Platform.OS === 'android' ? (StatusBar.currentHeight || 28) : 20,
+    16
+  );
+  const bottomInset = Math.max(insets.bottom, 16);
 
   const {
     score,
@@ -65,7 +76,13 @@ export const GameplayScreen: React.FC = () => {
   return (
     <LinearGradient
       colors={['#081729', '#05101C', '#02070D']}
-      style={styles.container}
+      style={[
+        styles.container,
+        {
+          paddingTop: topInset + 6,
+          paddingBottom: bottomInset + 12,
+        },
+      ]}
     >
       {/* ── Top HUD ── */}
       <View style={styles.topHud}>
