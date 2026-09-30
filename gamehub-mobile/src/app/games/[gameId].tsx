@@ -37,11 +37,12 @@ export default function GameScreen() {
 
   const categoryColor = CATEGORY_COLORS[gameConfig.category] || Colors.primary;
 
-  // Dedicated Full-Screen Experience for Mind Lock
-  if (cleanGameId === 'mind-lock' && registeredGame) {
+  // Dedicated Full-Screen Experience for Mind Lock & Find One
+  if ((cleanGameId === 'mind-lock' || cleanGameId === 'find-one') && registeredGame) {
     const GameComponent = registeredGame.component;
     return <GameComponent engine={undefined as any} onFinish={() => {}} isPaused={false} />;
   }
+
 
   // Active Gameplay Mode
   if (isPlaying && registeredGame) {

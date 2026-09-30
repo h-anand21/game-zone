@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
+import { useRouter } from 'expo-router';
 import { FOColors, FORadius, FOSpacing, FOTypography } from '../theme';
 import {
   GameLogo,
@@ -28,6 +29,7 @@ import { CATEGORIES_DATA } from '../logic';
 import type { CategoryType } from '../types';
 
 export const HomeScreen: React.FC = () => {
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const {
     stats,
@@ -56,8 +58,21 @@ export const HomeScreen: React.FC = () => {
       >
         {/* ── Top Header Row ── */}
         <View style={styles.headerRow}>
-          {/* Player Profile */}
+          {/* Player Profile & Exit */}
           <View style={styles.profileBadge}>
+            <Pressable
+              onPress={() => {
+                if (router.canGoBack()) {
+                  router.back();
+                } else {
+                  router.replace('/');
+                }
+              }}
+              style={styles.backBtn}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
+              <Text style={styles.backArrow}>←</Text>
+            </Pressable>
             <Image source={{ uri: profile.avatar }} style={styles.avatarImg} />
             <View>
               <Text style={styles.greetingText}>Hi there!</Text>
@@ -247,6 +262,22 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: FOSpacing.md,
+  },
+  backBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#0E2238',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#1D3B5C',
+    marginRight: 4,
+  },
+  backArrow: {
+    fontSize: 20,
+    color: '#E0EEF8',
+    fontWeight: '700',
   },
   profileBadge: {
     flexDirection: 'row',
