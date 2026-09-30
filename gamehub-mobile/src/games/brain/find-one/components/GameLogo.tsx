@@ -65,76 +65,79 @@ export const GameLogo: React.FC<GameLogoProps> = ({
         <G>
           {/* Shadow Pass */}
           <SvgText
-            x="75"
+            x="160"
             y="56"
-            fontSize="46"
+            fontSize="48"
             fontWeight="900"
             fontFamily="System"
-            letterSpacing="2"
+            textAnchor="middle"
+            letterSpacing="3"
             fill="#061A33"
             stroke="#041224"
             strokeWidth="12"
             strokeLinejoin="round"
           >
-            FIN
+            FIND
           </SvgText>
 
           {/* Outline Pass */}
           <SvgText
-            x="75"
+            x="160"
             y="54"
-            fontSize="46"
+            fontSize="48"
             fontWeight="900"
             fontFamily="System"
-            letterSpacing="2"
+            textAnchor="middle"
+            letterSpacing="3"
             fill="#124E96"
             stroke="#124E96"
             strokeWidth="6"
             strokeLinejoin="round"
           >
-            FIN
+            FIND
           </SvgText>
 
           {/* Fill Pass */}
           <SvgText
-            x="75"
+            x="160"
             y="52"
-            fontSize="46"
+            fontSize="48"
             fontWeight="900"
             fontFamily="System"
-            letterSpacing="2"
+            textAnchor="middle"
+            letterSpacing="3"
             fill="url(#findGrad)"
           >
-            FIN
+            FIND
           </SvgText>
 
-          {/* Magnifying Glass for letter 'D' */}
-          <G transform="translate(195, 12)">
+          {/* Decorative Magnifying Glass Accent beside FIND */}
+          <G transform="translate(238, 8)">
             {/* Glass Handle */}
             <Rect
-              x="26"
-              y="26"
-              width="10"
-              height="20"
+              x="22"
+              y="22"
+              width="8"
+              height="18"
               rx="4"
-              transform="rotate(-40, 31, 36)"
+              transform="rotate(-40, 26, 31)"
               fill="#2488FF"
               stroke="#0B52B3"
               strokeWidth="2"
             />
             {/* Glass Rim Shadow */}
-            <Circle cx="18" cy="18" r="18" fill="#041224" />
+            <Circle cx="15" cy="15" r="16" fill="#041224" />
             {/* Glass Rim */}
-            <Circle cx="18" cy="18" r="16" fill="url(#lensGrad)" stroke="#124E96" strokeWidth="3" />
+            <Circle cx="15" cy="15" r="14" fill="url(#lensGrad)" stroke="#124E96" strokeWidth="2.5" />
             {/* Inner Lens Reflection */}
-            <Circle cx="18" cy="18" r="11" fill="#47B0FF" opacity="0.6" />
+            <Circle cx="15" cy="15" r="10" fill="#47B0FF" opacity="0.6" />
             <Path
-              d="M10,12 A10,10 0 0,1 26,12"
+              d="M8,10 A8,8 0 0,1 22,10"
               stroke="#FFFFFF"
-              strokeWidth="2.5"
+              strokeWidth="2"
               strokeLinecap="round"
               fill="none"
-              opacity="0.8"
+              opacity="0.85"
             />
           </G>
         </G>
@@ -143,12 +146,13 @@ export const GameLogo: React.FC<GameLogoProps> = ({
         <G>
           {/* Shadow Pass */}
           <SvgText
-            x="85"
+            x="160"
             y="112"
             fontSize="64"
             fontWeight="900"
             fontFamily="System"
-            letterSpacing="2"
+            textAnchor="middle"
+            letterSpacing="3"
             fill="#5E3100"
             stroke="#5E3100"
             strokeWidth="14"
@@ -159,12 +163,13 @@ export const GameLogo: React.FC<GameLogoProps> = ({
 
           {/* Outline Pass */}
           <SvgText
-            x="85"
+            x="160"
             y="108"
             fontSize="64"
             fontWeight="900"
             fontFamily="System"
-            letterSpacing="2"
+            textAnchor="middle"
+            letterSpacing="3"
             fill="#A65800"
             stroke="#A65800"
             strokeWidth="8"
@@ -175,12 +180,13 @@ export const GameLogo: React.FC<GameLogoProps> = ({
 
           {/* Fill Pass */}
           <SvgText
-            x="85"
+            x="160"
             y="105"
             fontSize="64"
             fontWeight="900"
             fontFamily="System"
-            letterSpacing="2"
+            textAnchor="middle"
+            letterSpacing="3"
             fill="url(#oneGrad)"
           >
             ONE

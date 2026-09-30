@@ -22,11 +22,13 @@ import {
   PandaIllustration,
   StatCard,
   Confetti,
+  LeaderboardModal,
 } from '../components';
 import { useFindOneStore } from '../store/findOneStore';
 import { calculateAccuracy } from '../logic';
 
 export const NewBestScreen: React.FC = () => {
+  const [showLeaderboard, setShowLeaderboard] = React.useState(false);
   const insets = useSafeAreaInsets();
   const topInset = Math.max(
     insets.top,
@@ -216,11 +218,17 @@ export const NewBestScreen: React.FC = () => {
             variant="purple"
             size="sm"
             icon={<Text style={{ fontSize: 16 }}>📊</Text>}
-            onPress={() => {}}
+            onPress={() => setShowLeaderboard(true)}
             style={styles.subBtn}
           />
         </View>
       </ScrollView>
+
+      {/* Leaderboard Modal */}
+      <LeaderboardModal
+        visible={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+      />
     </LinearGradient>
   );
 };

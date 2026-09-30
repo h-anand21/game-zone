@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
+import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FOColors, FORadius, FOSpacing, FOTypography } from '../theme';
@@ -27,6 +28,10 @@ import {
   CategoryCard,
   StatCard,
   CategorySelectionModal,
+  LeaderboardModal,
+  ProfileEditModal,
+  CoinRewardModal,
+  SettingsModal,
 } from '../components';
 import { useFindOneStore } from '../store/findOneStore';
 import { CATEGORIES_DATA } from '../logic';
@@ -36,7 +41,44 @@ export const HomeScreen: React.FC = () => {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+
+  // Modals state
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showCoinsModal, setShowCoinsModal] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // Interactive 4x4 Mini Puzzle on Home Screen
+  const [demoPairIndex, setDemoPairIndex] = useState(0);
+  const [demoOddIndex, setDemoOddIndex] = useState(9);
+  const [foundSpotToast, setFoundSpotToast] = useState(false);
+
+  const demoPairs = [
+    { base: '🐼', odd: '🦊', label: 'Fox in Pandas!' },
+    { base: '🐻', odd: '🐨', label: 'Koala in Bears!' },
+    { base: '🐸', odd: '🐢', label: 'Turtle in Frogs!' },
+    { base: '🦆', odd: '🐥', label: 'Chick in Ducks!' },
+    { base: '🍔', odd: '🍩', label: 'Donut in Burgers!' },
+  ];
+
+  const currentDemo = demoPairs[demoPairIndex % demoPairs.length];
+
+  const handleDemoTap = (idx: number) => {
+    if (idx === demoOddIndex) {
+      if (Platform.OS !== 'web') {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+      setFoundSpotToast(true);
+      setTimeout(() => setFoundSpotToast(false), 1200);
+      setDemoPairIndex((prev) => prev + 1);
+      setDemoOddIndex(Math.floor(Math.random() * 16));
+    } else {
+      if (Platform.OS !== 'web') {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+    }
+  };
 
   const topInset = Math.max(
     insets.top,
@@ -54,11 +96,10 @@ export const HomeScreen: React.FC = () => {
     setScreen,
   } = useFindOneStore();
 
-  // Demo 4x4 example grid with 15 Pandas and 1 Fox
   const demoTiles = Array.from({ length: 16 }).map((_, idx) => ({
     id: idx,
-    emoji: idx === 9 ? '🦊' : '🐼',
-    isOdd: idx === 9,
+    emoji: idx === demoOddIndex ? currentDemo.odd : currentDemo.base,
+    isOdd: idx === demoOddIndex,
   }));
 
   return (
@@ -93,33 +134,59 @@ export const HomeScreen: React.FC = () => {
             >
               <Text style={styles.backArrow}>←</Text>
             </Pressable>
-            <Image source={{ uri: profile.avatar }} style={styles.avatarImg} />
-            <View>
-              <Text style={styles.greetingText}>Hi there!</Text>
-              <View style={styles.nameRow}>
-                <Text style={styles.playerName}>{profile.name}</Text>
-                <Text style={styles.editIcon}>✏️</Text>
+
+            {/* Profile Tap -> Opens ProfileEditModal */}
+            <Pressable
+              onPress={() => setShowProfileModal(true)}
+              style={styles.profileClickArea}
+              hitSlop={{ top: 8, bottom: 8, left: 4, right: 8 }}
+            >
+              {profile.avatar && profile.avatar.startsWith('http') ? (
+                <Image source={{ uri: profile.avatar }} style={styles.avatarImg} />
+              ) : (
+                <View style={styles.avatarEmojiHolder}>
+                  <Text style={{ fontSize: 24 }}>{profile.avatar || '🐼'}</Text>
+                </View>
+              )}
+              <View>
+                <Text style={styles.greetingText}>Hi there!</Text>
+                <View style={styles.nameRow}>
+                  <Text style={styles.playerName}>{profile.name}</Text>
+                  <Text style={styles.editIcon}>✏️</Text>
+                </View>
               </View>
-            </View>
+            </Pressable>
           </View>
 
           {/* Right Badges: Coins, Rank, Settings */}
           <View style={styles.rightBadges}>
-            {/* Coins */}
-            <View style={styles.coinPill}>
+            {/* Coins -> Opens CoinRewardModal */}
+            <Pressable
+              onPress={() => setShowCoinsModal(true)}
+              style={({ pressed }) => [styles.coinPill, pressed && { opacity: 0.8 }]}
+              hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+            >
               <Text style={styles.pillIcon}>⭐</Text>
               <Text style={styles.pillText}>{profile.coins}</Text>
               <Text style={styles.pillPlus}>+</Text>
-            </View>
+            </Pressable>
 
-            {/* Rank */}
-            <View style={styles.rankPill}>
+            {/* Rank -> Opens LeaderboardModal */}
+            <Pressable
+              onPress={() => setShowLeaderboardModal(true)}
+              style={({ pressed }) => [styles.rankPill, pressed && { opacity: 0.8 }]}
+              hitSlop={{ top: 8, bottom: 8, left: 4, right: 4 }}
+            >
               <Text style={styles.pillIcon}>👑</Text>
-              <Text style={styles.pillText}>{profile.rank}</Text>
-            </View>
+              <Text style={styles.pillText}>#{profile.rank}</Text>
+            </Pressable>
 
-            {/* Settings Icon */}
-            <Pressable style={styles.settingsBtn}>
+            {/* Settings Icon -> Opens SettingsModal */}
+            <Pressable
+              onPress={() => setShowSettingsModal(true)}
+              style={({ pressed }) => [styles.settingsBtn, pressed && { opacity: 0.8 }]}
+              hitSlop={{ top: 8, bottom: 8, left: 4, right: 8 }}
+            >
               <Text style={styles.settingsIcon}>⚙️</Text>
             </Pressable>
           </View>
@@ -154,23 +221,27 @@ export const HomeScreen: React.FC = () => {
             </View>
 
             <View style={styles.exampleBubbleRight}>
-              <Text style={styles.bubbleText}>Just one is different! ✨</Text>
+              <Text style={styles.bubbleText}>
+                {foundSpotToast ? 'Spot Found! 🎯' : `${currentDemo.label} ✨`}
+              </Text>
             </View>
           </View>
 
-          {/* 4x4 Mini Preview Grid */}
+          {/* 4x4 Mini Interactive Preview Grid */}
           <View style={styles.miniGridWrapper}>
             <View style={styles.miniGrid}>
               {demoTiles.map((t) => (
-                <View
+                <Pressable
                   key={t.id}
-                  style={[
+                  onPress={() => handleDemoTap(t.id)}
+                  style={({ pressed }) => [
                     styles.miniTile,
                     t.isOdd && styles.miniTileOdd,
+                    pressed && { transform: [{ scale: 0.88 }] },
                   ]}
                 >
                   <Text style={styles.miniTileEmoji}>{t.emoji}</Text>
-                </View>
+                </Pressable>
               ))}
             </View>
           </View>
@@ -234,7 +305,7 @@ export const HomeScreen: React.FC = () => {
             size="sm"
             icon={<Text style={{ fontSize: 16 }}>📊</Text>}
             rightIcon={<Text style={{ fontSize: 16, color: '#FFFFFF' }}>›</Text>}
-            onPress={() => {}}
+            onPress={() => setShowLeaderboardModal(true)}
             style={styles.subBtn}
           />
         </View>
@@ -271,6 +342,30 @@ export const HomeScreen: React.FC = () => {
       <CategorySelectionModal
         visible={showCategoryModal}
         onClose={() => setShowCategoryModal(false)}
+      />
+
+      {/* Leaderboard & Match History Modal */}
+      <LeaderboardModal
+        visible={showLeaderboardModal}
+        onClose={() => setShowLeaderboardModal(false)}
+      />
+
+      {/* Profile Edit Modal */}
+      <ProfileEditModal
+        visible={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+      />
+
+      {/* Coin Reward Modal */}
+      <CoinRewardModal
+        visible={showCoinsModal}
+        onClose={() => setShowCoinsModal(false)}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        visible={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
       />
     </LinearGradient>
   );
@@ -312,7 +407,22 @@ const styles = StyleSheet.create({
   profileBadge: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
+  },
+  profileClickArea: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 8,
+  },
+  avatarEmojiHolder: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#0E2845',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#FFC928',
   },
   avatarImg: {
     width: 44,

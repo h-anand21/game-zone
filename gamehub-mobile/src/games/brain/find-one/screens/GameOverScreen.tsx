@@ -21,11 +21,13 @@ import {
   WoodenSign,
   FoxIllustration,
   StatCard,
+  LeaderboardModal,
 } from '../components';
 import { useFindOneStore } from '../store/findOneStore';
 import { calculateAccuracy } from '../logic';
 
 export const GameOverScreen: React.FC = () => {
+  const [showLeaderboard, setShowLeaderboard] = React.useState(false);
   const insets = useSafeAreaInsets();
   const topInset = Math.max(
     insets.top,
@@ -199,11 +201,17 @@ export const GameOverScreen: React.FC = () => {
             variant="purple"
             size="sm"
             icon={<Text style={{ fontSize: 16 }}>📊</Text>}
-            onPress={() => {}}
+            onPress={() => setShowLeaderboard(true)}
             style={styles.subBtn}
           />
         </View>
       </ScrollView>
+
+      {/* Leaderboard Modal */}
+      <LeaderboardModal
+        visible={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+      />
     </LinearGradient>
   );
 };

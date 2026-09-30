@@ -9,3 +9,7 @@ export * from './StatCard';
 export * from './CharacterIllustration';
 export * from './Confetti';
 export * from './CategorySelectionModal';
+export * from './LeaderboardModal';
+export * from './ProfileEditModal';
+export * from './CoinRewardModal';
+export * from './SettingsModal';
