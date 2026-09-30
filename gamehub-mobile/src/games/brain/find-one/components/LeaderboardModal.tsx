@@ -158,7 +158,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               style={styles.playerBanner}
             >
               <View style={styles.playerBannerAvatar}>
-                <Text style={{ fontSize: 28 }}>{profile.avatar || '🐼'}</Text>
+                {renderAvatar(profile.avatar, 38)}
               </View>
 
               <View style={styles.playerBannerInfo}>
@@ -226,69 +226,91 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
 
             {/* Tab 1: Global Standings Table */}
             {activeTab === 'ranking' && (
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.listContainer}
-              >
-                {displayRanking.map((item, index) => {
-                  const isUser = item.isCurrentPlayer;
+              <View style={styles.tabContentHolder}>
+                {/* Visual Position Indicator for the User */}
+                <View style={styles.positionBanner}>
+                  <View style={styles.positionBannerLeft}>
+                    <Text style={styles.positionBannerIcon}>📍</Text>
+                    <Text style={styles.positionBannerText}>
+                      Your Standing: <Text style={{ color: '#FFD700', fontWeight: '900' }}>#{userRank}</Text>
+                      <Text style={{ color: '#8BAFCF' }}> of {displayRanking.length}</Text>
+                    </Text>
+                  </View>
+                  <View style={[styles.tierMiniTag, { backgroundColor: `${userTier.color}25`, borderColor: userTier.color }]}>
+                    <Text style={[styles.tierMiniTagText, { color: userTier.color }]}>
+                      {userTier.icon} {userTier.name}
+                    </Text>
+                  </View>
+                </View>
 
-                  return (
-                    <View
-                      key={`${item.rank}-${index}`}
-                      style={[
-                        styles.rankRow,
-                        isUser && styles.userRankRow,
-                      ]}
-                    >
-                      {/* Rank Indicator */}
-                      <View style={styles.rankBadgeHolder}>
-                        <Text style={styles.rankBadgeText}>
-                          {getRankBadge(item.rank)}
-                        </Text>
-                      </View>
+                <ScrollView
+                  style={styles.scrollArea}
+                  showsVerticalScrollIndicator={true}
+                  nestedScrollEnabled={true}
+                  contentContainerStyle={styles.listContainer}
+                >
+                  {displayRanking.map((item, index) => {
+                    const isUser = item.isCurrentPlayer;
 
-                      {/* Avatar */}
-                      <View style={styles.avatarHolder}>
-                        <Text style={{ fontSize: 20 }}>{item.avatar}</Text>
-                      </View>
-
-                      {/* Player Info */}
-                      <View style={styles.playerInfo}>
-                        <View style={styles.nameWrap}>
-                          <Text
-                            style={[
-                              styles.playerName,
-                              isUser && styles.userPlayerName,
-                            ]}
-                            numberOfLines={1}
-                          >
-                            {item.playerName}
+                    return (
+                      <View
+                        key={`${item.rank}-${index}`}
+                        style={[
+                          styles.rankRow,
+                          isUser && styles.userRankRow,
+                        ]}
+                      >
+                        {/* Rank Indicator */}
+                        <View style={styles.rankBadgeHolder}>
+                          <Text style={styles.rankBadgeText}>
+                            {getRankBadge(item.rank)}
                           </Text>
-                          {isUser && (
-                            <View style={styles.youBadge}>
-                              <Text style={styles.youBadgeText}>YOU</Text>
-                            </View>
-                          )}
                         </View>
-                        <Text style={styles.dateAchieved}>{item.date}</Text>
-                      </View>
 
-                      {/* Score & Accuracy */}
-                      <View style={styles.scoreContainer}>
-                        <Text style={styles.scoreValue}>{item.score} PTS</Text>
-                        <Text style={styles.accValue}>{item.accuracy}% acc</Text>
+                        {/* Avatar */}
+                        <View style={styles.avatarHolder}>
+                          {renderAvatar(item.avatar, 26)}
+                        </View>
+
+                        {/* Player Info */}
+                        <View style={styles.playerInfo}>
+                          <View style={styles.nameWrap}>
+                            <Text
+                              style={[
+                                styles.playerName,
+                                isUser && styles.userPlayerName,
+                              ]}
+                              numberOfLines={1}
+                            >
+                              {item.playerName}
+                            </Text>
+                            {isUser && (
+                              <View style={styles.youBadge}>
+                                <Text style={styles.youBadgeText}>YOU</Text>
+                              </View>
+                            )}
+                          </View>
+                          <Text style={styles.dateAchieved}>{item.date}</Text>
+                        </View>
+
+                        {/* Score & Accuracy */}
+                        <View style={styles.scoreContainer}>
+                          <Text style={styles.scoreValue}>{item.score} PTS</Text>
+                          <Text style={styles.accValue}>{item.accuracy}% acc</Text>
+                        </View>
                       </View>
-                    </View>
-                  );
-                })}
-              </ScrollView>
+                    );
+                  })}
+                </ScrollView>
+              </View>
             )}
 
             {/* Tab 2: Real Match History with Real Dates */}
             {activeTab === 'history' && (
               <ScrollView
-                showsVerticalScrollIndicator={false}
+                style={styles.scrollArea}
+                showsVerticalScrollIndicator={true}
+                nestedScrollEnabled={true}
                 contentContainerStyle={styles.listContainer}
               >
                 {history.length === 0 ? (
@@ -376,17 +398,59 @@ const styles = StyleSheet.create({
   modalCardWrapper: {
     width: '100%',
     maxWidth: 390,
-    maxHeight: '88%',
+    height: '84%',
   },
   modalCard: {
     width: '100%',
+    flex: 1,
     borderRadius: FORadius.xl,
-    padding: FOSpacing.lg,
+    padding: FOSpacing.md,
     borderWidth: 2,
     borderColor: '#FFC928',
     borderTopColor: '#FFE57F',
     borderBottomWidth: 5,
     borderBottomColor: '#05111E',
+  },
+  tabContentHolder: {
+    flex: 1,
+  },
+  scrollArea: {
+    flex: 1,
+  },
+  positionBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#092138',
+    borderRadius: FORadius.sm,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#184775',
+  },
+  positionBannerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  positionBannerIcon: {
+    fontSize: 13,
+  },
+  positionBannerText: {
+    fontSize: 11.5,
+    color: '#E0EEF8',
+    fontWeight: '700',
+  },
+  tierMiniTag: {
+    borderWidth: 1,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  tierMiniTagText: {
+    fontSize: 9,
+    fontWeight: '800',
   },
   headerRow: {
     flexDirection: 'row',
