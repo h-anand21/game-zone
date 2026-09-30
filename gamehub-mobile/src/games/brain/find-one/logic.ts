@@ -54,9 +54,9 @@ export const CHARACTER_PAIRS: CharacterPair[] = [
     id: 'anim-4',
     category: 'animals',
     base: { id: 'frog', name: 'Frog', category: 'animals', emoji: '🐸' },
-    odd: { id: 'frog-blush', name: 'Smiling Frog', category: 'animals', emoji: '🐸', accessory: 'blush' },
-    description: 'Look closely for the frog with a sweet smile!',
-    difficulty: 'hard',
+    odd: { id: 'turtle', name: 'Turtle', category: 'animals', emoji: '🐢' },
+    description: 'Spot the cute Turtle hiding among the Frogs!',
+    difficulty: 'medium',
   },
   {
     id: 'anim-5',
@@ -65,6 +65,14 @@ export const CHARACTER_PAIRS: CharacterPair[] = [
     odd: { id: 'tiger', name: 'Tiger Cub', category: 'animals', emoji: '🐯' },
     description: 'Find the little tiger hiding with the cats!',
     difficulty: 'medium',
+  },
+  {
+    id: 'anim-6',
+    category: 'animals',
+    base: { id: 'rabbit', name: 'Rabbit', category: 'animals', emoji: '🐰' },
+    odd: { id: 'hamster', name: 'Hamster', category: 'animals', emoji: '🐹' },
+    description: 'Find the cute hamster among the rabbits!',
+    difficulty: 'easy',
   },
 
   // ── Clothes ────────────────────────────────────────────────
@@ -92,6 +100,22 @@ export const CHARACTER_PAIRS: CharacterPair[] = [
     description: 'Spot the sun hat among the caps!',
     difficulty: 'medium',
   },
+  {
+    id: 'cloth-4',
+    category: 'clothes',
+    base: { id: 'glasses', name: 'Sunglasses', category: 'clothes', emoji: '🕶️' },
+    odd: { id: 'goggles', name: 'Goggles', category: 'clothes', emoji: '🥽' },
+    description: 'Find the goggles among sunglasses!',
+    difficulty: 'hard',
+  },
+  {
+    id: 'cloth-5',
+    category: 'clothes',
+    base: { id: 'socks', name: 'Socks', category: 'clothes', emoji: '🧦' },
+    odd: { id: 'gloves', name: 'Gloves', category: 'clothes', emoji: '🧤' },
+    description: 'Find the gloves among socks!',
+    difficulty: 'easy',
+  },
 
   // ── Food ───────────────────────────────────────────────────
   {
@@ -117,6 +141,22 @@ export const CHARACTER_PAIRS: CharacterPair[] = [
     odd: { id: 'cupcake', name: 'Cupcake', category: 'food', emoji: '🧁' },
     description: 'Spot the cupcake among ice creams!',
     difficulty: 'easy',
+  },
+  {
+    id: 'food-4',
+    category: 'food',
+    base: { id: 'apple', name: 'Red Apple', category: 'food', emoji: '🍎' },
+    odd: { id: 'orange', name: 'Orange', category: 'food', emoji: '🍊' },
+    description: 'Find the orange among red apples!',
+    difficulty: 'easy',
+  },
+  {
+    id: 'food-5',
+    category: 'food',
+    base: { id: 'fries', name: 'French Fries', category: 'food', emoji: '🍟' },
+    odd: { id: 'popcorn', name: 'Popcorn', category: 'food', emoji: '🍿' },
+    description: 'Spot the popcorn box among fries!',
+    difficulty: 'medium',
   },
 
   // ── Vehicles ───────────────────────────────────────────────
@@ -144,15 +184,31 @@ export const CHARACTER_PAIRS: CharacterPair[] = [
     description: 'Find the police car among taxis!',
     difficulty: 'hard',
   },
+  {
+    id: 'veh-4',
+    category: 'vehicles',
+    base: { id: 'train', name: 'Bullet Train', category: 'vehicles', emoji: '🚆' },
+    odd: { id: 'helicopter', name: 'Helicopter', category: 'vehicles', emoji: '🚁' },
+    description: 'Spot the helicopter among trains!',
+    difficulty: 'easy',
+  },
+  {
+    id: 'veh-5',
+    category: 'vehicles',
+    base: { id: 'bicycle', name: 'Bicycle', category: 'vehicles', emoji: '🚲' },
+    odd: { id: 'motorcycle', name: 'Motorcycle', category: 'vehicles', emoji: '🏍️' },
+    description: 'Find the motorcycle among bicycles!',
+    difficulty: 'medium',
+  },
 
   // ── Characters ─────────────────────────────────────────────
   {
     id: 'char-1',
     category: 'characters',
-    base: { id: 'boy-cap', name: 'Cap Boy', category: 'characters', emoji: '🧢' },
-    odd: { id: 'boy-glasses', name: 'Glasses Boy', category: 'characters', emoji: '👓' },
-    description: 'Find the character with glasses!',
-    difficulty: 'medium',
+    base: { id: 'boy', name: 'Happy Boy', category: 'characters', emoji: '👦' },
+    odd: { id: 'girl', name: 'Happy Girl', category: 'characters', emoji: '👧' },
+    description: 'Find the girl among the boys!',
+    difficulty: 'easy',
   },
   {
     id: 'char-2',
@@ -160,6 +216,30 @@ export const CHARACTER_PAIRS: CharacterPair[] = [
     base: { id: 'ninja', name: 'Ninja', category: 'characters', emoji: '🥷' },
     odd: { id: 'wizard', name: 'Wizard', category: 'characters', emoji: '🧙' },
     description: 'Find the magic wizard hiding with ninjas!',
+    difficulty: 'easy',
+  },
+  {
+    id: 'char-3',
+    category: 'characters',
+    base: { id: 'princess', name: 'Princess', category: 'characters', emoji: '👸' },
+    odd: { id: 'witch', name: 'Witch', category: 'characters', emoji: '🧙‍♀️' },
+    description: 'Find the witch among the princesses!',
+    difficulty: 'medium',
+  },
+  {
+    id: 'char-4',
+    category: 'characters',
+    base: { id: 'cowboy', name: 'Cowboy', category: 'characters', emoji: '🤠' },
+    odd: { id: 'police-officer', name: 'Police Officer', category: 'characters', emoji: '👮' },
+    description: 'Spot the police officer among cowboys!',
+    difficulty: 'medium',
+  },
+  {
+    id: 'char-5',
+    category: 'characters',
+    base: { id: 'superhero', name: 'Superhero', category: 'characters', emoji: '🦸' },
+    odd: { id: 'alien', name: 'Alien', category: 'characters', emoji: '👽' },
+    description: 'Spot the alien hiding among superheroes!',
     difficulty: 'easy',
   },
 ];

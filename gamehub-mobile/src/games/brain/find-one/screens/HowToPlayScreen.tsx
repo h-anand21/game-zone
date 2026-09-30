@@ -244,7 +244,7 @@ export const HowToPlayScreen: React.FC = () => {
               <View style={styles.miniDiffGrid}>
                 {Array.from({ length: 9 }).map((_, i) => (
                   <View key={i} style={styles.diffTile}>
-                    <Text style={{ fontSize: 12 }}>🐸</Text>
+                    <Text style={{ fontSize: 12 }}>{i === 2 ? '🐢' : '🐸'}</Text>
                   </View>
                 ))}
               </View>

@@ -61,4 +61,11 @@ describe('Find One — Logic Engine', () => {
   it('should provide complete CATEGORIES_DATA with 5 categories', () => {
     expect(CATEGORIES_DATA).toHaveLength(5);
   });
+
+  it('should ensure all character pairs have completely distinct emojis', () => {
+    CHARACTER_PAIRS.forEach((pair) => {
+      expect(pair.base.emoji).not.toBe(pair.odd.emoji);
+      expect(pair.base.id).not.toBe(pair.odd.id);
+    });
+  });
 });
