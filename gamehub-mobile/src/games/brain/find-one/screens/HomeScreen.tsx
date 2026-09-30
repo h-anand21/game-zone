@@ -163,13 +163,13 @@ export const HomeScreen: React.FC = () => {
                 <Image source={{ uri: profile.avatar }} style={styles.avatarImg} />
               ) : (
                 <View style={styles.avatarEmojiHolder}>
-                  <Text style={{ fontSize: 24 }}>{profile.avatar || '🐼'}</Text>
+                  <Text style={{ fontSize: 18 }}>{profile.avatar || '🐼'}</Text>
                 </View>
               )}
-              <View>
+              <View style={styles.nameCol}>
                 <Text style={styles.greetingText}>Hi there!</Text>
                 <View style={styles.nameRow}>
-                  <Text style={styles.playerName}>{profile.name}</Text>
+                  <Text style={styles.playerName} numberOfLines={1}>{profile.name}</Text>
                   <Text style={styles.editIcon}>✏️</Text>
                 </View>
               </View>
@@ -411,113 +411,120 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: FOSpacing.md,
+    marginBottom: FOSpacing.sm,
+    gap: 4,
   },
   backBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#0E2238',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
     borderColor: '#1D3B5C',
-    marginRight: 4,
   },
   backArrow: {
-    fontSize: 20,
+    fontSize: 16,
     color: '#E0EEF8',
-    fontWeight: '700',
+    fontWeight: '800',
   },
   profileBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
+    flexShrink: 1,
   },
   profileClickArea: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
+    flexShrink: 1,
   },
   avatarEmojiHolder: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: '#0E2845',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: '#FFC928',
   },
   avatarImg: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 2,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1.5,
     borderColor: '#FFC928',
   },
+  nameCol: {
+    flexShrink: 1,
+  },
   greetingText: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     color: FOColors.textMuted,
   },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 2,
   },
   playerName: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '900',
     color: '#FFFFFF',
+    maxWidth: 65,
   },
   editIcon: {
-    fontSize: 12,
+    fontSize: 10,
   },
   rightBadges: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 5,
+    flexShrink: 0,
   },
   coinPill: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#0F263F',
     borderRadius: FORadius.round,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 7,
+    paddingVertical: 4,
     borderWidth: 1.5,
     borderColor: '#1F4770',
-    gap: 5,
+    gap: 3,
   },
   rankPill: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#0F263F',
     borderRadius: FORadius.round,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 7,
+    paddingVertical: 4,
     borderWidth: 1.5,
     borderColor: '#1F4770',
-    gap: 5,
+    gap: 3,
   },
   pillIcon: {
-    fontSize: 14,
+    fontSize: 12,
   },
   pillText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '900',
     color: '#FFFFFF',
   },
   pillPlus: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '900',
     color: FOColors.primary,
   },
   settingsBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     backgroundColor: '#0F263F',
     alignItems: 'center',
     justifyContent: 'center',
@@ -525,7 +532,7 @@ const styles = StyleSheet.create({
     borderColor: '#1F4770',
   },
   settingsIcon: {
-    fontSize: 16,
+    fontSize: 14,
   },
   logoSection: {
     width: '100%',

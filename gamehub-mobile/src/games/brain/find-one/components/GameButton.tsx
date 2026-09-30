@@ -132,6 +132,8 @@ export const GameButton: React.FC<GameButtonProps> = ({
           {icon && <View style={styles.iconContainer}>{icon}</View>}
 
           <Text
+            numberOfLines={1}
+            ellipsizeMode="tail"
             style={[
               styles.text,
               isSmall && styles.textSm,
@@ -173,7 +175,7 @@ const styles = StyleSheet.create({
     borderTopColor: 'rgba(255, 255, 255, 0.45)',
   },
   innerSm: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
     paddingVertical: 9,
   },
   innerLg: {
@@ -193,13 +195,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 5,
   },
   iconContainer: {
-    marginRight: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   rightIconContainer: {
-    marginLeft: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   text: {
     fontSize: 18,
@@ -207,7 +211,8 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
   textSm: {
-    fontSize: 14,
+    fontSize: 12.5,
+    letterSpacing: 0.3,
   },
   textLg: {
     fontSize: 24,

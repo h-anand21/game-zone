@@ -10,6 +10,7 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FORadius, FOSpacing } from '../theme';
@@ -53,6 +54,23 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
 
   const userTier = getLeagueTier(stats.bestScore);
   const userRank = computeUserRank(stats.bestScore, stats.accuracy);
+
+  // Helper to render avatar correctly whether it's an image URL or an emoji
+  const renderAvatar = (avatar: string | undefined, size: number = 32) => {
+    if (avatar && (avatar.startsWith('http') || avatar.startsWith('file') || avatar.startsWith('data:'))) {
+      return (
+        <Image
+          source={{ uri: avatar }}
+          style={{ width: size, height: size, borderRadius: size / 2 }}
+        />
+      );
+    }
+    return (
+      <Text style={{ fontSize: size * 0.62 }}>
+        {avatar || '🐼'}
+      </Text>
+    );
+  };
 
   // Build real dynamic leaderboard list where user is placed at their exact earned rank!
   const generateDynamicRanking = (): LeaderboardEntry[] => {
