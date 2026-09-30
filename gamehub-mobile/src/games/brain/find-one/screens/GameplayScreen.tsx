@@ -11,6 +11,7 @@ import {
   useWindowDimensions,
   Platform,
   StatusBar,
+  BackHandler,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -51,6 +52,16 @@ export const GameplayScreen: React.FC = () => {
     skipRound,
     pauseGame,
   } = useFindOneStore();
+
+  // Intercept back button during gameplay to pause the game instead of quitting
+  useEffect(() => {
+    const backAction = () => {
+      pauseGame();
+      return true;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () => sub.remove();
+  }, [pauseGame]);
 
   // Active game countdown loop
   useEffect(() => {

@@ -11,6 +11,7 @@ import {
   useWindowDimensions,
   Platform,
   StatusBar,
+  BackHandler,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Text as SvgText, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
@@ -23,6 +24,7 @@ import {
   StatCard,
   Confetti,
   LeaderboardModal,
+  LeaderboardBarsIcon,
 } from '../components';
 import { useFindOneStore } from '../store/findOneStore';
 import { calculateAccuracy } from '../logic';
@@ -46,6 +48,16 @@ export const NewBestScreen: React.FC = () => {
     startGame,
     setScreen,
   } = useFindOneStore();
+
+  // Intercept hardware back button to return to home safely
+  React.useEffect(() => {
+    const backAction = () => {
+      setScreen('home');
+      return true;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () => sub.remove();
+  }, [setScreen]);
 
   const accuracy = calculateAccuracy(correctCount, wrongCount);
   const diffScore = Math.max(1, score - previousBest);
@@ -217,7 +229,7 @@ export const NewBestScreen: React.FC = () => {
             title="LEADERBOARD"
             variant="purple"
             size="sm"
-            icon={<Text style={{ fontSize: 16 }}>📊</Text>}
+            icon={<LeaderboardBarsIcon size={18} />}
             onPress={() => setShowLeaderboard(true)}
             style={styles.subBtn}
           />

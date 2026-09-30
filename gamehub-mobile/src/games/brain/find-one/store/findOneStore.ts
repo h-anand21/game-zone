@@ -35,22 +35,50 @@ export function formatGameDate(dateObj: Date): string {
   return `${day} ${month} ${year}, ${hours}:${minutes} ${ampm}`;
 }
 
-export function calculateRank(bestScore: number): number {
-  if (bestScore >= 45) return 1;
-  if (bestScore >= 35) return 3;
-  if (bestScore >= 25) return 7;
-  if (bestScore >= 18) return 11;
-  if (bestScore >= 12) return 14;
-  if (bestScore >= 6) return 21;
-  if (bestScore >= 1) return 28;
-  return 35;
+export interface BenchmarkPlayer {
+  id: string;
+  playerName: string;
+  avatar: string;
+  score: number;
+  accuracy: number;
+  date: string;
+}
+
+export const GLOBAL_BENCHMARK_PLAYERS: BenchmarkPlayer[] = [
+  { id: 'gb-1', playerName: 'Sophia Chen', avatar: '🦊', score: 42, accuracy: 98, date: 'Today, 08:15 PM' },
+  { id: 'gb-2', playerName: 'Marcus Vance', avatar: '🐯', score: 36, accuracy: 96, date: 'Today, 05:40 PM' },
+  { id: 'gb-3', playerName: 'Elena Rostova', avatar: '🐨', score: 30, accuracy: 94, date: 'Yesterday, 09:20 PM' },
+  { id: 'gb-4', playerName: 'Liam Gallagher', avatar: '🦁', score: 25, accuracy: 92, date: 'Yesterday, 03:10 PM' },
+  { id: 'gb-5', playerName: 'David Kim', avatar: '🐼', score: 20, accuracy: 91, date: '28 Sep, 11:05 PM' },
+  { id: 'gb-6', playerName: 'Aarav Sharma', avatar: '🐻', score: 16, accuracy: 89, date: '28 Sep, 08:30 PM' },
+  { id: 'gb-7', playerName: 'Chloe Dubois', avatar: '🐰', score: 12, accuracy: 87, date: '27 Sep, 04:30 PM' },
+  { id: 'gb-8', playerName: 'Lucas Silva', avatar: '🐢', score: 8, accuracy: 85, date: '26 Sep, 02:15 PM' },
+  { id: 'gb-9', playerName: 'Kai Tanaka', avatar: '🐸', score: 5, accuracy: 83, date: '25 Sep, 07:15 PM' },
+  { id: 'gb-10', playerName: 'Zara Ahmed', avatar: '🐥', score: 2, accuracy: 80, date: '24 Sep, 01:25 PM' },
+];
+
+export function computeUserRank(bestScore: number, accuracy: number = 100): number {
+  if (bestScore <= 0) return GLOBAL_BENCHMARK_PLAYERS.length + 1;
+  let rank = 1;
+  for (const p of GLOBAL_BENCHMARK_PLAYERS) {
+    if (bestScore < p.score) {
+      rank++;
+    } else if (bestScore === p.score && accuracy < p.accuracy) {
+      rank++;
+    }
+  }
+  return rank;
+}
+
+export function calculateRank(bestScore: number, accuracy: number = 100): number {
+  return computeUserRank(bestScore, accuracy);
 }
 
 const INITIAL_PROFILE: PlayerProfile = {
   name: 'Champion',
   avatar: '🐼',
   coins: 350,
-  rank: 28,
+  rank: computeUserRank(0, 0),
 };
 
 const INITIAL_STATS: PlayerStats = {
@@ -262,7 +290,7 @@ export const useFindOneStore = create<FindOneStoreState>((set, get) => ({
       const overallAcc = calculateAccuracy(newTotalCorrect, newTotalWrong);
       const gameAcc = calculateAccuracy(correctCount, wrongCount);
       const newBestScore = Math.max(stats.bestScore, score);
-      const newRank = calculateRank(newBestScore);
+      const newRank = computeUserRank(newBestScore, overallAcc);
 
       const updatedStats: PlayerStats = {
         bestScore: newBestScore,
@@ -379,6 +407,79 @@ export const useFindOneStore = create<FindOneStoreState>((set, get) => ({
 
   exitHome: () => {
     triggerHaptic('light');
+    const { score, stats, correctCount, wrongCount, currentStreak, selectedCategory } = get();
+
+    // If the user earned score before exiting via Pause menu, record their match run
+    if (score > 0) {
+      const now = new Date();
+      const gameAcc = calculateAccuracy(correctCount, wrongCount);
+      const isNewBestScore = score > stats.bestScore;
+      const newBestScore = Math.max(stats.bestScore, score);
+      const newTotalGames = stats.totalGames + 1;
+      const newTotalCorrect = stats.totalCorrect + correctCount;
+      const newTotalWrong = stats.totalWrong + wrongCount;
+      const overallAcc = calculateAccuracy(newTotalCorrect, newTotalWrong);
+      const newRank = computeUserRank(newBestScore, overallAcc);
+
+      const newHistoryItem: GameHistoryRecord = {
+        id: `match_${Date.now()}`,
+        score,
+        accuracy: gameAcc,
+        streak: currentStreak,
+        durationSeconds: Math.max(3, correctCount * 2),
+        date: now.toISOString(),
+        formattedDate: formatGameDate(now),
+        category: selectedCategory,
+      };
+
+      const updatedStats: PlayerStats = {
+        bestScore: newBestScore,
+        bestTimeSeconds: Math.max(stats.bestTimeSeconds, Math.round(correctCount * 1.5)),
+        bestStreak: Math.max(stats.bestStreak, currentStreak),
+        totalGames: newTotalGames,
+        totalCorrect: newTotalCorrect,
+        totalWrong: newTotalWrong,
+        accuracy: overallAcc,
+      };
+
+      const newHistory = [newHistoryItem, ...get().history].slice(0, 30);
+      set({
+        stats: updatedStats,
+        profile: {
+          ...get().profile,
+          rank: newRank,
+          coins: get().profile.coins + score * 2,
+        },
+        history: newHistory,
+        isPaused: false,
+        currentScreen: 'home',
+      });
+      get().savePersistedData();
+
+      // SQLite sync
+      (async () => {
+        try {
+          const db = await getDatabase();
+          const scoreRepo = new ScoreRepository(db);
+          await scoreRepo.insert({
+            id: `fo_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+            eventId: `evt_${Date.now()}`,
+            gameId: 'find-one',
+            gameVersion: '1.0.0',
+            scoreVersion: 'v1',
+            score,
+            duration: Math.max(3, correctCount * 2),
+            metadata: {
+              accuracy: gameAcc,
+              streak: currentStreak,
+              category: selectedCategory,
+            },
+          });
+        } catch {}
+      })();
+      return;
+    }
+
     set({ isPaused: false, currentScreen: 'home' });
   },
 
@@ -470,19 +571,22 @@ export const useFindOneStore = create<FindOneStoreState>((set, get) => ({
         const scoreRepo = new ScoreRepository(db);
         const best = await scoreRepo.getBestScore('find-one');
         if (best > 0) {
-          set((state) => ({
-            stats: {
-              ...state.stats,
-              bestScore: Math.max(state.stats.bestScore, best),
-            },
-            profile: {
-              ...state.profile,
-              rank: calculateRank(Math.max(state.stats.bestScore, best)),
-            },
-          }));
+          set((state) => {
+            const combinedBest = Math.max(state.stats.bestScore, best);
+            return {
+              stats: {
+                ...state.stats,
+                bestScore: combinedBest,
+              },
+              profile: {
+                ...state.profile,
+                rank: computeUserRank(combinedBest, state.stats.accuracy),
+              },
+            };
+          });
         }
 
-        const scoreRows = await scoreRepo.getByGameId('find-one', 25);
+        const scoreRows = await scoreRepo.getByGameId('find-one', 30);
         if (scoreRows && scoreRows.length > 0) {
           const dbHistory: GameHistoryRecord[] = scoreRows.map((r) => {
             let meta: Record<string, any> = {};
@@ -501,11 +605,19 @@ export const useFindOneStore = create<FindOneStoreState>((set, get) => ({
               category: meta.category ?? 'animals',
             };
           });
-          if (dbHistory.length > 0) {
-            set((state) => ({
-              history: state.history.length > 0 ? state.history : dbHistory,
-            }));
-          }
+
+          set((state) => {
+            const existingIds = new Set(state.history.map((h) => h.id));
+            const merged = [...state.history];
+            for (const item of dbHistory) {
+              if (!existingIds.has(item.id)) {
+                merged.push(item);
+                existingIds.add(item.id);
+              }
+            }
+            merged.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+            return { history: merged.slice(0, 30) };
+          });
         }
       } catch {}
     } catch {}

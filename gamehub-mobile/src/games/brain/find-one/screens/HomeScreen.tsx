@@ -13,6 +13,7 @@ import {
   Image,
   Platform,
   StatusBar,
+  BackHandler,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
@@ -33,6 +34,8 @@ import {
   CoinRewardModal,
   SettingsModal,
   ExitConfirmModal,
+  HowToPlayBookIcon,
+  LeaderboardBarsIcon,
 } from '../components';
 import { useFindOneStore } from '../store/findOneStore';
 import { CATEGORIES_DATA } from '../logic';
@@ -50,6 +53,25 @@ export const HomeScreen: React.FC = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showCoinsModal, setShowCoinsModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // Intercept hardware back button on Android to prevent abrupt exit cut
+  React.useEffect(() => {
+    const onBackPress = () => {
+      setShowExitModal(true);
+      return true;
+    };
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, []);
+
+  const handleConfirmExit = () => {
+    setShowExitModal(false);
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)/games');
+    }
+  };
 
   // Interactive 4x4 Mini Puzzle on Home Screen
   const [demoPairIndex, setDemoPairIndex] = useState(0);
@@ -289,7 +311,7 @@ export const HomeScreen: React.FC = () => {
             title="HOW TO PLAY"
             variant="purple"
             size="sm"
-            icon={<Text style={{ fontSize: 18 }}>🎮</Text>}
+            icon={<HowToPlayBookIcon size={20} />}
             rightIcon={<Text style={{ fontSize: 16, color: '#FFFFFF' }}>›</Text>}
             onPress={() => setScreen('how-to-play')}
             style={styles.subBtn}
@@ -299,7 +321,7 @@ export const HomeScreen: React.FC = () => {
             title="LEADERBOARD"
             variant="blue"
             size="sm"
-            icon={<Text style={{ fontSize: 18 }}>🏆</Text>}
+            icon={<LeaderboardBarsIcon size={20} />}
             rightIcon={<Text style={{ fontSize: 16, color: '#FFFFFF' }}>›</Text>}
             onPress={() => setShowLeaderboardModal(true)}
             style={styles.subBtn}
@@ -333,6 +355,13 @@ export const HomeScreen: React.FC = () => {
           </View>
         </View>
       </ScrollView>
+
+      {/* Exit Confirmation Modal */}
+      <ExitConfirmModal
+        visible={showExitModal}
+        onCancel={() => setShowExitModal(false)}
+        onConfirm={handleConfirmExit}
+      />
 
       {/* Category Selection Modal */}
       <CategorySelectionModal

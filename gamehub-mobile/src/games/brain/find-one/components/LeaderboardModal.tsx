@@ -13,7 +13,12 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { FORadius, FOSpacing } from '../theme';
-import { useFindOneStore, formatGameDate } from '../store/findOneStore';
+import {
+  useFindOneStore,
+  formatGameDate,
+  GLOBAL_BENCHMARK_PLAYERS,
+  computeUserRank,
+} from '../store/findOneStore';
 import { GameButton } from './GameButton';
 import type { LeaderboardEntry } from '../types';
 
@@ -27,7 +32,14 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   onClose,
 }) => {
   const [activeTab, setActiveTab] = useState<'ranking' | 'history'>('ranking');
-  const { stats, profile, history, startGame } = useFindOneStore();
+  const { stats, profile, history, startGame, loadPersistedData } = useFindOneStore();
+
+  // Always re-hydrate data when modal opens so everything is fresh and up-to-date
+  React.useEffect(() => {
+    if (visible) {
+      loadPersistedData();
+    }
+  }, [visible]);
 
   // Tier names based on user's best score
   const getLeagueTier = (score: number) => {
@@ -40,12 +52,11 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   };
 
   const userTier = getLeagueTier(stats.bestScore);
-  const userRank = profile.rank || 28;
+  const userRank = computeUserRank(stats.bestScore, stats.accuracy);
 
-  // Build dynamic leaderboard list that adapts to user's real stats
+  // Build real dynamic leaderboard list where user is placed at their exact earned rank!
   const generateDynamicRanking = (): LeaderboardEntry[] => {
-    // Current user's real entry
-    const userDate = history.length > 0 ? history[0].formattedDate : formatGameDate(new Date());
+    const userDate = history.length > 0 ? history[0].formattedDate : 'Today';
     const userEntry: LeaderboardEntry = {
       rank: userRank,
       playerName: profile.name || 'Champion',
@@ -56,24 +67,31 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
       isCurrentPlayer: true,
     };
 
-    // Realistic competitors scaled dynamically around player's tier
-    const competitors: LeaderboardEntry[] = [
-      { rank: 1, playerName: 'Sophia Chen', avatar: '🦊', score: Math.max(48, stats.bestScore + 10), accuracy: 98, date: '30 Sep, 08:15 PM' },
-      { rank: 2, playerName: 'Marcus Vance', avatar: '🐯', score: Math.max(42, stats.bestScore + 7), accuracy: 96, date: '30 Sep, 05:40 PM' },
-      { rank: 3, playerName: 'Elena Rostova', avatar: '🐨', score: Math.max(37, stats.bestScore + 4), accuracy: 94, date: '29 Sep, 09:20 PM' },
-      { rank: 7, playerName: 'Liam Gallagher', avatar: '🦁', score: Math.max(25, stats.bestScore + 2), accuracy: 92, date: '29 Sep, 03:10 PM' },
-      { rank: 14, playerName: 'Aarav Sharma', avatar: '🐼', score: Math.max(14, Math.floor(stats.bestScore * 0.9)), accuracy: 90, date: '28 Sep, 11:05 PM' },
-      { rank: 21, playerName: 'Chloe Dubois', avatar: '🐰', score: Math.max(8, Math.floor(stats.bestScore * 0.7)), accuracy: 88, date: '28 Sep, 04:30 PM' },
-      { rank: 28, playerName: 'Kai Tanaka', avatar: '🐸', score: Math.max(4, Math.floor(stats.bestScore * 0.5)), accuracy: 85, date: '27 Sep, 07:15 PM' },
-      { rank: 35, playerName: 'Zara Ahmed', avatar: '🐻', score: Math.max(1, Math.floor(stats.bestScore * 0.3)), accuracy: 82, date: '27 Sep, 01:25 PM' },
+    // Combine benchmark community records with real player entry
+    const allEntries: LeaderboardEntry[] = [
+      ...GLOBAL_BENCHMARK_PLAYERS.map((p) => ({
+        rank: 0,
+        playerName: p.playerName,
+        avatar: p.avatar,
+        score: p.score,
+        accuracy: p.accuracy,
+        date: p.date,
+        isCurrentPlayer: false,
+      })),
+      userEntry,
     ];
 
-    // Filter out duplicate rank and insert player in correct order
-    const list = competitors.filter((c) => c.rank !== userRank);
-    list.push(userEntry);
-    list.sort((a, b) => a.rank - b.rank);
+    // Sort strictly by Score (descending), then Accuracy (descending)
+    allEntries.sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return b.accuracy - a.accuracy;
+    });
 
-    return list;
+    // Assign realistic sequential ranks 1, 2, 3...
+    return allEntries.map((item, idx) => ({
+      ...item,
+      rank: idx + 1,
+    }));
   };
 
   const displayRanking = generateDynamicRanking();

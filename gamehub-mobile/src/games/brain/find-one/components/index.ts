@@ -14,3 +14,4 @@ export * from './ProfileEditModal';
 export * from './CoinRewardModal';
 export * from './SettingsModal';
 export * from './ExitConfirmModal';
+export * from './ActionIcons';

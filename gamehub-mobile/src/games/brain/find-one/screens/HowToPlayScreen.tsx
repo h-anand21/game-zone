@@ -12,6 +12,7 @@ import {
   useWindowDimensions,
   Platform,
   StatusBar,
+  BackHandler,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Path } from 'react-native-svg';
@@ -28,6 +29,15 @@ import { useFindOneStore } from '../store/findOneStore';
 export const HowToPlayScreen: React.FC = () => {
   const { setScreen, startGame } = useFindOneStore();
   const insets = useSafeAreaInsets();
+
+  React.useEffect(() => {
+    const backAction = () => {
+      setScreen('home');
+      return true;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', backAction);
+    return () => sub.remove();
+  }, [setScreen]);
 
   const topInset = Math.max(
     insets.top,
