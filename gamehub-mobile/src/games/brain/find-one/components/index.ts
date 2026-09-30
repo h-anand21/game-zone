@@ -13,3 +13,4 @@ export * from './LeaderboardModal';
 export * from './ProfileEditModal';
 export * from './CoinRewardModal';
 export * from './SettingsModal';
+export * from './ExitConfirmModal';

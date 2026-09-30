@@ -481,6 +481,32 @@ export const useFindOneStore = create<FindOneStoreState>((set, get) => ({
             },
           }));
         }
+
+        const scoreRows = await scoreRepo.getByGameId('find-one', 25);
+        if (scoreRows && scoreRows.length > 0) {
+          const dbHistory: GameHistoryRecord[] = scoreRows.map((r) => {
+            let meta: Record<string, any> = {};
+            try {
+              meta = r.metadata ? JSON.parse(r.metadata) : {};
+            } catch {}
+            const recordDate = new Date(r.created_at || Date.now());
+            return {
+              id: r.id,
+              score: r.score,
+              accuracy: meta.accuracy ?? 100,
+              streak: meta.streak ?? 0,
+              durationSeconds: r.duration ?? 0,
+              date: r.created_at,
+              formattedDate: formatGameDate(recordDate),
+              category: meta.category ?? 'animals',
+            };
+          });
+          if (dbHistory.length > 0) {
+            set((state) => ({
+              history: state.history.length > 0 ? state.history : dbHistory,
+            }));
+          }
+        }
       } catch {}
     } catch {}
   },

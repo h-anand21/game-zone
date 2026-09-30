@@ -1,5 +1,5 @@
 // ============================================================
-// Find One — Leaderboard & Match History Modal (Real Dates & Records)
+// Find One — Dynamic Leaderboard & Real Match Records Modal
 // ============================================================
 
 import React, { useState } from 'react';
@@ -12,8 +12,9 @@ import {
   ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { FOColors, FORadius, FOSpacing } from '../theme';
-import { useFindOneStore } from '../store/findOneStore';
+import { FORadius, FOSpacing } from '../theme';
+import { useFindOneStore, formatGameDate } from '../store/findOneStore';
+import { GameButton } from './GameButton';
 import type { LeaderboardEntry } from '../types';
 
 interface LeaderboardModalProps {
@@ -26,38 +27,56 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   onClose,
 }) => {
   const [activeTab, setActiveTab] = useState<'ranking' | 'history'>('ranking');
-  const { stats, profile, history } = useFindOneStore();
+  const { stats, profile, history, startGame } = useFindOneStore();
 
-  // Dynamic Top Players Leaderboard
-  const baseLeaderboard: LeaderboardEntry[] = [
-    { rank: 1, playerName: 'Sophia Chen', avatar: '🦊', score: 48, accuracy: 98, date: '30 Sep, 08:15 PM' },
-    { rank: 2, playerName: 'Marcus Vance', avatar: '🐯', score: 42, accuracy: 96, date: '30 Sep, 05:40 PM' },
-    { rank: 3, playerName: 'Elena Rostova', avatar: '🐨', score: 37, accuracy: 94, date: '29 Sep, 09:20 PM' },
-    { rank: 4, playerName: 'Liam Gallagher', avatar: '🦁', score: 32, accuracy: 91, date: '29 Sep, 03:10 PM' },
-    { rank: 5, playerName: 'Aarav Sharma', avatar: '🐼', score: 28, accuracy: 90, date: '28 Sep, 11:05 PM' },
-    { rank: 6, playerName: 'Chloe Dubois', avatar: '🐰', score: 24, accuracy: 88, date: '28 Sep, 04:30 PM' },
-    { rank: 7, playerName: 'Kai Tanaka', avatar: '🐸', score: 20, accuracy: 86, date: '27 Sep, 07:15 PM' },
-    { rank: 8, playerName: 'Zara Ahmed', avatar: '🐻', score: 17, accuracy: 85, date: '27 Sep, 01:25 PM' },
-  ];
-
-  // Insert or show current player in leaderboard
-  const playerRank = profile.rank || 28;
-  const playerEntry: LeaderboardEntry = {
-    rank: playerRank,
-    playerName: profile.name || 'You',
-    avatar: profile.avatar || '🐼',
-    score: stats.bestScore,
-    accuracy: stats.accuracy,
-    date: history.length > 0 ? history[0].formattedDate : 'Today',
-    isCurrentPlayer: true,
+  // Tier names based on user's best score
+  const getLeagueTier = (score: number) => {
+    if (score >= 40) return { name: 'GRANDMASTER', color: '#FF4B4B', icon: '👑' };
+    if (score >= 30) return { name: 'MASTER LEAGUE', color: '#8A4BFF', icon: '💎' };
+    if (score >= 20) return { name: 'DIAMOND LEAGUE', color: '#2488FF', icon: '🔷' };
+    if (score >= 12) return { name: 'GOLD LEAGUE', color: '#FFC928', icon: '⭐' };
+    if (score >= 6) return { name: 'SILVER LEAGUE', color: '#B0BFCF', icon: '🛡️' };
+    return { name: 'BRONZE LEAGUE', color: '#CD7F32', icon: '🥉' };
   };
 
-  const displayList = [...baseLeaderboard];
-  if (playerRank <= 8) {
-    displayList.splice(playerRank - 1, 0, playerEntry);
-  } else {
-    displayList.push(playerEntry);
-  }
+  const userTier = getLeagueTier(stats.bestScore);
+  const userRank = profile.rank || 28;
+
+  // Build dynamic leaderboard list that adapts to user's real stats
+  const generateDynamicRanking = (): LeaderboardEntry[] => {
+    // Current user's real entry
+    const userDate = history.length > 0 ? history[0].formattedDate : formatGameDate(new Date());
+    const userEntry: LeaderboardEntry = {
+      rank: userRank,
+      playerName: profile.name || 'Champion',
+      avatar: profile.avatar || '🐼',
+      score: stats.bestScore,
+      accuracy: stats.accuracy || 100,
+      date: userDate,
+      isCurrentPlayer: true,
+    };
+
+    // Realistic competitors scaled dynamically around player's tier
+    const competitors: LeaderboardEntry[] = [
+      { rank: 1, playerName: 'Sophia Chen', avatar: '🦊', score: Math.max(48, stats.bestScore + 10), accuracy: 98, date: '30 Sep, 08:15 PM' },
+      { rank: 2, playerName: 'Marcus Vance', avatar: '🐯', score: Math.max(42, stats.bestScore + 7), accuracy: 96, date: '30 Sep, 05:40 PM' },
+      { rank: 3, playerName: 'Elena Rostova', avatar: '🐨', score: Math.max(37, stats.bestScore + 4), accuracy: 94, date: '29 Sep, 09:20 PM' },
+      { rank: 7, playerName: 'Liam Gallagher', avatar: '🦁', score: Math.max(25, stats.bestScore + 2), accuracy: 92, date: '29 Sep, 03:10 PM' },
+      { rank: 14, playerName: 'Aarav Sharma', avatar: '🐼', score: Math.max(14, Math.floor(stats.bestScore * 0.9)), accuracy: 90, date: '28 Sep, 11:05 PM' },
+      { rank: 21, playerName: 'Chloe Dubois', avatar: '🐰', score: Math.max(8, Math.floor(stats.bestScore * 0.7)), accuracy: 88, date: '28 Sep, 04:30 PM' },
+      { rank: 28, playerName: 'Kai Tanaka', avatar: '🐸', score: Math.max(4, Math.floor(stats.bestScore * 0.5)), accuracy: 85, date: '27 Sep, 07:15 PM' },
+      { rank: 35, playerName: 'Zara Ahmed', avatar: '🐻', score: Math.max(1, Math.floor(stats.bestScore * 0.3)), accuracy: 82, date: '27 Sep, 01:25 PM' },
+    ];
+
+    // Filter out duplicate rank and insert player in correct order
+    const list = competitors.filter((c) => c.rank !== userRank);
+    list.push(userEntry);
+    list.sort((a, b) => a.rank - b.rank);
+
+    return list;
+  };
+
+  const displayRanking = generateDynamicRanking();
 
   const getRankBadge = (rank: number) => {
     if (rank === 1) return '🥇';
@@ -84,7 +103,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             {/* Header Row */}
             <View style={styles.headerRow}>
               <View style={styles.titleBadge}>
-                <Text style={styles.titleIcon}>📊</Text>
+                <Text style={styles.titleIcon}>🏆</Text>
                 <Text style={styles.modalTitle}>LEADERBOARD</Text>
               </View>
 
@@ -96,6 +115,41 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                 <Text style={styles.closeIcon}>✕</Text>
               </Pressable>
             </View>
+
+            {/* Current Player Live Standing Banner */}
+            <LinearGradient
+              colors={['#1B4770', '#0D2947']}
+              style={styles.playerBanner}
+            >
+              <View style={styles.playerBannerAvatar}>
+                <Text style={{ fontSize: 28 }}>{profile.avatar || '🐼'}</Text>
+              </View>
+
+              <View style={styles.playerBannerInfo}>
+                <View style={styles.playerBannerNameRow}>
+                  <Text style={styles.playerBannerName}>{profile.name || 'Champion'}</Text>
+                  <View style={[styles.tierTag, { backgroundColor: `${userTier.color}25`, borderColor: userTier.color }]}>
+                    <Text style={[styles.tierTagText, { color: userTier.color }]}>
+                      {userTier.icon} {userTier.name}
+                    </Text>
+                  </View>
+                </View>
+
+                <View style={styles.playerBannerStatsRow}>
+                  <Text style={styles.playerBannerStat}>
+                    Rank: <Text style={{ color: '#FFD700', fontWeight: '900' }}>#{userRank}</Text>
+                  </Text>
+                  <Text style={styles.playerBannerStat}>•</Text>
+                  <Text style={styles.playerBannerStat}>
+                    Best: <Text style={{ color: '#65B2F5', fontWeight: '900' }}>{stats.bestScore} PTS</Text>
+                  </Text>
+                  <Text style={styles.playerBannerStat}>•</Text>
+                  <Text style={styles.playerBannerStat}>
+                    Games: <Text style={{ color: '#FFFFFF', fontWeight: '900' }}>{stats.totalGames}</Text>
+                  </Text>
+                </View>
+              </View>
+            </LinearGradient>
 
             {/* Segmented Tabs */}
             <View style={styles.tabContainer}>
@@ -112,7 +166,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                     activeTab === 'ranking' && styles.tabTextActive,
                   ]}
                 >
-                  GLOBAL RANKING
+                  GLOBAL STANDINGS
                 </Text>
               </Pressable>
 
@@ -129,18 +183,18 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                     activeTab === 'history' && styles.tabTextActive,
                   ]}
                 >
-                  MATCH HISTORY ({history.length})
+                  MY MATCHES ({history.length})
                 </Text>
               </Pressable>
             </View>
 
-            {/* Tab 1: Global Ranking Table */}
+            {/* Tab 1: Global Standings Table */}
             {activeTab === 'ranking' && (
               <ScrollView
                 showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.listContainer}
               >
-                {displayList.map((item, index) => {
+                {displayRanking.map((item, index) => {
                   const isUser = item.isCurrentPlayer;
 
                   return (
@@ -158,11 +212,12 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                         </Text>
                       </View>
 
-                      {/* Avatar & Player Info */}
+                      {/* Avatar */}
                       <View style={styles.avatarHolder}>
                         <Text style={{ fontSize: 20 }}>{item.avatar}</Text>
                       </View>
 
+                      {/* Player Info */}
                       <View style={styles.playerInfo}>
                         <View style={styles.nameWrap}>
                           <Text
@@ -194,7 +249,7 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               </ScrollView>
             )}
 
-            {/* Tab 2: Real Match History with Dates */}
+            {/* Tab 2: Real Match History with Real Dates */}
             {activeTab === 'history' && (
               <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -202,11 +257,22 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               >
                 {history.length === 0 ? (
                   <View style={styles.emptyState}>
-                    <Text style={styles.emptyIcon}>⏳</Text>
-                    <Text style={styles.emptyTitle}>No Matches Yet</Text>
+                    <Text style={styles.emptyIcon}>🎮</Text>
+                    <Text style={styles.emptyTitle}>No Matches Played Yet</Text>
                     <Text style={styles.emptySubtitle}>
-                      Play a game of Find One to record your match history with real dates, scores and accuracy!
+                      Every game you finish will be recorded here with its real date, time, final score, and accuracy!
                     </Text>
+                    <View style={{ marginTop: 16 }}>
+                      <GameButton
+                        title="PLAY FIRST MATCH"
+                        variant="gold"
+                        size="md"
+                        onPress={() => {
+                          onClose();
+                          startGame();
+                        }}
+                      />
+                    </View>
                   </View>
                 ) : (
                   history.map((record) => (
@@ -236,8 +302,12 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
                           <Text style={styles.historyStatValue}>{record.accuracy}%</Text>
                         </View>
                         <View style={styles.historyStatCol}>
-                          <Text style={styles.historyStatLabel}>STREAK</Text>
+                          <Text style={styles.historyStatLabel}>MAX STREAK</Text>
                           <Text style={styles.historyStatValue}>{record.streak} 🔥</Text>
+                        </View>
+                        <View style={styles.historyStatCol}>
+                          <Text style={styles.historyStatLabel}>TIME</Text>
+                          <Text style={styles.historyStatValue}>{record.durationSeconds}s</Text>
                         </View>
                       </View>
                     </View>
@@ -270,7 +340,7 @@ const styles = StyleSheet.create({
   modalCardWrapper: {
     width: '100%',
     maxWidth: 390,
-    maxHeight: '85%',
+    maxHeight: '88%',
   },
   modalCard: {
     width: '100%',
@@ -286,7 +356,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   titleBadge: {
     flexDirection: 'row',
@@ -316,6 +386,60 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#A8C5DE',
     fontWeight: '900',
+  },
+  playerBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: FORadius.lg,
+    padding: 10,
+    borderWidth: 1.5,
+    borderColor: '#265988',
+    marginBottom: 12,
+    gap: 10,
+  },
+  playerBannerAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#0A1E33',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
+    borderColor: '#FFC928',
+  },
+  playerBannerInfo: {
+    flex: 1,
+  },
+  playerBannerNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  playerBannerName: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  tierTag: {
+    borderWidth: 1,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: 6,
+  },
+  tierTagText: {
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.4,
+  },
+  playerBannerStatsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 3,
+  },
+  playerBannerStat: {
+    fontSize: 11,
+    color: '#8BAFCF',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -431,11 +555,11 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: 36,
+    paddingVertical: 24,
     paddingHorizontal: 16,
   },
   emptyIcon: {
-    fontSize: 38,
+    fontSize: 40,
     marginBottom: 8,
   },
   emptyTitle: {
@@ -448,7 +572,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#7093B3',
     textAlign: 'center',
-    lineHeight: 16,
+    lineHeight: 17,
   },
   historyCard: {
     backgroundColor: '#0B2036',
@@ -486,7 +610,8 @@ const styles = StyleSheet.create({
   },
   historyStatsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
+    paddingHorizontal: 6,
   },
   historyStatCol: {
     alignItems: 'center',

@@ -32,6 +32,7 @@ import {
   ProfileEditModal,
   CoinRewardModal,
   SettingsModal,
+  ExitConfirmModal,
 } from '../components';
 import { useFindOneStore } from '../store/findOneStore';
 import { CATEGORIES_DATA } from '../logic';
@@ -43,6 +44,7 @@ export const HomeScreen: React.FC = () => {
   const { width } = useWindowDimensions();
 
   // Modals state
+  const [showExitModal, setShowExitModal] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
@@ -122,13 +124,7 @@ export const HomeScreen: React.FC = () => {
           {/* Player Profile & Exit */}
           <View style={styles.profileBadge}>
             <Pressable
-              onPress={() => {
-                if (router.canGoBack()) {
-                  router.back();
-                } else {
-                  router.replace('/');
-                }
-              }}
+              onPress={() => setShowExitModal(true)}
               style={styles.backBtn}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
@@ -293,7 +289,7 @@ export const HomeScreen: React.FC = () => {
             title="HOW TO PLAY"
             variant="purple"
             size="sm"
-            icon={<Text style={{ fontSize: 16 }}>📖</Text>}
+            icon={<Text style={{ fontSize: 18 }}>🎮</Text>}
             rightIcon={<Text style={{ fontSize: 16, color: '#FFFFFF' }}>›</Text>}
             onPress={() => setScreen('how-to-play')}
             style={styles.subBtn}
@@ -303,7 +299,7 @@ export const HomeScreen: React.FC = () => {
             title="LEADERBOARD"
             variant="blue"
             size="sm"
-            icon={<Text style={{ fontSize: 16 }}>📊</Text>}
+            icon={<Text style={{ fontSize: 18 }}>🏆</Text>}
             rightIcon={<Text style={{ fontSize: 16, color: '#FFFFFF' }}>›</Text>}
             onPress={() => setShowLeaderboardModal(true)}
             style={styles.subBtn}
