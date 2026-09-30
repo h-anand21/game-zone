@@ -84,3 +84,24 @@ export interface GameSettings {
   soundEffects: boolean;
   hapticFeedback: boolean;
 }
+
+export interface GameHistoryRecord {
+  id: string;
+  score: number;
+  accuracy: number;
+  streak: number;
+  durationSeconds: number;
+  date: string;
+  formattedDate: string;
+  category: CategoryType;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  playerName: string;
+  avatar: string;
+  score: number;
+  accuracy: number;
+  date: string;
+  isCurrentPlayer?: boolean;
+}
