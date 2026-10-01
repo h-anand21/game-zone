@@ -21,6 +21,7 @@ export type EnvTheme =
   | 'result'
   | 'rewards'
   | 'daily'
+  | 'stats'
   | 'progress'
   | 'achievements'
   | 'collection'

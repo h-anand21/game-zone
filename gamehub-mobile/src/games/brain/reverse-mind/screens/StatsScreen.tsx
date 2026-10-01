@@ -26,6 +26,7 @@ const ACHIEVEMENTS: AchievementItem[] = [
     goal: 1,
     unlocked: true,
     rewardCoins: 50,
+    rarity: 'common',
   },
   {
     id: 'combo_master',
@@ -36,6 +37,7 @@ const ACHIEVEMENTS: AchievementItem[] = [
     goal: 8,
     unlocked: true,
     rewardCoins: 100,
+    rarity: 'rare',
   },
   {
     id: 'perfect_round',
@@ -46,6 +48,7 @@ const ACHIEVEMENTS: AchievementItem[] = [
     goal: 5,
     unlocked: false,
     rewardCoins: 200,
+    rarity: 'epic',
   },
   {
     id: 'speed_thinker',
@@ -56,6 +59,7 @@ const ACHIEVEMENTS: AchievementItem[] = [
     goal: 1,
     unlocked: true,
     rewardCoins: 150,
+    rarity: 'rare',
   },
   {
     id: 'mind_shift_pro',
@@ -66,6 +70,7 @@ const ACHIEVEMENTS: AchievementItem[] = [
     goal: 10,
     unlocked: false,
     rewardCoins: 300,
+    rarity: 'epic',
   },
   {
     id: 'master_mind',
@@ -76,6 +81,7 @@ const ACHIEVEMENTS: AchievementItem[] = [
     goal: 10,
     unlocked: false,
     rewardCoins: 500,
+    rarity: 'legendary',
   },
 ];
 

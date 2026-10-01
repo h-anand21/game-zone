@@ -119,6 +119,7 @@ const INITIAL_PLAYER_STATS: PlayerStats = {
   mindShiftBest: 2100,
   dailyStreak: 3,
   lastDailyDate: '2026-10-01',
+  selectedAvatar: 'char_boy',
 };
 
 const INITIAL_SETTINGS: GameSettings = {
