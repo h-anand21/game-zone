@@ -200,8 +200,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-    alignItems: 'center',
-  },
   pauseBtn: {
     backgroundColor: '#FF793F',
     borderColor: '#FFE082',
