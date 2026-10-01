@@ -12,7 +12,7 @@ interface GlowButtonProps {
   onPress: () => void;
   variant?: 'gold' | 'green' | 'blue' | 'purple' | 'red' | 'glass';
   size?: 'sm' | 'md' | 'lg';
-  icon?: string;
+  icon?: React.ReactNode;
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
@@ -132,7 +132,15 @@ export const GlowButton: React.FC<GlowButtonProps> = ({
             <View style={styles.specularLine} />
 
             <View style={styles.contentRow}>
-              {icon && <Text style={styles.buttonIcon}>{icon}</Text>}
+              {icon && (
+                <View style={styles.iconContainer}>
+                  {typeof icon === 'string' ? (
+                    <Text style={styles.buttonIconText}>{icon}</Text>
+                  ) : (
+                    icon
+                  )}
+                </View>
+              )}
               <Text
                 style={[
                   styles.titleText,
@@ -189,7 +197,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  buttonIcon: {
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonIconText: {
     fontSize: 18,
   },
   titleText: {

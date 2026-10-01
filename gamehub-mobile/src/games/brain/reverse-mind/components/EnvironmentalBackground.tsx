@@ -82,7 +82,7 @@ export const EnvironmentalBackground: React.FC<EnvironmentalBackgroundProps> = (
       theme === 'practice' ||
       theme === 'settings'
     ) {
-      return require('../../../../../assets/images/rm_bg_cozy_study.jpg');
+      return require('../../../../../assets/images/rm_bg_master_environment.jpg');
     }
     return require('../../../../../assets/images/rm_bg_adventure_world.jpg');
   };

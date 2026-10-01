@@ -1,5 +1,5 @@
 // ============================================================
-// REVERSE MIND — Home Screen Game Hub
+// REVERSE MIND — Home Screen Game Hub (SVG Vector Buttons & Icons)
 // ============================================================
 
 import React from 'react';
@@ -10,6 +10,16 @@ import { ReverseMindLogo } from '../components/ReverseMindLogo';
 import { MascotCompanion } from '../components/MascotCompanion';
 import { GlowButton } from '../components/GlowButton';
 import { BottomTabBar } from '../components/BottomTabBar';
+import {
+  PlayIconSvg,
+  CoinIconSvg,
+  GemIconSvg,
+  FlameIconSvg,
+  ReverseArrowIconSvg,
+  LightningIconSvg,
+  BrainIconSvg,
+  TargetIconSvg,
+} from '../components/SvgIcons';
 import { useReverseMindStore } from '../store/reverseMindStore';
 import type { GameMode, AppNavScreen } from '../types';
 import { RMTheme } from '../theme';
@@ -40,14 +50,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </View>
           </Pressable>
 
-          {/* Currencies: Coins & Gems */}
+          {/* Currencies: Coins & Gems (Pure SVG) */}
           <View style={styles.currencyRow}>
             <View style={styles.currencyBadge}>
-              <Text style={styles.currencyIcon}>🪙</Text>
+              <CoinIconSvg size={16} />
               <Text style={styles.currencyText}>{playerStats.coins}</Text>
             </View>
             <View style={[styles.currencyBadge, styles.gemBadge]}>
-              <Text style={styles.currencyIcon}>💎</Text>
+              <GemIconSvg size={16} />
               <Text style={styles.currencyText}>{playerStats.gems}</Text>
             </View>
           </View>
@@ -73,18 +83,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             />
           </View>
 
-          {/* Big Chunky Primary CTA */}
+          {/* Big Chunky Primary CTA (Pure SVG Icon) */}
           <View style={styles.ctaWrapper}>
             <GlowButton
               title="PLAY NOW"
               variant="gold"
               size="lg"
-              icon="▶"
+              icon={<PlayIconSvg size={24} color="#07111F" />}
               onPress={() => onNavigate('modes')}
             />
           </View>
 
-          {/* Daily Streak Banner */}
+          {/* Daily Streak Banner (SVG Flame) */}
           <Pressable onPress={() => onNavigate('daily')} style={styles.dailyBanner}>
             <LinearGradient
               colors={['#2A1810', '#1A0E08']}
@@ -93,7 +103,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               end={{ x: 1, y: 0 }}
             >
               <View style={styles.dailyIconBox}>
-                <Text style={styles.dailyEmoji}>🔥</Text>
+                <FlameIconSvg size={24} color="#FF9800" />
               </View>
               <View style={styles.dailyTextBox}>
                 <Text style={styles.dailyTitle}>{playerStats.dailyStreak}-DAY STREAK ACTIVE</Text>
@@ -117,7 +127,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   colors={['#162842', '#0F1C30']}
                   style={[styles.modeCardGradient, { borderColor: RMTheme.colors.cyanNeon }]}
                 >
-                  <Text style={styles.modeIcon}>🔄</Text>
+                  <View style={styles.modeIconBox}>
+                    <ReverseArrowIconSvg size={28} color={RMTheme.colors.cyanNeon} />
+                  </View>
                   <Text style={styles.modeName}>CLASSIC</Text>
                   <Text style={styles.modeSub}>Remember & Reverse</Text>
                 </LinearGradient>
@@ -132,7 +144,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   colors={['#27194A', '#190E33']}
                   style={[styles.modeCardGradient, { borderColor: RMTheme.colors.purpleNeon }]}
                 >
-                  <Text style={styles.modeIcon}>⚡</Text>
+                  <View style={styles.modeIconBox}>
+                    <LightningIconSvg size={28} color={RMTheme.colors.purpleNeon} />
+                  </View>
                   <Text style={styles.modeName}>QUICK FLIP</Text>
                   <Text style={styles.modeSub}>High Speed Rush</Text>
                 </LinearGradient>
@@ -147,7 +161,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   colors={['#3B220C', '#241407']}
                   style={[styles.modeCardGradient, { borderColor: RMTheme.colors.orangeNeon }]}
                 >
-                  <Text style={styles.modeIcon}>🧠</Text>
+                  <View style={styles.modeIconBox}>
+                    <BrainIconSvg size={28} color={RMTheme.colors.orangeNeon} />
+                  </View>
                   <Text style={styles.modeName}>MIND SHIFT</Text>
                   <Text style={styles.modeSub}>Dynamic Rules</Text>
                 </LinearGradient>
@@ -162,7 +178,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   colors={['#102E24', '#0A1C16']}
                   style={[styles.modeCardGradient, { borderColor: RMTheme.colors.emeraldGreen }]}
                 >
-                  <Text style={styles.modeIcon}>🎯</Text>
+                  <View style={styles.modeIconBox}>
+                    <TargetIconSvg size={28} color={RMTheme.colors.emeraldGreen} />
+                  </View>
                   <Text style={styles.modeName}>PRACTICE</Text>
                   <Text style={styles.modeSub}>No Timer Pressure</Text>
                 </LinearGradient>
@@ -239,13 +257,10 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderWidth: 1,
     borderColor: 'rgba(255, 216, 61, 0.3)',
-    gap: 4,
+    gap: 6,
   },
   gemBadge: {
     borderColor: 'rgba(77, 231, 255, 0.3)',
-  },
-  currencyIcon: {
-    fontSize: 12,
   },
   currencyText: {
     fontSize: 12,
@@ -295,9 +310,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 10,
   },
-  dailyEmoji: {
-    fontSize: 20,
-  },
   dailyTextBox: {
     flex: 1,
   },
@@ -346,8 +358,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     alignItems: 'center',
   },
-  modeIcon: {
-    fontSize: 26,
+  modeIconBox: {
     marginBottom: 6,
   },
   modeName: {

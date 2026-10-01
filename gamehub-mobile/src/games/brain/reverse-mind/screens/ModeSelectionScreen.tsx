@@ -1,5 +1,5 @@
 // ============================================================
-// REVERSE MIND — Mode Selection & Difficulty Screen
+// REVERSE MIND — Mode Selection & Difficulty Screen (SVG Icons)
 // ============================================================
 
 import React, { useState } from 'react';
@@ -8,6 +8,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { GameBackground } from '../components/GameBackground';
 import { GlowButton } from '../components/GlowButton';
 import { BottomTabBar } from '../components/BottomTabBar';
+import {
+  ReverseArrowIconSvg,
+  LightningIconSvg,
+  BrainIconSvg,
+  TargetIconSvg,
+  RocketIconSvg,
+} from '../components/SvgIcons';
 import type { GameMode, GameDifficulty, AppNavScreen } from '../types';
 import { RMTheme } from '../theme';
 
@@ -23,7 +30,7 @@ interface ModeMeta {
   name: string;
   tagline: string;
   desc: string;
-  icon: string;
+  renderIcon: (color: string) => React.ReactNode;
   color: string;
   gradient: [string, string];
 }
@@ -34,7 +41,7 @@ const MODES: ModeMeta[] = [
     name: 'CLASSIC REVERSE',
     tagline: 'STANDARD INVERSION',
     desc: 'Memorize the object sequence and tap every object in exact reverse order.',
-    icon: '🔄',
+    renderIcon: (color) => <ReverseArrowIconSvg size={30} color={color} />,
     color: RMTheme.colors.cyanNeon,
     gradient: ['#162842', '#0D1A2B'],
   },
@@ -43,7 +50,7 @@ const MODES: ModeMeta[] = [
     name: 'QUICK FLIP',
     tagline: 'SPEED BLITZ',
     desc: 'Ultra-fast memory flash! Rapid display time and high combo rewards.',
-    icon: '⚡',
+    renderIcon: (color) => <LightningIconSvg size={30} color={color} />,
     color: RMTheme.colors.purpleNeon,
     gradient: ['#28184C', '#180C30'],
   },
@@ -52,7 +59,7 @@ const MODES: ModeMeta[] = [
     name: 'MIND SHIFT',
     tagline: 'DYNAMIC RULES',
     desc: 'Rules mutate mid-game! Reverse while ignoring red items, specific categories, or order shifts.',
-    icon: '🧠',
+    renderIcon: (color) => <BrainIconSvg size={30} color={color} />,
     color: RMTheme.colors.orangeNeon,
     gradient: ['#381F08', '#201004'],
   },
@@ -61,7 +68,7 @@ const MODES: ModeMeta[] = [
     name: 'CASUAL PRACTICE',
     tagline: 'UNTIMED RELAXATION',
     desc: 'No time limits, no fail states. Pure cognitive exercise at your own pace.',
-    icon: '🎯',
+    renderIcon: (color) => <TargetIconSvg size={30} color={color} />,
     color: RMTheme.colors.emeraldGreen,
     gradient: ['#0D2B1E', '#061910'],
   },
@@ -115,9 +122,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                   >
-                    <View style={styles.cardLeft}>
-                      <Text style={styles.modeIcon}>{mode.icon}</Text>
-                    </View>
+                    <View style={styles.cardLeft}>{mode.renderIcon(mode.color)}</View>
                     <View style={styles.cardCenter}>
                       <Text style={[styles.cardTagline, { color: mode.color }]}>
                         {mode.tagline}
@@ -200,7 +205,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               title={`START ${activeModeMeta.name}`}
               variant="gold"
               size="lg"
-              icon="🚀"
+              icon={<RocketIconSvg size={22} color="#07111F" />}
               onPress={() => onLaunchGame(selectedMode, difficulty)}
             />
           </View>
@@ -264,9 +269,6 @@ const styles = StyleSheet.create({
   },
   cardLeft: {
     marginRight: 12,
-  },
-  modeIcon: {
-    fontSize: 30,
   },
   cardCenter: {
     flex: 1,

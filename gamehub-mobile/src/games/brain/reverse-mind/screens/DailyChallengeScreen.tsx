@@ -7,6 +7,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GameBackground } from '../components/GameBackground';
 import { GlowButton } from '../components/GlowButton';
+import { LightningIconSvg } from '../components/SvgIcons';
 import { BottomTabBar } from '../components/BottomTabBar';
 import { MascotCompanion } from '../components/MascotCompanion';
 import { useReverseMindStore } from '../store/reverseMindStore';
@@ -119,7 +120,7 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
               title="START TODAY'S CHALLENGE"
               variant="gold"
               size="lg"
-              icon="⚡"
+              icon={<LightningIconSvg size={22} color="#07111F" />}
               onPress={onStartDaily}
             />
           </View>

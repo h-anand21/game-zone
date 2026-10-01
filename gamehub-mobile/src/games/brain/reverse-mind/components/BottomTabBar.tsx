@@ -1,11 +1,18 @@
 // ============================================================
-// REVERSE MIND — Curved Glass Bottom Tab Bar
+// REVERSE MIND — Curved Glass Bottom Tab Bar (SVG Vector Icons)
 // ============================================================
 
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { AppNavScreen } from '../types';
+import {
+  HomeNavIconSvg,
+  ModesNavIconSvg,
+  DailyNavIconSvg,
+  StatsNavIconSvg,
+  ProfileNavIconSvg,
+} from './SvgIcons';
 import { RMTheme } from '../theme';
 
 interface BottomTabBarProps {
@@ -16,15 +23,35 @@ interface BottomTabBarProps {
 interface TabItem {
   id: AppNavScreen;
   label: string;
-  icon: string;
+  renderIcon: (color: string) => React.ReactNode;
 }
 
 const TABS: TabItem[] = [
-  { id: 'home', label: 'Home', icon: '🏠' },
-  { id: 'modes', label: 'Modes', icon: '🎮' },
-  { id: 'daily', label: 'Daily', icon: '📅' },
-  { id: 'stats', label: 'Stats', icon: '📊' },
-  { id: 'profile', label: 'Profile', icon: '👤' },
+  {
+    id: 'home',
+    label: 'Home',
+    renderIcon: (color) => <HomeNavIconSvg size={20} color={color} />,
+  },
+  {
+    id: 'modes',
+    label: 'Modes',
+    renderIcon: (color) => <ModesNavIconSvg size={20} color={color} />,
+  },
+  {
+    id: 'daily',
+    label: 'Daily',
+    renderIcon: (color) => <DailyNavIconSvg size={20} color={color} />,
+  },
+  {
+    id: 'stats',
+    label: 'Stats',
+    renderIcon: (color) => <StatsNavIconSvg size={20} color={color} />,
+  },
+  {
+    id: 'profile',
+    label: 'Profile',
+    renderIcon: (color) => <ProfileNavIconSvg size={20} color={color} />,
+  },
 ];
 
 export const BottomTabBar: React.FC<BottomTabBarProps> = ({
@@ -42,8 +69,10 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
         {TABS.map((tab) => {
           const isActive =
             currentScreen === tab.id ||
-            (tab.id === 'stats' && (currentScreen === 'achievements')) ||
+            (tab.id === 'stats' && currentScreen === 'achievements') ||
             (tab.id === 'profile' && (currentScreen === 'collection' || currentScreen === 'settings'));
+
+          const iconColor = isActive ? RMTheme.colors.cyanNeon : RMTheme.colors.textMuted;
 
           return (
             <Pressable
@@ -57,9 +86,10 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
               {/* Active Tab Glow Pill */}
               {isActive && <View style={styles.activePill} />}
 
-              <Text style={[styles.iconText, isActive && styles.iconActive]}>
-                {tab.icon}
-              </Text>
+              <View style={[styles.iconBox, isActive && styles.iconBoxActive]}>
+                {tab.renderIcon(iconColor)}
+              </View>
+
               <Text style={[styles.labelText, isActive && styles.labelActive]}>
                 {tab.label}
               </Text>
@@ -110,12 +140,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 6,
   },
-  iconText: {
-    fontSize: 20,
-    opacity: 0.6,
+  iconBox: {
+    marginTop: 4,
   },
-  iconActive: {
-    opacity: 1,
+  iconBoxActive: {
     transform: [{ scale: 1.1 }],
   },
   labelText: {

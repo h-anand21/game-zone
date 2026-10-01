@@ -8,6 +8,7 @@ import { EnvironmentalBackground } from '../components/EnvironmentalBackground';
 import { ReverseMindLogo } from '../components/ReverseMindLogo';
 import { MascotCompanion } from '../components/MascotCompanion';
 import { GlowButton } from '../components/GlowButton';
+import { RocketIconSvg } from '../components/SvgIcons';
 import type { AppNavScreen } from '../types';
 import { RMTheme } from '../theme';
 
@@ -55,7 +56,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onStart, onNavigat
             title="ENTER GAME HUB"
             variant="gold"
             size="lg"
-            icon="🚀"
+            icon={<RocketIconSvg size={22} color="#07111F" />}
             onPress={onStart}
           />
           <View style={{ height: 10 }} />
