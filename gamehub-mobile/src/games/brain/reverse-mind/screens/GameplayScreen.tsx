@@ -52,7 +52,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({ onBack }) => {
 
   const [countdownNum, setCountdownNum] = useState<number>(3);
   const [timerProgress, setTimerProgress] = useState<number>(1);
-  const timerIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── 1. Countdown Phase Handler ─────────────────────────────
   useEffect(() => {

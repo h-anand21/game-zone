@@ -37,8 +37,8 @@ export default function GameScreen() {
 
   const categoryColor = CATEGORY_COLORS[gameConfig.category] || Colors.primary;
 
-  // Dedicated Full-Screen Experience for Mind Lock, Find One & Number Rush
-  if ((cleanGameId === 'mind-lock' || cleanGameId === 'find-one' || cleanGameId === 'number-rush') && registeredGame) {
+  // Dedicated Full-Screen Experience for Mind Lock, Find One, Number Rush & Reverse Mind
+  if ((cleanGameId === 'mind-lock' || cleanGameId === 'find-one' || cleanGameId === 'number-rush' || cleanGameId === 'reverse-mind') && registeredGame) {
     const GameComponent = registeredGame.component;
     return (
       <>
