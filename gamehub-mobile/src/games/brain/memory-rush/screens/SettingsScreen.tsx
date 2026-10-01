@@ -40,7 +40,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateTab })
   ) => (
     <View style={styles.settingRow}>
       <View style={styles.settingIconBox}>
-        <Feather name={icon as any} size={18} color={colors.accent} />
+        <MRIcon name={icon} size={18} color={colors.accent} />
       </View>
       <View style={styles.settingInfo}>
         <Text style={styles.settingLabel}>{label}</Text>
