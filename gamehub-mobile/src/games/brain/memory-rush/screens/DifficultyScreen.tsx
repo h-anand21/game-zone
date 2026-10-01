@@ -146,8 +146,8 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
               <Switch
                 value={settings.smartDifficulty}
                 onValueChange={() => toggleSetting('smartDifficulty')}
-                trackColor={{ false: 'rgba(255, 255, 255, 0.1)', true: 'rgba(34, 211, 238, 0.4)' }}
-                thumbColor={settings.smartDifficulty ? MRColors.primaryCyan : '#8E9AA7'}
+                trackColor={{ false: 'rgba(255, 255, 255, 0.1)', true: 'rgba(255, 216, 61, 0.45)' }}
+                thumbColor={settings.smartDifficulty ? MRColors.yellowStatus : '#8E9AA7'}
               />
             </View>
           </GlassCard>
@@ -158,7 +158,7 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
           <PrimaryButton
             title="START GAME →"
             size="lg"
-            variant="cyan"
+            variant="gold"
             onPress={handleStart}
           />
         </View>
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.2,
-    borderColor: 'rgba(34, 211, 238, 0.3)',
+    borderColor: 'rgba(255, 216, 61, 0.35)',
   },
   headerTitleCol: {
     alignItems: 'center',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   headerTitleAccent: {
     fontSize: 18,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 2,
   },
   scrollContent: {
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   cardSelectedBorder: {
-    borderColor: MRColors.primaryCyan,
+    borderColor: MRColors.yellowStatus,
     borderWidth: 2,
   },
   cardTopRow: {
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
   },
   titleSelected: {
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
   },
   radioOuter: {
     width: 22,
@@ -243,13 +243,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   radioOuterSelected: {
-    borderColor: MRColors.primaryCyan,
+    borderColor: MRColors.yellowStatus,
   },
   radioInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: MRColors.primaryCyan,
+    backgroundColor: MRColors.yellowStatus,
   },
   taglineText: {
     fontSize: 11,
@@ -264,17 +264,17 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   specBadge: {
-    backgroundColor: 'rgba(34, 211, 238, 0.12)',
+    backgroundColor: 'rgba(255, 216, 61, 0.12)',
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.25)',
+    borderColor: 'rgba(255, 216, 61, 0.35)',
   },
   specText: {
     fontSize: 9,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1,
   },
   smartDiffCard: {

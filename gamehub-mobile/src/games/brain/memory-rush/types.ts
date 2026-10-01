@@ -67,11 +67,13 @@ export interface GridPos {
 export interface NumberTileData {
   id: string;
   value: number;
+  originalValue?: number;
   row: number;
   col: number;
   state: TileState;
   isChanged?: boolean;
   isMissing?: boolean;
+  sequenceStep?: number;
 }
 
 export interface RoundConfig {
@@ -85,8 +87,12 @@ export interface RoundConfig {
   targetValue?: number;
   targetPos?: GridPos;
   sequenceOrder?: number[];
-  changedPositions?: GridPos[];
-  missingNumbers?: number[];
+  sequenceTileIds?: string[];
+  changedTileId?: string;
+  changedOriginalValue?: number;
+  changedNewValue?: number;
+  vanishedValue?: number;
+  missingOptions?: number[];
   questionPrompt: string;
 }
 

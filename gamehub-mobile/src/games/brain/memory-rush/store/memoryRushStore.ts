@@ -276,89 +276,228 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
   },
 
   advanceToHide: () => {
-    const hiddenTiles = get().tiles.map((t) => ({ ...t, state: 'hidden' as const }));
-    set({ tiles: hiddenTiles, phase: 'hide' });
+    const { roundConfig, tiles } = get();
+    if (!roundConfig) return;
+
+    if (roundConfig.actualType === 'memoryGrid' || roundConfig.actualType === 'sequenceRush') {
+      const hiddenTiles = tiles.map((t) => ({ ...t, state: 'hidden' as const }));
+      set({ tiles: hiddenTiles, phase: 'hide' });
+    } else {
+      set({ phase: 'hide' });
+    }
   },
 
   advanceToQuestion: () => {
-    set({ phase: 'question', startTimeMs: Date.now() });
+    const { roundConfig, tiles } = get();
+    if (!roundConfig) return;
+
+    if (roundConfig.actualType === 'memoryGrid') {
+      const hiddenTiles = tiles.map((t) => ({ ...t, state: 'hidden' as const }));
+      set({ tiles: hiddenTiles, phase: 'question', startTimeMs: Date.now() });
+    } else if (roundConfig.actualType === 'sequenceRush') {
+      const hiddenTiles = tiles.map((t) => ({ ...t, state: 'hidden' as const, sequenceStep: undefined }));
+      set({
+        tiles: hiddenTiles,
+        phase: 'question',
+        startTimeMs: Date.now(),
+        playerInputSequence: [],
+      });
+    } else if (roundConfig.actualType === 'numberShift') {
+      const mutatedTiles = tiles.map((t) => {
+        if (t.id === roundConfig.changedTileId) {
+          return {
+            ...t,
+            value: roundConfig.changedNewValue!,
+            originalValue: roundConfig.changedOriginalValue,
+            state: 'default' as const,
+            isChanged: true,
+          };
+        }
+        return { ...t, state: 'default' as const };
+      });
+      set({ tiles: mutatedTiles, phase: 'question', startTimeMs: Date.now() });
+    } else if (roundConfig.actualType === 'missingNumber') {
+      const questionTiles = tiles.map((t) => {
+        if (t.value === roundConfig.vanishedValue) {
+          return {
+            ...t,
+            state: 'hidden' as const,
+            isMissing: true,
+          };
+        }
+        return { ...t, state: 'default' as const };
+      });
+      set({ tiles: questionTiles, phase: 'question', startTimeMs: Date.now() });
+    }
   },
 
   handleTileSelect: (tile) => {
-    const { roundConfig, combo, maxCombo, score, difficulty, startTimeMs, correctAnswers, totalAttempts, playerStats } = get();
+    const { roundConfig, combo, maxCombo, score, difficulty, startTimeMs, correctAnswers, totalAttempts, playerInputSequence, tiles } = get();
     if (!roundConfig) return { isCorrect: false, isComplete: false };
 
     const reaction = Date.now() - startTimeMs;
-    let isCorrect = false;
 
+    // 1. MEMORY GRID
     if (roundConfig.actualType === 'memoryGrid') {
-      isCorrect = tile.row === roundConfig.targetPos?.row && tile.col === roundConfig.targetPos?.col;
-    }
+      const isCorrect = tile.row === roundConfig.targetPos?.row && tile.col === roundConfig.targetPos?.col;
+      const newTotal = totalAttempts + 1;
+      const newCorrect = isCorrect ? correctAnswers + 1 : correctAnswers;
 
-    const newTotal = totalAttempts + 1;
-    const newCorrect = isCorrect ? correctAnswers + 1 : correctAnswers;
+      if (isCorrect) {
+        const newCombo = combo + 1;
+        const pts = calculateScore(true, newCombo, reaction, 10000, difficulty);
+        const newScore = score + pts;
 
-    if (isCorrect) {
-      const newCombo = combo + 1;
-      const pts = calculateScore(true, newCombo, reaction, 10000, difficulty);
-      const newScore = score + pts;
+        const updatedTiles = tiles.map((t) =>
+          t.id === tile.id ? { ...t, state: 'correct' as const } : t
+        );
 
-      const updatedTiles = get().tiles.map((t) =>
-        t.id === tile.id ? { ...t, state: 'correct' as const } : t
-      );
+        set({
+          tiles: updatedTiles,
+          combo: newCombo,
+          maxCombo: Math.max(maxCombo, newCombo),
+          score: newScore,
+          correctAnswers: newCorrect,
+          totalAttempts: newTotal,
+          lastFeedback: { type: 'perfect', message: 'PERFECT LOCATION!', points: pts },
+        });
 
-      set({
-        tiles: updatedTiles,
-        combo: newCombo,
-        maxCombo: Math.max(maxCombo, newCombo),
-        score: newScore,
-        correctAnswers: newCorrect,
-        totalAttempts: newTotal,
-        lastFeedback: { type: 'perfect', message: 'PERFECT!', points: pts },
-      });
-
-      return { isCorrect: true, isComplete: true };
-    } else {
-      const updatedTiles = get().tiles.map((t) =>
-        t.id === tile.id ? { ...t, state: 'wrong' as const } : t
-      );
-
-      set({
-        tiles: updatedTiles,
-        combo: 0,
-        totalAttempts: newTotal,
-        lastFeedback: { type: 'miss', message: 'MISS' },
-      });
-
-      return { isCorrect: false, isComplete: false };
-    }
-  },
-
-  handleAnswerChoice: (value) => {
-    const { roundConfig, combo, maxCombo, score, difficulty, startTimeMs, correctAnswers, totalAttempts } = get();
-    if (!roundConfig) return { isCorrect: false };
-
-    const reaction = Date.now() - startTimeMs;
-    let isCorrect = false;
-
-    if (roundConfig.actualType === 'missingNumber') {
-      isCorrect = roundConfig.missingNumbers?.includes(value) ?? false;
-    } else if (roundConfig.actualType === 'sequenceRush') {
-      // Input sequence check
-      const currentSeq = [...get().playerInputSequence, value];
-      set({ playerInputSequence: currentSeq });
-
-      const expected = roundConfig.sequenceOrder || [];
-      const isPartiallyCorrect = currentSeq.every((v, i) => v === expected[i]);
-      if (isPartiallyCorrect && currentSeq.length === expected.length) {
-        isCorrect = true;
-      } else if (!isPartiallyCorrect) {
-        isCorrect = false;
+        return { isCorrect: true, isComplete: true };
       } else {
-        return { isCorrect: true };
+        const updatedTiles = tiles.map((t) => {
+          if (t.id === tile.id) return { ...t, state: 'wrong' as const };
+          if (t.row === roundConfig.targetPos?.row && t.col === roundConfig.targetPos?.col) {
+            return { ...t, state: 'correct' as const };
+          }
+          return t;
+        });
+
+        set({
+          tiles: updatedTiles,
+          combo: 0,
+          totalAttempts: newTotal,
+          lastFeedback: { type: 'miss', message: 'WRONG TILE' },
+        });
+
+        return { isCorrect: false, isComplete: false };
       }
     }
 
+    // 2. SEQUENCE RUSH
+    if (roundConfig.actualType === 'sequenceRush') {
+      const expectedTileIds = roundConfig.sequenceTileIds || [];
+      const currentStep = playerInputSequence.length;
+      const expectedTileId = expectedTileIds[currentStep];
+
+      const isStepCorrect = tile.id === expectedTileId;
+      const newTotal = totalAttempts + 1;
+
+      if (isStepCorrect) {
+        const newSeq = [...playerInputSequence, tile.id];
+        const isComplete = newSeq.length === expectedTileIds.length;
+
+        const updatedTiles = tiles.map((t) =>
+          t.id === tile.id ? { ...t, state: 'correct' as const, sequenceStep: currentStep + 1 } : t
+        );
+
+        if (isComplete) {
+          const newCorrect = correctAnswers + 1;
+          const newCombo = combo + 1;
+          const pts = calculateScore(true, newCombo, reaction, 10000, difficulty) + expectedTileIds.length * 60;
+          const newScore = score + pts;
+
+          set({
+            tiles: updatedTiles,
+            playerInputSequence: newSeq,
+            combo: newCombo,
+            maxCombo: Math.max(maxCombo, newCombo),
+            score: newScore,
+            correctAnswers: newCorrect,
+            totalAttempts: newTotal,
+            lastFeedback: { type: 'perfect', message: 'SEQUENCE COMPLETE!', points: pts },
+          });
+
+          return { isCorrect: true, isComplete: true };
+        } else {
+          set({
+            tiles: updatedTiles,
+            playerInputSequence: newSeq,
+            totalAttempts: newTotal,
+            lastFeedback: { type: 'streak', message: `STEP ${currentStep + 1} ✓` },
+          });
+
+          return { isCorrect: true, isComplete: false };
+        }
+      } else {
+        const updatedTiles = tiles.map((t) =>
+          t.id === tile.id ? { ...t, state: 'wrong' as const } : t
+        );
+
+        set({
+          tiles: updatedTiles,
+          combo: 0,
+          totalAttempts: newTotal,
+          lastFeedback: { type: 'miss', message: 'WRONG SEQUENCE' },
+        });
+
+        return { isCorrect: false, isComplete: false };
+      }
+    }
+
+    // 3. NUMBER SHIFT
+    if (roundConfig.actualType === 'numberShift') {
+      const isCorrect = tile.id === roundConfig.changedTileId;
+      const newTotal = totalAttempts + 1;
+      const newCorrect = isCorrect ? correctAnswers + 1 : correctAnswers;
+
+      if (isCorrect) {
+        const newCombo = combo + 1;
+        const pts = calculateScore(true, newCombo, reaction, 10000, difficulty);
+        const newScore = score + pts;
+
+        const updatedTiles = tiles.map((t) =>
+          t.id === tile.id ? { ...t, state: 'correct' as const } : t
+        );
+
+        set({
+          tiles: updatedTiles,
+          combo: newCombo,
+          maxCombo: Math.max(maxCombo, newCombo),
+          score: newScore,
+          correctAnswers: newCorrect,
+          totalAttempts: newTotal,
+          lastFeedback: { type: 'perfect', message: 'MUTATION DETECTED!', points: pts },
+        });
+
+        return { isCorrect: true, isComplete: true };
+      } else {
+        const updatedTiles = tiles.map((t) => {
+          if (t.id === tile.id) return { ...t, state: 'wrong' as const };
+          if (t.id === roundConfig.changedTileId) return { ...t, state: 'correct' as const };
+          return t;
+        });
+
+        set({
+          tiles: updatedTiles,
+          combo: 0,
+          totalAttempts: newTotal,
+          lastFeedback: { type: 'miss', message: 'NOT THAT NUMBER' },
+        });
+
+        return { isCorrect: false, isComplete: false };
+      }
+    }
+
+    return { isCorrect: false, isComplete: false };
+  },
+
+  handleAnswerChoice: (value) => {
+    const { roundConfig, combo, maxCombo, score, difficulty, startTimeMs, correctAnswers, totalAttempts, tiles } = get();
+    if (!roundConfig) return { isCorrect: false };
+
+    const reaction = Date.now() - startTimeMs;
+    const isCorrect = value === roundConfig.vanishedValue;
+
     const newTotal = totalAttempts + 1;
     const newCorrect = isCorrect ? correctAnswers + 1 : correctAnswers;
 
@@ -367,13 +506,18 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
       const pts = calculateScore(true, newCombo, reaction, 10000, difficulty);
       const newScore = score + pts;
 
+      const updatedTiles = tiles.map((t) =>
+        t.isMissing ? { ...t, state: 'correct' as const, value: roundConfig.vanishedValue! } : t
+      );
+
       set({
+        tiles: updatedTiles,
         combo: newCombo,
         maxCombo: Math.max(maxCombo, newCombo),
         score: newScore,
         correctAnswers: newCorrect,
         totalAttempts: newTotal,
-        lastFeedback: { type: 'perfect', message: 'PERFECT!', points: pts },
+        lastFeedback: { type: 'perfect', message: 'VANISHED NUMBER FOUND!', points: pts },
       });
 
       return { isCorrect: true };
@@ -381,7 +525,7 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
       set({
         combo: 0,
         totalAttempts: newTotal,
-        lastFeedback: { type: 'miss', message: 'MISS' },
+        lastFeedback: { type: 'miss', message: 'INCORRECT CHOICE' },
       });
 
       return { isCorrect: false };

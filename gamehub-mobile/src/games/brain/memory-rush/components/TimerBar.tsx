@@ -13,7 +13,7 @@ interface TimerBarProps {
 
 export const TimerBar: React.FC<TimerBarProps> = ({ progress, remainingSeconds }) => {
   const isUrgent = remainingSeconds <= 5;
-  const barColor = isUrgent ? MRColors.dangerRose : MRColors.primaryCyan;
+  const barColor = isUrgent ? MRColors.dangerRose : MRColors.yellowStatus;
 
   return (
     <View style={styles.container}>
@@ -46,10 +46,10 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.2)',
+    borderColor: 'rgba(255, 216, 61, 0.3)',
   },
   fill: {
     height: '100%',
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   timerText: {
     fontSize: 14,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1,
     minWidth: 42,
     textAlign: 'right',

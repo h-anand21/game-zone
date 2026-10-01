@@ -44,12 +44,12 @@ const styles = StyleSheet.create({
     backgroundColor: MRColors.surface,
   },
   glowingBorder: {
-    borderColor: MRColors.borderGlass,
-    shadowColor: MRColors.primaryCyan,
+    borderColor: 'rgba(255, 216, 61, 0.45)',
+    shadowColor: MRColors.yellowStatus,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOpacity: 0.45,
+    shadowRadius: 14,
+    elevation: 8,
   },
   inner: {
     padding: 16,

@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView, Switch, Alert, TouchableOpacity } f
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MRIcon } from '../components/MRIcon';
 import { colors } from '../constants/colors';
-import { typography } from '../constants/typography';
 import { GameBackground } from '../components/GameBackground';
 import { GlassCard } from '../components/GlassCard';
 import { BottomTabBar, TabType } from '../components/BottomTabBar';
@@ -49,7 +48,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateTab })
       <Switch
         value={value}
         onValueChange={onValueChange}
-        trackColor={{ false: colors.surfaceElevated, true: 'rgba(34, 211, 238, 0.4)' }}
+        trackColor={{ false: colors.surfaceElevated, true: 'rgba(255, 216, 61, 0.45)' }}
         thumbColor={value ? colors.accent : colors.textSecondary}
       />
     </View>
@@ -165,14 +164,14 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 12,
-    fontWeight: typography.fontWeight.semibold,
+    fontWeight: '600',
     color: colors.accent,
     letterSpacing: 2,
     marginBottom: 4,
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: 1,
   },
@@ -182,7 +181,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     fontSize: 11,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textSecondary,
     letterSpacing: 1.5,
     marginBottom: 16,
@@ -203,7 +202,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 8,
-    backgroundColor: 'rgba(34, 211, 238, 0.1)',
+    backgroundColor: 'rgba(255, 216, 61, 0.15)',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -214,7 +213,7 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: 14,
-    fontWeight: typography.fontWeight.semibold,
+    fontWeight: '700',
     color: colors.textPrimary,
   },
   settingDesc: {
@@ -229,7 +228,7 @@ const styles = StyleSheet.create({
   },
   versionText: {
     fontSize: 12,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textSecondary,
     letterSpacing: 1,
   },

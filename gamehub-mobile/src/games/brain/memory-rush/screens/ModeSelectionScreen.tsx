@@ -126,16 +126,16 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
                     <MRIcon
                       name={item.iconName}
                       size={20}
-                      color={item.isFusion ? MRColors.yellowStatus : MRColors.cyanBright}
+                      color={MRColors.yellowStatus}
                     />
                   </View>
                   <View style={styles.titleCol}>
-                    <Text style={[styles.diffTagText, item.isFusion && styles.fusionTagText]}>
+                    <Text style={[styles.diffTagText, styles.fusionTagText]}>
                       {item.diffTag}
                     </Text>
                     <Text style={styles.cardTitle}>{item.title}</Text>
                   </View>
-                  <MRIcon name="chevron-right" size={20} color={MRColors.cyanBright} />
+                  <MRIcon name="chevron-right" size={20} color={MRColors.yellowStatus} />
                 </View>
 
                 <Text style={styles.cardDesc}>{item.desc}</Text>
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.2,
-    borderColor: 'rgba(34, 211, 238, 0.3)',
+    borderColor: 'rgba(255, 216, 61, 0.35)',
   },
   headerTitleCol: {
     alignItems: 'center',
@@ -181,13 +181,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 12,
     fontWeight: '900',
-    color: MRColors.textPrimary,
+    color: MRColors.textSecondary,
     letterSpacing: 2,
   },
   headerTitleAccent: {
     fontSize: 18,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 2,
   },
   subtitle: {
@@ -219,15 +219,15 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 12,
-    backgroundColor: 'rgba(34, 211, 238, 0.12)',
+    backgroundColor: 'rgba(255, 216, 61, 0.15)',
     borderWidth: 1.2,
-    borderColor: 'rgba(34, 211, 238, 0.35)',
+    borderColor: 'rgba(255, 216, 61, 0.4)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   fusionIconBox: {
-    backgroundColor: 'rgba(250, 204, 21, 0.15)',
-    borderColor: 'rgba(250, 204, 21, 0.4)',
+    backgroundColor: 'rgba(250, 204, 21, 0.22)',
+    borderColor: 'rgba(250, 204, 21, 0.5)',
   },
   titleCol: {
     flex: 1,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
   diffTagText: {
     fontSize: 8.5,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1,
   },
   fusionTagText: {
@@ -262,13 +262,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.2)',
+    borderColor: 'rgba(255, 216, 61, 0.25)',
     alignItems: 'center',
   },
   visualText: {
     fontSize: 11,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1.5,
   },
   pressed: {

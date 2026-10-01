@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Modal, Text, TouchableOpacity, BackHandler } from 'react-native';
 import { MRIcon } from './components/MRIcon';
 import { colors } from './constants/colors';
-import { typography } from './constants/typography';
 import { GlassCard } from './components/GlassCard';
 import { PrimaryButton } from './components/PrimaryButton';
 import { SecondaryButton } from './components/SecondaryButton';
@@ -331,7 +330,7 @@ const styles = StyleSheet.create({
   },
   exitTitle: {
     fontSize: 20,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: 1,
     marginBottom: 8,

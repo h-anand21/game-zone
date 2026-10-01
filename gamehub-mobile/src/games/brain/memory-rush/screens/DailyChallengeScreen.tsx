@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MRIcon } from '../components/MRIcon';
 import { colors } from '../constants/colors';
-import { typography } from '../constants/typography';
 import { GameBackground } from '../components/GameBackground';
 import { GlassCard } from '../components/GlassCard';
 import { PrimaryButton } from '../components/PrimaryButton';
@@ -123,14 +122,14 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 12,
-    fontWeight: typography.fontWeight.semibold,
+    fontWeight: '600',
     color: colors.accent,
     letterSpacing: 2,
     marginBottom: 4,
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: 1,
   },
@@ -147,26 +146,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(34, 211, 238, 0.15)',
+    backgroundColor: 'rgba(255, 216, 61, 0.15)',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 6,
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.accent,
     letterSpacing: 1,
   },
   challengeTitle: {
     fontSize: 32,
-    fontWeight: typography.fontWeight.black,
+    fontWeight: '900',
     color: colors.textPrimary,
     letterSpacing: 1,
   },
   challengeSubtitle: {
     fontSize: 12,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textSecondary,
     letterSpacing: 2,
     marginTop: 4,
@@ -182,13 +181,13 @@ const styles = StyleSheet.create({
   },
   progressLabel: {
     fontSize: 11,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textSecondary,
     letterSpacing: 1,
   },
   progressValue: {
     fontSize: 12,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.accent,
   },
   progressTrack: {
@@ -216,7 +215,7 @@ const styles = StyleSheet.create({
   },
   completedText: {
     fontSize: 16,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.success,
     letterSpacing: 1,
   },
@@ -229,7 +228,7 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 12,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textSecondary,
     letterSpacing: 1.5,
     marginBottom: 16,

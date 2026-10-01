@@ -21,17 +21,20 @@ export const MRColors = {
   textMuted: '#586E88',
   textShadow: 'rgba(0, 0, 0, 0.55)',
 
-  // Neon Electric Accents
-  primaryCyan: '#4DE7FF',
-  cyanBright: '#B2F5EA',
-  cyanShadow: '#0097A7',
-  cyanGlow: 'rgba(77, 231, 255, 0.5)',
-  cyanMuted: 'rgba(77, 231, 255, 0.15)',
-
-  yellowStatus: '#FFD83D',
+  // Primary Cyber Gold & Amber Accents (Arcade Master Theme)
+  primaryGold: '#FFD83D',
   goldLight: '#FFF59D',
   goldShadow: '#B28704',
-  goldGlow: 'rgba(255, 216, 61, 0.5)',
+  goldGlow: 'rgba(255, 216, 61, 0.55)',
+  goldMuted: 'rgba(255, 216, 61, 0.15)',
+  yellowStatus: '#FFD83D',
+
+  // Electric Cyan & Teal Highlights (Auxiliary energy sparks)
+  primaryCyan: '#00E5FF',
+  cyanBright: '#70EFFF',
+  cyanShadow: '#0097A7',
+  cyanGlow: 'rgba(0, 229, 255, 0.45)',
+  cyanMuted: 'rgba(0, 229, 255, 0.12)',
 
   successGreen: '#57E389',
   emeraldShadow: '#2E7D32',
@@ -41,9 +44,9 @@ export const MRColors = {
   coralShadow: '#C62828',
   coralGlow: 'rgba(255, 94, 108, 0.5)',
 
-  // Aliases for retro-compatibility
+  // Aliases
   backgroundPrimary: '#040B16',
-  accent: '#4DE7FF',
+  accent: '#FFD83D',
   warning: '#FFD83D',
   success: '#57E389',
   danger: '#FF5E6C',

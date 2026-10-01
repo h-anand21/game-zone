@@ -23,7 +23,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   title,
   onPress,
   size = 'lg',
-  variant = 'cyan',
+  variant = 'gold',
   icon,
   disabled = false,
   style,

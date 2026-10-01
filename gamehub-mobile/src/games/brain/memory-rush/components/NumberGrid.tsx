@@ -43,6 +43,9 @@ export const NumberGrid: React.FC<NumberGridProps> = ({
                 state={tile.state}
                 size={tileSize}
                 disabled={disabled}
+                sequenceStep={tile.sequenceStep}
+                isMissing={tile.isMissing}
+                isChanged={tile.isChanged}
                 onPress={() => onTilePress?.(tile)}
               />
             ))}

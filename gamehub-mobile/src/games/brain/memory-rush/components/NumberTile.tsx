@@ -15,6 +15,9 @@ interface NumberTileProps {
   onPress?: () => void;
   disabled?: boolean;
   style?: ViewStyle;
+  sequenceStep?: number;
+  isMissing?: boolean;
+  isChanged?: boolean;
 }
 
 export const NumberTile: React.FC<NumberTileProps> = ({
@@ -24,6 +27,9 @@ export const NumberTile: React.FC<NumberTileProps> = ({
   onPress,
   disabled = false,
   style,
+  sequenceStep,
+  isMissing = false,
+  isChanged = false,
 }) => {
   const isPreview = state === 'preview';
   const isHidden = state === 'hidden';
@@ -56,33 +62,49 @@ export const NumberTile: React.FC<NumberTileProps> = ({
     }
     if (isSelected) {
       return {
-        gradient: ['#38BDF8', '#0284C7', '#0369A1'],
-        lipColor: '#075985',
-        textColor: '#FFFFFF',
-        borderColor: '#BAE6FD',
-        glow: MRColors.primaryCyan,
+        gradient: ['#FBBF24', '#D97706', '#B45309'],
+        lipColor: '#78350F',
+        textColor: '#040B16',
+        borderColor: '#FDE68A',
+        glow: MRColors.yellowStatus,
+      };
+    }
+    if (isMissing && !isCorrect) {
+      return {
+        gradient: ['#1A2433', '#111A26', '#090E17'],
+        lipColor: '#070C12',
+        textColor: MRColors.yellowStatus,
+        borderColor: 'rgba(255, 216, 61, 0.5)',
+        glow: 'rgba(255, 216, 61, 0.4)',
       };
     }
     if (isPreview) {
       return {
         gradient: ['#1E293B', '#0F172A', '#020617'],
         lipColor: '#090D16',
-        textColor: MRColors.cyanBright,
-        borderColor: MRColors.primaryCyan,
-        glow: 'rgba(34, 211, 238, 0.4)',
+        textColor: MRColors.yellowStatus,
+        borderColor: sequenceStep !== undefined ? MRColors.yellowStatus : 'rgba(255, 216, 61, 0.4)',
+        glow: 'rgba(255, 216, 61, 0.45)',
       };
     }
-    // Hidden / Default tile state
+    // Default or Hidden tile
     return {
       gradient: ['#1E293B', '#111827', '#0B0F19'],
       lipColor: '#05070D',
-      textColor: MRColors.textSecondary,
-      borderColor: 'rgba(34, 211, 238, 0.25)',
-      glow: 'rgba(0, 0, 0, 0.5)',
+      textColor: isHidden ? MRColors.textMuted : MRColors.textPrimary,
+      borderColor: isChanged ? 'rgba(255, 216, 61, 0.6)' : 'rgba(255, 216, 61, 0.22)',
+      glow: isChanged ? 'rgba(255, 216, 61, 0.35)' : 'rgba(0, 0, 0, 0.5)',
     };
   };
 
   const config = getColors();
+
+  const getDisplayText = () => {
+    if (isCorrect || isWrong) return value;
+    if (isMissing) return '?';
+    if (isHidden) return '?';
+    return value;
+  };
 
   return (
     <Pressable
@@ -96,7 +118,7 @@ export const NumberTile: React.FC<NumberTileProps> = ({
         },
         style,
       ]}
-      accessibilityLabel={isPreview ? `Number ${value}` : 'Hidden Tile'}
+      accessibilityLabel={isPreview ? `Number ${value}` : 'Tile'}
       accessibilityRole="button"
     >
       {({ pressed }) => (
@@ -130,17 +152,24 @@ export const NumberTile: React.FC<NumberTileProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 0, y: 1 }}
             >
-              {/* Glass Specular Spec */}
+              {/* Glass Specular Highlight */}
               <View style={styles.topGlassHighlight} />
+
+              {/* Sequence Step Badge Indicator */}
+              {sequenceStep !== undefined && (
+                <View style={styles.sequenceBadge}>
+                  <Text style={styles.sequenceBadgeText}>{sequenceStep}</Text>
+                </View>
+              )}
 
               <Text
                 style={[
                   styles.numberText,
                   { fontSize, color: config.textColor },
-                  (isCorrect || isWrong || isSelected) && styles.textShadow,
+                  (isCorrect || isWrong || isSelected || isPreview) && styles.textShadow,
                 ]}
               >
-                {isPreview || isCorrect || isWrong ? value : isHidden ? '?' : ''}
+                {getDisplayText()}
               </Text>
             </LinearGradient>
           </View>
@@ -189,5 +218,26 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0, 0, 0, 0.6)',
     textShadowOffset: { width: 0, height: 1.5 },
     textShadowRadius: 3,
+  },
+  sequenceBadge: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: MRColors.yellowStatus,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: MRColors.yellowStatus,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  sequenceBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#040B16',
   },
 });

@@ -99,14 +99,18 @@ export function generateRoundConfig(
     actualType = mode as RoundType;
   }
 
-  const initialTiles = generateTilesForGrid(rows, cols, difficulty);
+  let initialTiles = generateTilesForGrid(rows, cols, difficulty);
 
   let prompt = '';
   let targetVal: number | undefined;
   let targetPos: GridPos | undefined;
   let seqOrder: number[] | undefined;
-  let changedPos: GridPos[] | undefined;
-  let missingNums: number[] | undefined;
+  let seqTileIds: string[] | undefined;
+  let changedTileId: string | undefined;
+  let changedOriginalVal: number | undefined;
+  let changedNewVal: number | undefined;
+  let vanishedVal: number | undefined;
+  let missingOpts: number[] | undefined;
 
   switch (actualType) {
     case 'memoryGrid': {
@@ -118,23 +122,54 @@ export function generateRoundConfig(
     }
     case 'sequenceRush': {
       const seqLen = Math.min(initialTiles.length, difficulty === 'hard' ? 5 : difficulty === 'medium' ? 4 : 3);
-      const shuffled = shuffleArray(initialTiles).slice(0, seqLen);
-      seqOrder = shuffled.map((t) => t.value);
-      const isReverse = difficulty === 'hard' && Math.random() > 0.5;
-      prompt = isReverse ? 'REPEAT IN REVERSE ORDER' : 'REPEAT THE SEQUENCE';
+      const chosenTiles = shuffleArray(initialTiles).slice(0, seqLen);
+      seqTileIds = chosenTiles.map((t) => t.id);
+      seqOrder = chosenTiles.map((t) => t.value);
+
+      // Mark the sequence steps on initialTiles for preview
+      initialTiles = initialTiles.map((tile) => {
+        const stepIdx = seqTileIds!.indexOf(tile.id);
+        if (stepIdx !== -1) {
+          return { ...tile, sequenceStep: stepIdx + 1 };
+        }
+        return tile;
+      });
+
+      prompt = `REPEAT SEQUENCE: 1 OF ${seqLen}`;
       break;
     }
     case 'numberShift': {
-      // Pick 1 or 2 tiles to change value
-      const targetIndices = shuffleArray(initialTiles.map((_, idx) => idx)).slice(0, difficulty === 'hard' ? 2 : 1);
-      changedPos = targetIndices.map((idx) => ({ row: initialTiles[idx].row, col: initialTiles[idx].col }));
-      prompt = 'WHAT CHANGED?';
+      const targetTile = initialTiles[getRandomInt(0, initialTiles.length - 1)];
+      changedTileId = targetTile.id;
+      changedOriginalVal = targetTile.value;
+
+      // Generate a new value distinct from all current tiles
+      const existingValues = new Set(initialTiles.map((t) => t.value));
+      let newVal: number;
+      do {
+        newVal = getRandomInt(1, difficulty === 'easy' ? 9 : 99);
+      } while (existingValues.has(newVal));
+
+      changedNewVal = newVal;
+      prompt = `ONE NUMBER MUTATED! TAP THE CHANGED NUMBER`;
       break;
     }
     case 'missingNumber': {
-      const missingTile = initialTiles[getRandomInt(0, initialTiles.length - 1)];
-      missingNums = [missingTile.value];
-      prompt = 'WHICH NUMBER IS MISSING?';
+      const targetTile = initialTiles[getRandomInt(0, initialTiles.length - 1)];
+      vanishedVal = targetTile.value;
+
+      // Generate 3 distractors not in initialTiles
+      const existingValues = new Set(initialTiles.map((t) => t.value));
+      const distractors: number[] = [];
+      while (distractors.length < 3) {
+        const d = getRandomInt(1, difficulty === 'easy' ? 9 : 99);
+        if (!existingValues.has(d) && !distractors.includes(d)) {
+          distractors.push(d);
+        }
+      }
+
+      missingOpts = shuffleArray([vanishedVal, ...distractors]);
+      prompt = `WHICH NUMBER VANISHED FROM THE EMPTY TILE?`;
       break;
     }
   }
@@ -150,8 +185,12 @@ export function generateRoundConfig(
     targetValue: targetVal,
     targetPos,
     sequenceOrder: seqOrder,
-    changedPositions: changedPos,
-    missingNumbers: missingNums,
+    sequenceTileIds: seqTileIds,
+    changedTileId,
+    changedOriginalValue: changedOriginalVal,
+    changedNewValue: changedNewVal,
+    vanishedValue: vanishedVal,
+    missingOptions: missingOpts,
     questionPrompt: prompt,
   };
 

@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MRIcon } from '../components/MRIcon';
 import { colors } from '../constants/colors';
-import { typography } from '../constants/typography';
 import { GameBackground } from '../components/GameBackground';
 import { GlassCard } from '../components/GlassCard';
 import { StatCard } from '../components/StatCard';
@@ -155,14 +154,14 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     fontSize: 12,
-    fontWeight: typography.fontWeight.semibold,
+    fontWeight: '600',
     color: colors.accent,
     letterSpacing: 2,
     marginBottom: 4,
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: 1,
   },
@@ -172,14 +171,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   heroNumber: {
-    fontSize: typography.fontSize.mainScore,
-    fontWeight: typography.fontWeight.black,
+    fontSize: 48,
+    fontWeight: '900',
     color: colors.accent,
     letterSpacing: 1,
   },
   heroLabel: {
     fontSize: 11,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textSecondary,
     letterSpacing: 2,
     marginTop: 4,
@@ -202,7 +201,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 13,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textPrimary,
     letterSpacing: 1.5,
   },
@@ -216,13 +215,13 @@ const styles = StyleSheet.create({
   },
   modeTitle: {
     fontSize: 12,
-    fontWeight: typography.fontWeight.semibold,
+    fontWeight: '700',
     color: colors.textPrimary,
     letterSpacing: 1,
   },
   modeAcc: {
     fontSize: 12,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.accent,
   },
   barTrack: {
@@ -249,7 +248,7 @@ const styles = StyleSheet.create({
   },
   runMode: {
     fontSize: 13,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textPrimary,
   },
   runDate: {
@@ -262,7 +261,7 @@ const styles = StyleSheet.create({
   },
   runScore: {
     fontSize: 14,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.accent,
   },
   runAcc: {

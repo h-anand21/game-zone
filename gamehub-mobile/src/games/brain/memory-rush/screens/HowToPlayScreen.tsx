@@ -77,7 +77,7 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({ onGotIt }) => 
           <PrimaryButton
             title="GOT IT →"
             size="lg"
-            variant="cyan"
+            variant="gold"
             onPress={onGotIt}
           />
         </View>
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 11,
     fontWeight: '800',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1.5,
     marginTop: 2,
   },
@@ -127,17 +127,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: 'rgba(34, 211, 238, 0.12)',
+    backgroundColor: 'rgba(255, 216, 61, 0.15)',
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.3)',
+    borderColor: 'rgba(255, 216, 61, 0.4)',
   },
   stepNum: {
     fontSize: 9,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1,
   },
   stepTitle: {
@@ -158,13 +158,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.2)',
+    borderColor: 'rgba(255, 216, 61, 0.25)',
     alignItems: 'center',
   },
   visualText: {
     fontSize: 12,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1.5,
   },
   ctaWrapper: {

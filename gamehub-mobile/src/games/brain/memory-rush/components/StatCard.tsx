@@ -3,7 +3,6 @@ import { View, Text, StyleSheet } from 'react-native';
 import { GlassCard } from './GlassCard';
 import { MRIcon } from './MRIcon';
 import { colors } from '../constants/colors';
-import { typography } from '../constants/typography';
 
 interface StatCardProps {
   title: string;
@@ -43,13 +42,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 10,
-    fontWeight: typography.fontWeight.bold,
+    fontWeight: '800',
     color: colors.textSecondary,
     letterSpacing: 1,
   },
   value: {
     fontSize: 20,
-    fontWeight: typography.fontWeight.black,
+    fontWeight: '900',
     letterSpacing: 0.5,
   },
 });

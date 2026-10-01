@@ -49,9 +49,9 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({ onNextRoun
               <Text style={styles.metricValWhite}>×{combo}</Text>
             </View>
             <View style={styles.metricCell}>
-              <MRIcon name="star" size={14} color={MRColors.cyanBright} />
+              <MRIcon name="star" size={14} color={MRColors.yellowStatus} />
               <Text style={styles.metricLabel}>TIME BONUS</Text>
-              <Text style={styles.metricValCyan}>+4s</Text>
+              <Text style={styles.metricValYellow}>+4s</Text>
             </View>
           </View>
         </GlassCard>
@@ -60,7 +60,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({ onNextRoun
           <PrimaryButton
             title="NEXT ROUND →"
             size="lg"
-            variant="cyan"
+            variant="gold"
             onPress={onNextRound}
           />
         </View>
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
   roundTag: {
     fontSize: 11,
     fontWeight: '800',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1.5,
     marginTop: 4,
   },
@@ -106,11 +106,11 @@ const styles = StyleSheet.create({
   pointsVal: {
     fontSize: 48,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     marginVertical: 4,
-    textShadowColor: MRColors.cyanGlow,
+    textShadowColor: MRColors.goldGlow,
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
+    textShadowRadius: 14,
   },
   metricsGrid: {
     flexDirection: 'row',
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.2)',
+    borderColor: 'rgba(255, 216, 61, 0.25)',
     gap: 2,
   },
   metricLabel: {
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   metricValCyan: {
     fontSize: 16,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     marginTop: 2,
   },
   metricValYellow: {

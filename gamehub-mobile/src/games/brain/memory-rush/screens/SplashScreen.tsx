@@ -31,7 +31,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../../../../assets/images/mr_bg_home.jpg')}
+        source={require('../../../../../assets/images/mr_arcade_loading_bg.jpg')}
         style={StyleSheet.absoluteFill}
         resizeMode="cover"
       />
@@ -87,26 +87,26 @@ const styles = StyleSheet.create({
   appTitleAccent: {
     fontSize: 52,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 6,
     lineHeight: 56,
-    textShadowColor: MRColors.cyanGlow,
+    textShadowColor: MRColors.goldGlow,
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 16,
+    textShadowRadius: 18,
   },
   subtitlePill: {
     marginTop: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
     borderRadius: 12,
-    backgroundColor: MRColors.cyanMuted,
-    borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.3)',
+    backgroundColor: 'rgba(255, 216, 61, 0.15)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 216, 61, 0.4)',
   },
   subtitleText: {
-    fontSize: 10,
+    fontSize: 10.5,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 2,
   },
   loadingBox: {
@@ -118,21 +118,21 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.25)',
+    borderColor: 'rgba(255, 216, 61, 0.35)',
     marginBottom: 10,
   },
   fill: {
     height: '100%',
     borderRadius: 4,
-    backgroundColor: MRColors.primaryCyan,
+    backgroundColor: MRColors.yellowStatus,
   },
   loadingText: {
     fontSize: 11,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 2,
   },
 });

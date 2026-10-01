@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(23, 29, 36, 0.85)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.25)',
+    borderColor: 'rgba(255, 216, 61, 0.3)',
     paddingHorizontal: 10,
     paddingVertical: 6,
     gap: 6,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     fontSize: 13,
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
   },
   label: {
     fontSize: 10,
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   badge: {
-    backgroundColor: 'rgba(34, 211, 238, 0.2)',
+    backgroundColor: 'rgba(255, 216, 61, 0.15)',
     borderRadius: 8,
     paddingHorizontal: 5,
     paddingVertical: 1,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 9,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
   },
   pressed: {
     transform: [{ scale: 0.95 }],

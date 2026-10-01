@@ -56,7 +56,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
               <MRIcon
                 name={tab.iconName}
                 size={18}
-                color={isActive ? MRColors.cyanBright : MRColors.textMuted}
+                color={isActive ? MRColors.yellowStatus : MRColors.textMuted}
               />
               <Text style={[styles.labelText, isActive && styles.activeLabel]}>
                 {tab.label}
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 24,
     borderWidth: 1.2,
-    borderColor: 'rgba(34, 211, 238, 0.3)',
+    borderColor: 'rgba(255, 216, 61, 0.3)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.6,
@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
     width: 24,
     height: 3,
     borderRadius: 1.5,
-    backgroundColor: MRColors.primaryCyan,
-    shadowColor: MRColors.primaryCyan,
+    backgroundColor: MRColors.yellowStatus,
+    shadowColor: MRColors.yellowStatus,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.9,
     shadowRadius: 6,
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   activeLabel: {
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     fontWeight: '900',
   },
   pressed: {

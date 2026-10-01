@@ -114,7 +114,7 @@ export const FinalResultScreen: React.FC<FinalResultScreenProps> = ({
             <PrimaryButton
               title="PLAY AGAIN →"
               size="lg"
-              variant="cyan"
+              variant="gold"
               onPress={onPlayAgain}
             />
             <SecondaryButton
@@ -152,18 +152,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: 'rgba(34, 211, 238, 0.12)',
+    backgroundColor: 'rgba(255, 216, 61, 0.15)',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderWidth: 1.2,
-    borderColor: 'rgba(34, 211, 238, 0.35)',
+    borderColor: 'rgba(255, 216, 61, 0.4)',
     marginTop: 4,
   },
   perfText: {
     fontSize: 10,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1.5,
   },
   scrollContent: {
@@ -184,11 +184,11 @@ const styles = StyleSheet.create({
   scoreVal: {
     fontSize: 48,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     marginVertical: 4,
-    textShadowColor: MRColors.cyanGlow,
+    textShadowColor: MRColors.goldGlow,
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 12,
+    textShadowRadius: 14,
   },
   metricsRow: {
     flexDirection: 'row',
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.2)',
+    borderColor: 'rgba(255, 216, 61, 0.25)',
     gap: 3,
   },
   mLabel: {
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   mValCyan: {
     fontSize: 13,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
   },
   mValWhite: {
     fontSize: 13,
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   barFill: {
     height: '100%',
     borderRadius: 4,
-    backgroundColor: MRColors.primaryCyan,
+    backgroundColor: MRColors.yellowStatus,
   },
   btnStack: {
     gap: 10,
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   homeLinkText: {
     fontSize: 11,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1.5,
   },
 });

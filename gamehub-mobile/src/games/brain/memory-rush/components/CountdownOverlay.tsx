@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   diffSubtitle: {
     fontSize: 12,
     fontWeight: '800',
-    color: MRColors.primaryCyan,
+    color: MRColors.yellowStatus,
     letterSpacing: 3,
     marginTop: 4,
   },
@@ -108,20 +108,20 @@ const styles = StyleSheet.create({
     width: 140,
     height: 140,
     borderRadius: 70,
-    backgroundColor: 'rgba(34, 211, 238, 0.10)',
+    backgroundColor: 'rgba(255, 216, 61, 0.12)',
     borderWidth: 2.5,
-    borderColor: MRColors.primaryCyan,
+    borderColor: MRColors.yellowStatus,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: MRColors.primaryCyan,
+    shadowColor: MRColors.yellowStatus,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: 20,
     elevation: 8,
   },
   rushCircle: {
-    backgroundColor: 'rgba(34, 211, 238, 0.25)',
-    borderColor: MRColors.cyanBright,
+    backgroundColor: 'rgba(255, 216, 61, 0.25)',
+    borderColor: '#FFF59D',
     transform: [{ scale: 1.15 }],
   },
   countText: {
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   },
   rushText: {
     fontSize: 28,
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 2,
   },
   prepareText: {

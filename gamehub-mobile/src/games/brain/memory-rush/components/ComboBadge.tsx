@@ -22,13 +22,13 @@ export const ComboBadge: React.FC<ComboBadgeProps> = ({ combo }) => {
 
 const styles = StyleSheet.create({
   badge: {
-    backgroundColor: 'rgba(34, 211, 238, 0.15)',
+    backgroundColor: 'rgba(255, 216, 61, 0.15)',
     borderWidth: 1.5,
-    borderColor: MRColors.primaryCyan,
+    borderColor: MRColors.yellowStatus,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
-    shadowColor: MRColors.primaryCyan,
+    shadowColor: MRColors.yellowStatus,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.6,
     shadowRadius: 8,
@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   comboText: {
     fontSize: 12,
     fontWeight: '900',
-    color: MRColors.cyanBright,
+    color: MRColors.yellowStatus,
     letterSpacing: 1.2,
   },
 });

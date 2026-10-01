@@ -25,7 +25,7 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
     if (activeTheme === 'gameplay') {
       return require('../../../../../assets/images/mr_bg_gameplay.jpg');
     }
-    return require('../../../../../assets/images/mr_bg_home.jpg');
+    return require('../../../../../assets/images/mr_arcade_home_bg.jpg');
   };
 
   const getOpacity = () => {
