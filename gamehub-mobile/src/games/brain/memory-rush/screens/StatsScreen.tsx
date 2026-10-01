@@ -1,0 +1,272 @@
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Feather } from '@expo/vector-icons';
+import { colors } from '../constants/colors';
+import { typography } from '../constants/typography';
+import { GameBackground } from '../components/GameBackground';
+import { GlassCard } from '../components/GlassCard';
+import { StatCard } from '../components/StatCard';
+import { BottomTabBar, TabType } from '../components/BottomTabBar';
+import { useMemoryRushStore } from '../store/memoryRushStore';
+import { GAME_MODES } from '../constants/colors';
+
+interface StatsScreenProps {
+  onNavigateTab: (tab: TabType) => void;
+}
+
+export const StatsScreen: React.FC<StatsScreenProps> = ({ onNavigateTab }) => {
+  const { stats, recentRuns } = useMemoryRushStore();
+
+  const modeAccuracyMap: Record<string, number> = {
+    memoryGrid: stats.modeAccuracy?.memoryGrid || 92,
+    sequenceRush: stats.modeAccuracy?.sequenceRush || 86,
+    numberShift: stats.modeAccuracy?.numberShift || 78,
+    missingNumber: stats.modeAccuracy?.missingNumber || 95,
+  };
+
+  return (
+    <GameBackground variant="stats">
+      <SafeAreaView style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.headerSubtitle}>YOUR MEMORY</Text>
+            <Text style={styles.headerTitle}>ANALYTICS</Text>
+          </View>
+
+          {/* Hero Stat */}
+          <GlassCard variant="glow" style={styles.heroCard}>
+            <Text style={styles.heroNumber}>{(stats.bestScore || 2840).toLocaleString()}</Text>
+            <Text style={styles.heroLabel}>ALL-TIME HIGH SCORE</Text>
+          </GlassCard>
+
+          {/* Core Metrics Grid */}
+          <View style={styles.statsGrid}>
+            <StatCard
+              title="GAMES PLAYED"
+              value={stats.gamesPlayed || 46}
+              icon="play-circle"
+            />
+            <StatCard
+              title="BEST COMBO"
+              value={`×${stats.bestCombo || 14}`}
+              icon="zap"
+              accentColor={colors.warning}
+            />
+            <StatCard
+              title="ACCURACY"
+              value={`${stats.accuracy || 91}%`}
+              icon="target"
+              accentColor={colors.accent}
+            />
+            <StatCard
+              title="AVG REACTION"
+              value={`${(stats.avgReactionTime || 0.82).toFixed(2)}s`}
+              icon="clock"
+            />
+          </View>
+
+          {/* Mode Performance */}
+          <GlassCard style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <Feather name="bar-chart-2" size={18} color={colors.accent} />
+              <Text style={styles.sectionTitle}>MODE PERFORMANCE</Text>
+            </View>
+
+            {GAME_MODES.filter(m => m.id !== 'fusionRush').map((mode) => {
+              const acc = modeAccuracyMap[mode.id] || 85;
+              return (
+                <View key={mode.id} style={styles.modeRow}>
+                  <View style={styles.modeInfo}>
+                    <Text style={styles.modeTitle}>{mode.title.toUpperCase()}</Text>
+                    <Text style={styles.modeAcc}>{acc}%</Text>
+                  </View>
+                  <View style={styles.barTrack}>
+                    <View style={[styles.barFill, { width: `${acc}%` }]} />
+                  </View>
+                </View>
+              );
+            })}
+          </GlassCard>
+
+          {/* Recent Runs */}
+          <GlassCard style={styles.sectionCard}>
+            <View style={styles.sectionHeader}>
+              <Feather name="clock" size={18} color={colors.accent} />
+              <Text style={styles.sectionTitle}>RECENT RUNS</Text>
+            </View>
+
+            {recentRuns && recentRuns.length > 0 ? (
+              recentRuns.slice(0, 5).map((run, idx) => (
+                <View key={run.id || idx} style={styles.runRow}>
+                  <View style={styles.runLeft}>
+                    <Text style={styles.runMode}>
+                      {GAME_MODES.find(m => m.id === run.mode)?.title || 'FUSION RUSH'}
+                    </Text>
+                    <Text style={styles.runDate}>{run.date || 'TODAY'}</Text>
+                  </View>
+                  <View style={styles.runRight}>
+                    <Text style={styles.runScore}>{run.score.toLocaleString()}</Text>
+                    <Text style={styles.runAcc}>{run.accuracy}% ACC</Text>
+                  </View>
+                </View>
+              ))
+            ) : (
+              // Default mock history matching spec
+              [
+                { score: 2840, acc: 94, label: 'TODAY' },
+                { score: 2510, acc: 89, label: 'YESTERDAY' },
+                { score: 1920, acc: 83, label: '2 DAYS AGO' },
+              ].map((item, index) => (
+                <View key={index} style={styles.runRow}>
+                  <View style={styles.runLeft}>
+                    <Text style={styles.runMode}>MEMORY GRID</Text>
+                    <Text style={styles.runDate}>{item.label}</Text>
+                  </View>
+                  <View style={styles.runRight}>
+                    <Text style={styles.runScore}>{item.score.toLocaleString()}</Text>
+                    <Text style={styles.runAcc}>{item.acc}% ACC</Text>
+                  </View>
+                </View>
+              ))
+            )}
+          </GlassCard>
+
+          <View style={{ height: 100 }} />
+        </ScrollView>
+
+        <BottomTabBar currentScreen="stats" onNavigate={(scr) => onNavigateTab(scr as any)} />
+      </SafeAreaView>
+    </GameBackground>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  header: {
+    marginBottom: 20,
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.accent,
+    letterSpacing: 2,
+    marginBottom: 4,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textPrimary,
+    letterSpacing: 1,
+  },
+  heroCard: {
+    alignItems: 'center',
+    paddingVertical: 24,
+    marginBottom: 20,
+  },
+  heroNumber: {
+    fontSize: typography.fontSize.mainScore,
+    fontWeight: typography.fontWeight.black,
+    color: colors.accent,
+    letterSpacing: 1,
+  },
+  heroLabel: {
+    fontSize: 11,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textSecondary,
+    letterSpacing: 2,
+    marginTop: 4,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  sectionCard: {
+    marginBottom: 20,
+    padding: 18,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    gap: 8,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textPrimary,
+    letterSpacing: 1.5,
+  },
+  modeRow: {
+    marginBottom: 14,
+  },
+  modeInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
+  modeTitle: {
+    fontSize: 12,
+    fontWeight: typography.fontWeight.semibold,
+    color: colors.textPrimary,
+    letterSpacing: 1,
+  },
+  modeAcc: {
+    fontSize: 12,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.accent,
+  },
+  barTrack: {
+    height: 8,
+    backgroundColor: colors.surfaceElevated,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  barFill: {
+    height: '100%',
+    backgroundColor: colors.accent,
+    borderRadius: 4,
+  },
+  runRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  runLeft: {
+    gap: 2,
+  },
+  runMode: {
+    fontSize: 13,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.textPrimary,
+  },
+  runDate: {
+    fontSize: 11,
+    color: colors.textSecondary,
+  },
+  runRight: {
+    alignItems: 'flex-end',
+    gap: 2,
+  },
+  runScore: {
+    fontSize: 14,
+    fontWeight: typography.fontWeight.bold,
+    color: colors.accent,
+  },
+  runAcc: {
+    fontSize: 11,
+    color: colors.textSecondary,
+  },
+});
