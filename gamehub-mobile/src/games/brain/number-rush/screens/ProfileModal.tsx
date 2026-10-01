@@ -49,49 +49,50 @@ export const ProfileModal: React.FC = () => {
         showsVerticalScrollIndicator={false}
         bounces={true}
       >
-        {/* 3. Hero Profile Dashboard Card */}
-        <WoodPanel style={styles.profileCard} variant="wood" hasRivets={true}>
-          {/* Avatar with Golden Frame */}
-          <View style={styles.avatarContainer}>
-            <View style={styles.avatarDisk}>
-              <Text style={styles.avatarEmoji}>🏃</Text>
+        {/* 3. Compact Hero Profile Dashboard Card */}
+        <WoodPanel style={styles.profileCard} variant="wood" hasRivets={false}>
+          <View style={styles.profileTopRow}>
+            {/* Left: Avatar with Level Badge */}
+            <View style={styles.avatarContainer}>
+              <View style={styles.avatarDisk}>
+                <Text style={styles.avatarEmoji}>🏃</Text>
+              </View>
+              <View style={styles.levelBadge}>
+                <Text style={styles.levelText}>L{stats.level}</Text>
+              </View>
             </View>
-            <View style={styles.levelBadge}>
-              <Text style={styles.levelText}>LVL {stats.level}</Text>
+
+            {/* Right: Player Name, Title Pill & XP Bar */}
+            <View style={styles.profileInfoCol}>
+              <View style={styles.playerNameRow}>
+                <Text style={styles.playerName} numberOfLines={1}>{stats.playerName || 'Player'}</Text>
+                <Pressable
+                  onPress={() => setScreen('settings')}
+                  style={styles.settingsMiniBtn}
+                >
+                  <Text style={styles.settingsMiniIcon}>⚙️ SETTINGS</Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.titlePill}>
+                <Text style={styles.titlePillText}>{getPlayerTitle(stats.level)}</Text>
+              </View>
+
+              {/* XP Progress Bar */}
+              <View style={styles.xpSection}>
+                <View style={styles.xpLabelRow}>
+                  <Text style={styles.xpLabel}>PROGRESS</Text>
+                  <Text style={styles.xpVal}>
+                    {currentXpInLevel}/{xpRequired} XP ({progressPercent}%)
+                  </Text>
+                </View>
+                <View style={styles.xpTrack}>
+                  <View style={[styles.xpFill, { width: `${progressPercent}%` }]} />
+                  <View style={styles.xpShine} />
+                </View>
+              </View>
             </View>
           </View>
-
-          <Text style={styles.playerName}>{stats.playerName || 'Player'}</Text>
-          <View style={styles.titlePill}>
-            <Text style={styles.titlePillText}>{getPlayerTitle(stats.level)}</Text>
-          </View>
-
-          {/* XP Progress Bar */}
-          <View style={styles.xpSection}>
-            <View style={styles.xpLabelRow}>
-              <Text style={styles.xpLabel}>LEVEL {stats.level} PROGRESS</Text>
-              <Text style={styles.xpVal}>
-                {currentXpInLevel} / {xpRequired} XP ({progressPercent}%)
-              </Text>
-            </View>
-            <View style={styles.xpTrack}>
-              <View style={[styles.xpFill, { width: `${progressPercent}%` }]} />
-              <View style={styles.xpShine} />
-            </View>
-          </View>
-
-          {/* Settings & Audio Shortcut */}
-          <Pressable
-            onPress={() => setScreen('settings')}
-            style={({ pressed }) => [
-              styles.settingsBtn,
-              pressed && { opacity: 0.8 },
-            ]}
-          >
-            <Text style={styles.settingsBtnIcon}>⚙️</Text>
-            <Text style={styles.settingsBtnText}>SOUND & GAME SETTINGS</Text>
-            <Text style={styles.settingsBtnArrow}>→</Text>
-          </Pressable>
         </WoodPanel>
 
         {/* 4. Career Performance Section */}
@@ -236,150 +237,142 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   profileCard: {
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    marginBottom: 14,
+  },
+  profileTopRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 20,
-    paddingHorizontal: 18,
-    marginBottom: 16,
+    width: '100%',
   },
   avatarContainer: {
     position: 'relative',
-    marginBottom: 10,
+    marginRight: 14,
   },
   avatarDisk: {
-    width: 82,
-    height: 82,
-    borderRadius: 41,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: '#0F2643',
-    borderWidth: 3.5,
+    borderWidth: 2.5,
     borderColor: '#FFD700',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#FFB800',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 6,
   },
   avatarEmoji: {
-    fontSize: 42,
+    fontSize: 32,
   },
   levelBadge: {
     position: 'absolute',
-    bottom: -4,
-    right: -4,
+    bottom: -3,
+    right: -3,
     backgroundColor: '#FF6D00',
-    paddingHorizontal: 9,
-    paddingVertical: 3,
-    borderRadius: 12,
-    borderWidth: 2,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    borderWidth: 1.5,
     borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 5,
+    elevation: 4,
   },
   levelText: {
     color: '#FFFFFF',
     fontWeight: '900',
-    fontSize: 11,
+    fontSize: 9,
     letterSpacing: 0.5,
+  },
+  profileInfoCol: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  playerNameRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 3,
   },
   playerName: {
     color: '#FFFFFF',
-    fontSize: 22,
-    fontWeight: '900',
-    letterSpacing: 1,
-  },
-  titlePill: {
-    backgroundColor: 'rgba(46, 213, 115, 0.18)',
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: '#2ED573',
-    marginTop: 6,
-    marginBottom: 14,
-  },
-  titlePillText: {
-    color: '#2ED573',
-    fontSize: 11,
+    fontSize: 17,
     fontWeight: '900',
     letterSpacing: 0.8,
   },
+  settingsMiniBtn: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  settingsMiniIcon: {
+    color: '#FFE082',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  titlePill: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(46, 213, 115, 0.18)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2ED573',
+    marginBottom: 6,
+  },
+  titlePillText: {
+    color: '#2ED573',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
   xpSection: {
     width: '100%',
-    marginVertical: 4,
   },
   xpLabelRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 3,
   },
   xpLabel: {
     color: '#8CA0BA',
-    fontSize: 11,
+    fontSize: 9,
     fontWeight: '900',
-    letterSpacing: 0.8,
+    letterSpacing: 0.5,
   },
   xpVal: {
     color: '#00E5FF',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '900',
   },
   xpTrack: {
     width: '100%',
-    height: 12,
+    height: 9,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 6,
+    borderRadius: 5,
     overflow: 'hidden',
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
     position: 'relative',
   },
   xpFill: {
     height: '100%',
     backgroundColor: '#00E676',
-    borderRadius: 6,
+    borderRadius: 5,
   },
   xpShine: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 4,
+    height: 3,
     backgroundColor: 'rgba(255, 255, 255, 0.35)',
-  },
-  settingsBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 14,
-    paddingVertical: 9,
-    paddingHorizontal: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.25)',
-    width: '100%',
-  },
-  settingsBtnIcon: {
-    fontSize: 14,
-    marginRight: 8,
-  },
-  settingsBtnText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '900',
-    letterSpacing: 0.8,
-    flex: 1,
-    textAlign: 'center',
-  },
-  settingsBtnArrow: {
-    color: '#FFD700',
-    fontSize: 14,
-    fontWeight: '900',
   },
   sectionHeaderRow: {
     flexDirection: 'row',

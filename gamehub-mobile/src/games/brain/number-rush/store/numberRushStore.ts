@@ -162,8 +162,8 @@ let timerInterval: any = null;
 
 export const useNumberRushStore = create<NumberRushState>((set, get) => ({
   // Defaults
-  currentScreen: 'home',
-  previousScreen: 'home',
+  currentScreen: 'splash',
+  previousScreen: 'splash',
   selectedMode: 'animal-count',
   selectedCategory: 'observe',
   difficulty: 'easy',

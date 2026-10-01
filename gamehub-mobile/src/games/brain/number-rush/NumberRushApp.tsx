@@ -7,6 +7,7 @@ import { View, StyleSheet, StatusBar, BackHandler } from 'react-native';
 import { NRTheme } from './theme';
 import { useNumberRushStore } from './store/numberRushStore';
 import {
+  SplashScreen,
   HomeScreen,
   ModeHubScreen,
   CategoryScreen,
@@ -124,6 +125,8 @@ export const NumberRushApp: React.FC<NumberRushAppProps> = ({ onExit }) => {
 
   const renderActiveScreen = () => {
     switch (currentScreen) {
+      case 'splash':
+        return <SplashScreen />;
       case 'home':
         return <HomeScreen />;
       case 'mode-hub':

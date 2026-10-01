@@ -1,9 +1,10 @@
 // ============================================================
 // Number Rush — Screen 01: SPLASH (Brand Identity & Loading)
+// Mind Lock inspired 3D Procedural Vector Logo + Mascot
 // ============================================================
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Pressable } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
 import Animated, {
   useSharedValue,
@@ -12,28 +13,34 @@ import Animated, {
   withSequence,
   withTiming,
   Easing,
-  interpolate,
 } from 'react-native-reanimated';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
-import { MascotIllustration } from '../components/MascotIllustration';
+import { MascotIllustration, NumberRushLogo } from '../components';
 
 const { width } = Dimensions.get('window');
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const SplashScreen: React.FC = () => {
-  const { setScreen } = useNumberRushStore();
+  const { setScreen, loadPersistedData } = useNumberRushStore();
   const [progress, setProgress] = useState(0);
 
   const float1 = useSharedValue(0);
   const float2 = useSharedValue(0);
-  const logoScale = useSharedValue(0.85);
+  const logoScale = useSharedValue(0.78);
+  const logoOpacity = useSharedValue(0);
 
   useEffect(() => {
+    loadPersistedData();
+
     // Pulse logo entrance
     logoScale.value = withTiming(1, {
-      duration: 800,
-      easing: Easing.out(Easing.back(1.4)),
+      duration: 900,
+      easing: Easing.out(Easing.back(1.5)),
+    });
+    logoOpacity.value = withTiming(1, {
+      duration: 600,
+      easing: Easing.out(Easing.quad),
     });
 
     // Floating number animations
@@ -55,24 +62,25 @@ export const SplashScreen: React.FC = () => {
       true
     );
 
-    // Simulate game initialization progress
+    // Fast, smooth loading progress bar
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
           setTimeout(() => {
             setScreen('home');
-          }, 300);
+          }, 350);
           return 100;
         }
-        return prev + 15;
+        return prev + 12;
       });
-    }, 120);
+    }, 110);
 
     return () => clearInterval(interval);
   }, []);
 
   const logoAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: logoOpacity.value,
     transform: [{ scale: logoScale.value }],
   }));
 
@@ -84,8 +92,12 @@ export const SplashScreen: React.FC = () => {
     transform: [{ translateY: float2.value }, { rotate: `${float2.value * -0.7}deg` }],
   }));
 
+  const handleSkip = () => {
+    setScreen('home');
+  };
+
   return (
-    <View style={styles.container}>
+    <Pressable style={styles.container} onPress={handleSkip}>
       {/* Background with Ambient Overlay */}
       <ExpoImage source={JUNGLE_BG} style={styles.bgImage} contentFit="cover" />
       <View style={styles.darkVignette} />
@@ -104,32 +116,35 @@ export const SplashScreen: React.FC = () => {
         <Text style={[styles.floatText, { color: '#FF4757' }]}>×</Text>
       </Animated.View>
 
-      {/* Central Hero Logo & Mascot */}
+      {/* Central Hero: 3D Procedural Vector Logo + Mascot Centerpiece */}
       <View style={styles.heroContent}>
-        <Animated.View style={[styles.logoCard, logoAnimatedStyle]}>
-          <Text style={styles.arcadeBadge}>ARCADE BRAIN ADVENTURE</Text>
-          <Text style={styles.logoTitle}>NUMBER</Text>
-          <Text style={styles.logoTitleRush}>RUSH</Text>
-          <Text style={styles.logoTagline}>THINK • TAP • RUSH</Text>
+        <Animated.View style={[styles.logoWrapper, logoAnimatedStyle]}>
+          <NumberRushLogo width={Math.min(width * 0.88, 330)} showTagline={true} />
         </Animated.View>
 
-        {/* Mascot Centerpiece */}
+        {/* Mascot Centerpiece (Runner Boy with floating cubes) */}
         <View style={styles.mascotHolder}>
-          <MascotIllustration size={200} character="runner_boy" mood="celebrate" />
+          <MascotIllustration size={185} character="runner_boy" mood="celebrate" showNumbers />
         </View>
       </View>
 
       {/* Bottom Loading Progress Bar */}
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingStatus}>
-          {progress < 100 ? 'ENTERING THE JUNGLE ARENA...' : 'READY TO RUSH!'}
-        </Text>
-        <View style={styles.loadingTrack}>
-          <View style={[styles.loadingFill, { width: `${progress}%` }]} />
+        <View style={styles.statusRow}>
+          <Text style={styles.loadingStatus}>
+            {progress < 100 ? 'ENTERING JUNGLE ARENA...' : 'READY TO RUSH!'}
+          </Text>
+          <Text style={styles.percentText}>{Math.min(100, progress)}%</Text>
         </View>
-        <Text style={styles.versionText}>v2.0 • HIGH PERFORMANCE ARCADE</Text>
+
+        <View style={styles.loadingTrack}>
+          <View style={[styles.loadingFill, { width: `${Math.min(100, progress)}%` }]} />
+          <View style={styles.progressShine} />
+        </View>
+
+        <Text style={styles.tapToSkipText}>TAP ANYWHERE TO START</Text>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
@@ -146,13 +161,13 @@ const styles = StyleSheet.create({
   },
   darkVignette: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(6, 18, 13, 0.65)',
+    backgroundColor: 'rgba(6, 18, 13, 0.7)',
   },
   floatingNumber: {
     position: 'absolute',
-    width: 52,
-    height: 52,
-    borderRadius: 16,
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     backgroundColor: 'rgba(12, 32, 56, 0.85)',
     borderWidth: 2,
     borderColor: '#FFD700',
@@ -164,99 +179,86 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  num1: { top: '15%', left: '10%' },
-  num2: { top: '22%', right: '12%', borderColor: '#00E5FF' },
-  num3: { bottom: '30%', left: '8%', borderColor: '#2ED573' },
-  num4: { bottom: '26%', right: '10%', borderColor: '#FF4757' },
+  num1: { top: '12%', left: '8%' },
+  num2: { top: '18%', right: '10%', borderColor: '#00E5FF' },
+  num3: { bottom: '32%', left: '6%', borderColor: '#2ED573' },
+  num4: { bottom: '28%', right: '8%', borderColor: '#FF4757' },
   floatText: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '900',
     color: '#FFD700',
   },
   heroContent: {
     alignItems: 'center',
-    marginTop: 30,
-  },
-  logoCard: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(7, 27, 52, 0.88)',
-    borderWidth: 3,
-    borderColor: '#FFC107',
-    borderRadius: 24,
-    paddingHorizontal: 28,
-    paddingVertical: 14,
-    shadowColor: '#FFB800',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 20,
-    elevation: 12,
-  },
-  arcadeBadge: {
-    color: '#00E5FF',
-    fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 2.5,
-    marginBottom: 2,
-  },
-  logoTitle: {
-    color: '#FFFFFF',
-    fontSize: 34,
-    fontWeight: '900',
-    letterSpacing: 3,
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 6,
-  },
-  logoTitleRush: {
-    color: '#FFD700',
-    fontSize: 42,
-    fontWeight: '900',
-    letterSpacing: 4,
-    marginTop: -8,
-    textShadowColor: '#FF6D00',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 10,
-  },
-  logoTagline: {
-    color: '#2ED573',
-    fontSize: 12,
-    fontWeight: '900',
-    letterSpacing: 2,
-    marginTop: 4,
-  },
-  mascotHolder: {
     marginTop: 20,
   },
-  loadingContainer: {
-    width: width * 0.85,
+  logoWrapper: {
+    alignItems: 'center',
+    marginBottom: 8,
+    shadowColor: '#FFB800',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    elevation: 10,
+  },
+  mascotHolder: {
+    marginTop: 10,
     alignItems: 'center',
   },
-  loadingStatus: {
-    color: '#FFE082',
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 1.5,
+  loadingContainer: {
+    width: '84%',
+    alignItems: 'center',
+  },
+  statusRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
     marginBottom: 8,
+  },
+  loadingStatus: {
+    color: '#00E5FF',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+  },
+  percentText: {
+    color: '#FFD700',
+    fontSize: 12,
+    fontWeight: '900',
   },
   loadingTrack: {
     width: '100%',
     height: 12,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
     borderRadius: 6,
+    overflow: 'hidden',
     borderWidth: 1.5,
     borderColor: 'rgba(255, 255, 255, 0.2)',
-    overflow: 'hidden',
+    position: 'relative',
+    shadowColor: '#2ED573',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 4,
   },
   loadingFill: {
     height: '100%',
-    backgroundColor: '#2ED573',
+    backgroundColor: '#00E676',
     borderRadius: 6,
   },
-  versionText: {
-    color: '#5C7491',
+  progressShine: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+  },
+  tapToSkipText: {
+    color: '#8CA0BA',
     fontSize: 10,
-    fontWeight: '700',
-    letterSpacing: 1,
-    marginTop: 10,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    marginTop: 12,
   },
 });

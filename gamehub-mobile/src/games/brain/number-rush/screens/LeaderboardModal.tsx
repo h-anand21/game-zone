@@ -11,6 +11,7 @@ import {
   Pressable,
 } from 'react-native';
 import { Image as ExpoImage } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
 import { HeaderHUD, BottomNavBar, MascotIllustration } from '../components';
@@ -18,6 +19,7 @@ import { HeaderHUD, BottomNavBar, MascotIllustration } from '../components';
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const LeaderboardModal: React.FC = () => {
+  const insets = useSafeAreaInsets();
   const { setScreen, leaderboard, stats } = useNumberRushStore();
   const [activeTab, setActiveTab] = useState<'global' | 'weekly' | 'friends'>('global');
 
@@ -225,11 +227,11 @@ export const LeaderboardModal: React.FC = () => {
         </View>
 
         {/* Safe bottom spacer for sticky user bar + bottom nav */}
-        <View style={{ height: 160 }} />
+        <View style={{ height: 175 + insets.bottom }} />
       </ScrollView>
 
-      {/* 7. Sticky User Rank Row */}
-      <View style={styles.userStickyRow}>
+      {/* 7. Sticky User Rank Row (Safe above BottomNavBar) */}
+      <View style={[styles.userStickyRow, { bottom: 76 + insets.bottom }]}>
         <View style={styles.userRankPill}>
           <Text style={styles.userRankText}>{userRank}</Text>
         </View>
