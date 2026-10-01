@@ -1,11 +1,18 @@
+// ============================================================
+// MEMORY RUSH — 13 Settings Screen (Benchmark Quality Level)
+// Physical Stone & Wood Panels with Gold Trim, Tactile Toggles & Saves
+// ============================================================
+
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MRIcon } from '../components/MRIcon';
-import { colors } from '../constants/colors';
-import { GameBackground } from '../components/GameBackground';
-import { GlassCard } from '../components/GlassCard';
+import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { JungleHeaderHUD } from '../components/JungleHeaderHUD';
+import { StonePanel } from '../components/StonePanel';
+import { WoodPanel } from '../components/WoodPanel';
 import { BottomTabBar, TabType } from '../components/BottomTabBar';
+import { MRIcon } from '../components/MRIcon';
+import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
 
 interface SettingsScreenProps {
@@ -39,7 +46,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateTab })
   ) => (
     <View style={styles.settingRow}>
       <View style={styles.settingIconBox}>
-        <MRIcon name={icon} size={18} color={colors.accent} />
+        <MRIcon name={icon} size={18} color="#FFD700" />
       </View>
       <View style={styles.settingInfo}>
         <Text style={styles.settingLabel}>{label}</Text>
@@ -48,25 +55,25 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateTab })
       <Switch
         value={value}
         onValueChange={onValueChange}
-        trackColor={{ false: colors.surfaceElevated, true: 'rgba(255, 216, 61, 0.45)' }}
-        thumbColor={value ? colors.accent : colors.textSecondary}
+        trackColor={{ false: 'rgba(0, 0, 0, 0.45)', true: 'rgba(255, 215, 0, 0.45)' }}
+        thumbColor={value ? '#FFD700' : '#8A9BAA'}
       />
     </View>
   );
 
   return (
-    <GameBackground variant="stats">
+    <JungleWorldBackground variant="settings">
       <SafeAreaView style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerSubtitle}>PREFERENCES</Text>
-            <Text style={styles.headerTitle}>SETTINGS</Text>
-          </View>
+        {/* Header HUD */}
+        <JungleHeaderHUD
+          title="SETTINGS"
+          subtitle="PREFERENCES"
+        />
 
-          {/* GAME SECTION */}
-          <GlassCard style={styles.sectionCard}>
-            <Text style={styles.sectionHeader}>GAMEPLAY</Text>
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {/* GAMEPLAY SECTION */}
+          <StonePanel variant="carved" style={styles.sectionPanel}>
+            <Text style={styles.sectionHeader}>GAMEPLAY & AUDIO</Text>
             {renderToggle(
               "Sound Effects",
               "Audio feedback during gameplay",
@@ -95,10 +102,10 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateTab })
               (val) => updateSettings({ smartDifficulty: val }),
               "cpu"
             )}
-          </GlassCard>
+          </StonePanel>
 
           {/* ACCESSIBILITY SECTION */}
-          <GlassCard style={styles.sectionCard}>
+          <StonePanel variant="slate" style={styles.sectionPanel}>
             <Text style={styles.sectionHeader}>ACCESSIBILITY</Text>
             {renderToggle(
               "High Contrast",
@@ -121,33 +128,33 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateTab })
               (val) => updateSettings({ reducedMotion: val }),
               "feather"
             )}
-          </GlassCard>
+          </StonePanel>
 
           {/* DATA SECTION */}
-          <GlassCard style={styles.sectionCard}>
-            <Text style={styles.sectionHeader}>DATA & SAVES</Text>
+          <WoodPanel variant="dark" style={styles.sectionPanel}>
+            <Text style={styles.sectionHeader}>DATA & TEMPLE SAVES</Text>
             <TouchableOpacity style={styles.dangerRow} onPress={handleReset} activeOpacity={0.7}>
-              <View style={[styles.settingIconBox, { backgroundColor: 'rgba(251, 113, 133, 0.15)' }]}>
-                <MRIcon name="trash-2" size={18} color={colors.danger} />
+              <View style={[styles.settingIconBox, { backgroundColor: 'rgba(239, 68, 68, 0.2)', borderColor: '#EF4444' }]}>
+                <MRIcon name="trash-2" size={18} color="#EF4444" />
               </View>
               <View style={styles.settingInfo}>
-                <Text style={[styles.settingLabel, { color: colors.danger }]}>Reset Progress</Text>
+                <Text style={[styles.settingLabel, { color: '#EF4444' }]}>Reset Progress</Text>
                 <Text style={styles.settingDesc}>Clear local high scores and stats history</Text>
               </View>
             </TouchableOpacity>
-          </GlassCard>
+          </WoodPanel>
 
           <View style={styles.footer}>
-            <Text style={styles.versionText}>MEMORY RUSH v1.0.0</Text>
-            <Text style={styles.copyrightText}>ARCADE BRAIN ENGINE</Text>
+            <Text style={styles.versionText}>MEMORY RUSH v2.0.0 • JUNGLE ADVENTURE</Text>
+            <Text style={styles.copyrightText}>TEMPLE BRAIN PUZZLE ENGINE</Text>
           </View>
 
-          <View style={{ height: 100 }} />
+          <View style={{ height: 90 }} />
         </ScrollView>
 
         <BottomTabBar currentScreen="settings" onNavigate={(scr) => onNavigateTab(scr as any)} />
       </SafeAreaView>
-    </GameBackground>
+    </JungleWorldBackground>
   );
 };
 
@@ -156,53 +163,39 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingTop: 6,
+    gap: 12,
   },
-  header: {
-    marginBottom: 20,
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.accent,
-    letterSpacing: 2,
-    marginBottom: 4,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: 1,
-  },
-  sectionCard: {
-    padding: 18,
-    marginBottom: 20,
+  sectionPanel: {
+    width: '100%',
   },
   sectionHeader: {
     fontSize: 11,
-    fontWeight: '800',
-    color: colors.textSecondary,
+    fontWeight: '900',
+    color: '#FFD700',
     letterSpacing: 1.5,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   settingRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.04)',
+    borderBottomColor: 'rgba(255, 255, 255, 0.06)',
   },
   dangerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 8,
   },
   settingIconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    backgroundColor: 'rgba(255, 216, 61, 0.15)',
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: 'rgba(10, 16, 12, 0.75)',
+    borderWidth: 1.5,
+    borderColor: '#546A58',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -213,29 +206,30 @@ const styles = StyleSheet.create({
   },
   settingLabel: {
     fontSize: 14,
-    fontWeight: '700',
-    color: colors.textPrimary,
+    fontWeight: '800',
+    color: '#FFF8E7',
   },
   settingDesc: {
     fontSize: 11,
-    color: colors.textSecondary,
+    color: '#D1DEC8',
     marginTop: 2,
+    fontWeight: '600',
   },
   footer: {
     alignItems: 'center',
-    marginVertical: 16,
+    marginVertical: 12,
     gap: 4,
   },
   versionText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: colors.textSecondary,
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FFD700',
     letterSpacing: 1,
   },
   copyrightText: {
-    fontSize: 10,
-    color: colors.textSecondary,
+    fontSize: 9.5,
+    color: '#A0B4A2',
     letterSpacing: 1.5,
-    opacity: 0.6,
+    opacity: 0.7,
   },
 });

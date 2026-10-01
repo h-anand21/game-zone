@@ -1,10 +1,14 @@
 // ============================================================
-// MEMORY RUSH — Energetic Countdown Overlay (3 -> 2 -> 1 -> RUSH!)
+// MEMORY RUSH — 06 Cinematic Jungle Countdown (3 -> 2 -> 1 -> RUSH!)
+// Giant 3D Carved Stone Portal with Pulsing Energy Rings
 // ============================================================
 
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { MRColors } from '../constants/colors';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, Animated } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
+import { JungleWorldBackground } from './JungleWorldBackground';
+import { StoneNumberTile } from './StoneNumberTile';
 import type { GameMode, GameDifficulty } from '../types';
 
 interface CountdownOverlayProps {
@@ -20,21 +24,46 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
 }) => {
   const [count, setCount] = useState<number>(3);
   const [isRush, setIsRush] = useState<boolean>(false);
+  const scaleAnim = useRef(new Animated.Value(0.7)).current;
+  const pulseRing = useRef(new Animated.Value(1)).current;
+
+  const triggerStepAnim = () => {
+    scaleAnim.setValue(0.7);
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 4,
+      tension: 60,
+      useNativeDriver: true,
+    }).start();
+  };
 
   useEffect(() => {
+    triggerStepAnim();
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    } catch (e) {}
+
     const timer = setInterval(() => {
       setCount((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
           setIsRush(true);
+          try {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          } catch (e) {}
+          triggerStepAnim();
           setTimeout(() => {
             onFinish();
-          }, 600);
+          }, 650);
           return 0;
         }
+        try {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        } catch (e) {}
+        triggerStepAnim();
         return prev - 1;
       });
-    }, 700);
+    }, 750);
 
     return () => clearInterval(timer);
   }, [onFinish]);
@@ -56,29 +85,59 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
   };
 
   return (
-    <View style={styles.overlay}>
-      <View style={styles.topInfo}>
-        <Text style={styles.modeTitle}>{getModeTitle()}</Text>
-        <Text style={styles.diffSubtitle}>{difficulty.toUpperCase()}</Text>
-      </View>
+    <JungleWorldBackground variant="arena">
+      <View style={styles.overlay}>
+        {/* Top Header Sign */}
+        <View style={styles.topInfo}>
+          <View style={styles.headerWoodSign}>
+            <Text style={styles.getReadyText}>GET READY!</Text>
+            <Text style={styles.modeTitle}>{getModeTitle()}</Text>
+            <View style={styles.diffPill}>
+              <Text style={styles.diffText}>{difficulty.toUpperCase()}</Text>
+            </View>
+          </View>
+        </View>
 
-      <View style={styles.centerBox}>
-        <View style={[styles.pulseCircle, isRush && styles.rushCircle]}>
-          <Text style={[styles.countText, isRush && styles.rushText]}>
-            {isRush ? 'RUSH!' : count}
-          </Text>
+        {/* Floating Number Stones in Atmosphere */}
+        <View style={[styles.floatingDecor, { top: '35%', left: 24 }]}>
+          <StoneNumberTile value={4} size={44} state="preview" disabled />
+        </View>
+        <View style={[styles.floatingDecor, { top: '38%', right: 26 }]}>
+          <StoneNumberTile value={7} size={48} state="correct" disabled />
+        </View>
+
+        {/* Center Portal: Giant 3D Stone Number */}
+        <Animated.View style={[styles.centerBox, { transform: [{ scale: scaleAnim }] }]}>
+          {/* Energy Halo Outer Ring */}
+          <View style={styles.energyHalo}>
+            <View style={styles.stoneDialExtrusion}>
+              <LinearGradient
+                colors={['#4E5E6E', '#2A3642', '#182129']}
+                style={styles.stoneDialSurface}
+              >
+                <View style={styles.dialTopBevel} />
+                <View style={styles.runeRing} />
+
+                <Text style={[styles.countText, isRush && styles.rushText]}>
+                  {isRush ? 'RUSH!' : count}
+                </Text>
+              </LinearGradient>
+            </View>
+          </View>
+        </Animated.View>
+
+        {/* Bottom Status Badge */}
+        <View style={styles.bottomPill}>
+          <Text style={styles.prepareText}>PREPARE YOUR MEMORY EYE</Text>
         </View>
       </View>
-
-      <Text style={styles.prepareText}>PREPARE YOUR MEMORY</Text>
-    </View>
+    </JungleWorldBackground>
   );
 };
 
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(8, 10, 13, 0.92)',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 70,
@@ -86,58 +145,134 @@ const styles = StyleSheet.create({
   },
   topInfo: {
     alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  headerWoodSign: {
+    backgroundColor: 'rgba(28, 14, 4, 0.85)',
+    borderRadius: 20,
+    borderWidth: 2.5,
+    borderColor: '#C68A4C',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+  },
+  getReadyText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 2,
   },
   modeTitle: {
     fontSize: 22,
     fontWeight: '900',
-    color: MRColors.textPrimary,
-    letterSpacing: 2,
+    color: '#FFF8E7',
+    letterSpacing: 1.5,
+    marginTop: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.85)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 3,
   },
-  diffSubtitle: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: MRColors.yellowStatus,
-    letterSpacing: 3,
-    marginTop: 4,
+  diffPill: {
+    marginTop: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderWidth: 1,
+    borderColor: '#718496',
+  },
+  diffText: {
+    fontSize: 9.5,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 1.5,
+  },
+  floatingDecor: {
+    position: 'absolute',
+    opacity: 0.7,
   },
   centerBox: {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  pulseCircle: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: 'rgba(255, 216, 61, 0.12)',
-    borderWidth: 2.5,
-    borderColor: MRColors.yellowStatus,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: MRColors.yellowStatus,
+  energyHalo: {
+    padding: 12,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.35)',
+    shadowColor: '#FFD700',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
-    shadowRadius: 20,
-    elevation: 8,
+    shadowRadius: 24,
+    elevation: 12,
   },
-  rushCircle: {
-    backgroundColor: 'rgba(255, 216, 61, 0.25)',
-    borderColor: '#FFF59D',
-    transform: [{ scale: 1.15 }],
+  stoneDialExtrusion: {
+    borderRadius: 85,
+    backgroundColor: '#0F161C',
+    paddingBottom: 8,
+  },
+  stoneDialSurface: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    borderWidth: 3.5,
+    borderColor: '#7E92A5',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  dialTopBevel: {
+    position: 'absolute',
+    top: 0,
+    left: '15%',
+    right: '15%',
+    height: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    borderRadius: 2,
+  },
+  runeRing: {
+    position: 'absolute',
+    width: 136,
+    height: 136,
+    borderRadius: 68,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 215, 0, 0.35)',
   },
   countText: {
-    fontSize: 56,
+    fontSize: 72,
     fontWeight: '900',
-    color: MRColors.textPrimary,
+    color: '#FFD700',
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 6,
   },
   rushText: {
-    fontSize: 28,
-    color: MRColors.yellowStatus,
-    letterSpacing: 2,
+    fontSize: 34,
+    color: '#FFF8E7',
+    letterSpacing: 3,
+    textShadowColor: '#B7791F',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 8,
+  },
+  bottomPill: {
+    backgroundColor: 'rgba(10, 18, 12, 0.85)',
+    borderRadius: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderWidth: 1.5,
+    borderColor: '#546A58',
   },
   prepareText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: MRColors.textSecondary,
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#E2CA92',
     letterSpacing: 2,
   },
 });

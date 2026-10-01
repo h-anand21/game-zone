@@ -1,100 +1,188 @@
 // ============================================================
-// MEMORY RUSH — 2.5D Arcade Cyber Design Tokens & Theme
-// (Inspired by Reverse Mind, Number Rush, Mind Lock & Find One)
+// MEMORY RUSH — 3D Cartoon Jungle Temple Adventure Palette
+// Physical Stone, Wood, Parchment, Jungle Green & Gold Accents
 // ============================================================
 
 export const MRColors = {
-  // Deep Cozy Space / Canvas Surfaces
-  bgVoid: '#040B16',
-  bgDark: '#07111F',
-  surface: '#0D1F34',
-  surfaceElevated: '#16243A',
-  surfaceGlass: 'rgba(16, 27, 43, 0.85)',
+  // World Canvas / Void
+  bgVoid: '#0F1A12',
+  bgDark: '#16281C',
+  surface: '#203627',
+  surfaceElevated: '#2A4734',
+  surfaceGlass: 'rgba(22, 40, 28, 0.88)',
   surfaceGlassLight: 'rgba(255, 255, 255, 0.12)',
-  borderSubtle: 'rgba(255, 255, 255, 0.12)',
-  borderGlass: 'rgba(77, 231, 255, 0.35)',
-  borderHighlight: 'rgba(255, 255, 255, 0.22)',
+
+  // Stone Material Tokens
+  stoneLight: '#8C9BAE',
+  stoneMid: '#4E5D6C',
+  stoneDark: '#2B3540',
+  stoneBorder: '#607284',
+  stoneShadow: '#182028',
+  stoneMoss: '#3F5943',
+  stoneBevelTop: 'rgba(255, 255, 255, 0.28)',
+  stoneBevelBottom: 'rgba(0, 0, 0, 0.55)',
+
+  // Wood Material Tokens
+  woodLight: '#9E5D2E',
+  woodMid: '#6B3814',
+  woodDark: '#431F07',
+  woodDeep: '#2A1102',
+  woodBorder: '#8A4A1C',
+  woodShadow: '#1F0B01',
+  woodBevelTop: 'rgba(255, 218, 170, 0.35)',
+  woodBevelBottom: 'rgba(0, 0, 0, 0.65)',
+
+  // Parchment Material Tokens
+  parchmentLight: '#FFFDF0',
+  parchmentMid: '#F6E8C3',
+  parchmentDark: '#E2CA92',
+  parchmentBorder: '#C9AC6C',
+  parchmentText: '#3D250F',
+  parchmentTextMuted: '#6E4E2C',
 
   // Primary Text & Utilities
-  textPrimary: '#F0F6FC',
-  textSecondary: '#8CA0B8',
-  textMuted: '#586E88',
-  textShadow: 'rgba(0, 0, 0, 0.55)',
+  textPrimary: '#FFFFFF',
+  textCream: '#FFF8E7',
+  textSecondary: '#D1DEC8',
+  textMuted: '#8BA18B',
+  textShadow: 'rgba(0, 0, 0, 0.75)',
 
-  // Primary Cyber Gold & Amber Accents (Arcade Master Theme)
-  primaryGold: '#FFD83D',
-  goldLight: '#FFF59D',
-  goldShadow: '#B28704',
-  goldGlow: 'rgba(255, 216, 61, 0.55)',
-  goldMuted: 'rgba(255, 216, 61, 0.15)',
-  yellowStatus: '#FFD83D',
+  // Gold / Yellow CTA (Tactile 3D Action)
+  primaryGold: '#FFD700',
+  goldLight: '#FFF275',
+  goldMid: '#FFA000',
+  goldShadow: '#8F5800',
+  goldExtrusion: '#6B3E00',
+  goldGlow: 'rgba(255, 215, 0, 0.6)',
+  goldMuted: 'rgba(255, 215, 0, 0.16)',
+  yellowStatus: '#FFC107',
 
-  // Electric Cyan & Teal Highlights (Auxiliary energy sparks)
-  primaryCyan: '#00E5FF',
-  cyanBright: '#70EFFF',
-  cyanShadow: '#0097A7',
-  cyanGlow: 'rgba(0, 229, 255, 0.45)',
-  cyanMuted: 'rgba(0, 229, 255, 0.12)',
+  // Jungle Emerald Green
+  jungleGreen: '#10B981',
+  emeraldLight: '#6EE7B7',
+  emeraldMid: '#059669',
+  emeraldShadow: '#047857',
+  emeraldExtrusion: '#064E3B',
+  emeraldGlow: 'rgba(16, 185, 129, 0.6)',
 
-  successGreen: '#57E389',
-  emeraldShadow: '#2E7D32',
-  emeraldGlow: 'rgba(87, 227, 137, 0.5)',
+  // Coral / Lava Danger Red
+  dangerRose: '#EF4444',
+  dangerLight: '#FCA5A5',
+  dangerMid: '#DC2626',
+  dangerShadow: '#B91C1C',
+  dangerExtrusion: '#7F1D1D',
+  coralShadow: '#7F1D1D',
+  coralGlow: 'rgba(239, 68, 68, 0.6)',
 
-  dangerRose: '#FF5E6C',
-  coralShadow: '#C62828',
-  coralGlow: 'rgba(255, 94, 108, 0.5)',
+  // Sky / Waterfall Blue
+  skyBlue: '#38BDF8',
+  blueLight: '#BAE6FD',
+  blueMid: '#0284C7',
+  blueShadow: '#0369A1',
+  blueExtrusion: '#0C4A6E',
+  blueGlow: 'rgba(56, 189, 248, 0.55)',
 
-  // Aliases
-  backgroundPrimary: '#040B16',
-  accent: '#FFD83D',
-  warning: '#FFD83D',
-  success: '#57E389',
-  danger: '#FF5E6C',
+  // Mystical Temple Purple
+  runicPurple: '#A855F7',
+  purpleLight: '#D8B4FE',
+  purpleMid: '#7E22CE',
+  purpleShadow: '#581C87',
+  purpleExtrusion: '#3B0764',
+  purpleGlow: 'rgba(168, 85, 247, 0.55)',
+
+  // Common UI Aliases for backward compatibility
+  backgroundPrimary: '#0F1A12',
+  accent: '#FFD700',
+  warning: '#FFA000',
+  success: '#10B981',
+  danger: '#EF4444',
+  borderSubtle: 'rgba(255, 255, 255, 0.14)',
+  borderGlass: 'rgba(255, 215, 0, 0.35)',
+  borderHighlight: 'rgba(255, 255, 255, 0.28)',
+  primaryCyan: '#38BDF8',
+  cyanBright: '#BAE6FD',
+  cyanShadow: '#0369A1',
+  cyanGlow: 'rgba(56, 189, 248, 0.5)',
+  cyanMuted: 'rgba(56, 189, 248, 0.15)',
+  successGreen: '#10B981',
 };
 
 export const colors = MRColors;
 
-// 2.5D Button Palette (Same structure as Number Rush & Reverse Mind)
+// 2.5D Physical Game Button Themes
 export const MRButtonThemes = {
-  cyan: {
-    face: '#4DE7FF',
-    highlight: '#B2F5EA',
-    bevel: '#0097A7',
-    shadow: '#006064',
-    text: '#040B16',
-    glow: 'rgba(77, 231, 255, 0.55)',
-  },
   gold: {
-    face: '#FFD83D',
-    highlight: '#FFF59D',
-    bevel: '#B28704',
-    shadow: '#7A5B00',
-    text: '#040B16',
-    glow: 'rgba(255, 216, 61, 0.55)',
+    face: '#FFC800',
+    highlight: '#FFF6A5',
+    bevel: '#FFA000',
+    shadow: '#8C5300',
+    extrusion: '#5E3600',
+    text: '#3D2500',
+    glow: 'rgba(255, 200, 0, 0.6)',
   },
   emerald: {
-    face: '#57E389',
-    highlight: '#B7F4C7',
-    bevel: '#2E7D32',
-    shadow: '#1B5E20',
-    text: '#040B16',
-    glow: 'rgba(87, 227, 137, 0.55)',
+    face: '#10B981',
+    highlight: '#A7F3D0',
+    bevel: '#059669',
+    shadow: '#047857',
+    extrusion: '#064E3B',
+    text: '#FFFFFF',
+    glow: 'rgba(16, 185, 129, 0.6)',
   },
   coral: {
-    face: '#FF5E6C',
-    highlight: '#FFCDD2',
-    bevel: '#C62828',
-    shadow: '#7F0000',
+    face: '#EF4444',
+    highlight: '#FECACA',
+    bevel: '#DC2626',
+    shadow: '#B91C1C',
+    extrusion: '#7F1D1D',
     text: '#FFFFFF',
-    glow: 'rgba(255, 94, 108, 0.55)',
+    glow: 'rgba(239, 68, 68, 0.6)',
+  },
+  blue: {
+    face: '#0EA5E9',
+    highlight: '#BAE6FD',
+    bevel: '#0284C7',
+    shadow: '#0369A1',
+    extrusion: '#0C4A6E',
+    text: '#FFFFFF',
+    glow: 'rgba(14, 165, 233, 0.55)',
+  },
+  wood: {
+    face: '#8B4513',
+    highlight: '#D2955A',
+    bevel: '#6B3814',
+    shadow: '#431F07',
+    extrusion: '#2A1102',
+    text: '#FFF8E7',
+    glow: 'rgba(139, 69, 19, 0.45)',
+  },
+  stone: {
+    face: '#5A6A7A',
+    highlight: '#94A3B8',
+    bevel: '#404E5C',
+    shadow: '#2A3440',
+    extrusion: '#182028',
+    text: '#F8FAFC',
+    glow: 'rgba(148, 163, 184, 0.35)',
+  },
+  // Alias for backward compatibility
+  cyan: {
+    face: '#0EA5E9',
+    highlight: '#BAE6FD',
+    bevel: '#0284C7',
+    shadow: '#0369A1',
+    extrusion: '#0C4A6E',
+    text: '#FFFFFF',
+    glow: 'rgba(14, 165, 233, 0.55)',
   },
   glass: {
-    face: '#16243A',
-    highlight: 'rgba(255, 255, 255, 0.20)',
-    bevel: '#0D1F34',
-    shadow: '#040B16',
-    text: '#F0F6FC',
-    glow: 'rgba(77, 231, 255, 0.25)',
+    face: '#203627',
+    highlight: 'rgba(255, 255, 255, 0.22)',
+    bevel: '#16281C',
+    shadow: '#0F1A12',
+    extrusion: '#070D09',
+    text: '#FFF8E7',
+    glow: 'rgba(16, 185, 129, 0.3)',
   },
 };
 

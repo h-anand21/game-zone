@@ -1,13 +1,15 @@
 // ============================================================
-// MEMORY RUSH — 10 Final Result Screen (Performance Analytics)
+// MEMORY RUSH — 10 Final Result Screen (Temple Victory Celebration)
+// Golden Sunset Victory Temple with Altar Tablets, Rewards & Tactile CTAs
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
-import { GameBackground } from '../components/GameBackground';
-import { GlassCard } from '../components/GlassCard';
-import { PrimaryButton } from '../components/PrimaryButton';
-import { SecondaryButton } from '../components/SecondaryButton';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { WoodPanel } from '../components/WoodPanel';
+import { StonePanel } from '../components/StonePanel';
+import { JungleButton } from '../components/JungleButton';
 import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
@@ -30,13 +32,14 @@ export const FinalResultScreen: React.FC<FinalResultScreenProps> = ({
   const perfTitle = getPerformanceTitle(accuracy, maxCombo, score);
 
   return (
-    <GameBackground theme="stats">
+    <JungleWorldBackground variant="victory">
       <View style={styles.container}>
+        {/* Victory Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>RUN COMPLETE</Text>
+          <Text style={styles.crownEmoji}>👑</Text>
+          <Text style={styles.title}>RUN COMPLETE!</Text>
           <View style={styles.perfBadge}>
-            <MRIcon name="star" size={11} color={MRColors.cyanBright} />
-            <Text style={styles.perfText}>{perfTitle}</Text>
+            <Text style={styles.perfText}>{perfTitle.toUpperCase()}</Text>
           </View>
         </View>
 
@@ -44,91 +47,117 @@ export const FinalResultScreen: React.FC<FinalResultScreenProps> = ({
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* Main Huge Score Card */}
-          <GlassCard glowing style={styles.scoreCard}>
-            <Text style={styles.scoreLabel}>FINAL SCORE</Text>
-            <Text style={styles.scoreVal}>{score.toLocaleString()}</Text>
+          {/* Main Huge Score Tablet */}
+          <WoodPanel variant="sign" style={styles.scoreWood}>
+            <View style={styles.scoreInner}>
+              <Text style={styles.scoreLabel}>TEMPLE FINAL SCORE</Text>
+              <Text style={styles.scoreVal}>{score.toLocaleString()}</Text>
 
-            {/* 4 Compact Metrics */}
-            <View style={styles.metricsRow}>
-              <View style={styles.metricCell}>
-                <MRIcon name="target" size={12} color={MRColors.yellowStatus} />
-                <Text style={styles.mLabel}>ACCURACY</Text>
-                <Text style={styles.mValYellow}>{accuracy}%</Text>
-              </View>
-              <View style={styles.metricCell}>
-                <MRIcon name="zap" size={12} color={MRColors.cyanBright} />
-                <Text style={styles.mLabel}>BEST COMBO</Text>
-                <Text style={styles.mValCyan}>×{maxCombo}</Text>
-              </View>
-              <View style={styles.metricCell}>
-                <MRIcon name="clock" size={12} color={MRColors.textPrimary} />
-                <Text style={styles.mLabel}>REACTION</Text>
-                <Text style={styles.mValWhite}>0.76s</Text>
-              </View>
-              <View style={styles.metricCell}>
-                <MRIcon name="award" size={12} color={MRColors.cyanBright} />
-                <Text style={styles.mLabel}>MEMORY LVL</Text>
-                <Text style={styles.mValCyan}>12</Text>
+              {/* 4 Carved Stone Metrics */}
+              <View style={styles.metricsRow}>
+                <View style={styles.metricCell}>
+                  <MRIcon name="target" size={14} color="#FFD700" />
+                  <Text style={styles.mVal}>{accuracy}%</Text>
+                  <Text style={styles.mLabel}>ACCURACY</Text>
+                </View>
+                <View style={styles.metricCell}>
+                  <MRIcon name="zap" size={14} color="#38BDF8" />
+                  <Text style={styles.mVal}>×{maxCombo}</Text>
+                  <Text style={styles.mLabel}>BEST COMBO</Text>
+                </View>
+                <View style={styles.metricCell}>
+                  <MRIcon name="clock" size={14} color="#10B981" />
+                  <Text style={styles.mVal}>0.72s</Text>
+                  <Text style={styles.mLabel}>REACTION</Text>
+                </View>
+                <View style={styles.metricCell}>
+                  <MRIcon name="award" size={14} color="#FFD700" />
+                  <Text style={styles.mVal}>LVL 12</Text>
+                  <Text style={styles.mLabel}>RANK</Text>
+                </View>
               </View>
             </View>
-          </GlassCard>
+          </WoodPanel>
 
-          {/* Simple Performance Chart */}
-          <GlassCard style={styles.chartCard}>
-            <View style={styles.chartHeader}>
-              <MRIcon name="bar-chart-2" size={14} color={MRColors.cyanBright} />
-              <Text style={styles.chartTitle}>ROUND PERFORMANCE</Text>
+          {/* Treasure Rewards Section */}
+          <StonePanel variant="carved" style={styles.rewardStone}>
+            <View style={styles.rewardHeader}>
+              <Text style={styles.rewardTitle}>TEMPLE EXPEDITION REWARDS</Text>
             </View>
+
+            <View style={styles.rewardItemsRow}>
+              <View style={styles.rewardItem}>
+                <Text style={styles.rewardEmoji}>🪙</Text>
+                <Text style={styles.rewardVal}>+500</Text>
+                <Text style={styles.rewardLabel}>COINS</Text>
+              </View>
+
+              <View style={styles.rewardDivider} />
+
+              <View style={styles.rewardItem}>
+                <Text style={styles.rewardEmoji}>⭐</Text>
+                <Text style={styles.rewardVal}>+350</Text>
+                <Text style={styles.rewardLabel}>EXP</Text>
+              </View>
+
+              <View style={styles.rewardDivider} />
+
+              <View style={styles.rewardItem}>
+                <Text style={styles.rewardEmoji}>💎</Text>
+                <Text style={styles.rewardVal}>+5</Text>
+                <Text style={styles.rewardLabel}>GEMS</Text>
+              </View>
+            </View>
+          </StonePanel>
+
+          {/* Round Performance Breakdown */}
+          <WoodPanel variant="dark" style={styles.perfWood}>
+            <Text style={styles.perfSectionTitle}>ROUND TRIAL PROGRESSION</Text>
 
             <View style={styles.chartStack}>
-              <View style={styles.chartRow}>
-                <Text style={styles.rowLabel}>Round 1</Text>
-                <View style={styles.barTrack}>
-                  <View style={[styles.barFill, { width: '85%' }]} />
+              {[
+                { round: 'Round 1', pct: '100%', color: '#10B981' },
+                { round: 'Round 2', pct: '90%', color: '#10B981' },
+                { round: 'Round 3', pct: '80%', color: '#FFD700' },
+                { round: 'Round 4', pct: '100%', color: '#10B981' },
+              ].map((r, i) => (
+                <View key={i} style={styles.chartRow}>
+                  <Text style={styles.rowLabel}>{r.round}</Text>
+                  <View style={styles.barTrack}>
+                    <View style={[styles.barFill, { width: r.pct as any, backgroundColor: r.color }]} />
+                  </View>
+                  <Text style={styles.pctText}>{r.pct}</Text>
                 </View>
-              </View>
-              <View style={styles.chartRow}>
-                <Text style={styles.rowLabel}>Round 2</Text>
-                <View style={styles.barTrack}>
-                  <View style={[styles.barFill, { width: '95%' }]} />
-                </View>
-              </View>
-              <View style={styles.chartRow}>
-                <Text style={styles.rowLabel}>Round 3</Text>
-                <View style={styles.barTrack}>
-                  <View style={[styles.barFill, { width: '70%' }]} />
-                </View>
-              </View>
-              <View style={styles.chartRow}>
-                <Text style={styles.rowLabel}>Round 4</Text>
-                <View style={styles.barTrack}>
-                  <View style={[styles.barFill, { width: '100%' }]} />
-                </View>
-              </View>
+              ))}
             </View>
-          </GlassCard>
+          </WoodPanel>
 
-          {/* Buttons Stack */}
+          {/* Action Buttons Stack */}
           <View style={styles.btnStack}>
-            <PrimaryButton
-              title="PLAY AGAIN →"
-              size="lg"
+            <JungleButton
+              title="PLAY AGAIN ▶"
+              size="hero"
               variant="gold"
               onPress={onPlayAgain}
             />
-            <SecondaryButton
-              title="CHANGE MODE"
+            <JungleButton
+              title="CHANGE TRIAL MODE 📜"
               size="md"
+              variant="wood"
               onPress={onChangeMode}
             />
-            <Pressable onPress={onHome} style={styles.homeLink}>
-              <Text style={styles.homeLinkText}>BACK HOME →</Text>
-            </Pressable>
+            <JungleButton
+              title="RETURN TO HOME 🏛️"
+              size="md"
+              variant="stone"
+              onPress={onHome}
+            />
           </View>
+
+          <View style={{ height: 24 }} />
         </ScrollView>
       </View>
-    </GameBackground>
+    </JungleWorldBackground>
   );
 };
 
@@ -140,107 +169,148 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 10,
+    marginBottom: 8,
+  },
+  crownEmoji: {
+    fontSize: 32,
+    marginBottom: 2,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '900',
-    color: MRColors.textPrimary,
+    color: '#FFD700',
     letterSpacing: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 5,
   },
   perfBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(255, 216, 61, 0.15)',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 216, 61, 0.4)',
     marginTop: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 4,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    borderWidth: 1.5,
+    borderColor: '#FFD700',
   },
   perfText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
+    color: '#FFF8E7',
     letterSpacing: 1.5,
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingBottom: 24,
-    gap: 12,
+    gap: 10,
   },
-  scoreCard: {
+  scoreWood: {
+    width: '100%',
+  },
+  scoreInner: {
     alignItems: 'center',
-    padding: 18,
+    paddingVertical: 8,
   },
   scoreLabel: {
     fontSize: 10,
     fontWeight: '900',
-    color: MRColors.textMuted,
-    letterSpacing: 1,
+    color: '#FFD700',
+    letterSpacing: 1.5,
   },
   scoreVal: {
-    fontSize: 48,
+    fontSize: 52,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
+    color: '#FFFFFF',
     marginVertical: 4,
-    textShadowColor: MRColors.goldGlow,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 14,
+    textShadowColor: '#4A2800',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 6,
   },
   metricsRow: {
     flexDirection: 'row',
     width: '100%',
-    marginTop: 12,
+    marginTop: 10,
     gap: 6,
   },
   metricCell: {
     flex: 1,
-    backgroundColor: 'rgba(8, 10, 13, 0.85)',
-    borderRadius: 10,
+    backgroundColor: 'rgba(16, 24, 20, 0.85)',
+    borderRadius: 12,
     paddingVertical: 8,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 216, 61, 0.25)',
-    gap: 3,
+    borderWidth: 1.5,
+    borderColor: '#546A58',
+    gap: 2,
+  },
+  mVal: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#FFF8E7',
+    marginTop: 2,
   },
   mLabel: {
-    fontSize: 7.5,
+    fontSize: 8,
     fontWeight: '900',
-    color: MRColors.textMuted,
+    color: '#CAD8E6',
     letterSpacing: 0.5,
   },
-  mValYellow: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: MRColors.yellowStatus,
+  rewardStone: {
+    width: '100%',
   },
-  mValCyan: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: MRColors.yellowStatus,
-  },
-  mValWhite: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: MRColors.textPrimary,
-  },
-  chartCard: {
-    padding: 16,
-  },
-  chartHeader: {
-    flexDirection: 'row',
+  rewardHeader: {
     alignItems: 'center',
-    gap: 6,
-    marginBottom: 12,
+    marginBottom: 8,
   },
-  chartTitle: {
+  rewardTitle: {
     fontSize: 11,
     fontWeight: '900',
-    color: MRColors.textSecondary,
+    color: '#FFD700',
+    letterSpacing: 1.5,
+  },
+  rewardItemsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: 'rgba(10, 16, 12, 0.75)',
+    borderRadius: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.25)',
+  },
+  rewardItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  rewardEmoji: {
+    fontSize: 20,
+    marginBottom: 2,
+  },
+  rewardVal: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#FFD700',
+  },
+  rewardLabel: {
+    fontSize: 8.5,
+    fontWeight: '900',
+    color: '#A0B4A2',
+    letterSpacing: 0.8,
+    marginTop: 2,
+  },
+  rewardDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+  },
+  perfWood: {
+    width: '100%',
+  },
+  perfSectionTitle: {
+    fontSize: 10.5,
+    fontWeight: '900',
+    color: '#FFD700',
     letterSpacing: 1.2,
+    marginBottom: 10,
   },
   chartStack: {
     gap: 8,
@@ -253,33 +323,31 @@ const styles = StyleSheet.create({
   rowLabel: {
     fontSize: 10,
     fontWeight: '800',
-    color: MRColors.textMuted,
-    width: 55,
+    color: '#D1DEC8',
+    width: 60,
   },
   barTrack: {
     flex: 1,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: MRColors.surfaceElevated,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#546A58',
   },
   barFill: {
     height: '100%',
-    borderRadius: 4,
-    backgroundColor: MRColors.yellowStatus,
+    borderRadius: 5,
+  },
+  pctText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#FFD700',
+    width: 38,
+    textAlign: 'right',
   },
   btnStack: {
     gap: 10,
     marginTop: 6,
-  },
-  homeLink: {
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  homeLinkText: {
-    fontSize: 11,
-    fontWeight: '900',
-    color: MRColors.yellowStatus,
-    letterSpacing: 1.5,
   },
 });

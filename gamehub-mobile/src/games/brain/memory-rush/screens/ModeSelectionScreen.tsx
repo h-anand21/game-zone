@@ -1,5 +1,6 @@
 // ============================================================
-// MEMORY RUSH — 03 Mode Select Screen (5 Arcade Mode Cards)
+// MEMORY RUSH — 03 Mode Select Screen (Jungle Challenge Altar)
+// Physical Wood & Stone Mode Tablets with Mini Gameplay Visuals
 // ============================================================
 
 import React from 'react';
@@ -10,8 +11,12 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
-import { GameBackground } from '../components/GameBackground';
-import { GlassCard } from '../components/GlassCard';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
+import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { JungleHeaderHUD } from '../components/JungleHeaderHUD';
+import { WoodPanel } from '../components/WoodPanel';
+import { StonePanel } from '../components/StonePanel';
 import { BottomTabBar } from '../components/BottomTabBar';
 import { MRIcon, MRIconName } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
@@ -31,6 +36,7 @@ interface ModeCardData {
   visual: string;
   iconName: MRIconName;
   diffTag: string;
+  accentColor: string;
   isFusion?: boolean;
 }
 
@@ -38,42 +44,47 @@ const MODES_DATA: ModeCardData[] = [
   {
     id: 'memoryGrid',
     title: 'MEMORY GRID',
-    desc: 'Remember positions. Locate target numbers after grid hides.',
+    desc: 'Remember tile positions. Locate hidden target numbers on the stone altar.',
     visual: '4   8   2  |  7   1   9',
     iconName: 'grid',
     diffTag: 'SPATIAL MEMORY',
+    accentColor: '#38BDF8',
   },
   {
     id: 'sequenceRush',
     title: 'SEQUENCE RUSH',
-    desc: 'Remember order. Repeat exact sequence forward or in reverse.',
-    visual: '3 → 8 → 1 → 6 → 4',
+    desc: 'Watch the ancient numbered sequence, then carve it back step by step.',
+    visual: '3  ➔  8  ➔  1  ➔  6  ➔  4',
     iconName: 'arrow-right',
     diffTag: 'ORDER RECALL',
+    accentColor: '#FFD700',
   },
   {
     id: 'numberShift',
     title: 'NUMBER SHIFT',
-    desc: 'Spot the change. Identify which positions transformed.',
-    visual: '[7 2 9]  ➜  [7 8 9]',
+    desc: 'Spot which stone tile shifted and transformed its number.',
+    visual: '[ 7  2  9 ]  ➔  [ 7  8  9 ]',
     iconName: 'refresh-cw',
     diffTag: 'PATTERN SHIFT',
+    accentColor: '#EF4444',
   },
   {
     id: 'missingNumber',
     title: 'MISSING NUMBER',
-    desc: 'Find what vanished. Select the missing number from options.',
-    visual: '8   3   _   1',
+    desc: 'Which sacred number vanished from the grid? Tap the missing rune.',
+    visual: '8    3    ❓    1',
     iconName: 'help-circle',
     diffTag: 'ELIMINATION',
+    accentColor: '#10B981',
   },
   {
     id: 'fusionRush',
     title: 'FUSION RUSH',
-    desc: '4 challenges. ONE RUN. The signature endless memory rush.',
+    desc: '4 temple trials combined into ONE run. The ultimate jungle explorer test.',
     visual: 'GRID ➔ SEQUENCE ➔ SHIFT ➔ MISSING',
     iconName: 'zap',
-    diffTag: 'SIGNATURE ENDLESS',
+    diffTag: 'SIGNATURE TRIAL',
+    accentColor: '#FFD700',
     isFusion: true,
   },
 ];
@@ -86,26 +97,26 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   const { setMode } = useMemoryRushStore();
 
   const handlePickMode = (m: GameMode) => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    } catch (e) {}
     setMode(m);
     onSelectMode(m);
   };
 
   return (
-    <GameBackground theme="home">
+    <JungleWorldBackground variant="forest">
       <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Pressable onPress={onBack} style={styles.backBtn}>
-            <MRIcon name="arrow-left" size={18} color={MRColors.textPrimary} />
-          </Pressable>
-          <View style={styles.headerTitleCol}>
-            <Text style={styles.headerTitle}>CHOOSE YOUR</Text>
-            <Text style={styles.headerTitleAccent}>CHALLENGE</Text>
-          </View>
-          <View style={{ width: 36 }} />
-        </View>
+        {/* Jungle Header HUD */}
+        <JungleHeaderHUD
+          title="CHOOSE CHALLENGE"
+          subtitle="TEMPLE TRIALS"
+          onBack={onBack}
+        />
 
-        <Text style={styles.subtitle}>TEST A DIFFERENT PART OF YOUR MEMORY.</Text>
+        <Text style={styles.subtitle}>
+          TEST A DIFFERENT PART OF YOUR MEMORY ARCHIVE
+        </Text>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -119,38 +130,68 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
                 styles.cardWrapper,
                 pressed && styles.pressed,
               ]}
+              accessibilityLabel={`Select ${item.title}`}
             >
-              <GlassCard glowing={item.isFusion} style={styles.cardInner}>
-                <View style={styles.cardHeaderRow}>
-                  <View style={[styles.iconBox, item.isFusion && styles.fusionIconBox]}>
-                    <MRIcon
-                      name={item.iconName}
-                      size={20}
-                      color={MRColors.yellowStatus}
-                    />
+              {item.isFusion ? (
+                <WoodPanel variant="sign" style={styles.cardWood}>
+                  <View style={styles.cardHeaderRow}>
+                    <View style={[styles.iconBox, { borderColor: '#FFD700' }]}>
+                      <MRIcon name={item.iconName} size={22} color="#FFD700" />
+                    </View>
+                    <View style={styles.titleCol}>
+                      <Text style={[styles.diffTagText, { color: '#FFD700' }]}>
+                        {item.diffTag}
+                      </Text>
+                      <Text style={styles.cardTitle}>{item.title}</Text>
+                    </View>
+                    <View style={styles.playArrowPill}>
+                      <Text style={styles.playArrowText}>PLAY ▶</Text>
+                    </View>
                   </View>
-                  <View style={styles.titleCol}>
-                    <Text style={[styles.diffTagText, styles.fusionTagText]}>
-                      {item.diffTag}
+
+                  <Text style={styles.cardDesc}>{item.desc}</Text>
+
+                  <View style={styles.visualBox}>
+                    <Text style={[styles.visualText, { color: '#FFD700' }]}>
+                      {item.visual}
                     </Text>
-                    <Text style={styles.cardTitle}>{item.title}</Text>
                   </View>
-                  <MRIcon name="chevron-right" size={20} color={MRColors.yellowStatus} />
-                </View>
+                </WoodPanel>
+              ) : (
+                <StonePanel variant="carved" style={styles.cardStone}>
+                  <View style={styles.cardHeaderRow}>
+                    <View style={[styles.iconBox, { borderColor: item.accentColor }]}>
+                      <MRIcon name={item.iconName} size={22} color={item.accentColor} />
+                    </View>
+                    <View style={styles.titleCol}>
+                      <Text style={[styles.diffTagText, { color: item.accentColor }]}>
+                        {item.diffTag}
+                      </Text>
+                      <Text style={styles.cardTitle}>{item.title}</Text>
+                    </View>
+                    <View style={styles.playArrowPill}>
+                      <Text style={styles.playArrowText}>PLAY ▶</Text>
+                    </View>
+                  </View>
 
-                <Text style={styles.cardDesc}>{item.desc}</Text>
+                  <Text style={styles.cardDesc}>{item.desc}</Text>
 
-                <View style={styles.visualBox}>
-                  <Text style={styles.visualText}>{item.visual}</Text>
-                </View>
-              </GlassCard>
+                  <View style={styles.visualBox}>
+                    <Text style={[styles.visualText, { color: item.accentColor }]}>
+                      {item.visual}
+                    </Text>
+                  </View>
+                </StonePanel>
+              )}
             </Pressable>
           ))}
+
+          <View style={{ height: 80 }} />
         </ScrollView>
 
         <BottomTabBar currentScreen="modes" onNavigate={onNavigate} />
       </View>
-    </GameBackground>
+    </JungleWorldBackground>
   );
 };
 
@@ -159,56 +200,31 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 42,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: MRColors.surfaceElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 216, 61, 0.35)',
-  },
-  headerTitleCol: {
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 12,
-    fontWeight: '900',
-    color: MRColors.textSecondary,
-    letterSpacing: 2,
-  },
-  headerTitleAccent: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: MRColors.yellowStatus,
-    letterSpacing: 2,
-  },
   subtitle: {
     fontSize: 10,
-    color: MRColors.textSecondary,
+    color: '#D4E2D4',
     fontWeight: '800',
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: 2,
     marginBottom: 12,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   scrollContent: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingBottom: 24,
-    gap: 12,
+    gap: 8,
   },
   cardWrapper: {
     width: '100%',
   },
-  cardInner: {
-    padding: 16,
+  cardWood: {
+    width: '100%',
+  },
+  cardStone: {
+    width: '100%',
   },
   cardHeaderRow: {
     flexDirection: 'row',
@@ -216,59 +232,72 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   iconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 216, 61, 0.15)',
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 216, 61, 0.4)',
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: 'rgba(10, 16, 12, 0.75)',
+    borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  fusionIconBox: {
-    backgroundColor: 'rgba(250, 204, 21, 0.22)',
-    borderColor: 'rgba(250, 204, 21, 0.5)',
   },
   titleCol: {
     flex: 1,
   },
   diffTagText: {
-    fontSize: 8.5,
+    fontSize: 9,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
-    letterSpacing: 1,
-  },
-  fusionTagText: {
-    color: MRColors.yellowStatus,
+    letterSpacing: 1.2,
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: '900',
-    color: MRColors.textPrimary,
+    color: '#FFFFFF',
     letterSpacing: 1,
-    marginTop: 1,
+    marginTop: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowRadius: 2,
+  },
+  playArrowPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: '#FFD700',
+    borderWidth: 1.5,
+    borderColor: '#FFF8E7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 3,
+  },
+  playArrowText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#3B1E00',
+    letterSpacing: 0.5,
   },
   cardDesc: {
     fontSize: 11,
-    color: MRColors.textSecondary,
+    color: '#D1DEC8',
     fontWeight: '700',
     marginTop: 8,
     lineHeight: 16,
   },
   visualBox: {
     marginTop: 10,
-    backgroundColor: 'rgba(8, 10, 13, 0.85)',
+    backgroundColor: 'rgba(8, 14, 10, 0.75)',
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 216, 61, 0.25)',
+    borderColor: 'rgba(255, 255, 255, 0.15)',
     alignItems: 'center',
   },
   visualText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
     letterSpacing: 1.5,
   },
   pressed: {

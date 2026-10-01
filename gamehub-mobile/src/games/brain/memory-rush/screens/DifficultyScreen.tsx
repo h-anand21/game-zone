@@ -1,5 +1,6 @@
 // ============================================================
-// MEMORY RUSH — 04 Difficulty Selection Screen
+// MEMORY RUSH — 04 Difficulty Select Screen (Temple Trial Setup)
+// Physical Stone Tablets for Easy, Medium & Hard with 3D CTA
 // ============================================================
 
 import React, { useState } from 'react';
@@ -11,9 +12,12 @@ import {
   Pressable,
   Switch,
 } from 'react-native';
-import { GameBackground } from '../components/GameBackground';
-import { GlassCard } from '../components/GlassCard';
-import { PrimaryButton } from '../components/PrimaryButton';
+import * as Haptics from 'expo-haptics';
+import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { JungleHeaderHUD } from '../components/JungleHeaderHUD';
+import { StonePanel } from '../components/StonePanel';
+import { WoodPanel } from '../components/WoodPanel';
+import { JungleButton } from '../components/JungleButton';
 import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
@@ -28,36 +32,44 @@ interface DifficultyScreenProps {
 interface DiffOption {
   id: GameDifficulty;
   title: string;
+  badge: string;
   gridDesc: string;
   timeDesc: string;
   previewDesc: string;
   tagline: string;
+  accent: string;
 }
 
 const DIFF_OPTIONS: DiffOption[] = [
   {
     id: 'easy',
     title: 'EASY',
+    badge: 'STARTER',
     gridDesc: '2 × 3 GRID',
-    timeDesc: '30 SEC TIMER',
-    previewDesc: '2.5 SEC PREVIEW',
-    tagline: 'Start here. Perfect for warming up.',
+    timeDesc: '30s TIME',
+    previewDesc: '2.5s PREVIEW',
+    tagline: 'Gentle start. Great for warming up your memory eye.',
+    accent: '#34D399',
   },
   {
     id: 'medium',
     title: 'MEDIUM',
+    badge: 'FOCUSED',
     gridDesc: '3 × 4 GRID',
-    timeDesc: '20 SEC TIMER',
-    previewDesc: '1.5 SEC PREVIEW',
-    tagline: 'Find your focus. Balanced rush.',
+    timeDesc: '20s TIME',
+    previewDesc: '1.5s PREVIEW',
+    tagline: 'Standard temple challenge. High focus required.',
+    accent: '#FFD700',
   },
   {
     id: 'hard',
     title: 'HARD',
+    badge: 'MEMORY PRO',
     gridDesc: '4 × 4 GRID',
-    timeDesc: '15 SEC TIMER',
-    previewDesc: '0.8 SEC PREVIEW',
-    tagline: 'Enter the rush. Maximum pressure.',
+    timeDesc: '15s TIME',
+    previewDesc: '0.8s PREVIEW',
+    tagline: 'Extreme pressure! Rapid eye and photographic recall.',
+    accent: '#EF4444',
   },
 ];
 
@@ -69,25 +81,27 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
   const { difficulty, setDifficulty, settings, toggleSetting } = useMemoryRushStore();
   const [selectedDiff, setSelectedDiff] = useState<GameDifficulty>(difficulty);
 
+  const handleSelect = (diff: GameDifficulty) => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (e) {}
+    setSelectedDiff(diff);
+  };
+
   const handleStart = () => {
     setDifficulty(selectedDiff);
     onConfirm(selectedDiff);
   };
 
   return (
-    <GameBackground theme="home">
+    <JungleWorldBackground variant="forest">
       <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Pressable onPress={onBack} style={styles.backBtn}>
-            <MRIcon name="arrow-left" size={18} color={MRColors.textPrimary} />
-          </Pressable>
-          <View style={styles.headerTitleCol}>
-            <Text style={styles.headerTitle}>{mode.toUpperCase()}</Text>
-            <Text style={styles.headerTitleAccent}>SELECT DIFFICULTY</Text>
-          </View>
-          <View style={{ width: 36 }} />
-        </View>
+        {/* Jungle Header */}
+        <JungleHeaderHUD
+          title="SELECT DIFFICULTY"
+          subtitle={mode.toUpperCase()}
+          onBack={onBack}
+        />
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -99,24 +113,36 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
             return (
               <Pressable
                 key={option.id}
-                onPress={() => setSelectedDiff(option.id)}
+                onPress={() => handleSelect(option.id)}
                 style={styles.cardWrapper}
+                accessibilityLabel={`Select ${option.title} difficulty`}
               >
-                <GlassCard
-                  glowing={isSelected}
-                  style={isSelected ? { ...styles.cardInner, ...styles.cardSelectedBorder } : styles.cardInner}
+                <StonePanel
+                  variant={isSelected ? 'carved' : 'slate'}
+                  activeBorder={isSelected ? option.accent : undefined}
+                  style={styles.panelContainer}
                 >
                   <View style={styles.cardTopRow}>
-                    <Text style={[styles.cardTitle, isSelected && styles.titleSelected]}>
-                      {option.title}
-                    </Text>
-                    <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
-                      {isSelected && <View style={styles.radioInner} />}
+                    <View style={styles.titleWithBadge}>
+                      <Text style={[styles.cardTitle, isSelected && { color: option.accent }]}>
+                        {option.title}
+                      </Text>
+                      <View style={[styles.starterPill, { borderColor: option.accent }]}>
+                        <Text style={[styles.starterText, { color: option.accent }]}>
+                          {option.badge}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* Radio Stone Ring */}
+                    <View style={[styles.radioOuter, isSelected && { borderColor: option.accent }]}>
+                      {isSelected && <View style={[styles.radioInner, { backgroundColor: option.accent }]} />}
                     </View>
                   </View>
 
                   <Text style={styles.taglineText}>{option.tagline}</Text>
 
+                  {/* Tablet Specs */}
                   <View style={styles.specsRow}>
                     <View style={styles.specBadge}>
                       <Text style={styles.specText}>{option.gridDesc}</Text>
@@ -128,42 +154,46 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
                       <Text style={styles.specText}>{option.previewDesc}</Text>
                     </View>
                   </View>
-                </GlassCard>
+                </StonePanel>
               </Pressable>
             );
           })}
 
-          {/* Smart Difficulty Toggle */}
-          <GlassCard style={styles.smartDiffCard}>
+          {/* Smart Difficulty Wood Board */}
+          <WoodPanel variant="dark" style={styles.smartDiffPanel}>
             <View style={styles.toggleRow}>
               <View style={styles.toggleTextCol}>
                 <View style={styles.smartTitleRow}>
-                  <MRIcon name="cpu" size={16} color={MRColors.cyanBright} />
+                  <MRIcon name="cpu" size={16} color="#FFD700" />
                   <Text style={styles.smartTitle}>SMART DIFFICULTY</Text>
                 </View>
-                <Text style={styles.smartSub}>AUTO-ADJUST PREVIEW DURATION BASED ON ACCURACY</Text>
+                <Text style={styles.smartSub}>
+                  Auto-adjust preview time dynamically based on your accuracy
+                </Text>
               </View>
               <Switch
                 value={settings.smartDifficulty}
                 onValueChange={() => toggleSetting('smartDifficulty')}
-                trackColor={{ false: 'rgba(255, 255, 255, 0.1)', true: 'rgba(255, 216, 61, 0.45)' }}
-                thumbColor={settings.smartDifficulty ? MRColors.yellowStatus : '#8E9AA7'}
+                trackColor={{ false: 'rgba(0, 0, 0, 0.4)', true: 'rgba(255, 215, 0, 0.45)' }}
+                thumbColor={settings.smartDifficulty ? '#FFD700' : '#8E9AA7'}
               />
             </View>
-          </GlassCard>
+          </WoodPanel>
+
+          <View style={{ height: 20 }} />
         </ScrollView>
 
-        {/* Primary CTA */}
+        {/* Primary Tactile 3D CTA */}
         <View style={styles.ctaWrapper}>
-          <PrimaryButton
-            title="START GAME →"
-            size="lg"
+          <JungleButton
+            title="START GAME ▶"
+            size="hero"
             variant="gold"
             onPress={handleStart}
           />
         </View>
       </View>
-    </GameBackground>
+    </JungleWorldBackground>
   );
 };
 
@@ -172,114 +202,92 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 42,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    marginBottom: 16,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: MRColors.surfaceElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 216, 61, 0.35)',
-  },
-  headerTitleCol: {
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 11,
-    fontWeight: '900',
-    color: MRColors.textSecondary,
-    letterSpacing: 2,
-  },
-  headerTitleAccent: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: MRColors.yellowStatus,
-    letterSpacing: 2,
-  },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 24,
-    gap: 12,
+    paddingHorizontal: 16,
+    paddingTop: 4,
+    paddingBottom: 16,
+    gap: 8,
   },
   cardWrapper: {
     width: '100%',
   },
-  cardInner: {
-    padding: 16,
-  },
-  cardSelectedBorder: {
-    borderColor: MRColors.yellowStatus,
-    borderWidth: 2,
+  panelContainer: {
+    width: '100%',
   },
   cardTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  cardTitle: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: MRColors.textPrimary,
-    letterSpacing: 1.5,
+  titleWithBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
-  titleSelected: {
-    color: MRColors.yellowStatus,
+  cardTitle: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#FFF8E7',
+    letterSpacing: 1.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowRadius: 2,
+  },
+  starterPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    borderWidth: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+  },
+  starterText: {
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1,
   },
   radioOuter: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: '#718496',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  radioOuterSelected: {
-    borderColor: MRColors.yellowStatus,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   radioInner: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: MRColors.yellowStatus,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
   taglineText: {
-    fontSize: 11,
-    color: MRColors.textSecondary,
-    fontWeight: '700',
-    marginVertical: 6,
+    fontSize: 11.5,
+    color: '#D1DEC8',
+    fontWeight: '600',
+    marginVertical: 8,
+    lineHeight: 16,
   },
   specsRow: {
     flexDirection: 'row',
     gap: 6,
-    marginTop: 6,
     flexWrap: 'wrap',
   },
   specBadge: {
-    backgroundColor: 'rgba(255, 216, 61, 0.12)',
+    backgroundColor: 'rgba(10, 16, 12, 0.75)',
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderWidth: 1,
-    borderColor: 'rgba(255, 216, 61, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.14)',
   },
   specText: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
-    letterSpacing: 1,
+    color: '#FFD700',
+    letterSpacing: 0.8,
   },
-  smartDiffCard: {
+  smartDiffPanel: {
     marginTop: 6,
-    padding: 16,
   },
   toggleRow: {
     flexDirection: 'row',
@@ -288,7 +296,7 @@ const styles = StyleSheet.create({
   },
   toggleTextCol: {
     flex: 1,
-    paddingRight: 10,
+    paddingRight: 12,
   },
   smartTitleRow: {
     flexDirection: 'row',
@@ -297,19 +305,20 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   smartTitle: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '900',
-    color: MRColors.textPrimary,
+    color: '#FFF8E7',
     letterSpacing: 1,
   },
   smartSub: {
-    fontSize: 9,
-    color: MRColors.textSecondary,
-    fontWeight: '700',
-    lineHeight: 12,
+    fontSize: 10.5,
+    color: '#D2955A',
+    fontWeight: '600',
+    lineHeight: 14,
   },
   ctaWrapper: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingBottom: 24,
+    paddingTop: 8,
   },
 });

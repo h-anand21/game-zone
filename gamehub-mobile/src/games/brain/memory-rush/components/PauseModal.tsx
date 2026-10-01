@@ -1,12 +1,13 @@
 // ============================================================
-// MEMORY RUSH — Compact Dark Translucent Pause Modal
+// MEMORY RUSH — 08 Jungle Temple Pause Modal
+// Physical Carved Wood & Stone Board with Tactile 3D Buttons
 // ============================================================
 
 import React from 'react';
 import { View, Text, StyleSheet, Modal } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { JungleButton } from './JungleButton';
 import { MRColors } from '../constants/colors';
-import { PrimaryButton } from './PrimaryButton';
-import { SecondaryButton } from './SecondaryButton';
 
 interface PauseModalProps {
   visible: boolean;
@@ -32,15 +33,47 @@ export const PauseModal: React.FC<PauseModalProps> = ({
       statusBarTranslucent
     >
       <View style={styles.overlay}>
-        <View style={styles.panel}>
-          <Text style={styles.title}>GAME PAUSED</Text>
-          <Text style={styles.scoreText}>CURRENT SCORE: {score.toLocaleString()}</Text>
+        <View style={styles.outerContainer}>
+          {/* 3D Extrusion Foundation */}
+          <View style={styles.bottomExtrusion} />
 
-          <View style={styles.btnStack}>
-            <PrimaryButton title="RESUME ▶" onPress={onResume} size="md" />
-            <SecondaryButton title="RESTART ⟲" onPress={onRestart} size="md" />
-            <SecondaryButton title="EXIT TO HUB 🚪" onPress={onExit} size="md" />
-          </View>
+          {/* Main Carved Wood & Stone Panel */}
+          <LinearGradient
+            colors={['#5A2E12', '#3D1C08', '#261003']}
+            style={styles.panel}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+          >
+            <View style={styles.topBevel} />
+
+            <Text style={styles.title}>GAME PAUSED</Text>
+
+            <View style={styles.scoreTablet}>
+              <Text style={styles.scoreLabel}>CURRENT SCORE</Text>
+              <Text style={styles.scoreValue}>{score.toLocaleString()}</Text>
+            </View>
+
+            <View style={styles.btnStack}>
+              <JungleButton
+                title="RESUME ▶"
+                variant="gold"
+                size="md"
+                onPress={onResume}
+              />
+              <JungleButton
+                title="RESTART ⟲"
+                variant="wood"
+                size="md"
+                onPress={onRestart}
+              />
+              <JungleButton
+                title="QUIT TO HOME 🏛️"
+                variant="coral"
+                size="md"
+                onPress={onExit}
+              />
+            </View>
+          </LinearGradient>
         </View>
       </View>
     </Modal>
@@ -50,43 +83,79 @@ export const PauseModal: React.FC<PauseModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(8, 10, 13, 0.88)',
+    backgroundColor: 'rgba(8, 14, 10, 0.88)',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
     zIndex: 999,
   },
-  panel: {
+  outerContainer: {
     width: '100%',
     maxWidth: 320,
-    backgroundColor: 'rgba(17, 22, 28, 0.95)',
+    position: 'relative',
+  },
+  bottomExtrusion: {
+    position: 'absolute',
+    bottom: -6,
+    left: 4,
+    right: 4,
+    height: 12,
+    backgroundColor: '#1E0C02',
     borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: MRColors.borderGlass,
-    padding: 24,
+  },
+  panel: {
+    width: '100%',
+    borderRadius: 24,
+    borderWidth: 3,
+    borderColor: '#C68A4C',
+    padding: 22,
     alignItems: 'center',
-    shadowColor: MRColors.primaryCyan,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 10,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  topBevel: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: 'rgba(255, 225, 170, 0.45)',
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '900',
-    color: MRColors.textPrimary,
+    color: '#FFD700',
     letterSpacing: 2,
+    textTransform: 'uppercase',
     marginBottom: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 3,
   },
-  scoreText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: MRColors.cyanBright,
+  scoreTablet: {
+    backgroundColor: 'rgba(20, 32, 24, 0.85)',
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#546A58',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    alignItems: 'center',
+    marginVertical: 14,
+  },
+  scoreLabel: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#CAD8E6',
     letterSpacing: 1.2,
-    marginBottom: 20,
+  },
+  scoreValue: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#FFD700',
+    marginTop: 2,
   },
   btnStack: {
     width: '100%',
-    gap: 10,
+    gap: 8,
   },
 });

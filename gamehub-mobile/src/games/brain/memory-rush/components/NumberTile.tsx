@@ -1,10 +1,12 @@
 // ============================================================
-// MEMORY RUSH — 2.5D Chunky Arcade Number Tile (Native RN Text)
+// MEMORY RUSH — 3D Carved Stone Number Tile
+// Tactile stone tablet with carved rune bevels & glowing numerals
 // ============================================================
 
 import React from 'react';
 import { Text, StyleSheet, Pressable, ViewStyle, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { MRColors } from '../constants/colors';
 import type { TileState } from '../types';
 
@@ -37,67 +39,86 @@ export const NumberTile: React.FC<NumberTileProps> = ({
   const isCorrect = state === 'correct';
   const isWrong = state === 'wrong';
 
-  const lipHeight = Math.max(3, Math.round(size * 0.06));
-  const borderRadius = Math.round(size * 0.24);
-  const fontSize = size > 80 ? 34 : size > 65 ? 28 : size > 50 ? 22 : 18;
+  const lipHeight = Math.max(4, Math.round(size * 0.08));
+  const borderRadius = Math.round(size * 0.22);
+  const fontSize = size > 80 ? 36 : size > 65 ? 30 : size > 50 ? 24 : 18;
 
-  const getColors = () => {
+  // Jungle stone colors with high-visibility vibrant cartoon contrast
+  const getVisualConfig = () => {
     if (isCorrect) {
       return {
-        gradient: ['#22C55E', '#16A34A', '#15803D'],
-        lipColor: '#166534',
+        gradient: ['#34D399', '#10B981', '#047857'] as const,
+        lipColor: '#064E3B',
         textColor: '#FFFFFF',
-        borderColor: '#86EFAC',
-        glow: MRColors.successGreen,
+        borderColor: '#A7F3D0',
+        glow: 'rgba(16, 185, 129, 0.75)',
+        textShadowColor: 'rgba(0, 50, 20, 0.8)',
       };
     }
     if (isWrong) {
       return {
-        gradient: ['#F43F5E', '#E11D48', '#BE123C'],
-        lipColor: '#881337',
+        gradient: ['#F87171', '#EF4444', '#B91C1C'] as const,
+        lipColor: '#7F1D1D',
         textColor: '#FFFFFF',
-        borderColor: '#FECDD3',
-        glow: MRColors.dangerRose,
+        borderColor: '#FECACA',
+        glow: 'rgba(239, 68, 68, 0.8)',
+        textShadowColor: 'rgba(80, 0, 0, 0.8)',
       };
     }
     if (isSelected) {
       return {
-        gradient: ['#FBBF24', '#D97706', '#B45309'],
-        lipColor: '#78350F',
-        textColor: '#040B16',
-        borderColor: '#FDE68A',
-        glow: MRColors.yellowStatus,
+        gradient: ['#FDE047', '#EAB308', '#CA8A04'] as const,
+        lipColor: '#713F12',
+        textColor: '#3A1E00',
+        borderColor: '#FEF08A',
+        glow: 'rgba(234, 179, 8, 0.7)',
+        textShadowColor: 'rgba(255, 255, 255, 0.5)',
       };
     }
     if (isMissing && !isCorrect) {
       return {
-        gradient: ['#1A2433', '#111A26', '#090E17'],
-        lipColor: '#070C12',
-        textColor: MRColors.yellowStatus,
-        borderColor: 'rgba(255, 216, 61, 0.5)',
-        glow: 'rgba(255, 216, 61, 0.4)',
+        gradient: ['#475569', '#334155', '#1E293B'] as const,
+        lipColor: '#0F172A',
+        textColor: '#FDE047',
+        borderColor: '#FACC15',
+        glow: 'rgba(250, 204, 21, 0.5)',
+        textShadowColor: 'rgba(0, 0, 0, 0.8)',
       };
     }
     if (isPreview) {
+      // Warm mystical carved stone with glowing golden number
       return {
-        gradient: ['#1E293B', '#0F172A', '#020617'],
-        lipColor: '#090D16',
-        textColor: MRColors.yellowStatus,
-        borderColor: sequenceStep !== undefined ? MRColors.yellowStatus : 'rgba(255, 216, 61, 0.4)',
-        glow: 'rgba(255, 216, 61, 0.45)',
+        gradient: ['#4A5B6E', '#324151', '#212D3A'] as const,
+        lipColor: '#141D26',
+        textColor: '#FFD700',
+        borderColor: sequenceStep !== undefined ? '#FFD700' : '#8FA4BB',
+        glow: 'rgba(255, 215, 0, 0.5)',
+        textShadowColor: 'rgba(0, 0, 0, 0.9)',
       };
     }
-    // Default or Hidden tile
+    if (isHidden) {
+      // Ancient closed carved slab
+      return {
+        gradient: ['#3A4857', '#283441', '#1B242E'] as const,
+        lipColor: '#0E141B',
+        textColor: 'rgba(255, 255, 255, 0.35)',
+        borderColor: '#4E6175',
+        glow: 'rgba(0, 0, 0, 0.4)',
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+      };
+    }
+    // Default interactive state
     return {
-      gradient: ['#1E293B', '#111827', '#0B0F19'],
-      lipColor: '#05070D',
-      textColor: isHidden ? MRColors.textMuted : MRColors.textPrimary,
-      borderColor: isChanged ? 'rgba(255, 216, 61, 0.6)' : 'rgba(255, 216, 61, 0.22)',
-      glow: isChanged ? 'rgba(255, 216, 61, 0.35)' : 'rgba(0, 0, 0, 0.5)',
+      gradient: ['#425263', '#2D3A47', '#1E2833'] as const,
+      lipColor: '#121921',
+      textColor: '#FFFFFF',
+      borderColor: isChanged ? '#FBBF24' : '#5C7085',
+      glow: isChanged ? 'rgba(251, 191, 36, 0.45)' : 'rgba(0, 0, 0, 0.4)',
+      textShadowColor: 'rgba(0, 0, 0, 0.75)',
     };
   };
 
-  const config = getColors();
+  const config = getVisualConfig();
 
   const getDisplayText = () => {
     if (isCorrect || isWrong) return value;
@@ -106,9 +127,17 @@ export const NumberTile: React.FC<NumberTileProps> = ({
     return value;
   };
 
+  const handlePress = () => {
+    if (disabled) return;
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (e) {}
+    if (onPress) onPress();
+  };
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled || (isHidden === false && isPreview === false && state === 'disabled')}
       style={({ pressed }) => [
         styles.outer,
@@ -118,7 +147,7 @@ export const NumberTile: React.FC<NumberTileProps> = ({
         },
         style,
       ]}
-      accessibilityLabel={isPreview ? `Number ${value}` : 'Tile'}
+      accessibilityLabel={isPreview ? `Number ${value}` : 'Stone Tile'}
       accessibilityRole="button"
     >
       {({ pressed }) => (
@@ -152,8 +181,11 @@ export const NumberTile: React.FC<NumberTileProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 0, y: 1 }}
             >
-              {/* Glass Specular Highlight */}
-              <View style={styles.topGlassHighlight} />
+              {/* Beveled Top Highlight Rim */}
+              <View style={styles.topBevel} />
+
+              {/* Chiseled Stone Edge Border */}
+              <View style={[styles.chiseledRing, { borderRadius: borderRadius - 3 }]} />
 
               {/* Sequence Step Badge Indicator */}
               {sequenceStep !== undefined && (
@@ -162,11 +194,15 @@ export const NumberTile: React.FC<NumberTileProps> = ({
                 </View>
               )}
 
+              {/* Tactile 3D Number Glyph */}
               <Text
                 style={[
                   styles.numberText,
-                  { fontSize, color: config.textColor },
-                  (isCorrect || isWrong || isSelected || isPreview) && styles.textShadow,
+                  {
+                    fontSize,
+                    color: config.textColor,
+                    textShadowColor: config.textShadowColor,
+                  },
                 ]}
               >
                 {getDisplayText()}
@@ -179,6 +215,8 @@ export const NumberTile: React.FC<NumberTileProps> = ({
   );
 };
 
+export const StoneNumberTile = NumberTile;
+
 const styles = StyleSheet.create({
   outer: {
     margin: 4,
@@ -186,12 +224,17 @@ const styles = StyleSheet.create({
   lipWrapper: {
     overflow: 'hidden',
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 5,
   },
   tileFace: {
-    borderWidth: 1.5,
+    borderWidth: 2,
     overflow: 'hidden',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.6,
+    shadowOpacity: 0.7,
     shadowRadius: 8,
     elevation: 6,
   },
@@ -201,43 +244,52 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-  topGlassHighlight: {
+  topBevel: {
     position: 'absolute',
-    top: 2,
-    left: '12%',
-    right: '12%',
-    height: 1.5,
+    top: 1,
+    left: '10%',
+    right: '10%',
+    height: 2,
     backgroundColor: 'rgba(255, 255, 255, 0.45)',
     borderRadius: 1,
+  },
+  chiseledRing: {
+    position: 'absolute',
+    top: 2,
+    left: 2,
+    right: 2,
+    bottom: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.35)',
+    pointerEvents: 'none',
   },
   numberText: {
     fontWeight: '900',
     letterSpacing: 0.5,
-  },
-  textShadow: {
-    textShadowColor: 'rgba(0, 0, 0, 0.6)',
-    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 3,
   },
   sequenceBadge: {
     position: 'absolute',
     top: 4,
     right: 4,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
-    backgroundColor: MRColors.yellowStatus,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#FFD700',
+    borderWidth: 1.5,
+    borderColor: '#FFF59D',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: MRColors.yellowStatus,
+    shadowColor: '#FFD700',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.8,
     shadowRadius: 4,
     elevation: 4,
   },
   sequenceBadgeText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '900',
-    color: '#040B16',
+    color: '#3B1E00',
   },
 });

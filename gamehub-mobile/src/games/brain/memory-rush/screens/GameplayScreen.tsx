@@ -1,16 +1,20 @@
 // ============================================================
-// MEMORY RUSH — 07 Gameplay Screen (State Machine & Fast Action)
+// MEMORY RUSH — 07 Gameplay Screen (Jungle Temple Arena)
+// Tactile Stone Altar Grid, Wood Task Signboard, Fluid Timer & Power-ups
 // ============================================================
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { GameBackground } from '../components/GameBackground';
+import * as Haptics from 'expo-haptics';
+import { JungleWorldBackground } from '../components/JungleWorldBackground';
 import { NumberGrid } from '../components/NumberGrid';
 import { TimerBar } from '../components/TimerBar';
 import { ComboBadge } from '../components/ComboBadge';
 import { RoundFeedback } from '../components/RoundFeedback';
 import { PowerUpButton } from '../components/PowerUpButton';
+import { PauseModal } from '../components/PauseModal';
+import { StoneNumberTile } from '../components/StoneNumberTile';
 import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
@@ -48,12 +52,14 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     handleAnswerChoice,
     handleTimeoutMiss,
     usePowerUp,
+    startNewGame,
   } = useMemoryRushStore();
 
   const [remainingTimeMs, setRemainingTimeMs] = useState<number>(10000);
   const [totalTimeMs, setTotalTimeMs] = useState<number>(10000);
   const [isAnswerLocked, setIsAnswerLocked] = useState(false);
   const [mistakeSecondsLeft, setMistakeSecondsLeft] = useState<number | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const cdIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -73,7 +79,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
 
   // 1. Preview Phase Timer
   useEffect(() => {
-    if (phase === 'preview' && roundConfig) {
+    if (phase === 'preview' && roundConfig && !isPaused) {
       const previewMs = roundConfig.previewDurationMs;
       const timer = setTimeout(() => {
         advanceToHide();
@@ -81,18 +87,18 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
 
       return () => clearTimeout(timer);
     }
-  }, [phase, roundConfig, advanceToHide]);
+  }, [phase, roundConfig, advanceToHide, isPaused]);
 
   // 2. Hide Phase Transition
   useEffect(() => {
-    if (phase === 'hide') {
+    if (phase === 'hide' && !isPaused) {
       const timer = setTimeout(() => {
         advanceToQuestion();
       }, 500);
 
       return () => clearTimeout(timer);
     }
-  }, [phase, advanceToQuestion]);
+  }, [phase, advanceToQuestion, isPaused]);
 
   // Handler to advance to next round or finish run
   const triggerNextRoundOrFinish = useCallback(
@@ -134,7 +140,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
 
   // 3. Question / Answering Timer
   useEffect(() => {
-    if (phase === 'question' && roundConfig && !isAnswerLocked) {
+    if (phase === 'question' && roundConfig && !isAnswerLocked && !isPaused) {
       const timerMs = roundConfig.timerDurationMs;
       setRemainingTimeMs(timerMs);
       setTotalTimeMs(timerMs);
@@ -156,10 +162,10 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
         if (timerRef.current) clearInterval(timerRef.current);
       };
     }
-  }, [phase, roundConfig, isAnswerLocked, handleTimeoutMiss, triggerNextRoundOrFinish]);
+  }, [phase, roundConfig, isAnswerLocked, isPaused, handleTimeoutMiss, triggerNextRoundOrFinish]);
 
   const onTilePress = (tile: NumberTileData) => {
-    if (phase !== 'question' || isAnswerLocked) return;
+    if (phase !== 'question' || isAnswerLocked || isPaused) return;
     const res = handleTileSelect(tile);
 
     if (res.isComplete) {
@@ -168,7 +174,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
   };
 
   const onOptionPress = (val: number) => {
-    if (phase !== 'question' || isAnswerLocked) return;
+    if (phase !== 'question' || isAnswerLocked || isPaused) return;
     const res = handleAnswerChoice(val);
 
     if (res.isComplete) {
@@ -176,51 +182,91 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     }
   };
 
+  const handlePause = () => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (e) {}
+    setIsPaused(true);
+  };
+
+  const handleResume = () => {
+    setIsPaused(false);
+  };
+
+  const handleRestart = () => {
+    setIsPaused(false);
+    startNewGame();
+  };
+
   return (
-    <GameBackground theme="gameplay">
+    <JungleWorldBackground variant="arena" dimmed={isPaused}>
       <View style={styles.container}>
-        {/* Top Header Bar */}
+        {/* ==================================================== */}
+        {/* 1. TOP BAR (Carved Stone HUD) */}
+        {/* ==================================================== */}
         <View style={styles.topBar}>
-          <Pressable onPress={onBack} style={styles.backBtn}>
-            <MRIcon name="arrow-left" size={18} color={MRColors.textPrimary} />
+          {/* Back to Home / Exit */}
+          <Pressable
+            onPress={onBack}
+            style={styles.hudStoneBtn}
+            accessibilityLabel="Exit game"
+          >
+            <MRIcon name="arrow-left" size={18} color="#FFD700" />
           </Pressable>
 
-          <View style={styles.roundBadge}>
-            <Text style={styles.roundText}>
-              ROUND {String(round).padStart(2, '0')} / {String(totalRounds).padStart(2, '0')}
+          {/* Round Indicator Tablet */}
+          <View style={styles.roundTablet}>
+            <Text style={styles.roundLabel}>ROUND</Text>
+            <Text style={styles.roundNumbers}>
+              {String(round).padStart(2, '0')} / {String(totalRounds).padStart(2, '0')}
             </Text>
           </View>
 
-          <View style={styles.timerCol}>
-            <TimerBar
-              progress={remainingTimeMs / totalTimeMs}
-              remainingSeconds={remainingTimeMs / 1000}
-            />
+          {/* Timer & Pause Button */}
+          <View style={styles.topRightControls}>
+            <View style={styles.timerBox}>
+              <TimerBar
+                progress={remainingTimeMs / totalTimeMs}
+                remainingSeconds={remainingTimeMs / 1000}
+              />
+            </View>
+
+            <Pressable
+              onPress={handlePause}
+              style={styles.pauseStoneBtn}
+              accessibilityLabel="Pause game"
+            >
+              <MRIcon name="pause" size={16} color="#FFD700" />
+            </Pressable>
           </View>
         </View>
 
-        {/* TASK / PROMPT AREA */}
+        {/* ==================================================== */}
+        {/* 2. WOODEN INSTRUCTION SIGNBOARD (Layer 3 & 4) */}
+        {/* ==================================================== */}
         <View style={styles.taskContainer}>
+          {/* PREVIEW PHASE */}
           {phase === 'preview' && (
-            <View style={styles.phaseHeaderBox}>
-              <Text style={styles.phaseSubTitle}>
+            <View style={styles.woodInstructionSign}>
+              <Text style={styles.woodSignSub}>
                 {roundConfig?.actualType === 'sequenceRush'
                   ? 'MEMORIZE THE SEQUENCE ORDER'
                   : roundConfig?.actualType === 'numberShift'
                   ? 'MEMORIZE ALL NUMBERS'
                   : roundConfig?.actualType === 'missingNumber'
                   ? 'MEMORIZE BEFORE ONE VANISHES'
-                  : 'MEMORIZE NUMBER POSITIONS'}
+                  : 'MEMORIZE STONE POSITIONS'}
               </Text>
-              <Text style={styles.taskLabel}>GET READY...</Text>
+              <Text style={styles.woodSignMain}>WATCH THE STONES...</Text>
             </View>
           )}
 
+          {/* HIDE PHASE */}
           {phase === 'hide' && (
-            <View style={styles.phaseHeaderBox}>
-              <Text style={styles.taskLabel}>
+            <View style={styles.woodInstructionSign}>
+              <Text style={styles.woodSignMain}>
                 {roundConfig?.actualType === 'numberShift'
-                  ? 'MUTATING ONE NUMBER...'
+                  ? 'MUTATING A NUMBER...'
                   : roundConfig?.actualType === 'missingNumber'
                   ? 'ONE NUMBER VANISHED!'
                   : 'HIDING TILES...'}
@@ -228,38 +274,37 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
             </View>
           )}
 
+          {/* QUESTION PHASE */}
           {phase === 'question' && (
-            <View style={styles.questionContainer}>
-              {/* 1. MEMORY GRID TARGET DISPLAY */}
+            <View style={styles.questionWrapper}>
+              {/* MEMORY GRID TARGET DISPLAY */}
               {roundConfig?.actualType === 'memoryGrid' && (
-                <View style={styles.targetHeroCard}>
-                  <View style={styles.targetPill}>
-                    <MRIcon name="target" size={13} color={MRColors.primaryGold} />
-                    <Text style={styles.targetPillText}>MEMORY TARGET</Text>
-                  </View>
-                  <View style={styles.targetHeroRow}>
-                    <Text style={styles.targetPromptLabel}>WHERE WAS</Text>
-                    <View style={styles.targetBadgeGlow}>
+                <View style={styles.targetSignBoard}>
+                  <View style={styles.targetHeaderRow}>
+                    <Text style={styles.targetWhereWasText}>WHERE WAS</Text>
+                    {/* Glowing 3D Carved Number Token */}
+                    <View style={styles.targetTokenWrapper}>
                       <LinearGradient
-                        colors={['#FFE082', '#FFD83D', '#FFA000']}
-                        style={styles.targetBadgeGradient}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
+                        colors={['#FFE082', '#FFD700', '#B7791F']}
+                        style={styles.targetTokenFace}
                       >
-                        <Text style={styles.targetBadgeNumber}>{roundConfig.targetValue}</Text>
+                        <Text style={styles.targetTokenNum}>{roundConfig.targetValue}</Text>
                       </LinearGradient>
                     </View>
-                    <Text style={styles.targetPromptQuestion}>?</Text>
+                    <Text style={styles.targetQuestionMark}>?</Text>
                   </View>
-                  <Text style={styles.targetPromptSub}>Tap the tile where this number was hidden</Text>
+                  <Text style={styles.targetInstructionSub}>
+                    Tap the hidden stone tile in its original position
+                  </Text>
                 </View>
               )}
 
-              {/* 2. SEQUENCE RUSH TRACKER */}
+              {/* SEQUENCE RUSH TRACKER */}
               {roundConfig?.actualType === 'sequenceRush' && (
-                <View style={styles.sequenceTracker}>
-                  <Text style={styles.sequenceTrackerPrompt}>
-                    TAP IN ORDER: {playerInputSequence.length + 1} OF {roundConfig.sequenceOrder?.length || 0}
+                <View style={styles.sequenceSignBoard}>
+                  <Text style={styles.sequenceOrderPrompt}>
+                    TAP RUNIC ORDER: {playerInputSequence.length + 1} OF{' '}
+                    {roundConfig.sequenceOrder?.length || 0}
                   </Text>
                   <View style={styles.sequenceSlotsRow}>
                     {(roundConfig.sequenceOrder || []).map((expectedVal, idx) => {
@@ -284,76 +329,77 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
                 </View>
               )}
 
-              {/* 3. NUMBER SHIFT PROMPT */}
+              {/* NUMBER SHIFT PROMPT */}
               {roundConfig?.actualType === 'numberShift' && (
-                <View style={styles.shiftPromptBanner}>
-                  <View style={styles.modePillShift}>
-                    <MRIcon name="refresh-cw" size={14} color={MRColors.yellowStatus} />
-                    <Text style={styles.modePillText}>NUMBER SHIFT</Text>
-                  </View>
-                  <Text style={styles.shiftPromptMain}>SPOT THE MUTATED NUMBER!</Text>
-                  <Text style={styles.shiftPromptSub}>Tap the tile that changed from preview</Text>
+                <View style={styles.shiftSignBoard}>
+                  <Text style={styles.shiftSignMain}>SPOT THE MUTATED STONE!</Text>
+                  <Text style={styles.shiftSignSub}>
+                    Tap the tile that changed from preview
+                  </Text>
                 </View>
               )}
 
-              {/* 4. MISSING NUMBER PROMPT */}
+              {/* MISSING NUMBER PROMPT */}
               {roundConfig?.actualType === 'missingNumber' && (
-                <View style={styles.missingPromptBanner}>
-                  <View style={styles.modePillShift}>
-                    <MRIcon name="help-circle" size={14} color={MRColors.yellowStatus} />
-                    <Text style={styles.modePillText}>MISSING NUMBER</Text>
-                  </View>
-                  <Text style={styles.shiftPromptMain}>WHICH NUMBER VANISHED?</Text>
-                  <Text style={styles.shiftPromptSub}>Select from the options below</Text>
+                <View style={styles.missingSignBoard}>
+                  <Text style={styles.shiftSignMain}>WHICH STONE VANISHED?</Text>
+                  <Text style={styles.shiftSignSub}>
+                    Choose the missing number from below
+                  </Text>
                 </View>
               )}
             </View>
           )}
 
-          {/* Feedback Toast */}
+          {/* Feedback Overlay Toast */}
           <RoundFeedback
             type={lastFeedback.type}
             message={lastFeedback.message}
             points={lastFeedback.points}
           />
 
-          {/* Mistake Auto-Advance Seconds Indicator */}
+          {/* Mistake Auto-Advance Reveal Banner */}
           {mistakeSecondsLeft !== null && (
             <View style={styles.mistakeCountdownBanner}>
-              <MRIcon name="alert-triangle" size={15} color={MRColors.dangerRose} />
+              <MRIcon name="alert-triangle" size={15} color="#EF4444" />
               <Text style={styles.mistakeCountdownText}>
-                CORRECT ANSWER REVEALED • NEXT IN {mistakeSecondsLeft}s
+                ANSWER REVEALED • NEXT IN {mistakeSecondsLeft}s
               </Text>
             </View>
           )}
         </View>
 
-        {/* MAIN GAME BOARD */}
+        {/* ==================================================== */}
+        {/* 3. MAIN STONE ALTAR BOARD (Grid Area) */}
+        {/* ==================================================== */}
         {roundConfig && (
           <View style={styles.boardArea}>
-            <NumberGrid
-              tiles={tiles}
-              rows={roundConfig.gridRows}
-              cols={roundConfig.gridCols}
-              onTilePress={onTilePress}
-              disabled={phase !== 'question' || isAnswerLocked}
-            />
+            <View style={styles.altarFloorFrame}>
+              <NumberGrid
+                tiles={tiles}
+                rows={roundConfig.gridRows}
+                cols={roundConfig.gridCols}
+                onTilePress={onTilePress}
+                disabled={phase !== 'question' || isAnswerLocked || isPaused}
+              />
+            </View>
 
             {/* Answer Options for Missing Number Mode */}
             {roundConfig.actualType === 'missingNumber' && phase === 'question' && (
               <View style={styles.missingOptionsContainer}>
-                <Text style={styles.missingOptionsHeader}>CHOOSE VANISHED NUMBER:</Text>
+                <Text style={styles.missingOptionsHeader}>SELECT VANISHED NUMBER:</Text>
                 <View style={styles.missingOptionsRow}>
                   {(roundConfig.missingOptions || []).map((val) => (
                     <Pressable
                       key={`missing_${val}`}
                       onPress={() => onOptionPress(val)}
-                      disabled={isAnswerLocked}
+                      disabled={isAnswerLocked || isPaused}
                       style={({ pressed }) => [
                         styles.missingBtn,
                         pressed && !isAnswerLocked && styles.missingBtnPressed,
                         isAnswerLocked && { opacity: 0.4 },
                       ]}
+                      accessibilityLabel={`Option ${val}`}
                     >
                       <Text style={styles.missingBtnText}>{val}</Text>
                     </Pressable>
@@ -364,18 +410,22 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
           </View>
         )}
 
-        {/* BOTTOM HUD STATUS */}
+        {/* ==================================================== */}
+        {/* 4. BOTTOM HUD (Score, Combo, Power-ups) */}
+        {/* ==================================================== */}
         <View style={styles.bottomHud}>
           <View style={styles.scoreRow}>
-            <View style={styles.scoreCard}>
+            {/* Score Tablet */}
+            <View style={styles.scoreTablet}>
               <Text style={styles.scoreLabel}>SCORE</Text>
               <Text style={styles.scoreVal}>{score.toLocaleString()}</Text>
             </View>
 
+            {/* Combo Multiplier Badge */}
             <ComboBadge combo={combo} />
           </View>
 
-          {/* POWER-UPS ROW */}
+          {/* 3 POWER-UP PEDESTALS */}
           <View style={styles.powerUpRow}>
             <PowerUpButton
               type="freeze"
@@ -394,8 +444,17 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
             />
           </View>
         </View>
+
+        {/* IN-GAME PAUSE MODAL */}
+        <PauseModal
+          visible={isPaused}
+          score={score}
+          onResume={handleResume}
+          onRestart={handleRestart}
+          onExit={onBack}
+        />
       </View>
-    </GameBackground>
+    </JungleWorldBackground>
   );
 };
 
@@ -409,297 +468,256 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    gap: 10,
+    paddingHorizontal: 16,
+    gap: 8,
   },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: MRColors.surfaceElevated,
+  hudStoneBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#263442',
+    borderWidth: 2,
+    borderColor: '#607284',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 216, 61, 0.35)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  roundBadge: {
-    backgroundColor: 'rgba(255, 216, 61, 0.15)',
-    borderRadius: 12,
+  roundTablet: {
+    backgroundColor: 'rgba(28, 14, 4, 0.9)',
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: '#C68A4C',
     paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 216, 61, 0.4)',
+    paddingVertical: 5,
+    alignItems: 'center',
   },
-  roundText: {
-    fontSize: 11,
+  roundLabel: {
+    fontSize: 8.5,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
+    color: '#FFD700',
     letterSpacing: 1.5,
   },
-  timerCol: {
-    width: 100,
+  roundNumbers: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#FFF8E7',
+    letterSpacing: 1,
+  },
+  topRightControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  timerBox: {
+    width: 90,
+  },
+  pauseStoneBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#263442',
+    borderWidth: 2,
+    borderColor: '#607284',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   taskContainer: {
     alignItems: 'center',
-    paddingHorizontal: 20,
-    marginVertical: 10,
-    minHeight: 50,
+    paddingHorizontal: 16,
+    marginVertical: 6,
+    minHeight: 56,
     justifyContent: 'center',
   },
-  taskLabel: {
-    fontSize: 18,
+  woodInstructionSign: {
+    backgroundColor: 'rgba(38, 20, 6, 0.88)',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#C68A4C',
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+  },
+  woodSignSub: {
+    fontSize: 9.5,
     fontWeight: '900',
-    color: MRColors.textPrimary,
+    color: '#FFD700',
+    letterSpacing: 1.2,
+    marginBottom: 2,
+  },
+  woodSignMain: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#FFF8E7',
     letterSpacing: 1.5,
     textAlign: 'center',
-    textShadowColor: MRColors.goldGlow,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowRadius: 3,
+  },
+  questionWrapper: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  targetSignBoard: {
+    backgroundColor: 'rgba(38, 20, 6, 0.92)',
+    borderRadius: 18,
+    borderWidth: 2.5,
+    borderColor: '#C68A4C',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+  },
+  targetHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  targetWhereWasText: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: '#FFF8E7',
+    letterSpacing: 1.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 3,
+  },
+  targetTokenWrapper: {
+    borderRadius: 12,
+    backgroundColor: '#5C3400',
+    paddingBottom: 4,
+  },
+  targetTokenFace: {
+    paddingHorizontal: 14,
+    paddingVertical: 3,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#FFF9C4',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 44,
+  },
+  targetTokenNum: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#261204',
+  },
+  targetQuestionMark: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#FFD700',
+  },
+  targetInstructionSub: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#E2CA92',
+    marginTop: 3,
+  },
+  sequenceSignBoard: {
+    backgroundColor: 'rgba(38, 20, 6, 0.92)',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#C68A4C',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    alignItems: 'center',
+    gap: 6,
+  },
+  sequenceOrderPrompt: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 1.2,
+  },
+  sequenceSlotsRow: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  seqSlot: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: '#607284',
+    backgroundColor: 'rgba(10, 16, 22, 0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  seqSlotFilled: {
+    borderColor: '#FFD700',
+    backgroundColor: 'rgba(255, 215, 0, 0.25)',
+  },
+  seqSlotCurrent: {
+    borderColor: '#FFF9C4',
+    borderWidth: 2.5,
+  },
+  seqSlotText: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#8A9BAA',
+  },
+  seqSlotFilledText: {
+    color: '#FFD700',
+  },
+  shiftSignBoard: {
+    backgroundColor: 'rgba(38, 20, 6, 0.92)',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#EF4444',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    gap: 2,
+  },
+  shiftSignMain: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#FFF8E7',
+    letterSpacing: 1.2,
+  },
+  shiftSignSub: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#E2CA92',
+  },
+  missingSignBoard: {
+    backgroundColor: 'rgba(38, 20, 6, 0.92)',
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#10B981',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    alignItems: 'center',
+    gap: 2,
   },
   boardArea: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
   },
-  missingOptionsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 20,
-    paddingHorizontal: 16,
-  },
-  missingBtn: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
-    backgroundColor: MRColors.surfaceElevated,
+  altarFloorFrame: {
+    padding: 8,
+    borderRadius: 22,
+    backgroundColor: 'rgba(15, 22, 18, 0.45)',
     borderWidth: 1.5,
-    borderColor: MRColors.yellowStatus,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: MRColors.yellowStatus,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
-    shadowRadius: 6,
-    elevation: 6,
-  },
-  missingBtnPressed: {
-    transform: [{ scale: 0.94 }],
-    backgroundColor: MRColors.goldMuted,
-  },
-  missingBtnText: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: MRColors.yellowStatus,
-  },
-  bottomHud: {
-    paddingHorizontal: 20,
-    paddingBottom: 24,
-    gap: 14,
-  },
-  scoreRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  scoreCard: {
-    backgroundColor: MRColors.surfaceGlass,
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 216, 61, 0.3)',
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-  },
-  scoreLabel: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: MRColors.textMuted,
-    letterSpacing: 1.5,
-  },
-  scoreVal: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: MRColors.yellowStatus,
-    letterSpacing: 1,
-  },
-  powerUpRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    gap: 10,
-  },
-  phaseHeaderBox: {
-    alignItems: 'center',
-    gap: 2,
-  },
-  phaseSubTitle: {
-    fontSize: 9.5,
-    fontWeight: '800',
-    color: MRColors.yellowStatus,
-    letterSpacing: 1.5,
-  },
-  questionContainer: {
-    alignItems: 'center',
-    width: '100%',
-  },
-  targetHeroCard: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 2,
-    paddingHorizontal: 16,
-    gap: 4,
-  },
-  targetPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(255, 216, 61, 0.12)',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 216, 61, 0.35)',
-  },
-  targetPillText: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: MRColors.primaryGold,
-    letterSpacing: 1.2,
-  },
-  targetHeroRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    marginTop: 2,
-  },
-  targetPromptLabel: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: MRColors.textPrimary,
-    letterSpacing: 2,
-    textShadowColor: 'rgba(0, 0, 0, 0.6)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
-  },
-  targetBadgeGlow: {
-    borderRadius: 14,
-    shadowColor: MRColors.primaryGold,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.7,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  targetBadgeGradient: {
-    paddingHorizontal: 18,
-    paddingVertical: 4,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: '#FFF9C4',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 54,
-  },
-  targetBadgeNumber: {
-    fontSize: 26,
-    fontWeight: '900',
-    color: '#07111F',
-    textShadowColor: 'rgba(255, 255, 255, 0.4)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  targetPromptQuestion: {
-    fontSize: 24,
-    fontWeight: '900',
-    color: MRColors.primaryGold,
-    letterSpacing: 1,
-  },
-  targetPromptSub: {
-    fontSize: 10.5,
-    fontWeight: '700',
-    color: MRColors.textSecondary,
-    letterSpacing: 0.8,
-  },
-  sequenceTracker: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  sequenceTrackerPrompt: {
-    fontSize: 12,
-    fontWeight: '900',
-    color: MRColors.yellowStatus,
-    letterSpacing: 1.5,
-  },
-  sequenceSlotsRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  seqSlot: {
-    width: 38,
-    height: 38,
-    borderRadius: 10,
-    borderWidth: 1.2,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    backgroundColor: 'rgba(16, 27, 43, 0.8)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  seqSlotFilled: {
-    borderColor: MRColors.yellowStatus,
-    backgroundColor: 'rgba(255, 216, 61, 0.2)',
-  },
-  seqSlotCurrent: {
-    borderColor: '#FFF59D',
-    borderWidth: 2,
-  },
-  seqSlotText: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: MRColors.textMuted,
-  },
-  seqSlotFilledText: {
-    color: MRColors.yellowStatus,
-  },
-  shiftPromptBanner: {
-    alignItems: 'center',
-    gap: 3,
-  },
-  modePillShift: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(255, 216, 61, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 216, 61, 0.35)',
-  },
-  modePillText: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: MRColors.yellowStatus,
-    letterSpacing: 1,
-  },
-  shiftPromptMain: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: MRColors.textPrimary,
-    letterSpacing: 1.5,
-    textShadowColor: MRColors.goldGlow,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 8,
-  },
-  shiftPromptSub: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: MRColors.textSecondary,
-    letterSpacing: 1,
-  },
-  missingPromptBanner: {
-    alignItems: 'center',
-    gap: 3,
+    borderColor: 'rgba(110, 140, 120, 0.3)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
   },
   missingOptionsContainer: {
     marginTop: 14,
@@ -707,18 +725,49 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   missingOptionsHeader: {
-    fontSize: 9.5,
+    fontSize: 10,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
-    letterSpacing: 1.5,
+    color: '#FFD700',
+    letterSpacing: 1.2,
     marginBottom: 6,
+  },
+  missingOptionsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
+    paddingHorizontal: 12,
+  },
+  missingBtn: {
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: '#324151',
+    borderWidth: 2,
+    borderColor: '#FFD700',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  missingBtnPressed: {
+    transform: [{ scale: 0.94 }],
+    backgroundColor: '#B7791F',
+  },
+  missingBtnText: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#FFF8E7',
   },
   mistakeCountdownBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 68, 68, 0.16)',
-    borderColor: 'rgba(255, 68, 68, 0.5)',
+    backgroundColor: 'rgba(180, 20, 20, 0.35)',
+    borderColor: '#EF4444',
     borderWidth: 1.5,
     borderRadius: 14,
     paddingHorizontal: 14,
@@ -728,10 +777,44 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   mistakeCountdownText: {
-    fontFamily: 'Orbitron-Bold',
-    fontSize: 10.5,
+    fontSize: 11,
     letterSpacing: 0.8,
-    color: MRColors.dangerRose,
+    color: '#FCA5A5',
     fontWeight: '800',
+  },
+  bottomHud: {
+    paddingHorizontal: 16,
+    paddingBottom: 22,
+    gap: 12,
+  },
+  scoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  scoreTablet: {
+    backgroundColor: 'rgba(26, 40, 30, 0.92)',
+    borderWidth: 1.5,
+    borderColor: '#546A58',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+  },
+  scoreLabel: {
+    fontSize: 8.5,
+    fontWeight: '900',
+    color: '#CAD8E6',
+    letterSpacing: 1.5,
+  },
+  scoreVal: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 1,
+  },
+  powerUpRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    gap: 10,
   },
 });

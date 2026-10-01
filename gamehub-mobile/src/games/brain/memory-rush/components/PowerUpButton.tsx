@@ -1,9 +1,11 @@
 // ============================================================
-// MEMORY RUSH — Visually Secondary Power-up Trigger Button
+// MEMORY RUSH — 3D Carved Stone Power-up Pedestal
 // ============================================================
 
 import React from 'react';
 import { Text, StyleSheet, Pressable, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import { MRColors } from '../constants/colors';
 import type { PowerUpType } from '../types';
 
@@ -23,11 +25,11 @@ export const PowerUpButton: React.FC<PowerUpButtonProps> = ({
   const getIcon = () => {
     switch (type) {
       case 'freeze':
-        return '❄';
+        return '❄️';
       case 'reveal':
-        return '👁';
+        return '👁️';
       case 'secondChance':
-        return '🛡';
+        return '🛡️';
     }
   };
 
@@ -42,63 +44,88 @@ export const PowerUpButton: React.FC<PowerUpButtonProps> = ({
     }
   };
 
+  const handlePress = () => {
+    if (disabled || count <= 0) return;
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch (e) {}
+    onPress();
+  };
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled || count <= 0}
       style={({ pressed }) => [
-        styles.button,
+        styles.outerContainer,
         count <= 0 && styles.disabled,
         pressed && styles.pressed,
       ]}
+      accessibilityLabel={`${getLabel()} power-up`}
     >
-      <Text style={styles.icon}>{getIcon()}</Text>
-      <Text style={styles.label}>{getLabel()}</Text>
-      <View style={styles.badge}>
-        <Text style={styles.badgeText}>{count}</Text>
-      </View>
+      <View style={styles.bottomExtrusion} />
+      <LinearGradient
+        colors={['#4E5E6E', '#2D3844', '#1F2730']}
+        style={styles.pedestalFace}
+      >
+        <Text style={styles.icon}>{getIcon()}</Text>
+        <Text style={styles.label}>{getLabel()}</Text>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{count}</Text>
+        </View>
+      </LinearGradient>
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
+  outerContainer: {
+    position: 'relative',
+    marginHorizontal: 2,
+  },
+  bottomExtrusion: {
+    position: 'absolute',
+    bottom: -3,
+    left: 2,
+    right: 2,
+    height: 6,
+    backgroundColor: '#12181F',
+    borderRadius: 12,
+  },
+  pedestalFace: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(23, 29, 36, 0.85)',
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 216, 61, 0.3)',
+    borderWidth: 1.5,
+    borderColor: '#718496',
     paddingHorizontal: 10,
     paddingVertical: 6,
     gap: 6,
   },
   disabled: {
     opacity: 0.4,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   icon: {
     fontSize: 13,
-    color: MRColors.yellowStatus,
   },
   label: {
     fontSize: 10,
-    fontWeight: '800',
-    color: MRColors.textPrimary,
-    letterSpacing: 1,
+    fontWeight: '900',
+    color: '#FFF8E7',
+    letterSpacing: 0.8,
   },
   badge: {
-    backgroundColor: 'rgba(255, 216, 61, 0.15)',
+    backgroundColor: '#FFD700',
     borderRadius: 8,
-    paddingHorizontal: 5,
+    paddingHorizontal: 6,
     paddingVertical: 1,
   },
   badgeText: {
-    fontSize: 9,
+    fontSize: 9.5,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
+    color: '#3B1E00',
   },
   pressed: {
-    transform: [{ scale: 0.95 }],
+    transform: [{ translateY: 2 }],
   },
 });

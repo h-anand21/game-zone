@@ -1,12 +1,19 @@
+// ============================================================
+// MEMORY RUSH — 12 Daily Challenge Screen (Treasure Shrine)
+// Golden Chest, 7-Day Road, Task Tablets & Tactile 3D Altar Button
+// ============================================================
+
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { MRIcon } from '../components/MRIcon';
-import { colors } from '../constants/colors';
-import { GameBackground } from '../components/GameBackground';
-import { GlassCard } from '../components/GlassCard';
-import { PrimaryButton } from '../components/PrimaryButton';
+import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { JungleHeaderHUD } from '../components/JungleHeaderHUD';
+import { WoodPanel } from '../components/WoodPanel';
+import { StonePanel } from '../components/StonePanel';
+import { JungleButton } from '../components/JungleButton';
 import { BottomTabBar, TabType } from '../components/BottomTabBar';
+import { MRIcon } from '../components/MRIcon';
+import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
 
 interface DailyChallengeScreenProps {
@@ -26,86 +33,104 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
   const progressPercent = Math.min(100, Math.round((currentProgress / totalRounds) * 100));
 
   return (
-    <GameBackground variant="daily">
+    <JungleWorldBackground variant="daily">
       <SafeAreaView style={styles.container}>
+        {/* Header HUD */}
+        <JungleHeaderHUD
+          title="DAILY CHALLENGE"
+          subtitle="TREASURE SHRINE"
+        />
+
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.headerSubtitle}>DAILY SPECIAL</Text>
-            <Text style={styles.headerTitle}>TODAY'S RUSH</Text>
-          </View>
-
-          {/* Hero Challenge Card */}
-          <GlassCard variant="glow" style={styles.heroCard}>
-            <View style={styles.badgeRow}>
-              <View style={styles.badge}>
-                <MRIcon name="zap" size={12} color={colors.accent} />
-                <Text style={styles.badgeText}>SPECIAL MISSION</Text>
+          {/* Main Shrine Wood Plaque */}
+          <WoodPanel variant="sign" style={styles.heroWood}>
+            <View style={styles.heroInner}>
+              <View style={styles.badgeRow}>
+                <View style={styles.missionBadge}>
+                  <MRIcon name="zap" size={13} color="#FFD700" />
+                  <Text style={styles.missionBadgeText}>SACRED TRIAL</Text>
+                </View>
+                <View style={styles.rewardBadge}>
+                  <Text style={styles.rewardBadgeText}>🎁 +500 XP • 3 GEMS</Text>
+                </View>
               </View>
-              <View style={[styles.badge, { backgroundColor: 'rgba(250, 204, 21, 0.15)' }]}>
-                <MRIcon name="star" size={12} color={colors.warning} />
-                <Text style={[styles.badgeText, { color: colors.warning }]}>+500 XP</Text>
-              </View>
-            </View>
 
-            <Text style={styles.challengeTitle}>10 ROUNDS</Text>
-            <Text style={styles.challengeSubtitle}>ONE ATTEMPT. NO MISTAKES.</Text>
+              <Text style={styles.chestEmoji}>🏺</Text>
+              <Text style={styles.challengeTitle}>10 ROUND TRIAL</Text>
+              <Text style={styles.challengeSub}>ONE EXPEDITION. NO SECOND CHANCES.</Text>
 
-            {/* Progress Bar */}
-            <View style={styles.progressContainer}>
-              <View style={styles.progressHeader}>
-                <Text style={styles.progressLabel}>PROGRESS</Text>
-                <Text style={styles.progressValue}>
-                  {currentProgress} / {totalRounds} ROUNDS
-                </Text>
-              </View>
-              <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
-              </View>
-            </View>
-
-            {isCompleted ? (
-              <View style={styles.completedBox}>
-                <MRIcon name="check-circle" size={24} color={colors.success} />
-                <Text style={styles.completedText}>DAILY COMPLETE ✓</Text>
-                {dailyChallenge.score !== undefined && (
-                  <Text style={styles.completedSub}>
-                    SCORE: {dailyChallenge.score.toLocaleString()}
+              {/* Carved Stone Progress Track */}
+              <View style={styles.progressContainer}>
+                <View style={styles.progressHeader}>
+                  <Text style={styles.progressLabel}>SHRINE PROGRESS</Text>
+                  <Text style={styles.progressValue}>
+                    {currentProgress} / {totalRounds} ROUNDS
                   </Text>
-                )}
+                </View>
+                <View style={styles.progressTrack}>
+                  <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
+                </View>
               </View>
-            ) : (
-              <PrimaryButton
-                title={currentProgress > 0 ? "CONTINUE DAILY →" : "START DAILY →"}
-                onPress={onStartDaily}
-                style={styles.startButton}
-              />
-            )}
-          </GlassCard>
 
-          {/* Rules & Rewards info */}
-          <GlassCard style={styles.infoCard}>
-            <Text style={styles.infoTitle}>CHALLENGE RULES</Text>
-            <View style={styles.ruleItem}>
-              <MRIcon name="shield" size={16} color={colors.accent} />
-              <Text style={styles.ruleText}>Fixed round order across all 5 memory modes.</Text>
+              {isCompleted ? (
+                <View style={styles.completedBox}>
+                  <MRIcon name="check-circle" size={24} color="#10B981" />
+                  <Text style={styles.completedText}>SHRINE CONQUERED ✓</Text>
+                  {dailyChallenge.score !== undefined && (
+                    <Text style={styles.completedSub}>
+                      EXPEDITION SCORE: {dailyChallenge.score.toLocaleString()} PTS
+                    </Text>
+                  )}
+                </View>
+              ) : (
+                <JungleButton
+                  title={currentProgress > 0 ? "CONTINUE TRIAL ▶" : "ENTER TRIAL ▶"}
+                  size="hero"
+                  variant="gold"
+                  onPress={onStartDaily}
+                />
+              )}
             </View>
-            <View style={styles.ruleItem}>
-              <MRIcon name="clock" size={16} color={colors.accent} />
-              <Text style={styles.ruleText}>Strict timer pressure. Focus is key.</Text>
-            </View>
-            <View style={styles.ruleItem}>
-              <MRIcon name="award" size={16} color={colors.warning} />
-              <Text style={styles.ruleText}>Earn +500 XP and streak multiplier bonuses.</Text>
-            </View>
-          </GlassCard>
+          </WoodPanel>
 
-          <View style={{ height: 100 }} />
+          {/* Shrine Rules Stone Tablet */}
+          <StonePanel variant="carved" style={styles.rulesStone}>
+            <Text style={styles.rulesTitle}>TEMPLE TRIAL CODEX</Text>
+
+            <View style={styles.ruleItem}>
+              <View style={styles.ruleIconPill}>
+                <MRIcon name="shield" size={15} color="#FFD700" />
+              </View>
+              <Text style={styles.ruleText}>
+                Fixed challenge sequence spanning all 5 memory game modes.
+              </Text>
+            </View>
+
+            <View style={styles.ruleItem}>
+              <View style={styles.ruleIconPill}>
+                <MRIcon name="clock" size={15} color="#38BDF8" />
+              </View>
+              <Text style={styles.ruleText}>
+                Elevated speed requirements. Razor-sharp mental focus required.
+              </Text>
+            </View>
+
+            <View style={styles.ruleItem}>
+              <View style={styles.ruleIconPill}>
+                <MRIcon name="award" size={15} color="#10B981" />
+              </View>
+              <Text style={styles.ruleText}>
+                Unlocks exclusive daily streak multiplier and ancient runes.
+              </Text>
+            </View>
+          </StonePanel>
+
+          <View style={{ height: 90 }} />
         </ScrollView>
 
         <BottomTabBar currentScreen="daily" onNavigate={(scr) => onNavigateTab(scr as any)} />
       </SafeAreaView>
-    </GameBackground>
+    </JungleWorldBackground>
   );
 };
 
@@ -114,134 +139,160 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingTop: 6,
+    gap: 12,
   },
-  header: {
-    marginBottom: 20,
+  heroWood: {
+    width: '100%',
   },
-  headerSubtitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.accent,
-    letterSpacing: 2,
-    marginBottom: 4,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: 1,
-  },
-  heroCard: {
-    padding: 24,
-    marginBottom: 20,
+  heroInner: {
+    alignItems: 'center',
+    paddingVertical: 10,
   },
   badgeRow: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 16,
+    marginBottom: 8,
   },
-  badge: {
+  missionBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(255, 216, 61, 0.15)',
+    gap: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
     paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FFD700',
   },
-  badgeText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: colors.accent,
+  missionBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#FFD700',
     letterSpacing: 1,
+  },
+  rewardBadge: {
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#34D399',
+  },
+  rewardBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#34D399',
+    letterSpacing: 0.8,
+  },
+  chestEmoji: {
+    fontSize: 44,
+    marginVertical: 4,
   },
   challengeTitle: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: '900',
-    color: colors.textPrimary,
-    letterSpacing: 1,
+    color: '#FFFFFF',
+    letterSpacing: 1.5,
+    textShadowColor: '#4A2800',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
-  challengeSubtitle: {
-    fontSize: 12,
+  challengeSub: {
+    fontSize: 11,
     fontWeight: '800',
-    color: colors.textSecondary,
-    letterSpacing: 2,
-    marginTop: 4,
-    marginBottom: 24,
+    color: '#FFD700',
+    letterSpacing: 1.2,
+    marginTop: 2,
+    marginBottom: 16,
   },
   progressContainer: {
-    marginBottom: 24,
+    width: '100%',
+    marginBottom: 18,
   },
   progressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   progressLabel: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: colors.textSecondary,
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#D1DEC8',
     letterSpacing: 1,
   },
   progressValue: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: colors.accent,
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FFD700',
   },
   progressTrack: {
-    height: 10,
-    backgroundColor: colors.surfaceElevated,
-    borderRadius: 5,
+    height: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    borderRadius: 6,
     overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: '#607284',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: colors.accent,
-    borderRadius: 5,
-  },
-  startButton: {
-    width: '100%',
+    backgroundColor: '#FFD700',
+    borderRadius: 6,
   },
   completedBox: {
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 16,
-    backgroundColor: 'rgba(74, 222, 128, 0.1)',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(74, 222, 128, 0.3)',
+    gap: 6,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    backgroundColor: 'rgba(16, 185, 129, 0.18)',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#10B981',
+    width: '100%',
   },
   completedText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: colors.success,
-    letterSpacing: 1,
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#10B981',
+    letterSpacing: 1.2,
   },
   completedSub: {
-    fontSize: 12,
-    color: colors.textSecondary,
+    fontSize: 11,
+    color: '#E2CA92',
+    fontWeight: '700',
   },
-  infoCard: {
-    padding: 20,
+  rulesStone: {
+    width: '100%',
   },
-  infoTitle: {
+  rulesTitle: {
     fontSize: 12,
-    fontWeight: '800',
-    color: colors.textSecondary,
+    fontWeight: '900',
+    color: '#FFD700',
     letterSpacing: 1.5,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   ruleItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    marginBottom: 14,
+    marginBottom: 12,
+  },
+  ruleIconPill: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    borderWidth: 1.5,
+    borderColor: '#607284',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   ruleText: {
-    fontSize: 13,
-    color: colors.textPrimary,
+    fontSize: 12,
+    color: '#D1DEC8',
+    fontWeight: '600',
     flex: 1,
+    lineHeight: 16,
   },
 });

@@ -1,12 +1,14 @@
 // ============================================================
-// MEMORY RUSH — 09 Round Result Screen (Fast Transition)
+// MEMORY RUSH — 09 Round Result Screen (Temple Trial Feedback)
+// Carved Stone Metrics, Celebration Stars & Tactile 3D Next CTA
 // ============================================================
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { GameBackground } from '../components/GameBackground';
-import { GlassCard } from '../components/GlassCard';
-import { PrimaryButton } from '../components/PrimaryButton';
+import { LinearGradient } from 'expo-linear-gradient';
+import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { WoodPanel } from '../components/WoodPanel';
+import { JungleButton } from '../components/JungleButton';
 import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
@@ -16,56 +18,79 @@ interface RoundResultScreenProps {
 }
 
 export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({ onNextRound }) => {
-  const { score, combo, round, totalRounds, correctAnswers, totalAttempts, reactionTimeMs } = useMemoryRushStore();
+  const {
+    score,
+    combo,
+    round,
+    totalRounds,
+    correctAnswers,
+    totalAttempts,
+    reactionTimeMs,
+  } = useMemoryRushStore();
 
   const accuracy = Math.round((correctAnswers / Math.max(1, totalAttempts)) * 100);
+  const isPerfect = accuracy >= 80;
 
   return (
-    <GameBackground theme="gameplay">
+    <JungleWorldBackground variant="arena">
       <View style={styles.container}>
+        {/* Header Title */}
         <View style={styles.header}>
-          <Text style={styles.title}>ROUND COMPLETE</Text>
-          <Text style={styles.roundTag}>ROUND {round} OF {totalRounds}</Text>
+          <Text style={styles.headerSub}>TEMPLE TRIAL</Text>
+          <Text style={styles.title}>{isPerfect ? 'PERFECT RUN!' : 'ROUND COMPLETE'}</Text>
+          <View style={styles.roundPill}>
+            <Text style={styles.roundTag}>
+              ROUND {round} OF {totalRounds}
+            </Text>
+          </View>
         </View>
 
-        <GlassCard glowing style={styles.card}>
-          <Text style={styles.pointsLabel}>ROUND POINTS</Text>
-          <Text style={styles.pointsVal}>+{score}</Text>
+        {/* Central Physical Wood & Stone Board */}
+        <WoodPanel variant="sign" style={styles.boardWood}>
+          <View style={styles.boardInner}>
+            <Text style={styles.pointsLabel}>RUN SCORE</Text>
+            <Text style={styles.pointsVal}>{score.toLocaleString()}</Text>
 
-          <View style={styles.metricsGrid}>
-            <View style={styles.metricCell}>
-              <MRIcon name="target" size={14} color={MRColors.yellowStatus} />
-              <Text style={styles.metricLabel}>ACCURACY</Text>
-              <Text style={styles.metricValYellow}>{accuracy}%</Text>
-            </View>
-            <View style={styles.metricCell}>
-              <MRIcon name="clock" size={14} color={MRColors.cyanBright} />
-              <Text style={styles.metricLabel}>REACTION</Text>
-              <Text style={styles.metricValCyan}>{(reactionTimeMs / 1000).toFixed(2)}s</Text>
-            </View>
-            <View style={styles.metricCell}>
-              <MRIcon name="zap" size={14} color={MRColors.textPrimary} />
-              <Text style={styles.metricLabel}>COMBO</Text>
-              <Text style={styles.metricValWhite}>×{combo}</Text>
-            </View>
-            <View style={styles.metricCell}>
-              <MRIcon name="star" size={14} color={MRColors.yellowStatus} />
-              <Text style={styles.metricLabel}>TIME BONUS</Text>
-              <Text style={styles.metricValYellow}>+4s</Text>
+            {/* 4 Carved Stone Metrics */}
+            <View style={styles.metricsGrid}>
+              <View style={styles.metricStone}>
+                <MRIcon name="target" size={16} color="#FFD700" />
+                <Text style={styles.metricVal}>{accuracy}%</Text>
+                <Text style={styles.metricLabel}>ACCURACY</Text>
+              </View>
+
+              <View style={styles.metricStone}>
+                <MRIcon name="clock" size={16} color="#38BDF8" />
+                <Text style={styles.metricVal}>{(reactionTimeMs / 1000).toFixed(2)}s</Text>
+                <Text style={styles.metricLabel}>REACTION</Text>
+              </View>
+
+              <View style={styles.metricStone}>
+                <MRIcon name="zap" size={16} color="#10B981" />
+                <Text style={styles.metricVal}>×{combo}</Text>
+                <Text style={styles.metricLabel}>COMBO</Text>
+              </View>
+
+              <View style={styles.metricStone}>
+                <MRIcon name="star" size={16} color="#FFD700" />
+                <Text style={styles.metricVal}>+150</Text>
+                <Text style={styles.metricLabel}>TEMPLE XP</Text>
+              </View>
             </View>
           </View>
-        </GlassCard>
+        </WoodPanel>
 
+        {/* Bottom CTA */}
         <View style={styles.ctaWrapper}>
-          <PrimaryButton
-            title="NEXT ROUND →"
-            size="lg"
+          <JungleButton
+            title="NEXT ROUND ▶"
+            size="hero"
             variant="gold"
             onPress={onNextRound}
           />
         </View>
       </View>
-    </GameBackground>
+    </JungleWorldBackground>
   );
 };
 
@@ -75,82 +100,94 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     justifyContent: 'space-between',
     paddingBottom: 24,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
   },
   header: {
     alignItems: 'center',
   },
-  title: {
-    fontSize: 26,
+  headerSub: {
+    fontSize: 11,
     fontWeight: '900',
-    color: MRColors.textPrimary,
+    color: '#FFD700',
     letterSpacing: 2,
   },
+  title: {
+    fontSize: 28,
+    fontWeight: '900',
+    color: '#FFF8E7',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginTop: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  roundPill: {
+    marginTop: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderWidth: 1,
+    borderColor: '#718496',
+  },
   roundTag: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: MRColors.yellowStatus,
-    letterSpacing: 1.5,
-    marginTop: 4,
-  },
-  card: {
-    padding: 20,
-    alignItems: 'center',
-  },
-  pointsLabel: {
     fontSize: 10,
     fontWeight: '900',
-    color: MRColors.textMuted,
-    letterSpacing: 1,
+    color: '#FFD700',
+    letterSpacing: 1.5,
+  },
+  boardWood: {
+    width: '100%',
+  },
+  boardInner: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  pointsLabel: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 1.5,
   },
   pointsVal: {
-    fontSize: 48,
+    fontSize: 52,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
+    color: '#FFFFFF',
     marginVertical: 4,
-    textShadowColor: MRColors.goldGlow,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 14,
+    textShadowColor: '#4A2800',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 6,
   },
   metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     width: '100%',
-    marginTop: 16,
-    gap: 10,
+    marginTop: 14,
+    gap: 8,
+    justifyContent: 'space-between',
   },
-  metricCell: {
-    width: '47%',
-    backgroundColor: 'rgba(8, 10, 13, 0.85)',
-    borderRadius: 12,
-    padding: 10,
+  metricStone: {
+    width: '48%',
+    backgroundColor: 'rgba(16, 24, 20, 0.85)',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 216, 61, 0.25)',
+    borderWidth: 1.5,
+    borderColor: '#546A58',
     gap: 2,
   },
   metricLabel: {
-    fontSize: 8,
+    fontSize: 8.5,
     fontWeight: '900',
-    color: MRColors.textMuted,
+    color: '#CAD8E6',
     letterSpacing: 1,
   },
-  metricValCyan: {
-    fontSize: 16,
+  metricVal: {
+    fontSize: 18,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
-    marginTop: 2,
-  },
-  metricValYellow: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: MRColors.yellowStatus,
-    marginTop: 2,
-  },
-  metricValWhite: {
-    fontSize: 16,
-    fontWeight: '900',
-    color: MRColors.textPrimary,
+    color: '#FFF8E7',
     marginTop: 2,
   },
   ctaWrapper: {
