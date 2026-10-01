@@ -1,17 +1,18 @@
 // ============================================================
-// MEMORY RUSH — Chunky 2.5D Cyber Arcade Primary CTA Button
+// MEMORY RUSH — 2.5D Arcade Primary CTA Button
+// (Structured identically to Reverse Mind & Number Rush GlowButtons)
 // ============================================================
 
 import React from 'react';
 import { Text, StyleSheet, Pressable, ViewStyle, TextStyle, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MRColors } from '../constants/colors';
+import { MRColors, MRButtonThemes } from '../constants/colors';
 
 interface PrimaryButtonProps {
   title: string;
   onPress: () => void;
   size?: 'sm' | 'md' | 'lg';
-  variant?: 'cyan' | 'gold' | 'danger';
+  variant?: 'cyan' | 'gold' | 'emerald' | 'danger';
   icon?: React.ReactNode;
   disabled?: boolean;
   style?: ViewStyle;
@@ -32,37 +33,21 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   const fontSize = size === 'sm' ? 13 : size === 'md' ? 15 : 18;
   const lipHeight = size === 'sm' ? 3 : size === 'md' ? 4 : 5;
 
-  const getVariantStyles = () => {
+  const getTheme = () => {
     switch (variant) {
       case 'gold':
-        return {
-          gradient: ['#FDE047', '#EAB308', '#CA8A04'],
-          lipColor: '#A16207',
-          textColor: '#080A0D',
-          borderColor: '#FEF08A',
-          glow: 'rgba(250, 204, 21, 0.4)',
-        };
+        return MRButtonThemes.gold;
+      case 'emerald':
+        return MRButtonThemes.emerald;
       case 'danger':
-        return {
-          gradient: ['#FDA4AF', '#F43F5E', '#BE123C'],
-          lipColor: '#881337',
-          textColor: '#FFFFFF',
-          borderColor: '#FECDD3',
-          glow: 'rgba(251, 113, 133, 0.4)',
-        };
+        return MRButtonThemes.coral;
       case 'cyan':
       default:
-        return {
-          gradient: ['#67E8F9', '#22D3EE', '#0891B2'],
-          lipColor: '#155E75',
-          textColor: '#080A0D',
-          borderColor: '#A5F3FC',
-          glow: 'rgba(34, 211, 238, 0.5)',
-        };
+        return MRButtonThemes.cyan;
     }
   };
 
-  const vConfig = getVariantStyles();
+  const theme = getTheme();
 
   return (
     <Pressable
@@ -80,7 +65,8 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
             styles.buttonWrapper,
             {
               height: height + lipHeight,
-              backgroundColor: vConfig.lipColor,
+              backgroundColor: theme.shadow,
+              borderRadius: 18,
             },
           ]}
         >
@@ -90,15 +76,15 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
               {
                 height: height,
                 marginTop: pressed ? lipHeight : 0,
-                shadowColor: vConfig.glow,
+                shadowColor: theme.glow,
               },
             ]}
           >
             <LinearGradient
-              colors={vConfig.gradient as any}
+              colors={[theme.highlight, theme.face, theme.bevel]}
               style={[
                 styles.gradientSurface,
-                { height: height, borderColor: vConfig.borderColor },
+                { height: height, borderColor: theme.highlight },
               ]}
               start={{ x: 0, y: 0 }}
               end={{ x: 0, y: 1 }}
@@ -107,7 +93,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
               <View style={styles.topLightGlow} />
 
               <View style={styles.contentRow}>
-                <Text style={[styles.title, { fontSize, color: vConfig.textColor }, textStyle]}>
+                <Text style={[styles.title, { fontSize, color: theme.text }, textStyle]}>
                   {title}
                 </Text>
                 {icon && <View style={styles.iconBox}>{icon}</View>}
@@ -126,7 +112,6 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     width: '100%',
-    borderRadius: 18,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -134,8 +119,8 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 18,
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
+    shadowOpacity: 0.65,
+    shadowRadius: 12,
     elevation: 8,
   },
   gradientSurface: {
@@ -151,10 +136,10 @@ const styles = StyleSheet.create({
   topLightGlow: {
     position: 'absolute',
     top: 2,
-    left: '12%',
-    right: '12%',
+    left: '10%',
+    right: '10%',
     height: 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    backgroundColor: 'rgba(255, 255, 255, 0.70)',
     borderRadius: 1,
   },
   contentRow: {
@@ -167,6 +152,9 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 1.5,
     textTransform: 'uppercase',
+    textShadowColor: 'rgba(0, 0, 0, 0.35)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   iconBox: {
     marginLeft: 4,

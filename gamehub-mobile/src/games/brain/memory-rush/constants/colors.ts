@@ -1,38 +1,99 @@
 // ============================================================
-// MEMORY RUSH — Strict Premium Dark Color System
+// MEMORY RUSH — 2.5D Arcade Cyber Design Tokens & Theme
+// (Inspired by Reverse Mind, Number Rush, Mind Lock & Find One)
 // ============================================================
 
 export const MRColors = {
-  bgVoid: '#080A0D',
-  bgDark: '#0D1116',
-  surface: '#11161C',
-  surfaceElevated: '#171D24',
-  surfaceGlass: 'rgba(23, 29, 36, 0.82)',
-  borderSubtle: 'rgba(255, 255, 255, 0.08)',
-  borderGlass: 'rgba(34, 211, 238, 0.25)',
+  // Deep Cozy Space / Canvas Surfaces
+  bgVoid: '#040B16',
+  bgDark: '#07111F',
+  surface: '#0D1F34',
+  surfaceElevated: '#16243A',
+  surfaceGlass: 'rgba(16, 27, 43, 0.85)',
+  surfaceGlassLight: 'rgba(255, 255, 255, 0.12)',
+  borderSubtle: 'rgba(255, 255, 255, 0.12)',
+  borderGlass: 'rgba(77, 231, 255, 0.35)',
+  borderHighlight: 'rgba(255, 255, 255, 0.22)',
 
-  textPrimary: '#F5F7FA',
-  textSecondary: '#8E9AA7',
-  textMuted: '#526070',
+  // Primary Text & Utilities
+  textPrimary: '#F0F6FC',
+  textSecondary: '#8CA0B8',
+  textMuted: '#586E88',
+  textShadow: 'rgba(0, 0, 0, 0.55)',
 
-  primaryCyan: '#22D3EE',
-  cyanBright: '#67E8F9',
-  cyanGlow: 'rgba(34, 211, 238, 0.4)',
-  cyanMuted: 'rgba(34, 211, 238, 0.12)',
+  // Neon Electric Accents
+  primaryCyan: '#4DE7FF',
+  cyanBright: '#B2F5EA',
+  cyanShadow: '#0097A7',
+  cyanGlow: 'rgba(77, 231, 255, 0.5)',
+  cyanMuted: 'rgba(77, 231, 255, 0.15)',
 
-  yellowStatus: '#FACC15', // Small status / reward indicators ONLY
-  successGreen: '#4ADE80',
-  dangerRose: '#FB7185',
+  yellowStatus: '#FFD83D',
+  goldLight: '#FFF59D',
+  goldShadow: '#B28704',
+  goldGlow: 'rgba(255, 216, 61, 0.5)',
 
-  // Aliases for screen compatibility
-  backgroundPrimary: '#080A0D',
-  accent: '#22D3EE',
-  warning: '#FACC15',
-  success: '#4ADE80',
-  danger: '#FB7185',
+  successGreen: '#57E389',
+  emeraldShadow: '#2E7D32',
+  emeraldGlow: 'rgba(87, 227, 137, 0.5)',
+
+  dangerRose: '#FF5E6C',
+  coralShadow: '#C62828',
+  coralGlow: 'rgba(255, 94, 108, 0.5)',
+
+  // Aliases for retro-compatibility
+  backgroundPrimary: '#040B16',
+  accent: '#4DE7FF',
+  warning: '#FFD83D',
+  success: '#57E389',
+  danger: '#FF5E6C',
 };
 
 export const colors = MRColors;
+
+// 2.5D Button Palette (Same structure as Number Rush & Reverse Mind)
+export const MRButtonThemes = {
+  cyan: {
+    face: '#4DE7FF',
+    highlight: '#B2F5EA',
+    bevel: '#0097A7',
+    shadow: '#006064',
+    text: '#040B16',
+    glow: 'rgba(77, 231, 255, 0.55)',
+  },
+  gold: {
+    face: '#FFD83D',
+    highlight: '#FFF59D',
+    bevel: '#B28704',
+    shadow: '#7A5B00',
+    text: '#040B16',
+    glow: 'rgba(255, 216, 61, 0.55)',
+  },
+  emerald: {
+    face: '#57E389',
+    highlight: '#B7F4C7',
+    bevel: '#2E7D32',
+    shadow: '#1B5E20',
+    text: '#040B16',
+    glow: 'rgba(87, 227, 137, 0.55)',
+  },
+  coral: {
+    face: '#FF5E6C',
+    highlight: '#FFCDD2',
+    bevel: '#C62828',
+    shadow: '#7F0000',
+    text: '#FFFFFF',
+    glow: 'rgba(255, 94, 108, 0.55)',
+  },
+  glass: {
+    face: '#16243A',
+    highlight: 'rgba(255, 255, 255, 0.20)',
+    bevel: '#0D1F34',
+    shadow: '#040B16',
+    text: '#F0F6FC',
+    glow: 'rgba(77, 231, 255, 0.25)',
+  },
+};
 
 export const GAME_MODES = [
   { id: 'memoryGrid', title: 'Memory Grid', desc: 'Remember positions' },
@@ -41,4 +102,3 @@ export const GAME_MODES = [
   { id: 'missingNumber', title: 'Missing Number', desc: 'Find what vanished' },
   { id: 'fusionRush', title: 'Fusion Rush', desc: '4 challenges in one' },
 ];
-
