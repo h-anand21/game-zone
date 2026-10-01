@@ -53,16 +53,12 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
 
   // Safe Hardware Back Button Handling
   const handleBack = useCallback(() => {
-    if (currentScreen === 'gameplay') {
-      setScreen('home');
-      return true;
-    }
-    if (currentScreen !== 'home' && currentScreen !== 'splash') {
-      setScreen('home');
-      return true;
-    }
-    if (currentScreen === 'home') {
+    if (currentScreen === 'gameplay' || currentScreen === 'home') {
       setShowExitModal(true);
+      return true;
+    }
+    if (currentScreen !== 'splash') {
+      setScreen('home');
       return true;
     }
     return false;
@@ -92,8 +88,10 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
   };
 
   const handleConfirmDifficulty = (d: GameDifficulty) => {
+    triggerHaptic();
     setSelectedDiffTemp(d);
-    setScreen('rule-preview');
+    // Directly launch game after difficulty selection (Zero Friction)
+    startNewGame(selectedModeTemp, d);
   };
 
   const handleConfirmRules = () => {
@@ -151,9 +149,8 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
         <ModeSelectionScreen
           initialMode={selectedModeTemp}
           onLaunchGame={(m, d) => {
-            setSelectedModeTemp(m);
-            setSelectedDiffTemp(d);
-            setScreen('ready');
+            triggerHaptic();
+            startNewGame(m, d);
           }}
           onNavigate={handleNavigate}
           onBack={() => setScreen('home')}
