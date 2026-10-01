@@ -18,9 +18,9 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { id: 'home', label: 'Home', icon: '🏠' },
   { id: 'mode-hub', label: 'Modes', icon: '🎮' },
+  { id: 'daily-rush', label: 'Daily', icon: '🎁' },
   { id: 'leaderboard', label: 'Ranks', icon: '🏆' },
-  { id: 'achievements', label: 'Badges', icon: '🎖️' },
-  { id: 'settings', label: 'Settings', icon: '⚙️' },
+  { id: 'profile', label: 'Profile', icon: '👤' },
 ];
 
 export const BottomNavBar: React.FC = () => {

@@ -142,10 +142,10 @@ const styles = StyleSheet.create({
     paddingVertical: 50,
   },
   bgImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   darkVignette: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(6, 18, 13, 0.65)',
   },
   floatingNumber: {

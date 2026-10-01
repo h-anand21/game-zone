@@ -1,5 +1,5 @@
 // ============================================================
-// Number Rush — Arcade Leaderboard & Podium Screen
+// Number Rush — Screen 16: LEADERBOARD (Whimsical Jungle Leaderboard Reference)
 // ============================================================
 
 import React, { useState } from 'react';
@@ -10,15 +10,17 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
-import { HeaderHUD, BottomNavBar } from '../components';
+import { HeaderHUD, BottomNavBar, MascotIllustration } from '../components';
+
+const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const LeaderboardModal: React.FC = () => {
   const { setScreen, leaderboard, stats } = useNumberRushStore();
-  const [activeTab, setActiveTab] = useState<'global' | 'daily' | 'friends'>('global');
+  const [activeTab, setActiveTab] = useState<'global' | 'weekly' | 'friends'>('global');
 
-  // Sorted list
   const top1 = leaderboard[0];
   const top2 = leaderboard[1];
   const top3 = leaderboard[2];
@@ -26,11 +28,16 @@ export const LeaderboardModal: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      {/* 1. Atmospheric Jungle Background */}
+      <ExpoImage source={JUNGLE_BG} style={styles.bgImage} contentFit="cover" />
+      <View style={styles.darkVignette} />
+
+      {/* 2. Top Game HUD */}
       <HeaderHUD showBack onBackPress={() => setScreen('home')} title="LEADERBOARD" />
 
-      {/* Tabs */}
+      {/* 3. Filter Tabs Row */}
       <View style={styles.tabsRow}>
-        {(['global', 'daily', 'friends'] as const).map((tab) => {
+        {(['global', 'weekly', 'friends'] as const).map((tab) => {
           const isSelected = activeTab === tab;
           return (
             <Pressable
@@ -50,9 +57,20 @@ export const LeaderboardModal: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Top 3 Podium */}
+        {/* 4. Carved Billboard Header with Tiger Mascot */}
+        <View style={styles.headerBillboard}>
+          <View style={styles.mascotHolder}>
+            <MascotIllustration size={75} character="tiger" mood="happy" showAura={false} />
+          </View>
+          <View style={styles.billboardBody}>
+            <Text style={styles.billboardSub}>JUNGLE HALL OF FAME</Text>
+            <Text style={styles.billboardTitle}>CHAMPIONS ARENA</Text>
+          </View>
+        </View>
+
+        {/* 5. 3D TOP 3 PODIUM */}
         <View style={styles.podiumContainer}>
-          {/* 2nd Place */}
+          {/* 2nd Place (Silver) */}
           {top2 && (
             <View style={styles.podiumCol}>
               <View style={[styles.avatarBox, styles.silverBorder]}>
@@ -62,14 +80,14 @@ export const LeaderboardModal: React.FC = () => {
                 </View>
               </View>
               <Text style={styles.podiumName} numberOfLines={1}>{top2.name}</Text>
-              <Text style={styles.podiumScore}>{top2.score}</Text>
+              <Text style={styles.podiumScore}>{top2.score.toLocaleString()} 🪙</Text>
               <View style={[styles.pedestal, styles.pedestal2]}>
                 <Text style={styles.pedestalRank}>2nd</Text>
               </View>
             </View>
           )}
 
-          {/* 1st Place */}
+          {/* 1st Place (Gold Crown) */}
           {top1 && (
             <View style={[styles.podiumCol, styles.podiumCenter]}>
               <Text style={styles.crownIcon}>👑</Text>
@@ -80,14 +98,16 @@ export const LeaderboardModal: React.FC = () => {
                 </View>
               </View>
               <Text style={styles.podiumName} numberOfLines={1}>{top1.name}</Text>
-              <Text style={styles.podiumScore}>{top1.score}</Text>
+              <Text style={[styles.podiumScore, { color: '#FFD700' }]}>
+                {top1.score.toLocaleString()} 🪙
+              </Text>
               <View style={[styles.pedestal, styles.pedestal1]}>
                 <Text style={styles.pedestalRank}>1st</Text>
               </View>
             </View>
           )}
 
-          {/* 3rd Place */}
+          {/* 3rd Place (Bronze) */}
           {top3 && (
             <View style={styles.podiumCol}>
               <View style={[styles.avatarBox, styles.bronzeBorder]}>
@@ -97,7 +117,7 @@ export const LeaderboardModal: React.FC = () => {
                 </View>
               </View>
               <Text style={styles.podiumName} numberOfLines={1}>{top3.name}</Text>
-              <Text style={styles.podiumScore}>{top3.score}</Text>
+              <Text style={styles.podiumScore}>{top3.score.toLocaleString()} 🪙</Text>
               <View style={[styles.pedestal, styles.pedestal3]}>
                 <Text style={styles.pedestalRank}>3rd</Text>
               </View>
@@ -105,35 +125,46 @@ export const LeaderboardModal: React.FC = () => {
           )}
         </View>
 
-        {/* List of remaining ranks */}
+        {/* 6. Rank List 4 to 100 */}
         <View style={styles.listContainer}>
           {rest.map((entry) => (
             <View key={entry.id} style={styles.rankRow}>
-              <Text style={styles.rankText}>#{entry.rank}</Text>
+              <View style={styles.rankPill}>
+                <Text style={styles.rankText}>#{entry.rank}</Text>
+              </View>
               <Text style={styles.rowAvatar}>{entry.avatar}</Text>
               <View style={styles.rowInfo}>
                 <Text style={styles.rowName}>{entry.name}</Text>
-                <Text style={styles.rowMode}>{entry.mode} • x{entry.combo} streak</Text>
+                <Text style={styles.rowSub}>
+                  {entry.countryBadge} • {entry.mode} • x{entry.combo} streak
+                </Text>
               </View>
-              <Text style={styles.rowScore}>{entry.score}</Text>
+              <Text style={styles.rowScore}>{entry.score.toLocaleString()} 🪙</Text>
             </View>
           ))}
         </View>
 
-        {/* User's Current Performance Row */}
-        <View style={styles.userStickyRow}>
-          <Text style={styles.userRank}>#4</Text>
-          <Text style={styles.rowAvatar}>🏃</Text>
-          <View style={styles.rowInfo}>
-            <Text style={styles.userName}>You (Champion)</Text>
-            <Text style={styles.rowMode}>Your Best: {stats.bestScore} pts</Text>
-          </View>
-          <Text style={styles.userScore}>{stats.bestScore}</Text>
-        </View>
-
-        <View style={{ height: 100 }} />
+        <View style={{ height: 160 }} />
       </ScrollView>
 
+      {/* 7. Sticky User Rank Row */}
+      <View style={styles.userStickyRow}>
+        <View style={styles.userRankPill}>
+          <Text style={styles.userRankText}>#42</Text>
+        </View>
+        <Text style={styles.userAvatar}>🏃</Text>
+        <View style={styles.userInfo}>
+          <Text style={styles.userName}>YOU (Alex Rush)</Text>
+          <Text style={styles.userSub}>
+            Level {stats.level} • {stats.dailyStreak}d Streak
+          </Text>
+        </View>
+        <Text style={styles.userScore}>
+          {stats.bestScore > 0 ? stats.bestScore.toLocaleString() : '12,480'} 🪙
+        </Text>
+      </View>
+
+      {/* Global Bottom Navigation */}
       <BottomNavBar />
     </View>
   );
@@ -142,26 +173,34 @@ export const LeaderboardModal: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: NRTheme.colors.bgDark,
+    backgroundColor: '#06120D',
+  },
+  bgImage: {
+    ...StyleSheet.absoluteFill,
+  },
+  darkVignette: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(6, 18, 13, 0.65)',
   },
   tabsRow: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    justifyContent: 'center',
     gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: 'rgba(7, 27, 52, 0.75)',
   },
   tab: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderRadius: NRTheme.radius.md,
-    backgroundColor: '#0E223D',
+    paddingHorizontal: 18,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: 'rgba(0,0,0,0.3)',
     borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: 'transparent',
   },
   activeTab: {
-    backgroundColor: '#1E4575',
-    borderColor: '#FFC107',
+    backgroundColor: '#2ED573',
+    borderColor: '#FFFFFF',
   },
   tabText: {
     color: '#8CA0BA',
@@ -170,185 +209,239 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   activeTabText: {
-    color: '#FFC107',
+    color: '#04160D',
   },
   scrollContent: {
     paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  headerBillboard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(7, 27, 52, 0.88)',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#FFC107',
+    padding: 12,
+    marginBottom: 14,
+  },
+  mascotHolder: {
+    marginRight: 10,
+  },
+  billboardBody: {
+    flex: 1,
+  },
+  billboardSub: {
+    color: '#00E5FF',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+  },
+  billboardTitle: {
+    color: '#FFD700',
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 1.5,
   },
   podiumContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
     justifyContent: 'center',
-    marginVertical: 16,
-    paddingTop: 10,
+    alignItems: 'flex-end',
+    marginVertical: 12,
+    paddingHorizontal: 4,
   },
   podiumCol: {
-    width: 100,
+    flex: 1,
     alignItems: 'center',
   },
   podiumCenter: {
-    width: 120,
+    flex: 1.15,
     zIndex: 2,
   },
   crownIcon: {
-    fontSize: 26,
-    marginBottom: -6,
+    fontSize: 24,
+    marginBottom: -4,
   },
   avatarBox: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
-    backgroundColor: '#143154',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#0F2643',
     borderWidth: 3,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    marginBottom: 4,
   },
   goldBorder: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
     borderColor: '#FFD700',
-    width: 68,
-    height: 68,
-    borderRadius: 34,
   },
   silverBorder: {
-    borderColor: '#BDC3C7',
+    borderColor: '#D8E2DD',
   },
   bronzeBorder: {
-    borderColor: '#D35400',
+    borderColor: '#CD7F32',
   },
   avatarEmoji: {
-    fontSize: 28,
+    fontSize: 30,
   },
   rankBadge: {
     position: 'absolute',
     bottom: -4,
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
   },
-  goldBadge: {
-    backgroundColor: '#FFD700',
-  },
-  silverBadge: {
-    backgroundColor: '#BDC3C7',
-  },
-  bronzeBadge: {
-    backgroundColor: '#D35400',
-  },
+  goldBadge: { backgroundColor: '#FFD700' },
+  silverBadge: { backgroundColor: '#D8E2DD' },
+  bronzeBadge: { backgroundColor: '#CD7F32' },
   rankNum: {
     color: '#071324',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '900',
   },
   podiumName: {
     color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: 13,
-    marginTop: 6,
-    textAlign: 'center',
+    fontSize: 11,
+    marginTop: 2,
   },
   podiumScore: {
-    color: '#FFD700',
+    color: '#FFE082',
     fontWeight: '900',
-    fontSize: 14,
+    fontSize: 12,
     marginBottom: 6,
   },
   pedestal: {
-    width: '100%',
-    backgroundColor: '#143154',
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    width: '90%',
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.1)',
+    paddingTop: 8,
+    borderTopWidth: 2,
+    borderColor: '#FFFFFF',
   },
   pedestal1: {
-    height: 80,
-    backgroundColor: '#1B4576',
-    borderColor: '#FFD700',
+    height: 95,
+    backgroundColor: '#996515',
   },
   pedestal2: {
-    height: 56,
+    height: 70,
+    backgroundColor: '#5C7491',
   },
   pedestal3: {
-    height: 42,
+    height: 55,
+    backgroundColor: '#784212',
   },
   pedestalRank: {
     color: '#FFFFFF',
     fontWeight: '900',
     fontSize: 14,
+    letterSpacing: 1,
   },
   listContainer: {
+    backgroundColor: 'rgba(7, 27, 52, 0.85)',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.25)',
+    padding: 10,
     gap: 8,
-    marginTop: 10,
   },
   rankRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0D223B',
-    padding: 12,
-    borderRadius: NRTheme.radius.lg,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    borderRadius: 14,
+    padding: 10,
+  },
+  rankPill: {
+    width: 32,
+    alignItems: 'center',
   },
   rankText: {
     color: '#8CA0BA',
-    fontSize: 13,
     fontWeight: '900',
-    width: 32,
+    fontSize: 12,
   },
   rowAvatar: {
     fontSize: 22,
-    marginRight: 10,
+    marginHorizontal: 8,
   },
   rowInfo: {
     flex: 1,
   },
   rowName: {
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '800',
+    fontWeight: '900',
+    fontSize: 13,
   },
-  rowMode: {
+  rowSub: {
     color: '#8CA0BA',
-    fontSize: 11,
-    marginTop: 2,
+    fontSize: 9,
+    marginTop: 1,
   },
   rowScore: {
     color: '#FFD700',
-    fontSize: 16,
     fontWeight: '900',
+    fontSize: 13,
   },
   userStickyRow: {
+    position: 'absolute',
+    bottom: 65,
+    left: 16,
+    right: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#183B64',
-    padding: 14,
-    borderRadius: NRTheme.radius.lg,
+    backgroundColor: '#0F2F20',
+    borderRadius: 18,
     borderWidth: 2,
-    borderColor: '#FFC107',
-    marginTop: 16,
-    ...NRTheme.shadows.glowGold,
+    borderColor: '#2ED573',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    shadowColor: '#2ED573',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
   },
-  userRank: {
-    color: '#FFE082',
-    fontSize: 14,
+  userRankPill: {
+    backgroundColor: '#2ED573',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginRight: 8,
+  },
+  userRankText: {
+    color: '#04160D',
     fontWeight: '900',
-    width: 32,
+    fontSize: 10,
+  },
+  userAvatar: {
+    fontSize: 24,
+    marginRight: 8,
+  },
+  userInfo: {
+    flex: 1,
   },
   userName: {
-    color: '#FFE082',
-    fontSize: 15,
+    color: '#FFFFFF',
     fontWeight: '900',
+    fontSize: 13,
+  },
+  userSub: {
+    color: '#A5D6A7',
+    fontSize: 9,
   },
   userScore: {
-    color: '#FFFFFF',
-    fontSize: 18,
+    color: '#FFD700',
     fontWeight: '900',
+    fontSize: 14,
   },
 });

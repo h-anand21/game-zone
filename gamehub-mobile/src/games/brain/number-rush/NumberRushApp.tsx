@@ -1,5 +1,5 @@
 // ============================================================
-// Number Rush — Root Application Controller & Router
+// Number Rush — Root Application Controller & Screen Router
 // ============================================================
 
 import React, { useEffect } from 'react';
@@ -7,8 +7,12 @@ import { View, StyleSheet, StatusBar } from 'react-native';
 import { NRTheme } from './theme';
 import { useNumberRushStore } from './store/numberRushStore';
 import {
+  SplashScreen,
   HomeScreen,
   ModeHubScreen,
+  CategoryScreen,
+  ModePreviewScreen,
+  DifficultyModal,
   CountdownScreen,
   GameplayScreen,
   LevelCompleteScreen,
@@ -20,6 +24,7 @@ import {
   SettingsModal,
   DailyRushModal,
 } from './screens';
+import { PowerUpModal } from './components/PowerUpModal';
 
 interface NumberRushAppProps {
   onExit?: () => void;
@@ -35,10 +40,18 @@ export const NumberRushApp: React.FC<NumberRushAppProps> = () => {
 
   const renderActiveScreen = () => {
     switch (currentScreen) {
+      case 'splash':
+        return <SplashScreen />;
       case 'home':
         return <HomeScreen />;
       case 'mode-hub':
         return <ModeHubScreen />;
+      case 'category':
+        return <CategoryScreen />;
+      case 'mode-preview':
+        return <ModePreviewScreen />;
+      case 'difficulty':
+        return <DifficultyModal />;
       case 'countdown':
         return <CountdownScreen />;
       case 'gameplay':
@@ -46,6 +59,7 @@ export const NumberRushApp: React.FC<NumberRushAppProps> = () => {
           <>
             <GameplayScreen />
             <PauseModal />
+            <PowerUpModal />
           </>
         );
       case 'level-complete':

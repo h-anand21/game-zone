@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   goldAura: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(255, 215, 0, 0.12)',
   },
   lionIconHolder: {

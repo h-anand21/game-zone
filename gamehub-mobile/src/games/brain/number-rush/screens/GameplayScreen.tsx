@@ -233,10 +233,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#06120D',
   },
   bgImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   darkVignette: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(6, 18, 13, 0.6)',
   },
   loadingContainer: {
