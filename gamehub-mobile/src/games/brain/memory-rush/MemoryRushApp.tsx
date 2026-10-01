@@ -193,8 +193,12 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
   // Confirm Exit
   const handleConfirmExit = useCallback(() => {
     setShowExitModal(false);
-    setCurrentScreen('home');
-  }, []);
+    if (currentScreen === 'gameplay' || currentScreen === 'countdown') {
+      setCurrentScreen('home');
+    } else {
+      if (onExitGame) onExitGame();
+    }
+  }, [currentScreen, onExitGame, setShowExitModal]);
 
   return (
     <View style={styles.appContainer}>
@@ -279,7 +283,7 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
       )}
 
       {/* DEDICATED 2.5D ARCADE EXIT CONFIRMATION MODAL */}
-      <ExitConfirmationModal onConfirmExit={onExitGame} />
+      <ExitConfirmationModal onConfirmExit={handleConfirmExit} />
     </View>
   );
 };
