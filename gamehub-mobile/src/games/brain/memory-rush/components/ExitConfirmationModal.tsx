@@ -55,17 +55,14 @@ export const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
     >
       <View style={styles.overlay}>
         <View style={styles.panelContainer}>
-          {/* Cyber Centerpiece Floating Emblem Above Card */}
+          {/* Cyber Mascot Centerpiece Floating Emblem Above Card */}
           <View style={styles.emblemHolder}>
             <View style={styles.emblemHalo}>
               <Image
-                source={require('../../../../../assets/images/mr_arcade_loading_bg.jpg')}
-                style={styles.emblemBgImg}
+                source={require('../../../../../assets/images/mr_mascot_exit.jpg')}
+                style={styles.emblemImg}
                 resizeMode="cover"
               />
-              <View style={styles.emblemOverlay}>
-                <MRIcon name="power" size={32} color={MRColors.primaryGold} />
-              </View>
             </View>
           </View>
 
@@ -170,15 +167,9 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     elevation: 12,
   },
-  emblemBgImg: {
-    ...StyleSheet.absoluteFill,
-    opacity: 0.45,
-  },
-  emblemOverlay: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(7, 17, 31, 0.55)',
-    justifyContent: 'center',
-    alignItems: 'center',
+  emblemImg: {
+    width: '100%',
+    height: '100%',
   },
   panel: {
     width: '100%',

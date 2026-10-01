@@ -10,6 +10,7 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
+  Image,
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -158,34 +159,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* HERO ARCADE SIGNBOARD */}
-          <View style={styles.heroSignboard}>
-            <LinearGradient
-              colors={['#16253C', '#0C1C30', '#07111F']}
-              style={styles.signboardInner}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-            >
-              {/* Corner Rivets */}
-              <View style={[styles.rivet, styles.rivetTL]} />
-              <View style={[styles.rivet, styles.rivetTR]} />
-              <View style={[styles.rivet, styles.rivetBL]} />
-              <View style={[styles.rivet, styles.rivetBR]} />
-
-              <View style={styles.arcadeBadge}>
-                <MRIcon name="zap" size={10} color={MRColors.primaryGold} />
-                <Text style={styles.arcadeBadgeText}>CYBER BRAIN ARCADE</Text>
-              </View>
-
-              <View style={styles.titleRow}>
-                <Text style={styles.titleMain}>MEMORY</Text>
-                <Text style={styles.titleRush}>RUSH</Text>
-              </View>
-
-              <Text style={styles.taglineText}>
-                REMEMBER FASTER • THINK QUICKER • BEAT YOUR BEST
-              </Text>
-            </LinearGradient>
+          {/* HERO 3D ARCADE LOGO & MASCOT BANNER */}
+          <View style={styles.heroLogoWrapper}>
+            <Image
+              source={require('../../../../../assets/images/mr_logo_banner.jpg')}
+              style={styles.heroLogoImg}
+              resizeMode="cover"
+            />
           </View>
 
           {/* ACTIVE MODE HERO STAGE (Dominant Single PLAY Action) */}
@@ -380,85 +360,24 @@ const styles = StyleSheet.create({
     gap: 14,
   },
 
-  // Hero Signboard
-  heroSignboard: {
+  // Hero Logo Banner
+  heroLogoWrapper: {
     width: '100%',
+    height: 155,
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 216, 61, 0.4)',
     shadowColor: MRColors.primaryGold,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 6,
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
+    backgroundColor: '#07111F',
   },
-  signboardInner: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 216, 61, 0.35)',
-    alignItems: 'center',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  rivet: {
-    position: 'absolute',
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: MRColors.primaryGold,
-    opacity: 0.6,
-  },
-  rivetTL: { top: 8, left: 8 },
-  rivetTR: { top: 8, right: 8 },
-  rivetBL: { bottom: 8, left: 8 },
-  rivetBR: { bottom: 8, right: 8 },
-  arcadeBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(255, 216, 61, 0.12)',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 216, 61, 0.25)',
-    marginBottom: 6,
-  },
-  arcadeBadgeText: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: MRColors.primaryGold,
-    letterSpacing: 1.5,
-  },
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  titleMain: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: MRColors.textPrimary,
-    letterSpacing: 2,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
-  },
-  titleRush: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: MRColors.primaryGold,
-    letterSpacing: 2,
-    textShadowColor: MRColors.goldGlow,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
-  },
-  taglineText: {
-    fontSize: 9.5,
-    fontWeight: '800',
-    color: MRColors.textSecondary,
-    letterSpacing: 1,
-    marginTop: 4,
-    textAlign: 'center',
+  heroLogoImg: {
+    width: '100%',
+    height: '100%',
   },
 
   // Hero Stage Card (Dominant Play Now)
