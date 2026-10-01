@@ -11,15 +11,18 @@ interface GlassCardProps {
   children: React.ReactNode;
   style?: ViewStyle;
   glowing?: boolean;
+  variant?: 'default' | 'glow';
 }
 
 export const GlassCard: React.FC<GlassCardProps> = ({
   children,
   style,
   glowing = false,
+  variant,
 }) => {
+  const isGlowing = glowing || variant === 'glow';
   return (
-    <View style={[styles.outer, glowing && styles.glowingBorder, style]}>
+    <View style={[styles.outer, isGlowing && styles.glowingBorder, style]}>
       <LinearGradient
         colors={['rgba(23, 29, 36, 0.90)', 'rgba(17, 22, 28, 0.95)']}
         style={styles.inner}

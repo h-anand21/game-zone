@@ -103,10 +103,7 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
               >
                 <GlassCard
                   glowing={isSelected}
-                  style={[
-                    styles.cardInner,
-                    isSelected && styles.cardSelectedBorder,
-                  ]}
+                  style={isSelected ? { ...styles.cardInner, ...styles.cardSelectedBorder } : styles.cardInner}
                 >
                   <View style={styles.cardTopRow}>
                     <Text style={[styles.cardTitle, isSelected && styles.titleSelected]}>

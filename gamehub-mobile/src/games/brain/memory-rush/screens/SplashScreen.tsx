@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     backgroundColor: MRColors.bgVoid,
   },
   darkOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(8, 10, 13, 0.55)',
   },
   content: {

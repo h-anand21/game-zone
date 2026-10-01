@@ -11,22 +11,25 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface GameBackgroundProps {
   theme?: 'home' | 'gameplay' | 'stats' | 'daily';
+  variant?: 'home' | 'gameplay' | 'stats' | 'daily';
   children?: React.ReactNode;
 }
 
 export const GameBackground: React.FC<GameBackgroundProps> = ({
-  theme = 'home',
+  theme,
+  variant,
   children,
 }) => {
+  const activeTheme = variant || theme || 'home';
   const getBackgroundImage = () => {
-    if (theme === 'gameplay') {
+    if (activeTheme === 'gameplay') {
       return require('../../../../../assets/images/mr_bg_gameplay.jpg');
     }
     return require('../../../../../assets/images/mr_bg_home.jpg');
   };
 
   const getOpacity = () => {
-    switch (theme) {
+    switch (activeTheme) {
       case 'gameplay':
         return 0.18; // Very subtle for zero distraction behind grid
       case 'daily':
@@ -79,7 +82,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   darkScrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(8, 10, 13, 0.40)',
   },
   content: {

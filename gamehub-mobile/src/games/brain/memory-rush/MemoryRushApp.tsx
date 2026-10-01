@@ -200,77 +200,60 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
       {currentScreen === 'home' && (
         <HomeScreen
           onStartGame={handlePlayNow}
-          onNavigate={(scr) => {
-            if (scr === 'home') setCurrentScreen('home');
-            else if (scr === 'daily') setCurrentScreen('daily');
-            else if (scr === 'stats') setCurrentScreen('stats');
-            else if (scr === 'settings') setCurrentScreen('settings');
-          }}
+          onNavigate={(scr) => setCurrentScreen(scr as ScreenState)}
         />
       )}
 
       {currentScreen === 'mode_select' && (
         <ModeSelectionScreen
           onSelectMode={handleSelectMode}
+          onNavigate={(scr) => setCurrentScreen(scr as ScreenState)}
           onBack={() => setCurrentScreen('home')}
         />
       )}
 
       {currentScreen === 'difficulty' && (
         <DifficultyScreen
-          selectedMode={selectedMode}
-          selectedDifficulty={selectedDifficulty}
-          onSelectDifficulty={handleSelectDifficulty}
-          onStartGame={handleStartGameFlow}
+          mode={selectedMode}
+          onConfirm={(diff) => {
+            handleSelectDifficulty(diff);
+            handleStartGameFlow();
+          }}
           onBack={() => setCurrentScreen('home')}
         />
       )}
 
       {currentScreen === 'tutorial' && (
-        <HowToPlayScreen onFinish={handleTutorialFinish} />
+        <HowToPlayScreen onGotIt={handleTutorialFinish} />
       )}
 
       {currentScreen === 'countdown' && (
         <CountdownOverlay
-          modeTitle={selectedMode.toUpperCase()}
-          difficultyTitle={selectedDifficulty.toUpperCase()}
+          mode={selectedMode}
+          difficulty={selectedDifficulty}
           onFinish={handleCountdownFinish}
         />
       )}
 
       {currentScreen === 'gameplay' && (
         <GameplayScreen
-          onRequestExit={handleGameplayRequestExit}
+          onBack={handleGameplayRequestExit}
           onRoundComplete={handleRoundComplete}
+          onFinalResult={() => setCurrentScreen('final_result')}
         />
       )}
 
       {currentScreen === 'round_result' && (
         <RoundResultScreen
-          roundNumber={currentRound}
-          totalRounds={totalRounds}
-          roundPoints={lastRoundResult?.points || 240}
-          accuracy={lastRoundResult?.accuracy || 100}
-          reactionTime={lastRoundResult?.reactionTime || 0.81}
-          comboStreak={lastRoundResult?.combo || 5}
-          timeBonus={lastRoundResult?.timeBonus || 4}
-          isPerfect={lastRoundResult?.isPerfect ?? true}
           onNextRound={handleContinueNextRound}
         />
       )}
 
       {currentScreen === 'final_result' && (
         <FinalResultScreen
-          score={finalRunResult?.totalScore || 3840}
-          accuracy={finalRunResult?.accuracy || 94}
-          bestCombo={finalRunResult?.bestCombo || 8}
-          avgReactionTime={finalRunResult?.avgReactionTime || 0.76}
-          memoryLevel={finalRunResult?.memoryLevel || 12}
-          performanceTitle={finalRunResult?.performanceTitle || "FOCUSED"}
-          roundScores={finalRunResult?.roundScores || [400, 600, 350, 800, 500]}
           onPlayAgain={handlePlayAgain}
           onChangeMode={handleChangeMode}
-          onBackHome={() => setCurrentScreen('home')}
+          onHome={() => setCurrentScreen('home')}
         />
       )}
 
