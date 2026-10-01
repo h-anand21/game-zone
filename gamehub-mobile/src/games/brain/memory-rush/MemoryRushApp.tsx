@@ -1,10 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Modal, Text, TouchableOpacity, BackHandler } from 'react-native';
-import { MRIcon } from './components/MRIcon';
+import { View, StyleSheet, BackHandler } from 'react-native';
 import { colors } from './constants/colors';
-import { GlassCard } from './components/GlassCard';
-import { PrimaryButton } from './components/PrimaryButton';
-import { SecondaryButton } from './components/SecondaryButton';
 import { useMemoryRushStore } from './store/memoryRushStore';
 import { GameModeId, DifficultyId } from './types';
 import { TabType } from './components/BottomTabBar';
@@ -22,6 +18,8 @@ import { FinalResultScreen } from './screens/FinalResultScreen';
 import { StatsScreen } from './screens/StatsScreen';
 import { DailyChallengeScreen } from './screens/DailyChallengeScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
+
+import { ExitConfirmationModal } from './components/ExitConfirmationModal';
 
 export type ScreenState =
   | 'splash'
@@ -43,7 +41,6 @@ interface MemoryRushAppProps {
 
 export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
   const [currentScreen, setCurrentScreen] = useState<ScreenState>('splash');
-  const [showExitModal, setShowExitModal] = useState(false);
 
   const {
     selectedMode,
@@ -60,20 +57,24 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
     finalRunResult,
     dailyChallenge,
     advanceToNextRound,
+    showExitModal,
+    setShowExitModal,
   } = useMemoryRushStore();
 
   // Android hardware back handler
   useEffect(() => {
     const onBackPress = () => {
-      if (currentScreen === 'gameplay') {
+      if (showExitModal) {
+        setShowExitModal(false);
+        return true;
+      }
+      if (currentScreen === 'gameplay' || currentScreen === 'countdown') {
         setShowExitModal(true);
         return true;
       }
       if (currentScreen === 'home') {
-        if (onExitGame) {
-          onExitGame();
-          return true;
-        }
+        setShowExitModal(true);
+        return true;
       }
       if (['mode_select', 'difficulty', 'tutorial', 'stats', 'daily', 'settings'].includes(currentScreen)) {
         setCurrentScreen('home');
@@ -84,7 +85,7 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
 
     const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
     return () => subscription.remove();
-  }, [currentScreen, onExitGame]);
+  }, [currentScreen, onExitGame, showExitModal, setShowExitModal]);
 
   // Handle Splash complete
   const handleSplashFinish = useCallback(() => {
@@ -277,33 +278,8 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
         <SettingsScreen onNavigateTab={handleNavigateTab} />
       )}
 
-      {/* QUIT / EXIT CONFIRMATION MODAL */}
-      <Modal visible={showExitModal} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <GlassCard style={styles.exitCard}>
-            <View style={styles.warningIconBox}>
-              <MRIcon name="alert-triangle" size={28} color={colors.warning} />
-            </View>
-            <Text style={styles.exitTitle}>EXIT GAME?</Text>
-            <Text style={styles.exitSub}>
-              Your current round progress and combo streak will be lost.
-            </Text>
-
-            <View style={styles.modalButtonRow}>
-              <SecondaryButton
-                title="KEEP PLAYING"
-                onPress={() => setShowExitModal(false)}
-                style={{ flex: 1 }}
-              />
-              <PrimaryButton
-                title="EXIT"
-                onPress={handleConfirmExit}
-                style={{ flex: 1, backgroundColor: colors.danger }}
-              />
-            </View>
-          </GlassCard>
-        </View>
-      </Modal>
+      {/* DEDICATED 2.5D ARCADE EXIT CONFIRMATION MODAL */}
+      <ExitConfirmationModal onConfirmExit={onExitGame} />
     </View>
   );
 };
@@ -312,45 +288,5 @@ const styles = StyleSheet.create({
   appContainer: {
     flex: 1,
     backgroundColor: colors.backgroundPrimary,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(8, 10, 13, 0.85)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  exitCard: {
-    width: '100%',
-    padding: 24,
-    alignItems: 'center',
-  },
-  warningIconBox: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: 'rgba(250, 204, 21, 0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  exitTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: colors.textPrimary,
-    letterSpacing: 1,
-    marginBottom: 8,
-  },
-  exitSub: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: 24,
-    lineHeight: 18,
-  },
-  modalButtonRow: {
-    flexDirection: 'row',
-    gap: 12,
-    width: '100%',
   },
 });
