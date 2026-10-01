@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Modal, Text, TouchableOpacity, BackHandler } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { MRIcon } from './components/MRIcon';
 import { colors } from './constants/colors';
 import { typography } from './constants/typography';
 import { GlassCard } from './components/GlassCard';
@@ -294,7 +294,7 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
         <View style={styles.modalOverlay}>
           <GlassCard style={styles.exitCard}>
             <View style={styles.warningIconBox}>
-              <Feather name="alert-triangle" size={28} color={colors.warning} />
+              <MRIcon name="alert-triangle" size={28} color={colors.warning} />
             </View>
             <Text style={styles.exitTitle}>EXIT GAME?</Text>
             <Text style={styles.exitSub}>
