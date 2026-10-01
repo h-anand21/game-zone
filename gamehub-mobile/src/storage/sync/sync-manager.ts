@@ -102,7 +102,7 @@ class SyncManager {
 
         networkMonitor.finishSync(true);
       } catch (error) {
-        console.error('[Sync] Batch sync failed:', error);
+        console.warn('[Sync] Batch sync offline/failed (will retry):', (error as Error)?.message || error);
         // Mark all as failed (will retry with backoff)
         for (const item of pending) {
           await syncRepo.markFailed(item.id);
@@ -121,7 +121,7 @@ class SyncManager {
         return;
       }
     } catch (error) {
-      console.error('[Sync] Queue processing error:', error);
+      console.warn('[Sync] Queue processing deferred:', (error as Error)?.message || error);
       networkMonitor.finishSync(false);
     }
 
