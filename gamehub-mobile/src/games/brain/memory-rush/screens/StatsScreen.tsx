@@ -49,8 +49,8 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onNavigateTab }) => {
               icon="play-circle"
             />
             <StatCard
-              title="BEST COMBO"
-              value={`×${stats.bestCombo || 14}`}
+              title="BEST STREAK"
+              value={`×${stats.bestStreak || 14}`}
               icon="zap"
               accentColor={colors.warning}
             />
@@ -62,7 +62,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onNavigateTab }) => {
             />
             <StatCard
               title="AVG REACTION"
-              value={`${(stats.avgReactionTime || 0.82).toFixed(2)}s`}
+              value={`${(stats.avgReactionTimeMs ? (stats.avgReactionTimeMs / 1000) : 0.82).toFixed(2)}s`}
               icon="clock"
             />
           </View>
@@ -74,7 +74,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onNavigateTab }) => {
               <Text style={styles.sectionTitle}>MODE PERFORMANCE</Text>
             </View>
 
-            {GAME_MODES.filter(m => m.id !== 'fusionRush').map((mode) => {
+            {GAME_MODES.filter((m: { id: string }) => m.id !== 'fusionRush').map((mode: { id: string; title: string }) => {
               const acc = modeAccuracyMap[mode.id] || 85;
               return (
                 <View key={mode.id} style={styles.modeRow}>
@@ -98,11 +98,11 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onNavigateTab }) => {
             </View>
 
             {recentRuns && recentRuns.length > 0 ? (
-              recentRuns.slice(0, 5).map((run, idx) => (
+              recentRuns.slice(0, 5).map((run: any, idx: number) => (
                 <View key={run.id || idx} style={styles.runRow}>
                   <View style={styles.runLeft}>
                     <Text style={styles.runMode}>
-                      {GAME_MODES.find(m => m.id === run.mode)?.title || 'FUSION RUSH'}
+                      {GAME_MODES.find((m: { id: string }) => m.id === run.mode)?.title || 'FUSION RUSH'}
                     </Text>
                     <Text style={styles.runDate}>{run.date || 'TODAY'}</Text>
                   </View>

@@ -204,7 +204,7 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
       bestCombo: s.maxCombo || 8,
       avgReactionTime: 0.76,
       memoryLevel: Math.max(1, Math.floor((s.score || 3840) / 300)),
-      performanceTitle: getPerformanceTitle(acc, s.maxCombo),
+      performanceTitle: getPerformanceTitle(acc, s.maxCombo, s.score || 3840),
       roundScores: [400, 600, 350, 800, 500],
     };
   },

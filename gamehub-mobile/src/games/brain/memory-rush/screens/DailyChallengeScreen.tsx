@@ -22,7 +22,7 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
   const { dailyChallenge } = useMemoryRushStore();
 
   const isCompleted = dailyChallenge.completed;
-  const currentProgress = dailyChallenge.currentRound || 0;
+  const currentProgress = dailyChallenge.roundsCleared || 0;
   const totalRounds = dailyChallenge.totalRounds || 10;
   const progressPercent = Math.min(100, Math.round((currentProgress / totalRounds) * 100));
 
