@@ -4,6 +4,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { GameBackground } from '../components/GameBackground';
 import { NumberGrid } from '../components/NumberGrid';
 import { TimerBar } from '../components/TimerBar';
@@ -231,11 +232,26 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
             <View style={styles.questionContainer}>
               {/* 1. MEMORY GRID TARGET DISPLAY */}
               {roundConfig?.actualType === 'memoryGrid' && (
-                <View style={styles.targetBanner}>
-                  <Text style={styles.targetPromptText}>WHERE WAS NUMBER</Text>
-                  <View style={styles.targetBadge}>
-                    <Text style={styles.targetBadgeNumber}>{roundConfig.targetValue}</Text>
+                <View style={styles.targetHeroCard}>
+                  <View style={styles.targetPill}>
+                    <MRIcon name="target" size={13} color={MRColors.primaryGold} />
+                    <Text style={styles.targetPillText}>MEMORY TARGET</Text>
                   </View>
+                  <View style={styles.targetHeroRow}>
+                    <Text style={styles.targetPromptLabel}>WHERE WAS</Text>
+                    <View style={styles.targetBadgeGlow}>
+                      <LinearGradient
+                        colors={['#FFE082', '#FFD83D', '#FFA000']}
+                        style={styles.targetBadgeGradient}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                      >
+                        <Text style={styles.targetBadgeNumber}>{roundConfig.targetValue}</Text>
+                      </LinearGradient>
+                    </View>
+                    <Text style={styles.targetPromptQuestion}>?</Text>
+                  </View>
+                  <Text style={styles.targetPromptSub}>Tap the tile where this number was hidden</Text>
                 </View>
               )}
 
@@ -527,34 +543,83 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  targetBanner: {
+  targetHeroCard: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 2,
+    paddingHorizontal: 16,
+    gap: 4,
+  },
+  targetPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 5,
+    backgroundColor: 'rgba(255, 216, 61, 0.12)',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 216, 61, 0.35)',
   },
-  targetPromptText: {
-    fontSize: 16,
+  targetPillText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: MRColors.primaryGold,
+    letterSpacing: 1.2,
+  },
+  targetHeroRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginTop: 2,
+  },
+  targetPromptLabel: {
+    fontSize: 18,
     fontWeight: '900',
     color: MRColors.textPrimary,
     letterSpacing: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.6)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
-  targetBadge: {
-    backgroundColor: 'rgba(255, 216, 61, 0.18)',
-    borderWidth: 1.5,
-    borderColor: MRColors.yellowStatus,
-    paddingHorizontal: 14,
+  targetBadgeGlow: {
+    borderRadius: 14,
+    shadowColor: MRColors.primaryGold,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.7,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  targetBadgeGradient: {
+    paddingHorizontal: 18,
     paddingVertical: 4,
-    borderRadius: 12,
-    shadowColor: MRColors.yellowStatus,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 6,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#FFF9C4',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 54,
   },
   targetBadgeNumber: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '900',
-    color: MRColors.yellowStatus,
+    color: '#07111F',
+    textShadowColor: 'rgba(255, 255, 255, 0.4)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
+  targetPromptQuestion: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: MRColors.primaryGold,
+    letterSpacing: 1,
+  },
+  targetPromptSub: {
+    fontSize: 10.5,
+    fontWeight: '700',
+    color: MRColors.textSecondary,
+    letterSpacing: 0.8,
   },
   sequenceTracker: {
     alignItems: 'center',
