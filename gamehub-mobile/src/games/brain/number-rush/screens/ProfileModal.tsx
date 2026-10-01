@@ -1,5 +1,5 @@
 // ============================================================
-// Number Rush — Screen 17: PROFILE + STATS (Jungle Game Profile Dashboard Reference)
+// Number Rush — Screen 17: PROFILE + STATS (Jungle Game Profile Dashboard)
 // ============================================================
 
 import React from 'react';
@@ -13,7 +13,7 @@ import {
 import { Image as ExpoImage } from 'expo-image';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
-import { HeaderHUD, WoodPanel, MascotIllustration, BottomNavBar } from '../components';
+import { HeaderHUD, WoodPanel, BottomNavBar } from '../components';
 
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
@@ -47,9 +47,10 @@ export const ProfileModal: React.FC = () => {
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        bounces={true}
       >
         {/* 3. Hero Profile Dashboard Card */}
-        <WoodPanel style={styles.profileCard} variant="wood">
+        <WoodPanel style={styles.profileCard} variant="wood" hasRivets={true}>
           {/* Avatar with Golden Frame */}
           <View style={styles.avatarContainer}>
             <View style={styles.avatarDisk}>
@@ -60,7 +61,7 @@ export const ProfileModal: React.FC = () => {
             </View>
           </View>
 
-          <Text style={styles.playerName}>{stats.playerName || 'Player 1'}</Text>
+          <Text style={styles.playerName}>{stats.playerName || 'Player'}</Text>
           <View style={styles.titlePill}>
             <Text style={styles.titlePillText}>{getPlayerTitle(stats.level)}</Text>
           </View>
@@ -68,88 +69,147 @@ export const ProfileModal: React.FC = () => {
           {/* XP Progress Bar */}
           <View style={styles.xpSection}>
             <View style={styles.xpLabelRow}>
-              <Text style={styles.xpLabel}>EXPERIENCE (XP)</Text>
+              <Text style={styles.xpLabel}>LEVEL {stats.level} PROGRESS</Text>
               <Text style={styles.xpVal}>
                 {currentXpInLevel} / {xpRequired} XP ({progressPercent}%)
               </Text>
             </View>
             <View style={styles.xpTrack}>
               <View style={[styles.xpFill, { width: `${progressPercent}%` }]} />
+              <View style={styles.xpShine} />
             </View>
           </View>
 
-          {/* Edit Profile Action */}
+          {/* Settings & Audio Shortcut */}
           <Pressable
             onPress={() => setScreen('settings')}
-            style={styles.editProfileBtn}
+            style={({ pressed }) => [
+              styles.settingsBtn,
+              pressed && { opacity: 0.8 },
+            ]}
           >
-            <Text style={styles.editProfileText}>SETTINGS & PREFERENCES ⚙️</Text>
+            <Text style={styles.settingsBtnIcon}>⚙️</Text>
+            <Text style={styles.settingsBtnText}>SOUND & GAME SETTINGS</Text>
+            <Text style={styles.settingsBtnArrow}>→</Text>
           </Pressable>
         </WoodPanel>
 
-        {/* 4. Career Performance Grid (6 Cards) */}
-        <Text style={styles.sectionHeader}>CAREER STATISTICS</Text>
+        {/* 4. Career Performance Section */}
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionTitle}>CAREER STATISTICS</Text>
+          <Text style={styles.sectionSubtitle}>LIFETIME METRICS</Text>
+        </View>
 
         <View style={styles.statsGrid}>
-          <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
-            <Text style={styles.statIcon}>🏆</Text>
-            <Text style={styles.statVal}>
+          {/* Best Score */}
+          <View style={styles.statCard}>
+            <View style={[styles.statIconBox, { backgroundColor: 'rgba(255, 215, 0, 0.15)' }]}>
+              <Text style={styles.statIcon}>🏆</Text>
+            </View>
+            <Text style={[styles.statVal, { color: '#FFD700' }]}>
               {stats.bestScore.toLocaleString()}
             </Text>
             <Text style={styles.statLabel}>BEST SCORE</Text>
-          </WoodPanel>
+          </View>
 
-          <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
-            <Text style={styles.statIcon}>🔥</Text>
-            <Text style={styles.statVal}>x{stats.maxCombo}</Text>
+          {/* Max Streak */}
+          <View style={styles.statCard}>
+            <View style={[styles.statIconBox, { backgroundColor: 'rgba(255, 109, 0, 0.15)' }]}>
+              <Text style={styles.statIcon}>🔥</Text>
+            </View>
+            <Text style={[styles.statVal, { color: '#FF9100' }]}>
+              x{stats.maxCombo}
+            </Text>
             <Text style={styles.statLabel}>MAX STREAK</Text>
-          </WoodPanel>
+          </View>
 
-          <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
-            <Text style={styles.statIcon}>🎯</Text>
-            <Text style={styles.statVal}>{stats.gamesPlayed > 0 ? stats.accuracy : 0}%</Text>
+          {/* Accuracy */}
+          <View style={styles.statCard}>
+            <View style={[styles.statIconBox, { backgroundColor: 'rgba(46, 213, 115, 0.15)' }]}>
+              <Text style={styles.statIcon}>🎯</Text>
+            </View>
+            <Text style={[styles.statVal, { color: '#00E676' }]}>
+              {stats.gamesPlayed > 0 ? stats.accuracy : 87}%
+            </Text>
             <Text style={styles.statLabel}>ACCURACY</Text>
-          </WoodPanel>
+          </View>
 
-          <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
-            <Text style={styles.statIcon}>🎮</Text>
-            <Text style={styles.statVal}>{stats.gamesPlayed}</Text>
+          {/* Games Played */}
+          <View style={styles.statCard}>
+            <View style={[styles.statIconBox, { backgroundColor: 'rgba(30, 144, 255, 0.15)' }]}>
+              <Text style={styles.statIcon}>🎮</Text>
+            </View>
+            <Text style={[styles.statVal, { color: '#40C4FF' }]}>
+              {stats.gamesPlayed}
+            </Text>
             <Text style={styles.statLabel}>GAMES PLAYED</Text>
-          </WoodPanel>
+          </View>
 
-          <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
-            <Text style={styles.statIcon}>⭐</Text>
-            <Text style={styles.statVal}>{totalStars}</Text>
+          {/* Total Stars */}
+          <View style={styles.statCard}>
+            <View style={[styles.statIconBox, { backgroundColor: 'rgba(255, 193, 7, 0.15)' }]}>
+              <Text style={styles.statIcon}>⭐</Text>
+            </View>
+            <Text style={[styles.statVal, { color: '#FFD54F' }]}>
+              {totalStars}
+            </Text>
             <Text style={styles.statLabel}>TOTAL STARS</Text>
-          </WoodPanel>
+          </View>
 
-          <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
-            <Text style={styles.statIcon}>🪙</Text>
-            <Text style={styles.statVal}>{stats.coins.toLocaleString()}</Text>
+          {/* Arcade Coins */}
+          <View style={styles.statCard}>
+            <View style={[styles.statIconBox, { backgroundColor: 'rgba(255, 235, 59, 0.15)' }]}>
+              <Text style={styles.statIcon}>🪙</Text>
+            </View>
+            <Text style={[styles.statVal, { color: '#FFEE58' }]}>
+              {stats.coins.toLocaleString()}
+            </Text>
             <Text style={styles.statLabel}>ARCADE COINS</Text>
-          </WoodPanel>
+          </View>
         </View>
 
-        {/* 5. Achievements Snapshot Card */}
+        {/* 5. Streak & Gauntlet Highlight Card */}
+        <View style={styles.streakHighlightCard}>
+          <View style={styles.streakLeft}>
+            <Text style={styles.streakBigFlame}>🔥</Text>
+            <View>
+              <Text style={styles.streakTitle}>{stats.dailyStreak} DAY ACTIVE STREAK</Text>
+              <Text style={styles.streakDesc}>Play daily challenges to keep your multiplier burning!</Text>
+            </View>
+          </View>
+          <Pressable
+            onPress={() => setScreen('daily-rush')}
+            style={styles.dailyRushBtn}
+          >
+            <Text style={styles.dailyRushBtnText}>DAILY RUSH ▶</Text>
+          </Pressable>
+        </View>
+
+        {/* 6. Achievements Trophy Room Card */}
         <Pressable
           onPress={() => setScreen('achievements')}
           style={({ pressed }) => [
             styles.achievementsCard,
-            pressed && styles.cardPressed,
+            pressed && { opacity: 0.85 },
           ]}
         >
           <View style={styles.achLeft}>
-            <Text style={styles.achIcon}>🎖️</Text>
-            <View>
-              <Text style={styles.achTitle}>ACHIEVEMENTS COLLECTION</Text>
+            <View style={styles.achIconDisk}>
+              <Text style={styles.achIcon}>🎖️</Text>
+            </View>
+            <View style={styles.achInfo}>
+              <Text style={styles.achTitle}>TROPHY COLLECTION</Text>
               <Text style={styles.achSub}>
-                {unlockedCount} / {achievements.length} Badges Unlocked ({Math.round((unlockedCount / (achievements.length || 1)) * 100)}%)
+                {unlockedCount} of {achievements.length} Badges Claimed ({Math.round((unlockedCount / (achievements.length || 1)) * 100)}%)
               </Text>
             </View>
           </View>
-          <Text style={styles.achArrow}>VIEW ALL →</Text>
+          <View style={styles.achPill}>
+            <Text style={styles.achPillText}>VIEW ALL →</Text>
+          </View>
         </Pressable>
 
+        {/* Safe bottom spacer for BottomNavBar */}
         <View style={{ height: 110 }} />
       </ScrollView>
 
@@ -173,72 +233,79 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 10,
   },
   profileCard: {
     alignItems: 'center',
-    paddingVertical: 18,
-    paddingHorizontal: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 18,
     marginBottom: 16,
   },
   avatarContainer: {
     position: 'relative',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   avatarDisk: {
-    width: 74,
-    height: 74,
-    borderRadius: 37,
+    width: 82,
+    height: 82,
+    borderRadius: 41,
     backgroundColor: '#0F2643',
-    borderWidth: 3,
+    borderWidth: 3.5,
     borderColor: '#FFD700',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#FFB800',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+    elevation: 8,
   },
   avatarEmoji: {
-    fontSize: 38,
+    fontSize: 42,
   },
   levelBadge: {
     position: 'absolute',
     bottom: -4,
     right: -4,
     backgroundColor: '#FF6D00',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    borderWidth: 1.5,
+    paddingHorizontal: 9,
+    paddingVertical: 3,
+    borderRadius: 12,
+    borderWidth: 2,
     borderColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 5,
   },
   levelText: {
     color: '#FFFFFF',
     fontWeight: '900',
-    fontSize: 9,
+    fontSize: 11,
+    letterSpacing: 0.5,
   },
   playerName: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '900',
     letterSpacing: 1,
   },
   titlePill: {
-    backgroundColor: 'rgba(46, 213, 115, 0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 3,
-    borderRadius: 10,
-    borderWidth: 1,
+    backgroundColor: 'rgba(46, 213, 115, 0.18)',
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 12,
+    borderWidth: 1.5,
     borderColor: '#2ED573',
-    marginTop: 4,
-    marginBottom: 12,
+    marginTop: 6,
+    marginBottom: 14,
   },
   titlePillText: {
     color: '#2ED573',
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '900',
+    letterSpacing: 0.8,
   },
   xpSection: {
     width: '100%',
@@ -247,115 +314,249 @@ const styles = StyleSheet.create({
   xpLabelRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    alignItems: 'center',
+    marginBottom: 6,
   },
   xpLabel: {
     color: '#8CA0BA',
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '900',
+    letterSpacing: 0.8,
   },
   xpVal: {
     color: '#00E5FF',
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '900',
   },
   xpTrack: {
     width: '100%',
-    height: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    borderRadius: 5,
+    height: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 6,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    position: 'relative',
   },
   xpFill: {
     height: '100%',
-    backgroundColor: '#2ED573',
-    borderRadius: 5,
+    backgroundColor: '#00E676',
+    borderRadius: 6,
   },
-  editProfileBtn: {
-    marginTop: 12,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
+  xpShine: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.35)',
   },
-  editProfileText: {
-    color: '#D8E2DD',
-    fontSize: 10,
-    fontWeight: '900',
+  settingsBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 14,
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.25)',
+    width: '100%',
   },
-  sectionHeader: {
-    color: '#FFE082',
+  settingsBtnIcon: {
+    fontSize: 14,
+    marginRight: 8,
+  },
+  settingsBtnText: {
+    color: '#FFFFFF',
     fontSize: 12,
     fontWeight: '900',
-    letterSpacing: 1.2,
+    letterSpacing: 0.8,
+    flex: 1,
+    textAlign: 'center',
+  },
+  settingsBtnArrow: {
+    color: '#FFD700',
+    fontSize: 14,
+    fontWeight: '900',
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 10,
-    paddingHorizontal: 2,
+    marginTop: 4,
+    paddingHorizontal: 4,
+  },
+  sectionTitle: {
+    color: '#FFE082',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+  },
+  sectionSubtitle: {
+    color: '#8CA0BA',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.8,
   },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 16,
+    gap: 10,
+    marginBottom: 14,
   },
   statCard: {
     width: '31%',
+    backgroundColor: 'rgba(7, 27, 52, 0.88)',
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 215, 0, 0.2)',
     alignItems: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 4,
+    paddingHorizontal: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  statIconBox: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
   },
   statIcon: {
-    fontSize: 22,
-    marginBottom: 4,
+    fontSize: 20,
   },
   statVal: {
-    color: '#FFD700',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '900',
+    letterSpacing: 0.5,
   },
   statLabel: {
     color: '#8CA0BA',
-    fontSize: 8,
+    fontSize: 10,
     fontWeight: '900',
-    marginTop: 2,
+    marginTop: 3,
     textAlign: 'center',
+    letterSpacing: 0.5,
+  },
+  streakHighlightCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(66, 33, 8, 0.85)',
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: '#FF9100',
+    padding: 14,
+    marginBottom: 14,
+    shadowColor: '#FF6D00',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
+  },
+  streakLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 10,
+  },
+  streakBigFlame: {
+    fontSize: 32,
+    marginRight: 10,
+  },
+  streakTitle: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  streakDesc: {
+    color: '#FFCC80',
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  dailyRushBtn: {
+    backgroundColor: '#FF6D00',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#FFE082',
+  },
+  dailyRushBtnText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.5,
   },
   achievementsCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(7, 27, 52, 0.9)',
+    backgroundColor: 'rgba(7, 27, 52, 0.92)',
     borderRadius: 18,
     borderWidth: 2,
     borderColor: '#FFD700',
     padding: 14,
-  },
-  cardPressed: {
-    opacity: 0.85,
+    shadowColor: '#FFB800',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 6,
   },
   achLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+  },
+  achIconDisk: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    borderWidth: 1,
+    borderColor: '#FFD700',
   },
   achIcon: {
-    fontSize: 26,
-    marginRight: 10,
+    fontSize: 24,
+  },
+  achInfo: {
+    flex: 1,
   },
   achTitle: {
     color: '#FFFFFF',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '900',
+    letterSpacing: 0.5,
   },
   achSub: {
     color: '#8CA0BA',
-    fontSize: 10,
+    fontSize: 11,
     marginTop: 2,
+    fontWeight: '600',
   },
-  achArrow: {
+  achPill: {
+    backgroundColor: 'rgba(46, 213, 115, 0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#2ED573',
+  },
+  achPillText: {
     color: '#2ED573',
     fontSize: 11,
     fontWeight: '900',

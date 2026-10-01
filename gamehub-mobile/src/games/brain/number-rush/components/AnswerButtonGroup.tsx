@@ -17,7 +17,7 @@ interface AnswerButtonGroupProps {
   disabled?: boolean;
 }
 
-const BUTTON_THEMES: ButtonVariant[] = ['green', 'gold', 'blue', 'purple'];
+const BUTTON_THEMES: ButtonVariant[] = ['blue', 'gold', 'purple', 'wood'];
 
 export const AnswerButtonGroup: React.FC<AnswerButtonGroupProps> = ({
   options,
@@ -37,11 +37,14 @@ export const AnswerButtonGroup: React.FC<AnswerButtonGroupProps> = ({
 
         let variant: ButtonVariant = BUTTON_THEMES[index % BUTTON_THEMES.length];
         let showFeedback = isSubmitted;
+        const isWrongSelection = showFeedback && isSelected && !isCorrect;
+        const isCorrectAnswer = showFeedback && isCorrect;
+        const isDimmed = showFeedback && !isSelected && !isCorrect;
 
         if (showFeedback) {
-          if (isCorrect) {
+          if (isCorrectAnswer) {
             variant = 'green';
-          } else if (isSelected && !isCorrect) {
+          } else if (isWrongSelection) {
             variant = 'red';
           }
         }
@@ -55,6 +58,7 @@ export const AnswerButtonGroup: React.FC<AnswerButtonGroupProps> = ({
             style={[
               styles.btnWrapper,
               isEliminated && styles.eliminatedWrapper,
+              isDimmed && styles.dimmedWrapper,
             ]}
           >
             {/* 3D Bottom Bevel */}
@@ -62,6 +66,8 @@ export const AnswerButtonGroup: React.FC<AnswerButtonGroupProps> = ({
               style={[
                 styles.bevelBottom,
                 { backgroundColor: theme.shadow },
+                isWrongSelection && styles.bevelWrong,
+                isCorrectAnswer && styles.bevelCorrect,
               ]}
             />
 
@@ -76,10 +82,11 @@ export const AnswerButtonGroup: React.FC<AnswerButtonGroupProps> = ({
                   borderColor: theme.bevel,
                   transform: [
                     { translateY: pressed ? 5 : 0 },
-                    { scale: isSelected ? 1.02 : 1 },
+                    { scale: isSelected ? 1.03 : 1 },
                   ],
                 },
-                showFeedback && isCorrect && styles.correctGlow,
+                isCorrectAnswer && styles.faceCorrect,
+                isWrongSelection && styles.faceWrong,
               ]}
             >
               {/* Top Specular Highlight */}
@@ -87,13 +94,29 @@ export const AnswerButtonGroup: React.FC<AnswerButtonGroupProps> = ({
                 style={[
                   styles.specularGloss,
                   { backgroundColor: theme.highlight },
+                  isWrongSelection && { backgroundColor: '#FF8A80', opacity: 0.8 },
+                  isCorrectAnswer && { backgroundColor: '#B9F6CA', opacity: 0.8 },
                 ]}
               />
+
+              {/* Status Tag for Immediate Clarity */}
+              {isWrongSelection && (
+                <View style={styles.feedbackBadgeWrong}>
+                  <Text style={styles.feedbackBadgeWrongText}>✕ WRONG</Text>
+                </View>
+              )}
+              {isCorrectAnswer && (
+                <View style={styles.feedbackBadgeCorrect}>
+                  <Text style={styles.feedbackBadgeCorrectText}>✓ CORRECT</Text>
+                </View>
+              )}
 
               <Text
                 style={[
                   styles.optionText,
                   { color: theme.text },
+                  isWrongSelection && styles.optionTextWrong,
+                  isCorrectAnswer && styles.optionTextCorrect,
                 ]}
               >
                 {opt}
@@ -117,32 +140,55 @@ const styles = StyleSheet.create({
   },
   btnWrapper: {
     width: '47.5%',
-    height: 72,
+    height: 74,
     position: 'relative',
   },
   eliminatedWrapper: {
-    opacity: 0.25,
+    opacity: 0.2,
+  },
+  dimmedWrapper: {
+    opacity: 0.35,
   },
   bevelBottom: {
     position: 'absolute',
     left: 0,
     top: 6,
     width: '100%',
-    height: 66,
+    height: 68,
     borderRadius: NRTheme.radius.lg,
+  },
+  bevelWrong: {
+    backgroundColor: '#7A0000',
+  },
+  bevelCorrect: {
+    backgroundColor: '#00600F',
   },
   face: {
     width: '100%',
-    height: 66,
+    height: 68,
     borderRadius: NRTheme.radius.lg,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
     overflow: 'hidden',
-    borderTopWidth: 1.5,
-    borderTopColor: 'rgba(255, 255, 255, 0.4)',
+    borderTopWidth: 2,
+    borderTopColor: 'rgba(255, 255, 255, 0.45)',
     borderBottomWidth: 3,
     ...NRTheme.shadows.card,
+  },
+  faceWrong: {
+    backgroundColor: '#D50000',
+    borderColor: '#FF1744',
+    borderWidth: 3,
+    borderTopColor: '#FF8A80',
+    ...NRTheme.shadows.glowRed,
+  },
+  faceCorrect: {
+    backgroundColor: '#00C853',
+    borderColor: '#00E676',
+    borderWidth: 3,
+    borderTopColor: '#B9F6CA',
+    ...NRTheme.shadows.glowGreen,
   },
   specularGloss: {
     position: 'absolute',
@@ -153,15 +199,56 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     opacity: 0.65,
   },
+  feedbackBadgeWrong: {
+    position: 'absolute',
+    top: 4,
+    backgroundColor: '#7A0000',
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#FF5252',
+    zIndex: 10,
+  },
+  feedbackBadgeWrongText: {
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  feedbackBadgeCorrect: {
+    position: 'absolute',
+    top: 4,
+    backgroundColor: '#004D1A',
+    paddingHorizontal: 8,
+    paddingVertical: 1,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#69F0AE',
+    zIndex: 10,
+  },
+  feedbackBadgeCorrectText: {
+    color: '#69F0AE',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
   optionText: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '900',
     letterSpacing: 1,
-    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowColor: 'rgba(0,0,0,0.4)',
     textShadowOffset: { width: 0, height: 1.5 },
-    textShadowRadius: 2,
+    textShadowRadius: 3,
   },
-  correctGlow: {
-    ...NRTheme.shadows.glowGreen,
+  optionTextWrong: {
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowRadius: 4,
+  },
+  optionTextCorrect: {
+    color: '#FFFFFF',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowRadius: 4,
   },
 });

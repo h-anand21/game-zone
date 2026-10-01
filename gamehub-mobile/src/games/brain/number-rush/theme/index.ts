@@ -90,10 +90,10 @@ export const NRTheme = {
       text: '#FFFFFF',
     },
     red: {
-      face: '#FF4757',
-      highlight: '#FFA4AE',
-      bevel: '#D93644',
-      shadow: '#B3202C',
+      face: '#E50914',
+      highlight: '#FF6B6B',
+      bevel: '#B80000',
+      shadow: '#7A0000',
       text: '#FFFFFF',
     },
     wood: {
@@ -121,11 +121,18 @@ export const NRTheme = {
       elevation: 8,
     },
     glowGreen: {
-      shadowColor: '#2ED573',
+      shadowColor: '#00E676',
       shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 0.7,
-      shadowRadius: 12,
-      elevation: 10,
+      shadowOpacity: 0.85,
+      shadowRadius: 14,
+      elevation: 12,
+    },
+    glowRed: {
+      shadowColor: '#FF1744',
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.9,
+      shadowRadius: 16,
+      elevation: 14,
     },
     glowGold: {
       shadowColor: '#FFC107',

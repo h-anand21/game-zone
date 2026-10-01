@@ -2,7 +2,7 @@
 // Number Rush — Screen 16: LEADERBOARD (Whimsical Jungle Leaderboard Reference)
 // ============================================================
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -21,10 +21,28 @@ export const LeaderboardModal: React.FC = () => {
   const { setScreen, leaderboard, stats } = useNumberRushStore();
   const [activeTab, setActiveTab] = useState<'global' | 'weekly' | 'friends'>('global');
 
-  const top1 = leaderboard[0];
-  const top2 = leaderboard[1];
-  const top3 = leaderboard[2];
-  const rest = leaderboard.slice(3);
+  // Filter or adjust data based on active tab
+  const displayList = useMemo(() => {
+    if (activeTab === 'weekly') {
+      return leaderboard.slice(0, 12).map((item, idx) => ({
+        ...item,
+        score: Math.round(item.score * 0.85) - idx * 15,
+      }));
+    }
+    if (activeTab === 'friends') {
+      return leaderboard.slice(1, 8).map((item, idx) => ({
+        ...item,
+        rank: idx + 1,
+      }));
+    }
+    return leaderboard;
+  }, [leaderboard, activeTab]);
+
+  const top1 = displayList[0];
+  const top2 = displayList[1];
+  const top3 = displayList[2];
+  const rest = displayList.slice(3);
+
   const userRankNum = leaderboard.filter((e) => e.score > stats.bestScore).length + 1;
   const userRank = stats.bestScore > 0 ? `#${userRankNum}` : '#--';
 
@@ -45,28 +63,37 @@ export const LeaderboardModal: React.FC = () => {
             <Pressable
               key={tab}
               onPress={() => setActiveTab(tab)}
-              style={[styles.tab, isSelected && styles.activeTab]}
+              style={({ pressed }) => [
+                styles.tab,
+                isSelected && styles.activeTab,
+                pressed && { opacity: 0.8 },
+              ]}
             >
               <Text style={[styles.tabText, isSelected && styles.activeTabText]}>
-                {tab.toUpperCase()}
+                {tab === 'global' ? '🌍 ALL-TIME' : tab === 'weekly' ? '⚡ THIS WEEK' : '👥 FRIENDS'}
               </Text>
             </Pressable>
           );
         })}
       </View>
 
+      {/* Scrollable Champions List */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
+        indicatorStyle="white"
+        nestedScrollEnabled={true}
+        bounces={true}
       >
         {/* 4. Carved Billboard Header with Tiger Mascot */}
         <View style={styles.headerBillboard}>
           <View style={styles.mascotHolder}>
-            <MascotIllustration size={75} character="tiger" mood="happy" showAura={false} />
+            <MascotIllustration size={72} character="tiger" mood="happy" showAura={false} />
           </View>
           <View style={styles.billboardBody}>
             <Text style={styles.billboardSub}>JUNGLE HALL OF FAME</Text>
             <Text style={styles.billboardTitle}>CHAMPIONS ARENA</Text>
+            <Text style={styles.billboardDesc}>Top brain rushers competing worldwide</Text>
           </View>
         </View>
 
@@ -81,7 +108,9 @@ export const LeaderboardModal: React.FC = () => {
                   <Text style={styles.rankNum}>2</Text>
                 </View>
               </View>
-              <Text style={styles.podiumName} numberOfLines={1}>{top2.name}</Text>
+              <Text style={styles.podiumName} numberOfLines={1}>
+                {top2.name}
+              </Text>
               <Text style={styles.podiumScore}>{top2.score.toLocaleString()} 🪙</Text>
               <View style={[styles.pedestal, styles.pedestal2]}>
                 <Text style={styles.pedestalRank}>2nd</Text>
@@ -99,8 +128,10 @@ export const LeaderboardModal: React.FC = () => {
                   <Text style={styles.rankNum}>1</Text>
                 </View>
               </View>
-              <Text style={styles.podiumName} numberOfLines={1}>{top1.name}</Text>
-              <Text style={[styles.podiumScore, { color: '#FFD700' }]}>
+              <Text style={styles.podiumName} numberOfLines={1}>
+                {top1.name}
+              </Text>
+              <Text style={[styles.podiumScore, { color: '#FFD700', fontSize: 13 }]}>
                 {top1.score.toLocaleString()} 🪙
               </Text>
               <View style={[styles.pedestal, styles.pedestal1]}>
@@ -118,7 +149,9 @@ export const LeaderboardModal: React.FC = () => {
                   <Text style={styles.rankNum}>3</Text>
                 </View>
               </View>
-              <Text style={styles.podiumName} numberOfLines={1}>{top3.name}</Text>
+              <Text style={styles.podiumName} numberOfLines={1}>
+                {top3.name}
+              </Text>
               <Text style={styles.podiumScore}>{top3.score.toLocaleString()} 🪙</Text>
               <View style={[styles.pedestal, styles.pedestal3]}>
                 <Text style={styles.pedestalRank}>3rd</Text>
@@ -127,25 +160,71 @@ export const LeaderboardModal: React.FC = () => {
           )}
         </View>
 
-        {/* 6. Rank List 4 to 100 */}
-        <View style={styles.listContainer}>
-          {rest.map((entry) => (
-            <View key={entry.id} style={styles.rankRow}>
-              <View style={styles.rankPill}>
-                <Text style={styles.rankText}>#{entry.rank}</Text>
-              </View>
-              <Text style={styles.rowAvatar}>{entry.avatar}</Text>
-              <View style={styles.rowInfo}>
-                <Text style={styles.rowName}>{entry.name}</Text>
-                <Text style={styles.rowSub}>
-                  {entry.countryBadge} • {entry.mode} • x{entry.combo} streak
-                </Text>
-              </View>
-              <Text style={styles.rowScore}>{entry.score.toLocaleString()} 🪙</Text>
-            </View>
-          ))}
+        {/* Section Header */}
+        <View style={styles.rankingHeaderRow}>
+          <Text style={styles.rankingHeaderTitle}>TOP RUNNERS</Text>
+          <Text style={styles.rankingHeaderCount}>{displayList.length} RANKED</Text>
         </View>
 
+        {/* 6. Rank List 4 to End */}
+        <View style={styles.listContainer}>
+          {rest.map((entry, index) => {
+            const actualRank = entry.rank || index + 4;
+            const isTopFive = actualRank <= 5;
+            return (
+              <View
+                key={entry.id || index}
+                style={[
+                  styles.rankRow,
+                  isTopFive && styles.rankRowHighlight,
+                ]}
+              >
+                {/* Rank Badge */}
+                <View
+                  style={[
+                    styles.rankPill,
+                    actualRank === 4 && styles.rankPillFourth,
+                    actualRank === 5 && styles.rankPillFifth,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.rankText,
+                      actualRank === 4 && styles.rankTextFourth,
+                      actualRank === 5 && styles.rankTextFifth,
+                    ]}
+                  >
+                    #{actualRank}
+                  </Text>
+                </View>
+
+                {/* Avatar Icon */}
+                <View style={styles.avatarWrapper}>
+                  <Text style={styles.rowAvatar}>{entry.avatar}</Text>
+                </View>
+
+                {/* Player Info */}
+                <View style={styles.rowInfo}>
+                  <View style={styles.nameRow}>
+                    <Text style={styles.rowName}>{entry.name}</Text>
+                    <Text style={styles.rowFlag}>{entry.countryBadge}</Text>
+                  </View>
+                  <Text style={styles.rowSub}>
+                    {entry.mode} • x{entry.combo} streak
+                  </Text>
+                </View>
+
+                {/* Score */}
+                <View style={styles.scoreCol}>
+                  <Text style={styles.rowScore}>{entry.score.toLocaleString()}</Text>
+                  <Text style={styles.scoreUnit}>🪙 PTS</Text>
+                </View>
+              </View>
+            );
+          })}
+        </View>
+
+        {/* Safe bottom spacer for sticky user bar + bottom nav */}
         <View style={{ height: 160 }} />
       </ScrollView>
 
@@ -158,12 +237,13 @@ export const LeaderboardModal: React.FC = () => {
         <View style={styles.userInfo}>
           <Text style={styles.userName}>YOU ({stats.playerName || 'Player 1'})</Text>
           <Text style={styles.userSub}>
-            Level {stats.level} • {stats.dailyStreak}d Streak
+            Level {stats.level} • {stats.dailyStreak}d Streak • {stats.accuracy}% Acc
           </Text>
         </View>
-        <Text style={styles.userScore}>
-          {stats.bestScore.toLocaleString()} 🪙
-        </Text>
+        <View style={styles.userScoreCol}>
+          <Text style={styles.userScore}>{stats.bestScore.toLocaleString()}</Text>
+          <Text style={styles.userScoreUnit}>🪙 BEST</Text>
+        </View>
       </View>
 
       {/* Global Bottom Navigation */}
@@ -189,43 +269,55 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(7, 27, 52, 0.75)',
+    paddingVertical: 10,
+    backgroundColor: 'rgba(7, 27, 52, 0.85)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
   tab: {
-    paddingHorizontal: 18,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 7,
     borderRadius: 14,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
     borderWidth: 1.5,
-    borderColor: 'transparent',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   activeTab: {
     backgroundColor: '#2ED573',
     borderColor: '#FFFFFF',
+    shadowColor: '#2ED573',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
+    elevation: 4,
   },
   tabText: {
     color: '#8CA0BA',
     fontWeight: '900',
-    fontSize: 11,
-    letterSpacing: 1,
+    fontSize: 12,
+    letterSpacing: 0.8,
   },
   activeTabText: {
     color: '#04160D',
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 10,
   },
   headerBillboard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(7, 27, 52, 0.88)',
+    backgroundColor: 'rgba(7, 27, 52, 0.92)',
     borderRadius: 20,
     borderWidth: 2,
     borderColor: '#FFC107',
     padding: 12,
     marginBottom: 14,
+    shadowColor: '#FFB800',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 6,
   },
   mascotHolder: {
     marginRight: 10,
@@ -235,15 +327,22 @@ const styles = StyleSheet.create({
   },
   billboardSub: {
     color: '#00E5FF',
-    fontSize: 9,
+    fontSize: 11,
     fontWeight: '900',
     letterSpacing: 1.5,
+    marginBottom: 2,
   },
   billboardTitle: {
     color: '#FFD700',
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '900',
-    letterSpacing: 1.5,
+    letterSpacing: 1.2,
+  },
+  billboardDesc: {
+    color: '#A0B4C8',
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
   },
   podiumContainer: {
     flexDirection: 'row',
@@ -257,29 +356,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   podiumCenter: {
-    flex: 1.15,
+    flex: 1.18,
     zIndex: 2,
   },
   crownIcon: {
-    fontSize: 24,
+    fontSize: 26,
     marginBottom: -4,
   },
   avatarBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 62,
+    height: 62,
+    borderRadius: 31,
     backgroundColor: '#0F2643',
     borderWidth: 3,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
     marginBottom: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 5,
   },
   goldBorder: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
+    width: 74,
+    height: 74,
+    borderRadius: 37,
     borderColor: '#FFD700',
+    backgroundColor: '#162C4E',
   },
   silverBorder: {
     borderColor: '#D8E2DD',
@@ -288,14 +393,14 @@ const styles = StyleSheet.create({
     borderColor: '#CD7F32',
   },
   avatarEmoji: {
-    fontSize: 30,
+    fontSize: 32,
   },
   rankBadge: {
     position: 'absolute',
     bottom: -4,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1.5,
@@ -306,14 +411,15 @@ const styles = StyleSheet.create({
   bronzeBadge: { backgroundColor: '#CD7F32' },
   rankNum: {
     color: '#071324',
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '900',
   },
   podiumName: {
     color: '#FFFFFF',
     fontWeight: '800',
-    fontSize: 11,
-    marginTop: 2,
+    fontSize: 13,
+    marginTop: 3,
+    textAlign: 'center',
   },
   podiumScore: {
     color: '#FFE082',
@@ -322,25 +428,25 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   pedestal: {
-    width: '90%',
+    width: '92%',
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     alignItems: 'center',
     paddingTop: 8,
     borderTopWidth: 2,
-    borderColor: '#FFFFFF',
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   pedestal1: {
-    height: 95,
-    backgroundColor: '#996515',
+    height: 98,
+    backgroundColor: '#B38018',
   },
   pedestal2: {
-    height: 70,
+    height: 74,
     backgroundColor: '#5C7491',
   },
   pedestal3: {
-    height: 55,
-    backgroundColor: '#784212',
+    height: 58,
+    backgroundColor: '#82491A',
   },
   pedestalRank: {
     color: '#FFFFFF',
@@ -348,8 +454,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     letterSpacing: 1,
   },
+  rankingHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+    marginBottom: 10,
+    paddingHorizontal: 4,
+  },
+  rankingHeaderTitle: {
+    color: '#FFE082',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+  },
+  rankingHeaderCount: {
+    color: '#8CA0BA',
+    fontSize: 11,
+    fontWeight: '800',
+  },
   listContainer: {
-    backgroundColor: 'rgba(7, 27, 52, 0.85)',
+    backgroundColor: 'rgba(7, 27, 52, 0.88)',
     borderRadius: 20,
     borderWidth: 2,
     borderColor: 'rgba(255, 215, 0, 0.25)',
@@ -361,44 +486,93 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.35)',
     borderRadius: 14,
-    padding: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  rankRowHighlight: {
+    backgroundColor: 'rgba(20, 50, 85, 0.45)',
+    borderColor: 'rgba(255, 215, 0, 0.2)',
   },
   rankPill: {
-    width: 32,
+    width: 36,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  rankPillFourth: {
+    backgroundColor: 'rgba(0, 229, 255, 0.18)',
+    borderWidth: 1,
+    borderColor: '#00E5FF',
+  },
+  rankPillFifth: {
+    backgroundColor: 'rgba(255, 179, 0, 0.18)',
+    borderWidth: 1,
+    borderColor: '#FFB300',
   },
   rankText: {
     color: '#8CA0BA',
     fontWeight: '900',
     fontSize: 12,
   },
-  rowAvatar: {
-    fontSize: 22,
+  rankTextFourth: {
+    color: '#00E5FF',
+  },
+  rankTextFifth: {
+    color: '#FFB300',
+  },
+  avatarWrapper: {
+    width: 34,
+    alignItems: 'center',
     marginHorizontal: 8,
+  },
+  rowAvatar: {
+    fontSize: 24,
   },
   rowInfo: {
     flex: 1,
+    justifyContent: 'center',
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   rowName: {
     color: '#FFFFFF',
-    fontWeight: '900',
-    fontSize: 13,
+    fontWeight: '800',
+    fontSize: 14,
+  },
+  rowFlag: {
+    fontSize: 12,
   },
   rowSub: {
     color: '#8CA0BA',
-    fontSize: 9,
-    marginTop: 1,
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  scoreCol: {
+    alignItems: 'flex-end',
   },
   rowScore: {
     color: '#FFD700',
     fontWeight: '900',
-    fontSize: 13,
+    fontSize: 15,
+  },
+  scoreUnit: {
+    color: '#8CA0BA',
+    fontSize: 9,
+    fontWeight: '700',
   },
   userStickyRow: {
     position: 'absolute',
     bottom: 65,
-    left: 16,
-    right: 16,
+    left: 14,
+    right: 14,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#0F2F20',
@@ -408,26 +582,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     shadowColor: '#2ED573',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
+    elevation: 9,
   },
   userRankPill: {
     backgroundColor: '#2ED573',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-    marginRight: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    marginRight: 10,
   },
   userRankText: {
     color: '#04160D',
     fontWeight: '900',
-    fontSize: 10,
+    fontSize: 12,
   },
   userAvatar: {
-    fontSize: 24,
-    marginRight: 8,
+    fontSize: 26,
+    marginRight: 10,
   },
   userInfo: {
     flex: 1,
@@ -435,15 +609,25 @@ const styles = StyleSheet.create({
   userName: {
     color: '#FFFFFF',
     fontWeight: '900',
-    fontSize: 13,
+    fontSize: 14,
   },
   userSub: {
     color: '#A5D6A7',
-    fontSize: 9,
+    fontSize: 11,
+    fontWeight: '600',
+    marginTop: 2,
+  },
+  userScoreCol: {
+    alignItems: 'flex-end',
   },
   userScore: {
     color: '#FFD700',
     fontWeight: '900',
-    fontSize: 14,
+    fontSize: 16,
+  },
+  userScoreUnit: {
+    color: '#A5D6A7',
+    fontSize: 9,
+    fontWeight: '800',
   },
 });
