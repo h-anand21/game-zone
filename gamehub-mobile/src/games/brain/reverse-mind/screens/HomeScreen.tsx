@@ -41,7 +41,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onStartGame,
   onNavigate,
 }) => {
-  const { playerStats, setShowExitModal } = useReverseMindStore();
+  const { playerStats, setShowExitModal, mode } = useReverseMindStore();
+
+  const getModeDisplayName = () => {
+    switch (mode) {
+      case 'quick-flip':
+        return 'QUICK FLIP';
+      case 'mind-shift':
+        return 'MIND SHIFT';
+      case 'daily-flip':
+        return 'DAILY FLIP';
+      case 'practice':
+        return 'PRACTICE';
+      case 'classic':
+      default:
+        return 'CLASSIC';
+    }
+  };
 
   return (
     <GameBackground theme="home">
@@ -131,19 +147,19 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <View style={styles.mindBannerTextCol}>
               <Text style={styles.mindBannerTitle}>SYNAPSE INVERSION</Text>
               <Text style={styles.mindBannerSub}>
-                Invert sequences, dodge color shifts & boost working memory speed!
+                Active Mode: <Text style={{ color: '#4DE7FF', fontWeight: '900' }}>{getModeDisplayName()}</Text> | Invert sequences & boost memory speed!
               </Text>
             </View>
           </LinearGradient>
 
-          {/* Large Golden PLAY NOW Button */}
+          {/* Large Golden PLAY NOW Button (Passes active remembered mode) */}
           <View style={styles.playNowWrapper}>
             <GlowButton
-              title="PLAY NOW"
+              title={`PLAY NOW (${getModeDisplayName()})`}
               variant="gold"
               size="lg"
               icon={<PlayIconSvg size={24} color="#07111F" />}
-              onPress={() => onStartGame('classic')}
+              onPress={() => onStartGame(mode)}
             />
           </View>
 

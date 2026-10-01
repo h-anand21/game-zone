@@ -16,6 +16,7 @@ import {
   RocketIconSvg,
 } from '../components/SvgIcons';
 import type { GameMode, GameDifficulty, AppNavScreen } from '../types';
+import { useReverseMindStore } from '../store/reverseMindStore';
 import { RMTheme } from '../theme';
 
 interface ModeSelectionScreenProps {
@@ -109,7 +110,10 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               return (
                 <Pressable
                   key={mode.id}
-                  onPress={() => setSelectedMode(mode.id)}
+                  onPress={() => {
+                    setSelectedMode(mode.id);
+                    useReverseMindStore.getState().setMode(mode.id);
+                  }}
                   style={({ pressed }) => [
                     styles.modeCard,
                     isSelected && { borderColor: mode.color },

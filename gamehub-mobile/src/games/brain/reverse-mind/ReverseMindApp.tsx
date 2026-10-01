@@ -38,6 +38,7 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
     setShowExitModal,
     startNewGame,
     mode,
+    setMode,
     difficulty,
     score,
     maxCombo,
@@ -83,6 +84,7 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
   };
 
   const handleLaunchModeSelect = (m: GameMode) => {
+    setMode(m); // Save active mode to store persistently
     setSelectedModeTemp(m);
     setScreen('difficulty');
   };
@@ -90,8 +92,8 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
   const handleConfirmDifficulty = (d: GameDifficulty) => {
     triggerHaptic();
     setSelectedDiffTemp(d);
-    // Directly launch game after difficulty selection (Zero Friction)
-    startNewGame(selectedModeTemp, d);
+    // Directly launch game with persistent active mode in store & selected difficulty
+    startNewGame(mode, d);
   };
 
   const handleConfirmRules = () => {
