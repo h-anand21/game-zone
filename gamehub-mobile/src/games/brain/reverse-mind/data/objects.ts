@@ -1,5 +1,5 @@
 // ============================================================
-// REVERSE MIND — Rich Illustrated Object Catalog
+// REVERSE MIND — Rich Illustrated Memory Object Library
 // ============================================================
 
 import type { GameObject } from '../types';
@@ -9,7 +9,7 @@ export const GAME_OBJECTS: GameObject[] = [
   {
     id: 'corgi_01',
     category: 'animal',
-    name: 'Corgi',
+    name: 'Corgi Dog',
     symbol: '🐕',
     color: 'gold',
     hexColor: '#FFB74D',
@@ -38,6 +38,17 @@ export const GAME_OBJECTS: GameObject[] = [
     borderColor: '#F57C00',
     rarity: 'common',
     description: 'Playful whiskered scout',
+  },
+  {
+    id: 'fox_01',
+    category: 'animal',
+    name: 'Red Fox',
+    symbol: '🦊',
+    color: 'red',
+    hexColor: '#FF7043',
+    borderColor: '#F4511E',
+    rarity: 'rare',
+    description: 'Clever forest runner',
   },
   {
     id: 'penguin_01',
@@ -83,19 +94,8 @@ export const GAME_OBJECTS: GameObject[] = [
     rarity: 'common',
     description: 'Bamboo philosopher',
   },
-  {
-    id: 'fox_01',
-    category: 'animal',
-    name: 'Red Fox',
-    symbol: '🦊',
-    color: 'red',
-    hexColor: '#FF7043',
-    borderColor: '#F4511E',
-    rarity: 'rare',
-    description: 'Clever forest runner',
-  },
 
-  // ── Food (contains red items for Mind Shift) ───────────────
+  // ── Food ───────────────────────────────────────────────────
   {
     id: 'apple_01',
     category: 'food',
@@ -152,15 +152,15 @@ export const GAME_OBJECTS: GameObject[] = [
     description: 'Sprinkled sugar ring',
   },
   {
-    id: 'cupcake_01',
+    id: 'icecream_01',
     category: 'food',
-    name: 'Cupcake',
-    symbol: '🧁',
+    name: 'Ice Cream',
+    symbol: '🍦',
     color: 'cyan',
     hexColor: '#80DEEA',
     borderColor: '#26C6DA',
-    rarity: 'rare',
-    description: 'Frosted celebration treat',
+    rarity: 'common',
+    description: 'Chilled swirl cone',
   },
 
   // ── Vehicles ───────────────────────────────────────────────
@@ -310,6 +310,43 @@ export const GAME_OBJECTS: GameObject[] = [
     borderColor: '#0097A7',
     rarity: 'legendary',
     description: 'Prismatic mind focus',
+  },
+
+  // ── Character Expressions ──────────────────────────────────
+  {
+    id: 'face_cool',
+    category: 'expression',
+    name: 'Cool Sunglasses',
+    symbol: '😎',
+    color: 'gold',
+    hexColor: '#FFCA28',
+    borderColor: '#FFA000',
+    rarity: 'rare',
+    description: 'Confident focus mind',
+  },
+  {
+    id: 'face_think',
+    category: 'expression',
+    name: 'Deep Thinker',
+    symbol: '🤔',
+    color: 'blue',
+    hexColor: '#64B5F6',
+    borderColor: '#1E88E5',
+    rarity: 'common',
+    description: 'Pondering inversion path',
+  },
+
+  // ── Numbers (Optional Category) ────────────────────────────
+  {
+    id: 'num_07',
+    category: 'number',
+    name: 'Lucky Seven',
+    symbol: '7️⃣',
+    color: 'purple',
+    hexColor: '#AB47BC',
+    borderColor: '#7B1FA2',
+    rarity: 'rare',
+    description: 'Numerical sequence key',
   },
 ];
 

@@ -20,11 +20,16 @@ export type InGamePhase =
 export type AppNavScreen =
   | 'splash'
   | 'welcome'
+  | 'how-it-works'
+  | 'avatar'
   | 'home'
   | 'modes'
   | 'difficulty'
+  | 'rule-preview'
   | 'ready'
   | 'gameplay'
+  | 'level-complete'
+  | 'game-result'
   | 'rewards'
   | 'daily'
   | 'stats'
@@ -41,6 +46,7 @@ export type ObjectCategory =
   | 'nature'
   | 'toy'
   | 'object'
+  | 'expression'
   | 'number';
 
 export type ObjectColor =
@@ -52,11 +58,21 @@ export type ObjectColor =
   | 'purple'
   | 'orange';
 
+export type MemoryObjectState =
+  | 'idle'
+  | 'highlight'
+  | 'selected'
+  | 'correct'
+  | 'wrong'
+  | 'hidden'
+  | 'disabled'
+  | 'flipping';
+
 export interface GameObject {
   id: string;
   category: ObjectCategory;
   name: string;
-  symbol: string; // High-fidelity vector/emoji representation
+  symbol: string;
   color: ObjectColor;
   hexColor: string;
   borderColor: string;
@@ -65,7 +81,7 @@ export interface GameObject {
 }
 
 export interface SequenceItem {
-  uid: string; // Unique instance id for slot
+  uid: string;
   object: GameObject;
   originalIndex: number;
   expectedReverseIndex: number;
@@ -115,6 +131,7 @@ export interface PlayerStats {
   mindShiftBest: number;
   dailyStreak: number;
   lastDailyDate: string;
+  selectedAvatar: string;
 }
 
 export interface AchievementItem {
@@ -126,6 +143,7 @@ export interface AchievementItem {
   goal: number;
   unlocked: boolean;
   rewardCoins: number;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
 }
 
 export interface CollectibleItem {
