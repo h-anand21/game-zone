@@ -7,10 +7,11 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { JungleWorldBackground } from '../components/JungleWorldBackground';
-import { JungleHeaderHUD } from '../components/JungleHeaderHUD';
+import { JungleScreenPlaque } from '../components/JungleScreenPlaque';
+import { ExplorerCompanion } from '../components/ExplorerCompanion';
+import { JungleImageButton } from '../components/JungleImageButton';
 import { WoodPanel } from '../components/WoodPanel';
 import { StonePanel } from '../components/StonePanel';
-import { JungleButton } from '../components/JungleButton';
 import { BottomTabBar, TabType } from '../components/BottomTabBar';
 import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
@@ -35,11 +36,10 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
   return (
     <JungleWorldBackground variant="daily">
       <SafeAreaView style={styles.container}>
-        {/* Header HUD */}
-        <JungleHeaderHUD
-          title="DAILY CHALLENGE"
-          subtitle="TREASURE SHRINE"
-        />
+        {/* Sculpted Screen Title Plaque */}
+        <View style={styles.header}>
+          <JungleScreenPlaque type="daily_challenge" height={130} />
+        </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Main Shrine Wood Plaque */}
@@ -55,7 +55,6 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
                 </View>
               </View>
 
-              <Text style={styles.chestEmoji}>🏺</Text>
               <Text style={styles.challengeTitle}>10 ROUND TRIAL</Text>
               <Text style={styles.challengeSub}>ONE EXPEDITION. NO SECOND CHANCES.</Text>
 
@@ -81,12 +80,20 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
                       EXPEDITION SCORE: {dailyChallenge.score.toLocaleString()} PTS
                     </Text>
                   )}
+                  <View style={{ marginTop: 8, width: '100%' }}>
+                    <JungleImageButton
+                      type="claim_reward"
+                      height={66}
+                      zoom={1.05}
+                      onPress={() => {}}
+                    />
+                  </View>
                 </View>
               ) : (
-                <JungleButton
-                  title={currentProgress > 0 ? "CONTINUE TRIAL ▶" : "ENTER TRIAL ▶"}
-                  size="hero"
-                  variant="gold"
+                <JungleImageButton
+                  type="start_game"
+                  height={78}
+                  zoom={1.08}
                   onPress={onStartDaily}
                 />
               )}
@@ -137,6 +144,15 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  characterCenter: {
+    alignItems: 'center',
+    marginVertical: 4,
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -229,11 +245,11 @@ const styles = StyleSheet.create({
   },
   progressTrack: {
     height: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    backgroundColor: 'rgba(30, 48, 38, 0.85)',
     borderRadius: 6,
     overflow: 'hidden',
     borderWidth: 1.5,
-    borderColor: '#607284',
+    borderColor: '#4E6A55',
   },
   progressFill: {
     height: '100%',
@@ -282,7 +298,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    backgroundColor: 'rgba(35, 48, 60, 0.85)',
     borderWidth: 1.5,
     borderColor: '#607284',
     alignItems: 'center',

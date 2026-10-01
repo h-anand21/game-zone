@@ -5,12 +5,11 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { JungleWorldBackground } from '../components/JungleWorldBackground';
 import { WoodPanel } from '../components/WoodPanel';
-import { JungleButton } from '../components/JungleButton';
+import { JungleScreenPlaque } from '../components/JungleScreenPlaque';
+import { JungleImageButton } from '../components/JungleImageButton';
 import { MRIcon } from '../components/MRIcon';
-import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
 
 interface RoundResultScreenProps {
@@ -34,13 +33,12 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({ onNextRoun
   return (
     <JungleWorldBackground variant="arena">
       <View style={styles.container}>
-        {/* Header Title */}
+        {/* Sculpted Screen Header Plaque */}
         <View style={styles.header}>
-          <Text style={styles.headerSub}>TEMPLE TRIAL</Text>
-          <Text style={styles.title}>{isPerfect ? 'PERFECT RUN!' : 'ROUND COMPLETE'}</Text>
+          <JungleScreenPlaque type="round_feedback" height={135} />
           <View style={styles.roundPill}>
             <Text style={styles.roundTag}>
-              ROUND {round} OF {totalRounds}
+              ROUND {round} OF {totalRounds} • {isPerfect ? 'PERFECT RUN!' : 'SURVIVED'}
             </Text>
           </View>
         </View>
@@ -80,12 +78,12 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({ onNextRoun
           </View>
         </WoodPanel>
 
-        {/* Bottom CTA */}
+        {/* Bottom CTA with Cropped 3D Button */}
         <View style={styles.ctaWrapper}>
-          <JungleButton
-            title="NEXT ROUND ▶"
-            size="hero"
-            variant="gold"
+          <JungleImageButton
+            type="next_round"
+            height={72}
+            zoom={1.06}
             onPress={onNextRound}
           />
         </View>
@@ -104,6 +102,10 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
+  },
+  characterCenter: {
+    alignItems: 'center',
+    marginVertical: 4,
   },
   headerSub: {
     fontSize: 11,

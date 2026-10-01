@@ -129,10 +129,10 @@ export const NumberTile: React.FC<NumberTileProps> = ({
 
   const handlePress = () => {
     if (disabled) return;
+    if (onPress) onPress();
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch (e) {}
-    if (onPress) onPress();
   };
 
   return (
@@ -293,3 +293,4 @@ const styles = StyleSheet.create({
     color: '#3B1E00',
   },
 });
+

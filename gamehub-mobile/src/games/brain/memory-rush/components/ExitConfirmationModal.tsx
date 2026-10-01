@@ -9,11 +9,11 @@ import {
   Text,
   StyleSheet,
   Modal,
-  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemoryRushStore } from '../store/memoryRushStore';
-import { JungleButton } from './JungleButton';
+import { ExplorerCompanion } from './ExplorerCompanion';
+import { JungleImageButton } from './JungleImageButton';
 import { MRColors } from '../constants/colors';
 
 interface ExitConfirmationModalProps {
@@ -54,14 +54,10 @@ export const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
     >
       <View style={styles.overlay}>
         <View style={styles.panelContainer}>
-          {/* 3D Jungle Mascot Floating Emblem */}
+          {/* 3D Explorer Companion Floating Mascot */}
           <View style={styles.emblemHolder}>
             <View style={styles.emblemHalo}>
-              <Image
-                source={require('../../../../../assets/images/jungle/tiger_mascot.png')}
-                style={styles.emblemImg}
-                resizeMode="contain"
-              />
+              <ExplorerCompanion pose="waving" size={88} />
             </View>
           </View>
 
@@ -110,17 +106,17 @@ export const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
 
                 {/* Action Buttons Stack */}
                 <View style={styles.buttonStack}>
-                  <JungleButton
-                    title="KEEP EXPLORING ▶"
-                    variant="emerald"
-                    size="md"
+                  <JungleImageButton
+                    type="cancel"
+                    height={62}
+                    zoom={1.05}
                     onPress={handleCancel}
                   />
 
-                  <JungleButton
-                    title="EXIT TO GAMEHUB 🚪"
-                    variant="coral"
-                    size="md"
+                  <JungleImageButton
+                    type="quit_to_home"
+                    height={62}
+                    zoom={1.05}
                     onPress={handleConfirmExit}
                   />
                 </View>

@@ -10,18 +10,21 @@ import { MRColors } from '../constants/colors';
 interface TimerBarProps {
   progress: number; // 0 to 1
   remainingSeconds: number;
+  isFrozen?: boolean;
 }
 
-export const TimerBar: React.FC<TimerBarProps> = ({ progress, remainingSeconds }) => {
-  const isUrgent = remainingSeconds <= 5;
-  const gradientColors = isUrgent
+export const TimerBar: React.FC<TimerBarProps> = ({ progress, remainingSeconds, isFrozen = false }) => {
+  const isUrgent = remainingSeconds <= 5 && !isFrozen;
+  const gradientColors = isFrozen
+    ? (['#93C5FD', '#38BDF8', '#0284C7'] as const)
+    : isUrgent
     ? (['#F87171', '#EF4444', '#DC2626'] as const)
     : (['#FFF275', '#FFD700', '#FFA000'] as const);
 
   return (
     <View style={styles.container}>
       {/* Stone Carved Canal Track */}
-      <View style={styles.track}>
+      <View style={[styles.track, isFrozen && styles.trackFrozen]}>
         <LinearGradient
           colors={gradientColors}
           style={[
@@ -32,8 +35,8 @@ export const TimerBar: React.FC<TimerBarProps> = ({ progress, remainingSeconds }
           end={{ x: 1, y: 0 }}
         />
       </View>
-      <Text style={[styles.timerText, isUrgent && styles.textUrgent]}>
-        {Math.max(0, remainingSeconds).toFixed(1)}s
+      <Text style={[styles.timerText, isUrgent && styles.textUrgent, isFrozen && styles.textFrozen]}>
+        {isFrozen ? '❄️ ' : ''}{Math.max(0, remainingSeconds).toFixed(1)}s
       </Text>
     </View>
   );
@@ -68,5 +71,13 @@ const styles = StyleSheet.create({
   },
   textUrgent: {
     color: '#EF4444',
+  },
+  trackFrozen: {
+    borderColor: '#38BDF8',
+    backgroundColor: 'rgba(14, 30, 48, 0.85)',
+  },
+  textFrozen: {
+    color: '#38BDF8',
+    fontWeight: '900',
   },
 });

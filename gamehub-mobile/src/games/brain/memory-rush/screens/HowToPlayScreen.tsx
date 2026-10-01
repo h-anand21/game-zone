@@ -1,11 +1,12 @@
 // ============================================================
 // MEMORY RUSH — 05 How To Play Screen (Visual Jungle Tutorial)
-// 4 Visual Steps on Carved Stone & Parchment with 3D Number Tiles
+// Features Cropped HOW TO PLAY Plaque & Reading Explorer Companion
 // ============================================================
 
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { JungleScreenPlaque } from '../components/JungleScreenPlaque';
 import { JungleHeaderHUD } from '../components/JungleHeaderHUD';
 import { WoodPanel } from '../components/WoodPanel';
 import { StoneNumberTile } from '../components/StoneNumberTile';
@@ -21,12 +22,14 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({ onGotIt }) => 
   return (
     <JungleWorldBackground variant="forest">
       <View style={styles.container}>
-        {/* Header HUD */}
-        <JungleHeaderHUD
-          title="HOW TO PLAY"
-          subtitle="EXPLORER GUIDE"
-          onBack={onGotIt}
-        />
+        {/* Header HUD with Back Button */}
+        <JungleHeaderHUD onBack={onGotIt} />
+
+        {/* Sculpted HOW TO PLAY Plaque */}
+        <View style={styles.plaqueHolder}>
+          <JungleScreenPlaque type="how_to_play" height={150} />
+          <Text style={styles.subtitle}>MASTER MEMORY RUSH IN 4 SIMPLE STEPS</Text>
+        </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -131,6 +134,22 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 42,
   },
+  plaqueHolder: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 10,
+    color: '#D4E2D4',
+    fontWeight: '800',
+    textAlign: 'center',
+    marginTop: 2,
+    letterSpacing: 1.2,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
   scrollContent: {
     paddingHorizontal: 16,
     paddingBottom: 16,
@@ -222,6 +241,6 @@ const styles = StyleSheet.create({
   ctaWrapper: {
     paddingHorizontal: 16,
     paddingBottom: 24,
-    paddingTop: 8,
+    paddingTop: 4,
   },
 });

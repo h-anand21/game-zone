@@ -36,9 +36,6 @@ export const StonePanel: React.FC<StonePanelProps> = ({
 
   return (
     <View style={[styles.outerContainer, style]}>
-      {/* 3D Bottom Stone Extrusion */}
-      <View style={styles.bottomExtrusion} />
-
       {/* Main Stone Slab */}
       <LinearGradient
         colors={gradientColors}
@@ -52,7 +49,7 @@ export const StonePanel: React.FC<StonePanelProps> = ({
         {/* Top Chiseled Highlight Rim */}
         <View style={styles.topBevel} />
 
-        {/* Chiseled Inner Engraving Outline */}
+        {/* Chiseled Inner Engraving Outline (Subtle warm highlight, not black) */}
         <View style={styles.innerEngravedLine} />
 
         {/* Moss corner accent if mossy variant */}
@@ -75,16 +72,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     marginVertical: 6,
   },
-  bottomExtrusion: {
-    position: 'absolute',
-    bottom: -6,
-    left: 4,
-    right: 4,
-    height: 12,
-    backgroundColor: '#10161C',
-    borderRadius: 18,
-    zIndex: 0,
-  },
   stoneSurface: {
     borderRadius: 18,
     borderWidth: 2.5,
@@ -92,9 +79,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 7,
-    elevation: 7,
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
   },
   topBevel: {
     position: 'absolute',
@@ -112,7 +99,7 @@ const styles = StyleSheet.create({
     bottom: 4,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.35)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     pointerEvents: 'none',
   },
   mossBadgeTL: {

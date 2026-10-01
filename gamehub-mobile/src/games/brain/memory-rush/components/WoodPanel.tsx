@@ -32,9 +32,6 @@ export const WoodPanel: React.FC<WoodPanelProps> = ({
 
   return (
     <View style={[styles.outerContainer, style]}>
-      {/* 3D Bottom Wood Extrusion Shadow */}
-      <View style={styles.bottomExtrusion} />
-
       {/* Main Wood Beveled Slab */}
       <LinearGradient
         colors={gradientColors}
@@ -79,16 +76,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     marginVertical: 6,
   },
-  bottomExtrusion: {
-    position: 'absolute',
-    bottom: -5,
-    left: 4,
-    right: 4,
-    height: 10,
-    backgroundColor: '#1E0C02',
-    borderRadius: 16,
-    zIndex: 0,
-  },
   panelSurface: {
     borderRadius: 16,
     borderWidth: 2.5,
@@ -97,9 +84,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.45,
+    shadowOpacity: 0.35,
     shadowRadius: 6,
-    elevation: 6,
+    elevation: 4,
   },
   topBevel: {
     position: 'absolute',
@@ -115,7 +102,7 @@ const styles = StyleSheet.create({
     left: 12,
     right: 12,
     height: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   woodGrooveBottom: {
     position: 'absolute',

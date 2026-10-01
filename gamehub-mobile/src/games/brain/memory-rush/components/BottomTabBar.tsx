@@ -1,14 +1,13 @@
 // ============================================================
-// MEMORY RUSH — Carved Stone Bottom Altar Navigation Bar
-// Physical stone slab with gold engraved rune tabs & active lighting
+// MEMORY RUSH — Carved 3D Jungle Navigation Bar
+// Uses authentic carved button pack: HOME, CHALLENGE, STATS, SETTINGS
+// Instant 0ms touch feedback & active illumination aura
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet, Pressable, Image, Dimensions, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { MRIcon, MRIconName } from './MRIcon';
-import { MRColors } from '../constants/colors';
 import type { AppNavScreen } from '../types';
 
 export type TabType = 'home' | 'daily' | 'stats' | 'settings' | 'challenge';
@@ -21,45 +20,50 @@ export interface BottomTabBarProps {
 interface TabItem {
   id: AppNavScreen;
   label: string;
-  iconName: MRIconName;
-  runeEmoji: string;
 }
 
 const TABS: TabItem[] = [
-  { id: 'home', label: 'HOME', iconName: 'play', runeEmoji: '🏛️' },
-  { id: 'daily', label: 'CHALLENGE', iconName: 'star', runeEmoji: '⭐' },
-  { id: 'stats', label: 'STATS', iconName: 'bar-chart-2', runeEmoji: '📜' },
-  { id: 'settings', label: 'SETTINGS', iconName: 'cpu', runeEmoji: '⚙️' },
+  { id: 'home', label: 'HOME' },
+  { id: 'daily', label: 'CHALLENGE' },
+  { id: 'stats', label: 'STATS' },
+  { id: 'settings', label: 'SETTINGS' },
 ];
+
+const NAV_IMAGES: Record<string, any> = {
+  home: require('../../../../../assets/game/navigation/nav_home.png'),
+  daily: require('../../../../../assets/game/navigation/nav_challenge.png'),
+  challenge: require('../../../../../assets/game/navigation/nav_challenge.png'),
+  stats: require('../../../../../assets/game/navigation/nav_stats.png'),
+  settings: require('../../../../../assets/game/navigation/nav_settings.png'),
+};
 
 export const BottomTabBar: React.FC<BottomTabBarProps> = ({
   currentScreen,
   onNavigate,
 }) => {
   const handleTabPress = (tabId: AppNavScreen) => {
+    onNavigate(tabId);
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     } catch (e) {}
-    onNavigate(tabId);
   };
 
   return (
     <View style={styles.container}>
-      {/* 3D Bottom Extrusion Foundation */}
-      <View style={styles.bottomExtrusion} />
-
-      {/* Main Carved Stone Slab */}
+      {/* Main Carved Stone Altar Bar */}
       <LinearGradient
-        colors={['#3B4957', '#25303B', '#182129']}
+        colors={['#2A3844', '#1A242E', '#10171E']}
         style={styles.barGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
       >
-        {/* Top Sunlit Stone Highlight Rim */}
+        {/* Top Sunlit Edge Rim */}
         <View style={styles.topBevel} />
 
         {TABS.map((tab) => {
-          const isActive = currentScreen === tab.id;
+          const isActive =
+            currentScreen === tab.id ||
+            (tab.id === 'daily' && (currentScreen as string) === 'challenge');
 
           return (
             <Pressable
@@ -67,32 +71,34 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
               onPress={() => handleTabPress(tab.id)}
               style={({ pressed }) => [
                 styles.tabBtn,
-                isActive && styles.activeTabBtn,
                 pressed && styles.pressed,
               ]}
+              hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
               accessibilityLabel={`Navigate to ${tab.label}`}
+              accessibilityRole="button"
+              accessibilityState={{ selected: isActive }}
             >
+              {/* Active Golden Aura Glow */}
               {isActive && (
                 <View style={styles.activeGlowContainer}>
                   <LinearGradient
-                    colors={['rgba(255, 215, 0, 0.45)', 'transparent']}
-                    style={StyleSheet.absoluteFill}
+                    colors={['rgba(255, 215, 0, 0.40)', 'rgba(255, 215, 0, 0.05)', 'transparent']}
+                    style={styles.activeGlowGradient}
+                    start={{ x: 0.5, y: 0 }}
+                    end={{ x: 0.5, y: 1 }}
                   />
-                  <View style={styles.activeTopPill} />
+                  <View style={styles.activePill} />
                 </View>
               )}
 
-              <View style={[styles.iconWrapper, isActive && styles.activeIconWrapper]}>
-                <MRIcon
-                  name={tab.iconName}
-                  size={19}
-                  color={isActive ? '#FFD700' : '#8A9BAA'}
+              {/* 3D Hand-Carved Button Graphic from image copy.png */}
+              <View style={[styles.imageWrapper, isActive && styles.activeImageWrapper]}>
+                <Image
+                  source={NAV_IMAGES[tab.id]}
+                  style={[styles.navImage, !isActive && styles.inactiveImage]}
+                  resizeMode="contain"
                 />
               </View>
-
-              <Text style={[styles.labelText, isActive && styles.activeLabel]}>
-                {tab.label}
-              </Text>
             </Pressable>
           );
         })}
@@ -104,36 +110,29 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    paddingHorizontal: 16,
-    paddingBottom: 16,
+    paddingHorizontal: 12,
+    paddingTop: 4,
+    paddingBottom: Platform.OS === 'ios' ? 36 : 28,
     position: 'relative',
-  },
-  bottomExtrusion: {
-    position: 'absolute',
-    bottom: 12,
-    left: 20,
-    right: 20,
-    height: 10,
-    backgroundColor: '#0E141B',
-    borderRadius: 24,
-    zIndex: 0,
+    zIndex: 100,
   },
   barGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    height: 64,
+    height: 74,
     borderRadius: 24,
     borderWidth: 2,
-    borderColor: '#54687C',
+    borderColor: '#4A5D70',
     position: 'relative',
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.65,
+    shadowOpacity: 0.7,
     shadowRadius: 10,
-    elevation: 8,
+    elevation: 10,
     zIndex: 1,
+    paddingHorizontal: 4,
   },
   topBevel: {
     position: 'absolute',
@@ -141,7 +140,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 2.5,
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    backgroundColor: 'rgba(255, 255, 255, 0.28)',
   },
   tabBtn: {
     flex: 1,
@@ -149,50 +148,44 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    gap: 3,
-  },
-  activeTabBtn: {
-    backgroundColor: 'rgba(255, 215, 0, 0.08)',
   },
   activeGlowContainer: {
     ...StyleSheet.absoluteFill,
     alignItems: 'center',
   },
-  activeTopPill: {
+  activeGlowGradient: {
+    ...StyleSheet.absoluteFill,
+  },
+  activePill: {
     position: 'absolute',
     top: 0,
-    width: 32,
+    width: 38,
     height: 3.5,
     borderRadius: 2,
     backgroundColor: '#FFD700',
     shadowColor: '#FFD700',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.9,
+    shadowOpacity: 0.95,
     shadowRadius: 6,
+    elevation: 4,
   },
-  iconWrapper: {
+  imageWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    width: 28,
-    height: 28,
+    width: 70,
+    height: 58,
   },
-  activeIconWrapper: {
-    transform: [{ translateY: -1 }],
+  activeImageWrapper: {
+    transform: [{ scale: 1.08 }, { translateY: -1 }],
   },
-  labelText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: '#8A9BAA',
-    letterSpacing: 1,
+  navImage: {
+    width: '100%',
+    height: '100%',
   },
-  activeLabel: {
-    color: '#FFD700',
-    fontWeight: '900',
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+  inactiveImage: {
+    opacity: 0.72,
   },
   pressed: {
-    transform: [{ scale: 0.94 }],
+    transform: [{ scale: 0.92 }],
   },
 });

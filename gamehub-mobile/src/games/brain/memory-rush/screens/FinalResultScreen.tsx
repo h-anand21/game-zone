@@ -4,14 +4,14 @@
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { JungleWorldBackground } from '../components/JungleWorldBackground';
 import { WoodPanel } from '../components/WoodPanel';
 import { StonePanel } from '../components/StonePanel';
+import { JungleScreenPlaque } from '../components/JungleScreenPlaque';
+import { JungleImageButton } from '../components/JungleImageButton';
 import { JungleButton } from '../components/JungleButton';
 import { MRIcon } from '../components/MRIcon';
-import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
 import { getPerformanceTitle } from '../logic/scoring';
 
@@ -34,10 +34,9 @@ export const FinalResultScreen: React.FC<FinalResultScreenProps> = ({
   return (
     <JungleWorldBackground variant="victory">
       <View style={styles.container}>
-        {/* Victory Header */}
+        {/* Sculpted Screen Title Plaque */}
         <View style={styles.header}>
-          <Text style={styles.crownEmoji}>👑</Text>
-          <Text style={styles.title}>RUN COMPLETE!</Text>
+          <JungleScreenPlaque type="run_complete" height={155} />
           <View style={styles.perfBadge}>
             <Text style={styles.perfText}>{perfTitle.toUpperCase()}</Text>
           </View>
@@ -134,10 +133,10 @@ export const FinalResultScreen: React.FC<FinalResultScreenProps> = ({
 
           {/* Action Buttons Stack */}
           <View style={styles.btnStack}>
-            <JungleButton
-              title="PLAY AGAIN ▶"
-              size="hero"
-              variant="gold"
+            <JungleImageButton
+              type="play_again"
+              height={78}
+              zoom={1.08}
               onPress={onPlayAgain}
             />
             <JungleButton
@@ -146,10 +145,10 @@ export const FinalResultScreen: React.FC<FinalResultScreenProps> = ({
               variant="wood"
               onPress={onChangeMode}
             />
-            <JungleButton
-              title="RETURN TO HOME 🏛️"
-              size="md"
-              variant="stone"
+            <JungleImageButton
+              type="quit_to_home"
+              height={62}
+              zoom={1.05}
               onPress={onHome}
             />
           </View>
@@ -165,6 +164,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 42,
+  },
+  characterCenter: {
+    alignItems: 'center',
+    marginVertical: 4,
   },
   header: {
     alignItems: 'center',

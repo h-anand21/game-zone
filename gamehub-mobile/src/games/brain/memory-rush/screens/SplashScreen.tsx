@@ -1,5 +1,6 @@
 // ============================================================
 // MEMORY RUSH — 01 Splash Screen (3D Jungle Adventure World)
+// Features Cropped MEMORY RUSH Sculpted Plaque & Explorer Hero
 // ============================================================
 
 import React, { useEffect, useRef } from 'react';
@@ -11,9 +12,10 @@ import {
   Animated,
   Dimensions,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { JungleScreenPlaque } from '../components/JungleScreenPlaque';
+import { ExplorerCompanion } from '../components/ExplorerCompanion';
 import { StoneNumberTile } from '../components/StoneNumberTile';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -111,63 +113,52 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
   return (
     <JungleWorldBackground variant="home">
       <Pressable style={styles.container} onPress={handleTap}>
-        {/* Floating Number Stones in Environment (Layer 2) */}
+        {/* Floating Number Stones in Environment */}
         <Animated.View
           style={[
             styles.floatingStone,
-            { top: '16%', left: 24, transform: [{ translateY: translateY1 }, { rotate: '-12deg' }] },
+            { top: '15%', left: 18, transform: [{ translateY: translateY1 }, { rotate: '-12deg' }] },
           ]}
           pointerEvents="none"
         >
-          <StoneNumberTile value={7} size={54} state="preview" />
+          <StoneNumberTile value={7} size={50} state="preview" />
         </Animated.View>
 
         <Animated.View
           style={[
             styles.floatingStone,
-            { top: '22%', right: 28, transform: [{ translateY: translateY2 }, { rotate: '15deg' }] },
+            { top: '20%', right: 18, transform: [{ translateY: translateY2 }, { rotate: '15deg' }] },
           ]}
           pointerEvents="none"
         >
-          <StoneNumberTile value={3} size={60} state="correct" />
+          <StoneNumberTile value={3} size={54} state="correct" />
         </Animated.View>
 
         <Animated.View
           style={[
             styles.floatingStone,
-            { bottom: '26%', left: 32, transform: [{ translateY: translateY2 }, { rotate: '10deg' }] },
+            { bottom: '26%', left: 24, transform: [{ translateY: translateY2 }, { rotate: '10deg' }] },
           ]}
           pointerEvents="none"
         >
-          <StoneNumberTile value={9} size={52} state="preview" />
+          <StoneNumberTile value={9} size={48} state="preview" />
         </Animated.View>
 
         <Animated.View
           style={[
             styles.floatingStone,
-            { bottom: '28%', right: 36, transform: [{ translateY: translateY1 }, { rotate: '-8deg' }] },
+            { bottom: '28%', right: 28, transform: [{ translateY: translateY1 }, { rotate: '-8deg' }] },
           ]}
           pointerEvents="none"
         >
-          <StoneNumberTile value={5} size={50} state="selected" />
+          <StoneNumberTile value={5} size={46} state="selected" />
         </Animated.View>
 
-        {/* Center Title Object (Layer 3 & 4) */}
+        {/* Center Hero Logo Plaque */}
         <View style={styles.centerHero}>
-          <View style={styles.titleExtrusion}>
-            <LinearGradient
-              colors={['#8B4513', '#5E2B08', '#381602']}
-              style={styles.woodPlaque}
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 1 }}
-            >
-              <View style={styles.plaqueBevel} />
-              <Text style={styles.titleTop}>MEMORY</Text>
-              <Text style={styles.titleBottom}>RUSH</Text>
-              <View style={styles.taglineBadge}>
-                <Text style={styles.taglineText}>JUNGLE TEMPLE ADVENTURE</Text>
-              </View>
-            </LinearGradient>
+          <JungleScreenPlaque type="memory_rush" height={220} />
+          <View style={styles.taglineBadge}>
+            <Text style={styles.taglineText}>JUNGLE TEMPLE ADVENTURE</Text>
           </View>
         </View>
 
@@ -192,7 +183,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 60,
+    paddingVertical: 50,
     paddingHorizontal: 20,
   },
   floatingStone: {
@@ -205,61 +196,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  titleExtrusion: {
-    borderRadius: 28,
-    backgroundColor: '#1C0B01',
-    paddingBottom: 8,
-    width: Math.min(SCREEN_WIDTH - 40, 340),
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.65,
-    shadowRadius: 14,
-    elevation: 12,
-  },
-  woodPlaque: {
-    borderRadius: 28,
-    borderWidth: 3,
-    borderColor: '#C68A4C',
-    paddingVertical: 24,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  plaqueBevel: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: 'rgba(255, 230, 180, 0.55)',
-  },
-  titleTop: {
-    fontSize: 42,
-    fontWeight: '900',
-    color: '#FFF8E7',
-    letterSpacing: 4,
-    lineHeight: 46,
-    textShadowColor: 'rgba(0, 0, 0, 0.85)',
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 4,
-  },
-  titleBottom: {
-    fontSize: 54,
-    fontWeight: '900',
-    color: '#FFD700',
-    letterSpacing: 6,
-    lineHeight: 58,
-    textShadowColor: '#5C3400',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 6,
-  },
   taglineBadge: {
-    marginTop: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    marginTop: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: 'rgba(10, 16, 12, 0.75)',
     borderWidth: 1.5,
     borderColor: '#FFD700',
   },
@@ -267,13 +209,13 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '900',
     color: '#FFD700',
-    letterSpacing: 1.8,
+    letterSpacing: 2,
   },
   bottomArea: {
     width: '100%',
     alignItems: 'center',
     paddingHorizontal: 20,
-    gap: 10,
+    gap: 8,
   },
   tapPrompt: {
     paddingHorizontal: 24,
@@ -296,11 +238,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 10,
     borderRadius: 5,
-    backgroundColor: 'rgba(20, 30, 20, 0.8)',
+    backgroundColor: 'rgba(10, 16, 12, 0.8)',
     borderWidth: 1.5,
     borderColor: '#718496',
     overflow: 'hidden',
-    marginTop: 6,
+    marginTop: 4,
   },
   loadingFill: {
     height: '100%',

@@ -7,7 +7,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Switch, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { JungleWorldBackground } from '../components/JungleWorldBackground';
-import { JungleHeaderHUD } from '../components/JungleHeaderHUD';
+import { JungleScreenPlaque } from '../components/JungleScreenPlaque';
+import { ExplorerCompanion } from '../components/ExplorerCompanion';
 import { StonePanel } from '../components/StonePanel';
 import { WoodPanel } from '../components/WoodPanel';
 import { BottomTabBar, TabType } from '../components/BottomTabBar';
@@ -64,11 +65,10 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateTab })
   return (
     <JungleWorldBackground variant="settings">
       <SafeAreaView style={styles.container}>
-        {/* Header HUD */}
-        <JungleHeaderHUD
-          title="SETTINGS"
-          subtitle="PREFERENCES"
-        />
+        {/* Sculpted Screen Title Plaque */}
+        <View style={styles.header}>
+          <JungleScreenPlaque type="settings" height={120} />
+        </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* GAMEPLAY SECTION */}
@@ -161,6 +161,15 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateTab })
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  characterCenter: {
+    alignItems: 'center',
+    marginVertical: 4,
   },
   scrollContent: {
     paddingHorizontal: 16,

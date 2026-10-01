@@ -117,6 +117,38 @@ export const MRIcon: React.FC<MRIconProps> = ({
         </Svg>
       );
 
+    case 'trophy':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+          <Path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+          <Path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+          <Path d="M4 22h16" />
+          <Path d="M10 14.66V17c0 .55-.45 1-1 1H8c-.55 0-1 .45-1 1v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1v-1c0-.55-.45-1-1-1h-1c-.55 0-1-.45-1-1v-2.34" />
+          <Path d="M6 4h12a2 2 0 0 1 2 2v3a6 6 0 0 1-6 6h0a6 6 0 0 1-6-6V6a2 2 0 0 1 2-2z" fill={color} fillOpacity={0.25} />
+        </Svg>
+      );
+
+    case 'gem':
+    case 'diamond':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+          <Path d="M6 3h12l4 6-10 12L2 9z" fill={color} fillOpacity={0.25} />
+          <Path d="M11 3v18" />
+          <Path d="M2 9h20" />
+        </Svg>
+      );
+
+    case 'gamepad':
+      return (
+        <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">
+          <Rect x="2" y="6" width="20" height="12" rx="4" fill={color} fillOpacity={0.2} />
+          <Line x1="6" y1="12" x2="10" y2="12" />
+          <Line x1="8" y1="10" x2="8" y2="14" />
+          <Circle cx="15" cy="11" r="1" fill={color} />
+          <Circle cx="17" cy="13" r="1" fill={color} />
+        </Svg>
+      );
+
     case 'star':
       return (
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round">

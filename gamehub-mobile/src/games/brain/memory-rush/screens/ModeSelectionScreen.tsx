@@ -1,6 +1,6 @@
 // ============================================================
 // MEMORY RUSH — 03 Mode Select Screen (Jungle Challenge Altar)
-// Physical Wood & Stone Mode Tablets with Mini Gameplay Visuals
+// Features Cropped CHOOSE YOUR CHALLENGE Plaque & Map Explorer
 // ============================================================
 
 import React from 'react';
@@ -11,9 +11,9 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { JungleScreenPlaque } from '../components/JungleScreenPlaque';
 import { JungleHeaderHUD } from '../components/JungleHeaderHUD';
 import { WoodPanel } from '../components/WoodPanel';
 import { StonePanel } from '../components/StonePanel';
@@ -107,16 +107,16 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
   return (
     <JungleWorldBackground variant="forest">
       <View style={styles.container}>
-        {/* Jungle Header HUD */}
-        <JungleHeaderHUD
-          title="CHOOSE CHALLENGE"
-          subtitle="TEMPLE TRIALS"
-          onBack={onBack}
-        />
+        {/* Jungle Header HUD with Back Button */}
+        <JungleHeaderHUD onBack={onBack} />
 
-        <Text style={styles.subtitle}>
-          TEST A DIFFERENT PART OF YOUR MEMORY ARCHIVE
-        </Text>
+        {/* Sculpted CHOOSE YOUR CHALLENGE Plaque */}
+        <View style={styles.plaqueHolder}>
+          <JungleScreenPlaque type="choose_challenge" height={150} />
+          <Text style={styles.subtitle}>
+            TEST A DIFFERENT PART OF YOUR MEMORY ARCHIVE
+          </Text>
+        </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -200,13 +200,17 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 42,
   },
+  plaqueHolder: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 6,
+  },
   subtitle: {
     fontSize: 10,
     color: '#D4E2D4',
     fontWeight: '800',
     textAlign: 'center',
     marginTop: 2,
-    marginBottom: 12,
     letterSpacing: 1.5,
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 0, height: 1 },

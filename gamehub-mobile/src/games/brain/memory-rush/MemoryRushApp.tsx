@@ -173,11 +173,12 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
   }, [setSelectedMode, setSelectedDifficulty, startNewGame]);
 
   // Bottom Navigation handler
-  const handleNavigateTab = useCallback((tab: TabType) => {
+  const handleNavigateTab = useCallback((tab: TabType | string) => {
     switch (tab) {
       case 'home':
         setCurrentScreen('home');
         break;
+      case 'daily':
       case 'challenge':
         setCurrentScreen('daily');
         break;
@@ -186,6 +187,9 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
         break;
       case 'settings':
         setCurrentScreen('settings');
+        break;
+      default:
+        setCurrentScreen(tab as ScreenState);
         break;
     }
   }, []);

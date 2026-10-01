@@ -6,8 +6,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { JungleButton } from './JungleButton';
-import { MRColors } from '../constants/colors';
+import { JungleScreenPlaque } from './JungleScreenPlaque';
+import { ExplorerCompanion } from './ExplorerCompanion';
+import { JungleImageButton } from './JungleImageButton';
 
 interface PauseModalProps {
   visible: boolean;
@@ -46,7 +47,12 @@ export const PauseModal: React.FC<PauseModalProps> = ({
           >
             <View style={styles.topBevel} />
 
-            <Text style={styles.title}>GAME PAUSED</Text>
+            {/* Sculpted Screen Plaque */}
+            <JungleScreenPlaque type="pause" height={90} />
+
+            <View style={styles.companionContainer}>
+              <ExplorerCompanion pose="thinking" size={95} />
+            </View>
 
             <View style={styles.scoreTablet}>
               <Text style={styles.scoreLabel}>CURRENT SCORE</Text>
@@ -54,22 +60,22 @@ export const PauseModal: React.FC<PauseModalProps> = ({
             </View>
 
             <View style={styles.btnStack}>
-              <JungleButton
-                title="RESUME ▶"
-                variant="gold"
-                size="md"
+              <JungleImageButton
+                type="resume"
+                height={64}
+                zoom={1.05}
                 onPress={onResume}
               />
-              <JungleButton
-                title="RESTART ⟲"
-                variant="wood"
-                size="md"
+              <JungleImageButton
+                type="restart"
+                height={64}
+                zoom={1.05}
                 onPress={onRestart}
               />
-              <JungleButton
-                title="QUIT TO HOME 🏛️"
-                variant="coral"
-                size="md"
+              <JungleImageButton
+                type="quit_to_home"
+                height={64}
+                zoom={1.05}
                 onPress={onExit}
               />
             </View>
@@ -132,6 +138,11 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 3,
   },
+  companionContainer: {
+    marginVertical: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   scoreTablet: {
     backgroundColor: 'rgba(20, 32, 24, 0.85)',
     borderRadius: 12,
@@ -140,7 +151,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 6,
     alignItems: 'center',
-    marginVertical: 14,
+    marginVertical: 8,
   },
   scoreLabel: {
     fontSize: 9,

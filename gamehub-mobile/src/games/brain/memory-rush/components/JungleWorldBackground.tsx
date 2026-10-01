@@ -27,12 +27,14 @@ export type JungleBgVariant =
 interface JungleWorldBackgroundProps {
   variant?: JungleBgVariant;
   dimmed?: boolean;
+  blurRadius?: number;
   children?: React.ReactNode;
 }
 
 export const JungleWorldBackground: React.FC<JungleWorldBackgroundProps> = ({
   variant = 'home',
   dimmed = false,
+  blurRadius,
   children,
 }) => {
   const bgSource: ImageSourcePropType = useMemo(() => {
@@ -51,7 +53,7 @@ export const JungleWorldBackground: React.FC<JungleWorldBackgroundProps> = ({
         return require('../../../../../assets/images/jungle/jungle_bg.webp');
       case 'home':
       default:
-        return require('../../../../../assets/images/jungle/jungle_temple_home.jpg');
+        return require('../../../../../assets/game/backgrounds/mystical_temple_valley.png');
     }
   }, [variant]);
 
@@ -68,13 +70,15 @@ export const JungleWorldBackground: React.FC<JungleWorldBackgroundProps> = ({
       case 'stats':
         return ['rgba(15, 26, 18, 0.55)', 'rgba(10, 18, 13, 0.75)'];
       case 'home':
-        return ['rgba(15, 26, 18, 0.20)', 'rgba(10, 18, 13, 0.50)'];
+        return ['rgba(15, 26, 18, 0.25)', 'rgba(10, 18, 13, 0.55)'];
       case 'victory':
         return ['rgba(30, 20, 10, 0.25)', 'rgba(15, 12, 8, 0.60)'];
       default:
         return ['rgba(15, 26, 18, 0.35)', 'rgba(10, 18, 13, 0.60)'];
     }
   }, [variant, dimmed]);
+
+  const effectiveBlur = blurRadius !== undefined ? blurRadius : (variant === 'home' ? 1.8 : 0);
 
   return (
     <View style={styles.container}>
@@ -83,6 +87,7 @@ export const JungleWorldBackground: React.FC<JungleWorldBackgroundProps> = ({
         source={bgSource}
         style={StyleSheet.absoluteFill}
         resizeMode="cover"
+        blurRadius={effectiveBlur}
       />
 
       {/* LAYER 2 — ENVIRONMENTAL ATMOSPHERE & CONTRAST VIGNETTE */}

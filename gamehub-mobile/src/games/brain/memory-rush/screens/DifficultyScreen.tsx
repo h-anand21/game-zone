@@ -1,6 +1,6 @@
 // ============================================================
 // MEMORY RUSH — 04 Difficulty Select Screen (Temple Trial Setup)
-// Physical Stone Tablets for Easy, Medium & Hard with 3D CTA
+// Features Cropped SELECT DIFFICULTY Plaque & START GAME Button
 // ============================================================
 
 import React, { useState } from 'react';
@@ -14,10 +14,11 @@ import {
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { JungleScreenPlaque } from '../components/JungleScreenPlaque';
+import { JungleImageButton } from '../components/JungleImageButton';
 import { JungleHeaderHUD } from '../components/JungleHeaderHUD';
 import { StonePanel } from '../components/StonePanel';
 import { WoodPanel } from '../components/WoodPanel';
-import { JungleButton } from '../components/JungleButton';
 import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
@@ -96,12 +97,14 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
   return (
     <JungleWorldBackground variant="forest">
       <View style={styles.container}>
-        {/* Jungle Header */}
-        <JungleHeaderHUD
-          title="SELECT DIFFICULTY"
-          subtitle={mode.toUpperCase()}
-          onBack={onBack}
-        />
+        {/* Jungle Header with Back Button */}
+        <JungleHeaderHUD onBack={onBack} />
+
+        {/* Sculpted SELECT DIFFICULTY Title Plaque */}
+        <View style={styles.plaqueHolder}>
+          <JungleScreenPlaque type="select_difficulty" height={150} />
+          <Text style={styles.modeSubtitle}>MODE: {mode.toUpperCase()}</Text>
+        </View>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -180,15 +183,15 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
             </View>
           </WoodPanel>
 
-          <View style={{ height: 20 }} />
+          <View style={{ height: 16 }} />
         </ScrollView>
 
-        {/* Primary Tactile 3D CTA */}
+        {/* Primary 3D START GAME Button */}
         <View style={styles.ctaWrapper}>
-          <JungleButton
-            title="START GAME ▶"
-            size="hero"
-            variant="gold"
+          <JungleImageButton
+            type="start_game"
+            height={78}
+            zoom={1.08}
             onPress={handleStart}
           />
         </View>
@@ -202,9 +205,24 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 42,
   },
+  plaqueHolder: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginBottom: 4,
+  },
+  modeSubtitle: {
+    fontSize: 10.5,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 1.5,
+    marginTop: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
+  },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 4,
+    paddingTop: 2,
     paddingBottom: 16,
     gap: 8,
   },
@@ -317,8 +335,9 @@ const styles = StyleSheet.create({
     lineHeight: 14,
   },
   ctaWrapper: {
-    paddingHorizontal: 16,
-    paddingBottom: 24,
-    paddingTop: 8,
+    paddingHorizontal: 24,
+    paddingBottom: 22,
+    paddingTop: 4,
+    alignItems: 'center',
   },
 });

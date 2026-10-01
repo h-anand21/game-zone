@@ -1,6 +1,6 @@
 // ============================================================
 // MEMORY RUSH — 02 Home Screen (Jungle Adventure Temple Hub)
-// 3D Carved Wood Plaque, Tactile Altar CTA, Stone Stat Tablets, Daily Shrine
+// Features Cropped Sculpted HOME Plaque, 3D PLAY NOW Button & Explorer
 // ============================================================
 
 import React from 'react';
@@ -10,15 +10,16 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
-  Image,
   Dimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { JungleWorldBackground } from '../components/JungleWorldBackground';
+import { JungleScreenPlaque } from '../components/JungleScreenPlaque';
+import { JungleImageButton } from '../components/JungleImageButton';
+import { ExplorerCompanion } from '../components/ExplorerCompanion';
 import { JungleButton } from '../components/JungleButton';
 import { WoodPanel } from '../components/WoodPanel';
-import { StonePanel } from '../components/StonePanel';
 import { BottomTabBar } from '../components/BottomTabBar';
 import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
@@ -82,11 +83,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             accessibilityLabel="Player Profile"
           >
             <View style={styles.avatarCircle}>
-              <Image
-                source={require('../../../../../assets/images/jungle/runner_boy.png')}
-                style={styles.avatarImg}
-                resizeMode="cover"
-              />
+              <ExplorerCompanion pose="thumbs_up" size={30} />
             </View>
             <View style={styles.playerInfoCol}>
               <Text style={styles.playerName}>EXPLORER</Text>
@@ -139,34 +136,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* HERO MEMORY RUSH 3D TITLE BOARD */}
-          <View style={styles.heroBoardOuter}>
-            <View style={styles.heroBoardShadow} />
-            <LinearGradient
-              colors={['#8B4513', '#5E2B08', '#381602']}
-              style={styles.heroBoardSurface}
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 1 }}
-            >
-              <View style={styles.boardTopHighlight} />
-
-              <Text style={styles.heroTitleMain}>MEMORY RUSH</Text>
-
-              <Text style={styles.tagline}>
-                REMEMBER FASTER • THINK QUICKER • BEAT YOUR BEST
-              </Text>
-            </LinearGradient>
+          {/* SCULPTED 3D HOME TITLE PLAQUE WITH EXPLORER */}
+          <View style={styles.heroPlaqueWrapper}>
+            <JungleScreenPlaque type="home" height={175} />
+            <Text style={styles.tagline}>
+              REMEMBER FASTER • THINK QUICKER • BEAT YOUR BEST
+            </Text>
           </View>
 
-          {/* PRIMARY HERO CTA: GIANT CARVED ALTAR PLAY BUTTON */}
+          {/* PRIMARY HERO CTA: CROPPED 3D PLAY NOW BUTTON */}
           <View style={styles.primaryActionSection}>
-            <JungleButton
-              title="PLAY NOW ▶"
-              subtitle={`ACTIVE MODE: ${getModeTitle()}`}
-              size="hero"
-              variant="gold"
+            <JungleImageButton
+              type="play_now"
+              height={86}
+              zoom={1.08}
               onPress={onStartGame}
             />
+            <Text style={styles.activeModeCaption}>ACTIVE MODE: {getModeTitle()}</Text>
           </View>
 
           {/* 3 CARVED STONE STAT TABLETS */}
@@ -177,7 +163,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 colors={['#4E5E6E', '#2D3844']}
                 style={styles.statTabletSurface}
               >
-                <Text style={styles.statIcon}>🏆</Text>
+                <View style={styles.statIconBox}>
+                  <MRIcon name="trophy" size={20} color="#FFD700" />
+                </View>
                 <Text style={styles.statNumber}>
                   {(playerStats.bestScore || 0).toLocaleString()}
                 </Text>
@@ -191,7 +179,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 colors={['#4E5E6E', '#2D3844']}
                 style={styles.statTabletSurface}
               >
-                <Text style={styles.statIcon}>⚡</Text>
+                <View style={styles.statIconBox}>
+                  <MRIcon name="zap" size={20} color="#F59E0B" />
+                </View>
                 <Text style={styles.statNumber}>{playerStats.bestStreak || 0}×</Text>
                 <Text style={styles.statLabel}>BEST STREAK</Text>
               </LinearGradient>
@@ -203,22 +193,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 colors={['#4E5E6E', '#2D3844']}
                 style={styles.statTabletSurface}
               >
-                <Text style={styles.statIcon}>🎯</Text>
+                <View style={styles.statIconBox}>
+                  <MRIcon name="target" size={20} color="#10B981" />
+                </View>
                 <Text style={styles.statNumber}>{playerStats.accuracy || 92}%</Text>
                 <Text style={styles.statLabel}>ACCURACY</Text>
               </LinearGradient>
             </View>
           </View>
 
-          {/* DAILY CHALLENGE REWARD PANEL */}
+          {/* DAILY CHALLENGE REWARD PANEL WITH 3D EXPLORER ON CHEST */}
           <WoodPanel variant="sign" style={styles.dailyPanel}>
             <View style={styles.dailyRow}>
               <View style={styles.dailyMascotBox}>
-                <Image
-                  source={require('../../../../../assets/images/jungle/tiger_mascot.png')}
-                  style={styles.dailyMascotImg}
-                  resizeMode="contain"
-                />
+                <ExplorerCompanion pose="treasure_chest" size={54} />
               </View>
 
               <View style={styles.dailyInfo}>
@@ -241,7 +229,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </View>
           </WoodPanel>
 
-          {/* EXPLORE MODES QUICK BUTTON */}
+          {/* EXPLORE MODES SHORTCUT BUTTON */}
           <View style={styles.modeShortcutRow}>
             <JungleButton
               title="CHOOSE CHALLENGE MODE 📜"
@@ -271,7 +259,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingBottom: 10,
+    paddingBottom: 6,
     zIndex: 10,
   },
   playerPill: {
@@ -301,10 +289,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-  },
-  avatarImg: {
-    width: '100%',
-    height: '100%',
   },
   playerInfoCol: {
     justifyContent: 'center',
@@ -364,62 +348,37 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 6,
-    gap: 14,
+    paddingTop: 2,
+    gap: 12,
   },
-  heroBoardOuter: {
-    position: 'relative',
-    marginTop: 4,
-  },
-  heroBoardShadow: {
-    position: 'absolute',
-    bottom: -6,
-    left: 6,
-    right: 6,
-    height: 12,
-    backgroundColor: '#1C0B02',
-    borderRadius: 22,
-  },
-  heroBoardSurface: {
-    borderRadius: 22,
-    borderWidth: 3,
-    borderColor: '#C68A4C',
-    paddingVertical: 18,
-    paddingHorizontal: 16,
+  heroPlaqueWrapper: {
     alignItems: 'center',
-    position: 'relative',
-    overflow: 'hidden',
-  },
-  boardTopHighlight: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 3,
-    backgroundColor: 'rgba(255, 235, 180, 0.5)',
-  },
-  heroTitleMain: {
-    fontSize: 34,
-    fontWeight: '900',
-    color: '#FFD700',
-    letterSpacing: 3,
-    textAlign: 'center',
-    textShadowColor: '#4A2800',
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 4,
+    width: '100%',
   },
   tagline: {
     fontSize: 9.5,
     fontWeight: '800',
     color: '#FFF8E7',
     letterSpacing: 1.2,
-    marginTop: 6,
+    marginTop: 2,
     textAlign: 'center',
-    opacity: 0.9,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   primaryActionSection: {
     width: '100%',
-    marginVertical: 4,
+    alignItems: 'center',
+  },
+  activeModeCaption: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 1,
+    marginTop: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   statsRow: {
     flexDirection: 'row',
@@ -446,9 +405,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     alignItems: 'center',
   },
-  statIcon: {
-    fontSize: 16,
-    marginBottom: 2,
+  statIconBox: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
   },
   statNumber: {
     fontSize: 14,
@@ -466,7 +430,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   dailyPanel: {
-    marginTop: 4,
+    marginTop: 2,
   },
   dailyRow: {
     flexDirection: 'row',
@@ -474,8 +438,8 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   dailyMascotBox: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 52,
     borderRadius: 14,
     backgroundColor: '#261204',
     borderWidth: 2,
@@ -483,10 +447,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-  },
-  dailyMascotImg: {
-    width: '90%',
-    height: '90%',
   },
   dailyInfo: {
     flex: 1,

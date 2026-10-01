@@ -16,9 +16,8 @@ import { PowerUpButton } from '../components/PowerUpButton';
 import { PauseModal } from '../components/PauseModal';
 import { StoneNumberTile } from '../components/StoneNumberTile';
 import { MRIcon } from '../components/MRIcon';
-import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
-import type { NumberTileData } from '../types';
+import type { NumberTileData, PowerUpType } from '../types';
 
 interface GameplayScreenProps {
   onBack: () => void;
@@ -60,6 +59,10 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
   const [isAnswerLocked, setIsAnswerLocked] = useState(false);
   const [mistakeSecondsLeft, setMistakeSecondsLeft] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [isFrozen, setIsFrozen] = useState(false);
+  const [hasShield, setHasShield] = useState(false);
+  const [revealedTileId, setRevealedTileId] = useState<string | null>(null);
+  const [powerUpToast, setPowerUpToast] = useState<string | null>(null);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const cdIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -147,6 +150,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
       const startTime = Date.now();
 
       timerRef.current = setInterval(() => {
+        if (isFrozen) return; // Time freeze power-up halts timer countdown
         const elapsed = Date.now() - startTime;
         const rem = Math.max(0, timerMs - elapsed);
         setRemainingTimeMs(rem);
@@ -162,13 +166,98 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
         if (timerRef.current) clearInterval(timerRef.current);
       };
     }
-  }, [phase, roundConfig, isAnswerLocked, isPaused, handleTimeoutMiss, triggerNextRoundOrFinish]);
+  }, [phase, roundConfig, isAnswerLocked, isPaused, isFrozen, handleTimeoutMiss, triggerNextRoundOrFinish]);
+
+  // POWER-UP ACTIONS WITH FULL STATE SYNCHRONIZATION
+  const handleUsePowerUp = (type: PowerUpType) => {
+    if (powerUps[type] <= 0 || isAnswerLocked || isPaused) return;
+
+    if (type === 'freeze') {
+      if (isFrozen) return;
+      usePowerUp('freeze');
+      setIsFrozen(true);
+      setRemainingTimeMs((prev) => Math.min(totalTimeMs + 4000, prev + 3500));
+      setPowerUpToast('❄️ TIME FROZEN FOR 4 SECONDS!');
+      setTimeout(() => {
+        setIsFrozen(false);
+        setPowerUpToast(null);
+      }, 4000);
+      try {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch (e) {}
+      return;
+    }
+
+    if (type === 'reveal') {
+      if (phase !== 'question' || !roundConfig) return;
+      usePowerUp('reveal');
+      if (roundConfig.actualType === 'memoryGrid') {
+        const targetTile = tiles.find((t) => t.value === roundConfig.targetValue);
+        if (targetTile) {
+          setRevealedTileId(targetTile.id);
+          setPowerUpToast('👁️ TARGET STONE REVEALED IN GOLD!');
+          setTimeout(() => {
+            setRevealedTileId(null);
+            setPowerUpToast(null);
+          }, 2400);
+        }
+      } else if (roundConfig.actualType === 'numberShift') {
+        if (roundConfig.changedTileId) {
+          setRevealedTileId(roundConfig.changedTileId);
+          setPowerUpToast('👁️ MUTATED STONE HIGHLIGHTED!');
+          setTimeout(() => {
+            setRevealedTileId(null);
+            setPowerUpToast(null);
+          }, 2400);
+        }
+      } else if (roundConfig.actualType === 'sequenceRush') {
+        const nextIdx = playerInputSequence.length;
+        const nextVal = roundConfig.sequenceOrder?.[nextIdx];
+        const nextTile = tiles.find((t) => t.value === nextVal);
+        if (nextTile) {
+          setRevealedTileId(nextTile.id);
+          setPowerUpToast('👁️ NEXT SEQUENCE STONE REVEALED!');
+          setTimeout(() => {
+            setRevealedTileId(null);
+            setPowerUpToast(null);
+          }, 2400);
+        }
+      }
+      try {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch (e) {}
+      return;
+    }
+
+    if (type === 'secondChance') {
+      if (hasShield) return;
+      usePowerUp('secondChance');
+      setHasShield(true);
+      setPowerUpToast('🛡️ ANCIENT SHIELD ACTIVE! NEXT MISTAKE FORGIVEN');
+      setTimeout(() => {
+        setPowerUpToast(null);
+      }, 3500);
+      try {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch (e) {}
+      return;
+    }
+  };
 
   const onTilePress = (tile: NumberTileData) => {
     if (phase !== 'question' || isAnswerLocked || isPaused) return;
     const res = handleTileSelect(tile);
 
     if (res.isComplete) {
+      if (!res.isCorrect && hasShield) {
+        setHasShield(false);
+        setPowerUpToast('🛡️ SHIELD PROTECTED YOU! TRY AGAIN');
+        setTimeout(() => setPowerUpToast(null), 2500);
+        try {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        } catch (e) {}
+        return; // Mistake absorbed by active shield
+      }
       triggerNextRoundOrFinish(!res.isCorrect);
     }
   };
@@ -178,6 +267,15 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     const res = handleAnswerChoice(val);
 
     if (res.isComplete) {
+      if (!res.isCorrect && hasShield) {
+        setHasShield(false);
+        setPowerUpToast('🛡️ SHIELD PROTECTED YOU! TRY AGAIN');
+        setTimeout(() => setPowerUpToast(null), 2500);
+        try {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        } catch (e) {}
+        return;
+      }
       triggerNextRoundOrFinish(!res.isCorrect);
     }
   };
@@ -202,13 +300,16 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     <JungleWorldBackground variant="arena" dimmed={isPaused}>
       <View style={styles.container}>
         {/* ==================================================== */}
-        {/* 1. TOP BAR (Carved Stone HUD) */}
+        {/* 1. TOP BAR (Carved Stone HUD with Live Score & Timer) */}
         {/* ==================================================== */}
         <View style={styles.topBar}>
           {/* Back to Home / Exit */}
           <Pressable
             onPress={onBack}
-            style={styles.hudStoneBtn}
+            style={({ pressed }) => [
+              styles.hudStoneBtn,
+              pressed && { transform: [{ scale: 0.92 }] },
+            ]}
             accessibilityLabel="Exit game"
           >
             <MRIcon name="arrow-left" size={18} color="#FFD700" />
@@ -218,8 +319,14 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
           <View style={styles.roundTablet}>
             <Text style={styles.roundLabel}>ROUND</Text>
             <Text style={styles.roundNumbers}>
-              {String(round).padStart(2, '0')} / {String(totalRounds).padStart(2, '0')}
+              {String(round).padStart(2, '0')}/{String(totalRounds).padStart(2, '0')}
             </Text>
+          </View>
+
+          {/* Eye-Level Live Score Tablet */}
+          <View style={styles.hudScoreTablet}>
+            <Text style={styles.hudScoreLabel}>SCORE</Text>
+            <Text style={styles.hudScoreVal}>{score.toLocaleString()}</Text>
           </View>
 
           {/* Timer & Pause Button */}
@@ -228,12 +335,16 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
               <TimerBar
                 progress={remainingTimeMs / totalTimeMs}
                 remainingSeconds={remainingTimeMs / 1000}
+                isFrozen={isFrozen}
               />
             </View>
 
             <Pressable
               onPress={handlePause}
-              style={styles.pauseStoneBtn}
+              style={({ pressed }) => [
+                styles.pauseStoneBtn,
+                pressed && { transform: [{ scale: 0.92 }] },
+              ]}
               accessibilityLabel="Pause game"
             >
               <MRIcon name="pause" size={16} color="#FFD700" />
@@ -369,6 +480,13 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
           )}
         </View>
 
+        {/* Active Power-up or Shield Toast Banner */}
+        {powerUpToast && (
+          <View style={styles.powerUpToastBanner}>
+            <Text style={styles.powerUpToastText}>{powerUpToast}</Text>
+          </View>
+        )}
+
         {/* ==================================================== */}
         {/* 3. MAIN STONE ALTAR BOARD (Grid Area) */}
         {/* ==================================================== */}
@@ -376,7 +494,13 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
           <View style={styles.boardArea}>
             <View style={styles.altarFloorFrame}>
               <NumberGrid
-                tiles={tiles}
+                tiles={
+                  revealedTileId
+                    ? tiles.map((t) =>
+                        t.id === revealedTileId ? { ...t, state: 'selected' as const, isChanged: true } : t
+                      )
+                    : tiles
+                }
                 rows={roundConfig.gridRows}
                 cols={roundConfig.gridCols}
                 onTilePress={onTilePress}
@@ -415,10 +539,10 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
         {/* ==================================================== */}
         <View style={styles.bottomHud}>
           <View style={styles.scoreRow}>
-            {/* Score Tablet */}
+            {/* Score Tablet with High Contrast Bevels */}
             <View style={styles.scoreTablet}>
-              <Text style={styles.scoreLabel}>SCORE</Text>
-              <Text style={styles.scoreVal}>{score.toLocaleString()}</Text>
+              <Text style={styles.scoreLabel}>TOTAL SCORE</Text>
+              <Text style={styles.scoreVal}>🪙 {score.toLocaleString()} PTS</Text>
             </View>
 
             {/* Combo Multiplier Badge */}
@@ -430,17 +554,17 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
             <PowerUpButton
               type="freeze"
               count={powerUps.freeze}
-              onPress={() => usePowerUp('freeze')}
+              onPress={() => handleUsePowerUp('freeze')}
             />
             <PowerUpButton
               type="reveal"
               count={powerUps.reveal}
-              onPress={() => usePowerUp('reveal')}
+              onPress={() => handleUsePowerUp('reveal')}
             />
             <PowerUpButton
               type="secondChance"
               count={powerUps.secondChance}
-              onPress={() => usePowerUp('secondChance')}
+              onPress={() => handleUsePowerUp('secondChance')}
             />
           </View>
         </View>
@@ -566,105 +690,168 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
   },
-  targetSignBoard: {
-    backgroundColor: 'rgba(38, 20, 6, 0.92)',
-    borderRadius: 18,
-    borderWidth: 2.5,
-    borderColor: '#C68A4C',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  hudScoreTablet: {
+    backgroundColor: '#1E2B37',
+    borderWidth: 1.5,
+    borderColor: '#E6A15C',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 70,
+  },
+  hudScoreLabel: {
+    fontSize: 7.5,
+    fontWeight: '900',
+    color: '#E2CA92',
+    letterSpacing: 1.2,
+  },
+  hudScoreVal: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 0.5,
+  },
+  powerUpToastBanner: {
+    alignSelf: 'center',
+    backgroundColor: 'rgba(15, 23, 42, 0.94)',
+    borderWidth: 1.5,
+    borderColor: '#38BDF8',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 5,
+    marginVertical: 4,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.6,
-    shadowRadius: 8,
+    shadowRadius: 5,
+    elevation: 8,
+  },
+  powerUpToastText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#F0F9FF',
+    letterSpacing: 0.8,
+  },
+  targetSignBoard: {
+    backgroundColor: 'rgba(38, 20, 6, 0.95)',
+    borderRadius: 22,
+    borderWidth: 3,
+    borderColor: '#E6A15C',
+    paddingVertical: 14,
+    paddingHorizontal: 22,
+    alignItems: 'center',
+    width: '92%',
+    maxWidth: 380,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.7,
+    shadowRadius: 10,
+    elevation: 10,
   },
   targetHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 12,
   },
   targetWhereWasText: {
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: '900',
     color: '#FFF8E7',
-    letterSpacing: 1.5,
+    letterSpacing: 2,
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  targetTokenWrapper: {
+    borderRadius: 16,
+    backgroundColor: '#4A2600',
+    paddingBottom: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.6,
+    shadowRadius: 5,
+    elevation: 6,
+  },
+  targetTokenFace: {
+    paddingHorizontal: 20,
+    paddingVertical: 6,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: '#FFFBEB',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 58,
+  },
+  targetTokenNum: {
+    fontSize: 30,
+    fontWeight: '900',
+    color: '#1C0D02',
+  },
+  targetQuestionMark: {
+    fontSize: 30,
+    fontWeight: '900',
+    color: '#FFD700',
     textShadowColor: 'rgba(0, 0, 0, 0.8)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 3,
   },
-  targetTokenWrapper: {
-    borderRadius: 12,
-    backgroundColor: '#5C3400',
-    paddingBottom: 4,
-  },
-  targetTokenFace: {
-    paddingHorizontal: 14,
-    paddingVertical: 3,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: '#FFF9C4',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 44,
-  },
-  targetTokenNum: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#261204',
-  },
-  targetQuestionMark: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#FFD700',
-  },
   targetInstructionSub: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#E2CA92',
-    marginTop: 3,
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FDE68A',
+    marginTop: 6,
+    letterSpacing: 0.5,
   },
   sequenceSignBoard: {
-    backgroundColor: 'rgba(38, 20, 6, 0.92)',
-    borderRadius: 16,
-    borderWidth: 2,
+    backgroundColor: 'rgba(38, 20, 6, 0.95)',
+    borderRadius: 22,
+    borderWidth: 3,
     borderColor: '#C68A4C',
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
     alignItems: 'center',
-    gap: 6,
+    width: '92%',
+    maxWidth: 380,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.7,
+    shadowRadius: 10,
+    elevation: 10,
   },
   sequenceOrderPrompt: {
-    fontSize: 11,
+    fontSize: 13,
     fontWeight: '900',
     color: '#FFD700',
-    letterSpacing: 1.2,
+    letterSpacing: 1.5,
   },
   sequenceSlotsRow: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 8,
   },
   seqSlot: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    borderWidth: 1.5,
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    borderWidth: 2,
     borderColor: '#607284',
-    backgroundColor: 'rgba(10, 16, 22, 0.8)',
+    backgroundColor: 'rgba(10, 16, 22, 0.85)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   seqSlotFilled: {
     borderColor: '#FFD700',
-    backgroundColor: 'rgba(255, 215, 0, 0.25)',
+    backgroundColor: 'rgba(255, 215, 0, 0.3)',
   },
   seqSlotCurrent: {
     borderColor: '#FFF9C4',
-    borderWidth: 2.5,
+    borderWidth: 3,
   },
   seqSlotText: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '900',
     color: '#8A9BAA',
   },
@@ -672,35 +859,49 @@ const styles = StyleSheet.create({
     color: '#FFD700',
   },
   shiftSignBoard: {
-    backgroundColor: 'rgba(38, 20, 6, 0.92)',
-    borderRadius: 16,
-    borderWidth: 2,
+    backgroundColor: 'rgba(38, 20, 6, 0.95)',
+    borderRadius: 22,
+    borderWidth: 3,
     borderColor: '#EF4444',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    gap: 2,
+    width: '92%',
+    maxWidth: 380,
+    gap: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.7,
+    shadowRadius: 10,
+    elevation: 10,
   },
   shiftSignMain: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '900',
     color: '#FFF8E7',
-    letterSpacing: 1.2,
+    letterSpacing: 1.5,
   },
   shiftSignSub: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#E2CA92',
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FDE68A',
   },
   missingSignBoard: {
-    backgroundColor: 'rgba(38, 20, 6, 0.92)',
-    borderRadius: 16,
-    borderWidth: 2,
+    backgroundColor: 'rgba(38, 20, 6, 0.95)',
+    borderRadius: 22,
+    borderWidth: 3,
     borderColor: '#10B981',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    gap: 2,
+    width: '92%',
+    maxWidth: 380,
+    gap: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.7,
+    shadowRadius: 10,
+    elevation: 10,
   },
   boardArea: {
     flex: 1,
@@ -793,24 +994,32 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   scoreTablet: {
-    backgroundColor: 'rgba(26, 40, 30, 0.92)',
-    borderWidth: 1.5,
-    borderColor: '#546A58',
-    borderRadius: 14,
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    backgroundColor: '#26170B',
+    borderWidth: 2,
+    borderColor: '#E6A15C',
+    borderRadius: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 5,
+    elevation: 5,
   },
   scoreLabel: {
-    fontSize: 8.5,
+    fontSize: 9,
     fontWeight: '900',
-    color: '#CAD8E6',
+    color: '#E2CA92',
     letterSpacing: 1.5,
   },
   scoreVal: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '900',
     color: '#FFD700',
     letterSpacing: 1,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowRadius: 2,
   },
   powerUpRow: {
     flexDirection: 'row',

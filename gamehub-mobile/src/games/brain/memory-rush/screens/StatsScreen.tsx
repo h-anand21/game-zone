@@ -7,7 +7,8 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { JungleWorldBackground } from '../components/JungleWorldBackground';
-import { JungleHeaderHUD } from '../components/JungleHeaderHUD';
+import { JungleScreenPlaque } from '../components/JungleScreenPlaque';
+import { ExplorerCompanion } from '../components/ExplorerCompanion';
 import { WoodPanel } from '../components/WoodPanel';
 import { StonePanel } from '../components/StonePanel';
 import { BottomTabBar, TabType } from '../components/BottomTabBar';
@@ -32,11 +33,10 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onNavigateTab }) => {
   return (
     <JungleWorldBackground variant="stats">
       <SafeAreaView style={styles.container}>
-        {/* Header HUD */}
-        <JungleHeaderHUD
-          title="MY STATS"
-          subtitle="TEMPLE CHRONICLES"
-        />
+        {/* Sculpted Screen Title Plaque */}
+        <View style={styles.header}>
+          <JungleScreenPlaque type="stats" height={130} />
+        </View>
 
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Hero High Score Wood Plaque */}
@@ -45,61 +45,83 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onNavigateTab }) => {
               <Text style={styles.heroSub}>ALL-TIME HIGH SCORE</Text>
               <Text style={styles.heroNumber}>{(stats.bestScore || 2840).toLocaleString()}</Text>
               <View style={styles.rankPill}>
-                <Text style={styles.rankText}>🏆 MASTER OF THE JUNGLE</Text>
+                <MRIcon name="trophy" size={13} color="#FFD700" />
+                <Text style={styles.rankText}> MASTER OF THE JUNGLE</Text>
               </View>
             </View>
           </WoodPanel>
 
           {/* 6 Carved Stone Stat Cards Grid */}
           <View style={styles.statsGrid}>
-            <View style={styles.statCardOuter}>
-              <StonePanel variant="carved" style={styles.statPanel}>
-                <Text style={styles.statIcon}>🎮</Text>
-                <Text style={styles.statVal}>{stats.gamesPlayed || 46}</Text>
-                <Text style={styles.statLabel}>GAMES PLAYED</Text>
-              </StonePanel>
+            {/* Row 1 */}
+            <View style={styles.statsRow}>
+              <View style={styles.statCardOuter}>
+                <StonePanel variant="carved" style={styles.statPanel}>
+                  <View style={styles.statIconBox}>
+                    <MRIcon name="gamepad" size={18} color="#38BDF8" />
+                  </View>
+                  <Text style={styles.statVal}>{stats.gamesPlayed || 46}</Text>
+                  <Text style={styles.statLabel}>GAMES PLAYED</Text>
+                </StonePanel>
+              </View>
+
+              <View style={styles.statCardOuter}>
+                <StonePanel variant="carved" style={styles.statPanel}>
+                  <View style={styles.statIconBox}>
+                    <MRIcon name="zap" size={18} color="#F59E0B" />
+                  </View>
+                  <Text style={styles.statVal}>×{stats.bestStreak || 14}</Text>
+                  <Text style={styles.statLabel}>BEST STREAK</Text>
+                </StonePanel>
+              </View>
             </View>
 
-            <View style={styles.statCardOuter}>
-              <StonePanel variant="carved" style={styles.statPanel}>
-                <Text style={styles.statIcon}>⚡</Text>
-                <Text style={styles.statVal}>×{stats.bestStreak || 14}</Text>
-                <Text style={styles.statLabel}>BEST STREAK</Text>
-              </StonePanel>
+            {/* Row 2 */}
+            <View style={styles.statsRow}>
+              <View style={styles.statCardOuter}>
+                <StonePanel variant="carved" style={styles.statPanel}>
+                  <View style={styles.statIconBox}>
+                    <MRIcon name="target" size={18} color="#10B981" />
+                  </View>
+                  <Text style={styles.statVal}>{stats.accuracy || 91}%</Text>
+                  <Text style={styles.statLabel}>ACCURACY</Text>
+                </StonePanel>
+              </View>
+
+              <View style={styles.statCardOuter}>
+                <StonePanel variant="carved" style={styles.statPanel}>
+                  <View style={styles.statIconBox}>
+                    <MRIcon name="clock" size={18} color="#60A5FA" />
+                  </View>
+                  <Text style={styles.statVal}>
+                    {stats.avgReactionTimeMs ? (stats.avgReactionTimeMs / 1000).toFixed(2) : '0.82'}s
+                  </Text>
+                  <Text style={styles.statLabel}>AVG REACTION</Text>
+                </StonePanel>
+              </View>
             </View>
 
-            <View style={styles.statCardOuter}>
-              <StonePanel variant="carved" style={styles.statPanel}>
-                <Text style={styles.statIcon}>🎯</Text>
-                <Text style={styles.statVal}>{stats.accuracy || 91}%</Text>
-                <Text style={styles.statLabel}>ACCURACY</Text>
-              </StonePanel>
-            </View>
+            {/* Row 3 */}
+            <View style={styles.statsRow}>
+              <View style={styles.statCardOuter}>
+                <StonePanel variant="carved" style={styles.statPanel}>
+                  <View style={styles.statIconBox}>
+                    <MRIcon name="trophy" size={18} color="#FFD700" />
+                  </View>
+                  <Text style={styles.statVal}>{Math.max(1, Math.floor((stats.gamesPlayed || 46) * 0.75))}</Text>
+                  <Text style={styles.statLabel}>EXPEDITIONS WON</Text>
+                </StonePanel>
+              </View>
 
-            <View style={styles.statCardOuter}>
-              <StonePanel variant="carved" style={styles.statPanel}>
-                <Text style={styles.statIcon}>⏱️</Text>
-                <Text style={styles.statVal}>
-                  {stats.avgReactionTimeMs ? (stats.avgReactionTimeMs / 1000).toFixed(2) : '0.82'}s
-                </Text>
-                <Text style={styles.statLabel}>AVG REACTION</Text>
-              </StonePanel>
-            </View>
-
-            <View style={styles.statCardOuter}>
-              <StonePanel variant="carved" style={styles.statPanel}>
-                <Text style={styles.statIcon}>🏅</Text>
-                <Text style={styles.statVal}>{Math.max(1, Math.floor((stats.gamesPlayed || 46) * 0.75))}</Text>
-                <Text style={styles.statLabel}>EXPEDITIONS WON</Text>
-              </StonePanel>
-            </View>
-
-            <View style={styles.statCardOuter}>
-              <StonePanel variant="carved" style={styles.statPanel}>
-                <Text style={styles.statIcon}>💎</Text>
-                <Text style={styles.statVal}>{((stats.bestScore || 2840) * 3).toLocaleString()}</Text>
-                <Text style={styles.statLabel}>TOTAL POINTS</Text>
-              </StonePanel>
+              <View style={styles.statCardOuter}>
+                <StonePanel variant="carved" style={styles.statPanel}>
+                  <View style={styles.statIconBox}>
+                    <MRIcon name="gem" size={18} color="#EC4899" />
+                  </View>
+                  <Text style={styles.statVal}>{((stats.bestScore || 2840) * 3).toLocaleString()}</Text>
+                  <Text style={styles.statLabel}>TOTAL POINTS</Text>
+                </StonePanel>
+              </View>
             </View>
           </View>
 
@@ -181,6 +203,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 8,
+  },
+  characterCenter: {
+    alignItems: 'center',
+    marginVertical: 4,
+  },
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 6,
@@ -191,69 +222,85 @@ const styles = StyleSheet.create({
   },
   heroInner: {
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
   heroSub: {
-    fontSize: 10.5,
+    fontSize: 11,
     fontWeight: '900',
     color: '#FFD700',
     letterSpacing: 2,
   },
   heroNumber: {
-    fontSize: 44,
+    fontSize: 48,
     fontWeight: '900',
     color: '#FFFFFF',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
     marginVertical: 4,
-    textShadowColor: '#4A2800',
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
     textShadowOffset: { width: 0, height: 3 },
     textShadowRadius: 6,
   },
   rankPill: {
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 10,
-    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(50, 24, 8, 0.85)',
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 12,
+    borderWidth: 1.5,
     borderColor: '#FFD700',
-    marginTop: 4,
+    marginTop: 6,
+    gap: 6,
   },
   rankText: {
-    fontSize: 9.5,
+    fontSize: 10.5,
     fontWeight: '900',
     color: '#FFD700',
-    letterSpacing: 1,
+    letterSpacing: 1.2,
   },
   statsGrid: {
+    gap: 10,
+    width: '100%',
+  },
+  statsRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 8,
+    gap: 10,
+    width: '100%',
   },
   statCardOuter: {
-    width: '48%',
+    flex: 1,
   },
   statPanel: {
     width: '100%',
-    padding: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  statIcon: {
-    fontSize: 18,
-    marginBottom: 2,
+  statIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    backgroundColor: 'rgba(38, 52, 65, 0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.16)',
   },
   statVal: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: '900',
     color: '#FFD700',
-    marginTop: 2,
+    letterSpacing: 0.5,
   },
   statLabel: {
-    fontSize: 8.5,
+    fontSize: 9,
     fontWeight: '900',
     color: '#CAD8E6',
-    letterSpacing: 0.8,
-    marginTop: 2,
+    letterSpacing: 1,
+    marginTop: 3,
   },
   sectionWood: {
     width: '100%',
@@ -293,12 +340,12 @@ const styles = StyleSheet.create({
     color: '#FFD700',
   },
   barTrack: {
-    height: 9,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    height: 10,
+    backgroundColor: 'rgba(32, 48, 40, 0.85)',
     borderRadius: 5,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#546A58',
+    borderColor: '#5A7560',
   },
   barFill: {
     height: '100%',

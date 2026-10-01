@@ -4,12 +4,21 @@
 // ============================================================
 
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { JungleWorldBackground } from './JungleWorldBackground';
 import { StoneNumberTile } from './StoneNumberTile';
+import { JungleScreenPlaque } from './JungleScreenPlaque';
+import { ExplorerCompanion } from './ExplorerCompanion';
 import type { GameMode, GameDifficulty } from '../types';
+
+const COUNTDOWN_IMAGES: Record<number, any> = {
+  3: require('../../../../../assets/game/countdown/countdown_3.png'),
+  2: require('../../../../../assets/game/countdown/countdown_2.png'),
+  1: require('../../../../../assets/game/countdown/countdown_1.png'),
+  0: require('../../../../../assets/game/countdown/countdown_go.png'),
+};
 
 interface CountdownOverlayProps {
   mode: GameMode;
@@ -89,8 +98,8 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
       <View style={styles.overlay}>
         {/* Top Header Sign */}
         <View style={styles.topInfo}>
+          <JungleScreenPlaque type="get_ready" height={110} />
           <View style={styles.headerWoodSign}>
-            <Text style={styles.getReadyText}>GET READY!</Text>
             <Text style={styles.modeTitle}>{getModeTitle()}</Text>
             <View style={styles.diffPill}>
               <Text style={styles.diffText}>{difficulty.toUpperCase()}</Text>
@@ -99,36 +108,28 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({
         </View>
 
         {/* Floating Number Stones in Atmosphere */}
-        <View style={[styles.floatingDecor, { top: '35%', left: 24 }]}>
+        <View style={[styles.floatingDecor, { top: '28%', left: 24 }]}>
           <StoneNumberTile value={4} size={44} state="preview" disabled />
         </View>
-        <View style={[styles.floatingDecor, { top: '38%', right: 26 }]}>
+        <View style={[styles.floatingDecor, { top: '30%', right: 26 }]}>
           <StoneNumberTile value={7} size={48} state="correct" disabled />
         </View>
 
         {/* Center Portal: Giant 3D Stone Number */}
         <Animated.View style={[styles.centerBox, { transform: [{ scale: scaleAnim }] }]}>
-          {/* Energy Halo Outer Ring */}
-          <View style={styles.energyHalo}>
-            <View style={styles.stoneDialExtrusion}>
-              <LinearGradient
-                colors={['#4E5E6E', '#2A3642', '#182129']}
-                style={styles.stoneDialSurface}
-              >
-                <View style={styles.dialTopBevel} />
-                <View style={styles.runeRing} />
-
-                <Text style={[styles.countText, isRush && styles.rushText]}>
-                  {isRush ? 'RUSH!' : count}
-                </Text>
-              </LinearGradient>
-            </View>
-          </View>
+          <Image
+            source={isRush ? COUNTDOWN_IMAGES[0] : (COUNTDOWN_IMAGES[count] || COUNTDOWN_IMAGES[3])}
+            style={isRush ? styles.countdownGoImage : styles.countdownImage}
+            resizeMode="contain"
+          />
         </Animated.View>
 
-        {/* Bottom Status Badge */}
-        <View style={styles.bottomPill}>
-          <Text style={styles.prepareText}>PREPARE YOUR MEMORY EYE</Text>
+        {/* Explorer Companion Ready to Rush */}
+        <View style={styles.bottomSection}>
+          <ExplorerCompanion pose="run_splash" size={135} />
+          <View style={styles.bottomPill}>
+            <Text style={styles.prepareText}>PREPARE YOUR MEMORY EYE</Text>
+          </View>
         </View>
       </View>
     </JungleWorldBackground>
@@ -199,6 +200,16 @@ const styles = StyleSheet.create({
   centerBox: {
     alignItems: 'center',
     justifyContent: 'center',
+    width: 240,
+    height: 180,
+  },
+  countdownImage: {
+    width: 170,
+    height: 170,
+  },
+  countdownGoImage: {
+    width: 240,
+    height: 170,
   },
   energyHalo: {
     padding: 12,
@@ -261,6 +272,10 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 3 },
     textShadowRadius: 8,
   },
+  bottomSection: {
+    alignItems: 'center',
+    width: '100%',
+  },
   bottomPill: {
     backgroundColor: 'rgba(10, 18, 12, 0.85)',
     borderRadius: 16,
@@ -268,6 +283,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderWidth: 1.5,
     borderColor: '#546A58',
+    marginTop: -8,
   },
   prepareText: {
     fontSize: 11,
