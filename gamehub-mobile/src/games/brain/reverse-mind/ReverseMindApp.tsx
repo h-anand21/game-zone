@@ -184,7 +184,7 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
       )}
 
       {currentScreen === 'gameplay' && (
-        <GameplayScreen onBack={() => setScreen('home')} />
+        <GameplayScreen onBack={() => setShowExitModal(true)} />
       )}
 
       {currentScreen === 'level-complete' && (

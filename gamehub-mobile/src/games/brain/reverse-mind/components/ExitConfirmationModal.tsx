@@ -22,7 +22,7 @@ interface ExitConfirmationModalProps {
 export const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
   onConfirmExit,
 }) => {
-  const { showExitModal, setShowExitModal, playerStats } = useReverseMindStore();
+  const { showExitModal, setShowExitModal, playerStats, currentScreen, setScreen } = useReverseMindStore();
 
   const handleCancel = () => {
     setShowExitModal(false);
@@ -30,7 +30,11 @@ export const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
 
   const handleConfirmExit = () => {
     setShowExitModal(false);
-    onConfirmExit?.();
+    if (currentScreen === 'gameplay') {
+      setScreen('home');
+    } else {
+      onConfirmExit?.();
+    }
   };
 
   return (
