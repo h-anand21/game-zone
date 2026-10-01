@@ -25,3 +25,5 @@ export * from './DeleteAccountModal';
 export * from './SupportModal';
 export * from './PowerUpModal';
 export * from './ExitConfirmationModal';
+export * from './FloatingNumberBlock';
+export * from './HeroBoyPlayingNumbers';

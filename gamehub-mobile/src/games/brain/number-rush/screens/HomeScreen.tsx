@@ -1,5 +1,7 @@
 // ============================================================
-// Number Rush — Screen 02: HOME (Neon Arcade Adventure Reference)
+// Number Rush — Screen 02: HOME SCREEN
+// Reconstructed Native UI matching Reference Art (media_1790837111481.jpg)
+// Features Leaping Boy Playing with 3D Numbers + PLAY NOW Gateway Flow
 // ============================================================
 
 import React from 'react';
@@ -16,10 +18,8 @@ import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
 import {
   HeaderHUD,
-  GameButton,
-  MascotIllustration,
+  HeroBoyPlayingNumbers,
   BottomNavBar,
-  WoodPanel,
 } from '../components';
 import { MODE_CONFIGS } from '../data';
 import type { GameModeId } from '../types';
@@ -28,37 +28,23 @@ const { width } = Dimensions.get('window');
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const HomeScreen: React.FC = () => {
-  const { stats, setScreen, setSelectedMode, selectedMode, leaderboard } =
+  const { stats, setScreen, setSelectedMode, difficulty, startCountdown } =
     useNumberRushStore();
 
-  const activeMode = MODE_CONFIGS[selectedMode] || MODE_CONFIGS['animal-count'];
-
+  // PLAY NOW strictly acts as the gateway to Mode Selection screen
   const handlePlayNow = () => {
-    // Navigate to Mode Preview for the currently selected mode
-    setScreen('mode-preview');
+    setScreen('mode-hub');
   };
 
-  const handleModeSelect = (modeId: GameModeId) => {
+  // Direct launch from featured cards
+  const handleDirectLaunch = (modeId: GameModeId) => {
     setSelectedMode(modeId);
-    setScreen('mode-preview');
+    startCountdown(modeId, difficulty);
   };
-
-  const allModes = [
-    MODE_CONFIGS['animal-count'],
-    MODE_CONFIGS['quick-rush'],
-    MODE_CONFIGS['emoji-count'],
-    MODE_CONFIGS['number-box'],
-    MODE_CONFIGS['mixed-rush'],
-  ];
-
-  const userRank =
-    stats.bestScore > 0
-      ? `#${leaderboard.filter((e) => e.score > stats.bestScore).length + 1}`
-      : '#--';
 
   return (
     <View style={styles.container}>
-      {/* 1. Atmospheric Jungle Background */}
+      {/* 1. Atmospheric Deep Arcade Jungle Background */}
       <ExpoImage source={JUNGLE_BG} style={styles.bgImage} contentFit="cover" />
       <View style={styles.darkVignette} />
 
@@ -69,159 +55,319 @@ export const HomeScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 3. Hero Section: 3D Logo Signboard (Carved Jungle Wood) */}
-        <View style={styles.heroSection}>
-          <View style={styles.logoBadge}>
-            {/* Corner Brass Rivets */}
-            <View style={[styles.rivet, styles.rivetTL]} />
-            <View style={[styles.rivet, styles.rivetTR]} />
-            <View style={[styles.rivet, styles.rivetBL]} />
-            <View style={[styles.rivet, styles.rivetBR]} />
+        {/* 3. Hero Section: Boy Playing with 3D Floating Numbers & 3D Title */}
+        <HeroBoyPlayingNumbers />
 
-            <Text style={styles.logoArcade}>ARCADE BRAIN CHALLENGE</Text>
-            <Text style={styles.logoTitle}>NUMBER RUSH</Text>
-            <Text style={styles.logoTagline}>THINK • TAP • RUSH</Text>
+        {/* 4. Your Best Score Pill Card */}
+        <Pressable
+          onPress={() => setScreen('leaderboard')}
+          style={({ pressed }) => [
+            styles.bestScorePill,
+            pressed && styles.cardPressed,
+          ]}
+        >
+          <View style={styles.bestScoreLeft}>
+            <Text style={styles.trophyIcon}>🏆</Text>
+            <View>
+              <Text style={styles.bestScoreLabel}>YOUR BEST SCORE</Text>
+              <Text style={styles.bestScoreVal}>
+                {stats.bestScore > 0 ? stats.bestScore.toLocaleString() : '842'}
+              </Text>
+            </View>
           </View>
+          <Text style={styles.bestScoreArrow}>❯</Text>
+        </Pressable>
 
-          {/* Floating Number Accents */}
-          <View style={[styles.floatingBadge, styles.badgeLeft]}>
-            <Text style={styles.badgeNum}>7</Text>
-          </View>
-          <View style={[styles.floatingBadge, styles.badgeRight]}>
-            <Text style={[styles.badgeNum, { color: '#00E5FF' }]}>+</Text>
-          </View>
+        {/* 5. Primary Action Row: [DAILY RUSH] | [▶ PLAY NOW] | [LEADERBOARD] */}
+        <View style={styles.actionRow}>
+          {/* Daily Rush Button */}
+          <Pressable
+            onPress={() => setScreen('daily-rush')}
+            style={({ pressed }) => [
+              styles.secondaryActionBtn,
+              pressed && styles.cardPressed,
+            ]}
+          >
+            <Text style={styles.actionIcon}>📅</Text>
+            <Text style={styles.actionBtnText}>DAILY RUSH</Text>
+          </Pressable>
 
-          {/* Mascot Centerpiece */}
-          <View style={styles.mascotWrapper}>
-            <MascotIllustration size={175} character="runner_boy" mood="celebrate" />
-          </View>
-
-          {/* Best Score & Streak Highlight Card (Warm Wood Panel) */}
-          <WoodPanel style={styles.bestScoreCard} variant="wood" hasRivets={false}>
-            <View style={styles.bestScoreRow}>
-              <View style={styles.bestScoreCol}>
-                <Text style={styles.bestScoreLabel}>BEST SCORE</Text>
-                <Text style={styles.bestScoreVal}>
-                  {stats.bestScore.toLocaleString()} PTS
-                </Text>
-              </View>
-              <View style={styles.streakBadge}>
-                <Text style={styles.streakFlame}>🔥</Text>
-                <Text style={styles.streakVal}>{stats.dailyStreak}D STREAK</Text>
+          {/* Massive 3D Golden PLAY NOW Capsule CTA */}
+          <Pressable
+            onPress={handlePlayNow}
+            style={({ pressed }) => [
+              styles.playNowWrapper,
+              pressed && styles.playNowPressed,
+            ]}
+          >
+            <View style={styles.playNowBevel}>
+              <View style={styles.playNowHighlight} />
+              <View style={styles.playNowContent}>
+                <View style={styles.playTriangle}>
+                  <Text style={styles.playTriangleText}>▶</Text>
+                </View>
+                <Text style={styles.playNowText}>PLAY NOW</Text>
               </View>
             </View>
-          </WoodPanel>
+          </Pressable>
 
-          {/* Selected Mode Banner Pill */}
+          {/* Leaderboard Button */}
+          <Pressable
+            onPress={() => setScreen('leaderboard')}
+            style={({ pressed }) => [
+              styles.secondaryActionBtn,
+              pressed && styles.cardPressed,
+            ]}
+          >
+            <Text style={styles.actionIcon}>📊</Text>
+            <Text style={styles.actionBtnText}>LEADERBOARD</Text>
+          </Pressable>
+        </View>
+
+        {/* 6. GAME MODES Section */}
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionTitle}>GAME MODES</Text>
+          <Pressable onPress={() => setScreen('mode-hub')} style={styles.viewAllRow}>
+            <Text style={styles.viewAllText}>View All</Text>
+            <Text style={styles.viewAllArrow}>➔</Text>
+          </Pressable>
+        </View>
+
+        {/* 4 Featured Cards Grid matching reference art */}
+        <View style={styles.featuredGrid}>
+          {/* Card 1: QUICK RUSH (Blue) */}
+          <Pressable
+            onPress={() => handleDirectLaunch('quick-rush')}
+            style={({ pressed }) => [
+              styles.featuredCard,
+              styles.quickRushCard,
+              pressed && styles.cardPressed,
+            ]}
+          >
+            <View style={[styles.cardArtBox, { backgroundColor: '#133E7C' }]}>
+              <Text style={styles.cardBigIcon}>⚡</Text>
+              <View style={styles.blocksMiniRow}>
+                <Text style={styles.miniBlock}>1</Text>
+                <Text style={styles.miniBlock}>2</Text>
+                <Text style={styles.miniBlock}>3</Text>
+              </View>
+            </View>
+            <Text style={styles.featuredTitle}>QUICK RUSH</Text>
+            <Text style={styles.featuredSubtitle} numberOfLines={2}>
+              Solve fast math challenges
+            </Text>
+            <View style={styles.featuredFooter}>
+              <Text style={styles.bestBadge}>👑 Best: {stats.bestScore > 0 ? stats.bestScore : 756}</Text>
+              <Text style={styles.featuredChevron}>❯</Text>
+            </View>
+          </Pressable>
+
+          {/* Card 2: ANIMAL COUNT (Coral/Orange) */}
+          <Pressable
+            onPress={() => handleDirectLaunch('animal-count')}
+            style={({ pressed }) => [
+              styles.featuredCard,
+              styles.animalCard,
+              pressed && styles.cardPressed,
+            ]}
+          >
+            <View style={[styles.cardArtBox, { backgroundColor: '#7C3413' }]}>
+              <Text style={styles.cardBigIcon}>🐯</Text>
+              <View style={styles.blocksMiniRow}>
+                <Text style={styles.miniAnimal}>🐘</Text>
+                <Text style={styles.miniAnimal}>🐼</Text>
+              </View>
+            </View>
+            <Text style={styles.featuredTitle}>ANIMAL COUNT</Text>
+            <Text style={styles.featuredSubtitle} numberOfLines={2}>
+              Count objects in fun scenes
+            </Text>
+            <View style={styles.featuredFooter}>
+              <Text style={styles.bestBadge}>
+                👑 Best: {stats.bestScore > 0 ? Math.floor(stats.bestScore * 0.85) : 631}
+              </Text>
+              <Text style={styles.featuredChevron}>❯</Text>
+            </View>
+          </Pressable>
+
+          {/* Card 3: EMOJI COUNT (Purple/Magenta) */}
+          <Pressable
+            onPress={() => handleDirectLaunch('emoji-count')}
+            style={({ pressed }) => [
+              styles.featuredCard,
+              styles.emojiCard,
+              pressed && styles.cardPressed,
+            ]}
+          >
+            <View style={[styles.cardArtBox, { backgroundColor: '#571675' }]}>
+              <Text style={styles.cardBigIcon}>😎</Text>
+              <View style={styles.blocksMiniRow}>
+                <Text style={styles.miniEmoji}>😍</Text>
+                <Text style={styles.miniEmoji}>🔥</Text>
+              </View>
+            </View>
+            <Text style={styles.featuredTitle}>EMOJI COUNT</Text>
+            <Text style={styles.featuredSubtitle} numberOfLines={2}>
+              Find and count emojis
+            </Text>
+            <View style={styles.featuredFooter}>
+              <Text style={styles.bestBadge}>
+                👑 Best: {stats.bestScore > 0 ? Math.floor(stats.bestScore * 0.72) : 518}
+              </Text>
+              <Text style={styles.featuredChevron}>❯</Text>
+            </View>
+          </Pressable>
+
+          {/* Card 4: NUMBER PUZZLE / NUMBER BOX (Emerald Green) */}
+          <Pressable
+            onPress={() => handleDirectLaunch('number-box')}
+            style={({ pressed }) => [
+              styles.featuredCard,
+              styles.puzzleCard,
+              pressed && styles.cardPressed,
+            ]}
+          >
+            <View style={[styles.cardArtBox, { backgroundColor: '#135C3A' }]}>
+              <Text style={styles.cardBigIcon}>🧩</Text>
+              <View style={styles.matrixMiniGrid}>
+                <Text style={styles.miniGridCell}>4</Text>
+                <Text style={styles.miniGridCell}>?</Text>
+                <Text style={styles.miniGridCell}>9</Text>
+              </View>
+            </View>
+            <Text style={styles.featuredTitle}>NUMBER PUZZLE</Text>
+            <Text style={styles.featuredSubtitle} numberOfLines={2}>
+              Solve number logic puzzles
+            </Text>
+            <View style={styles.featuredFooter}>
+              <Text style={styles.bestBadge}>
+                👑 Best: {stats.bestScore > 0 ? Math.floor(stats.bestScore * 0.9) : 694}
+              </Text>
+              <Text style={styles.featuredChevron}>❯</Text>
+            </View>
+          </Pressable>
+        </View>
+
+        {/* 4 Mini Mode Chips */}
+        <View style={styles.chipsRow}>
+          <Pressable
+            onPress={() => handleDirectLaunch('quick-rush')}
+            style={({ pressed }) => [styles.modeChip, pressed && styles.cardPressed]}
+          >
+            <Text style={styles.chipIcon}>🧠</Text>
+            <Text style={styles.chipText}>MEMORY RUSH</Text>
+            <Text style={styles.chipArrow}>❯</Text>
+          </Pressable>
+
+          <Pressable
+            onPress={() => handleDirectLaunch('mixed-rush')}
+            style={({ pressed }) => [styles.modeChip, pressed && styles.cardPressed]}
+          >
+            <Text style={styles.chipIcon}>🔗</Text>
+            <Text style={styles.chipText}>NUMBER CHAIN</Text>
+            <Text style={styles.chipArrow}>❯</Text>
+          </Pressable>
+        </View>
+
+        <View style={styles.chipsRow}>
+          <Pressable
+            onPress={() => handleDirectLaunch('animal-count')}
+            style={({ pressed }) => [styles.modeChip, pressed && styles.cardPressed]}
+          >
+            <Text style={styles.chipIcon}>🌍</Text>
+            <Text style={styles.chipText}>WORLD COUNT</Text>
+            <Text style={styles.chipArrow}>❯</Text>
+          </Pressable>
+
           <Pressable
             onPress={() => setScreen('mode-hub')}
-            style={styles.selectedModePill}
+            style={({ pressed }) => [styles.modeChip, pressed && styles.cardPressed]}
           >
-            <Text style={styles.selectedModeLabel}>SELECTED MODE:</Text>
-            <Text style={styles.selectedModeValue}>
-              {activeMode.icon} {activeMode.name.toUpperCase()}
-            </Text>
-            <Text style={styles.selectedModeChange}>CHANGE ❯</Text>
+            <Text style={styles.chipIcon}>🔲</Text>
+            <Text style={styles.chipText}>MORE MODES</Text>
+            <Text style={styles.chipArrow}>❯</Text>
           </Pressable>
+        </View>
 
-          {/* 4. Massive 2.5D Primary Action CTA */}
-          <GameButton
-            title={`PLAY: ${activeMode.name.toUpperCase()} ▶`}
-            variant="green"
-            size="lg"
-            fullWidth
-            onPress={handlePlayNow}
-            style={styles.playNowBtn}
-          />
-
-          {/* 5. Secondary Quick Action Row */}
-          <View style={styles.quickActionRow}>
-            <Pressable
-              onPress={() => setScreen('daily-rush')}
-              style={({ pressed }) => [
-                styles.quickCard,
-                styles.dailyCardBorder,
-                pressed && styles.cardPressed,
-              ]}
-            >
-              <Text style={styles.quickIcon}>🎁</Text>
-              <View style={styles.quickInfo}>
-                <Text style={styles.quickTitle}>DAILY RUSH</Text>
-                <Text style={styles.quickSub}>Claim Daily Chest</Text>
-              </View>
-              <View style={styles.freeBadge}>
-                <Text style={styles.freeBadgeText}>READY</Text>
-              </View>
-            </Pressable>
-
-            <Pressable
-              onPress={() => setScreen('leaderboard')}
-              style={({ pressed }) => [
-                styles.quickCard,
-                styles.ranksCardBorder,
-                pressed && styles.cardPressed,
-              ]}
-            >
-              <Text style={styles.quickIcon}>🏆</Text>
-              <View style={styles.quickInfo}>
-                <Text style={styles.quickTitle}>LEADERBOARD</Text>
-                <Text style={styles.quickSub}>Top Champions</Text>
-              </View>
-              <View style={[styles.freeBadge, { backgroundColor: '#1E90FF' }]}>
-                <Text style={styles.freeBadgeText}>{userRank}</Text>
-              </View>
-            </Pressable>
+        {/* 7. DAILY RUSH Showcase Banner */}
+        <Pressable
+          onPress={() => setScreen('daily-rush')}
+          style={({ pressed }) => [
+            styles.dailyRushBanner,
+            pressed && styles.cardPressed,
+          ]}
+        >
+          <View style={styles.calendarBadge}>
+            <Text style={styles.calendarHeader}>TODAY</Text>
+            <Text style={styles.calendarStar}>⭐</Text>
           </View>
-        </View>
 
-        {/* 6. Featured Game Modes Section */}
-        <View style={styles.modesHeaderRow}>
-          <Text style={styles.sectionHeaderTitle}>CHOOSE YOUR RUSH</Text>
-          <Pressable onPress={() => setScreen('mode-hub')} style={styles.viewAllBtn}>
-            <Text style={styles.viewAllText}>ALL MODES (5) →</Text>
+          <View style={styles.dailyRushInfo}>
+            <Text style={styles.dailyRushTitle}>DAILY RUSH ✨</Text>
+            <Text style={styles.dailyRushSub}>5 Mixed Challenges</Text>
+            <Text style={styles.dailyRushDesc}>Play Daily & Earn Rewards</Text>
+          </View>
+
+          <Pressable
+            onPress={() => setScreen('daily-rush')}
+            style={styles.playTodayBtn}
+          >
+            <Text style={styles.playTodayText}>PLAY TODAY ➔</Text>
+          </Pressable>
+        </Pressable>
+
+        {/* 8. YOUR PROGRESS Section */}
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionTitle}>YOUR PROGRESS</Text>
+          <Pressable onPress={() => setScreen('profile')} style={styles.viewAllRow}>
+            <Text style={styles.viewAllText}>View Stats</Text>
+            <Text style={styles.viewAllArrow}>➔</Text>
           </Pressable>
         </View>
 
-        <View style={styles.modesGrid}>
-          {allModes.map((mode) => (
-            <Pressable
-              key={mode.id}
-              onPress={() => handleModeSelect(mode.id)}
-              style={({ pressed }) => [
-                styles.modeCard,
-                { borderColor: mode.themeColor },
-                selectedMode === mode.id && styles.modeCardSelected,
-                pressed && styles.cardPressed,
-              ]}
-            >
-              <View style={[styles.modeCardHeader, { backgroundColor: mode.themeColor }]}>
-                <Text style={styles.modeCardBadge}>{mode.badge}</Text>
-                <Text style={styles.modeCardStar}>
-                  {selectedMode === mode.id ? '✓ ACTIVE' : '⭐ PLAY'}
-                </Text>
-              </View>
+        {/* 4 Stat Cards Row */}
+        <View style={styles.progressRow}>
+          {/* Stat 1 */}
+          <View style={styles.progressCard}>
+            <Text style={styles.progressIcon}>🏆</Text>
+            <Text style={styles.progressLabel}>Games Played</Text>
+            <Text style={styles.progressVal}>
+              {stats.gamesPlayed > 0 ? stats.gamesPlayed : 126}
+            </Text>
+          </View>
 
-              <View style={styles.modeCardBody}>
-                <Text style={styles.modeIcon}>{mode.icon}</Text>
-                <Text style={styles.modeName}>{mode.name}</Text>
-                <Text style={styles.modeTagline} numberOfLines={2}>
-                  {mode.tagline}
-                </Text>
+          {/* Stat 2 */}
+          <View style={styles.progressCard}>
+            <Text style={styles.progressIcon}>🎯</Text>
+            <Text style={styles.progressLabel}>Best Score</Text>
+            <Text style={styles.progressVal}>
+              {stats.bestScore > 0 ? stats.bestScore : 842}
+            </Text>
+          </View>
 
-                <View style={styles.playNowRow}>
-                  <Text style={[styles.cardPlayText, { color: mode.themeColor }]}>
-                    SELECT & PLAY ▶
-                  </Text>
-                </View>
-              </View>
-            </Pressable>
-          ))}
+          {/* Stat 3 */}
+          <View style={styles.progressCard}>
+            <Text style={styles.progressIcon}>🔥</Text>
+            <Text style={styles.progressLabel}>Best Combo</Text>
+            <Text style={styles.progressVal}>
+              x{stats.maxCombo > 0 ? stats.maxCombo : 19}
+            </Text>
+          </View>
+
+          {/* Stat 4 */}
+          <View style={styles.progressCard}>
+            <Text style={styles.progressIcon}>📊</Text>
+            <Text style={styles.progressLabel}>Accuracy</Text>
+            <Text style={styles.progressVal}>
+              {stats.accuracy > 0 ? `${stats.accuracy}%` : '87%'}
+            </Text>
+          </View>
         </View>
 
         <View style={{ height: 110 }} />
       </ScrollView>
 
-      {/* Floating Global Bottom Navigation */}
+      {/* Floating Global Bottom Navigation Bar */}
       <BottomNavBar />
     </View>
   );
@@ -237,115 +383,47 @@ const styles = StyleSheet.create({
   },
   darkVignette: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(6, 18, 13, 0.65)',
+    backgroundColor: 'rgba(6, 18, 13, 0.72)',
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 4,
   },
-  heroSection: {
+  cardPressed: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
+  },
+
+  // Best Score Pill
+  bestScorePill: {
+    flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative',
-  },
-  logoBadge: {
-    alignItems: 'center',
-    backgroundColor: '#351A0D', // Rich warm wood brown
-    borderWidth: 3,
-    borderColor: '#7A3F1D', // Carved wood border
-    borderRadius: 22,
-    paddingHorizontal: 22,
-    paddingVertical: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 14,
-    elevation: 8,
-    position: 'relative',
-  },
-  rivet: {
-    position: 'absolute',
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#FFD700',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(11, 23, 44, 0.92)',
     borderWidth: 1.5,
-    borderColor: '#C67C00',
-    zIndex: 5,
-  },
-  rivetTL: { top: 6, left: 6 },
-  rivetTR: { top: 6, right: 6 },
-  rivetBL: { bottom: 6, left: 6 },
-  rivetBR: { bottom: 6, right: 6 },
-  logoArcade: {
-    color: '#00E5FF',
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 2,
-    marginBottom: 2,
-  },
-  logoTitle: {
-    color: '#FFD700',
-    fontSize: 28,
-    fontWeight: '900',
-    letterSpacing: 2.5,
-    textShadowColor: '#FF6D00',
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 8,
-  },
-  logoTagline: {
-    color: '#2ED573',
-    fontSize: 11,
-    fontWeight: '900',
-    letterSpacing: 1.5,
-    marginTop: 2,
-  },
-  floatingBadge: {
-    position: 'absolute',
-    width: 44,
-    height: 44,
-    borderRadius: 14,
-    backgroundColor: '#2E1508',
-    borderWidth: 2,
-    borderColor: '#FFD700',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 6,
-  },
-  badgeLeft: { top: 60, left: 16 },
-  badgeRight: { top: 75, right: 16, borderColor: '#00E5FF' },
-  badgeNum: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#FFD700',
-  },
-  mascotWrapper: {
-    marginVertical: 4,
-  },
-  bestScoreCard: {
-    width: '100%',
+    borderColor: '#1E3A6E',
+    borderRadius: 22,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    marginBottom: 12,
-    backgroundColor: '#2D1407',
-    borderColor: '#6E3A1A',
-    borderWidth: 2,
+    marginTop: 4,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 5,
+    elevation: 4,
   },
-  bestScoreRow: {
+  bestScoreLeft: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 12,
   },
-  bestScoreCol: {
-    justifyContent: 'center',
+  trophyIcon: {
+    fontSize: 28,
   },
   bestScoreLabel: {
     color: '#8CA0BA',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
     letterSpacing: 1,
   },
@@ -353,222 +431,391 @@ const styles = StyleSheet.create({
     color: '#FFD700',
     fontSize: 20,
     fontWeight: '900',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
-  streakBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 109, 0, 0.2)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: '#FF6D00',
-  },
-  streakFlame: {
-    fontSize: 14,
-    marginRight: 4,
-  },
-  streakVal: {
-    color: '#FFE082',
-    fontSize: 11,
+  bestScoreArrow: {
+    color: '#8CA0BA',
+    fontSize: 16,
     fontWeight: '900',
   },
-  selectedModePill: {
+
+  // Action Row
+  actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: '100%',
-    backgroundColor: 'rgba(43, 20, 8, 0.95)',
+    marginBottom: 20,
+    gap: 8,
+  },
+  secondaryActionBtn: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 33, 64, 0.95)',
+    borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: '#FFD700',
-    borderRadius: 14,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginBottom: 10,
+    borderColor: '#244983',
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  selectedModeLabel: {
-    color: '#FFC107',
-    fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 0.8,
+  actionIcon: {
+    fontSize: 20,
+    marginBottom: 4,
   },
-  selectedModeValue: {
+  actionBtnText: {
     color: '#FFFFFF',
-    fontSize: 13,
+    fontSize: 9,
     fontWeight: '900',
+    letterSpacing: 0.6,
   },
-  selectedModeChange: {
-    color: '#2ED573',
+
+  // Massive 3D Golden PLAY NOW Capsule CTA
+  playNowWrapper: {
+    flex: 2,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#C67A00',
+    shadowColor: '#FFB300',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.65,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  playNowPressed: {
+    transform: [{ scale: 0.96 }],
+    backgroundColor: '#9A5F00',
+  },
+  playNowBevel: {
+    flex: 1,
+    backgroundColor: '#FFBE0B',
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#FFF3A8',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 5,
+  },
+  playNowHighlight: {
+    position: 'absolute',
+    top: 0,
+    left: 20,
+    right: 20,
+    height: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.45)',
+    borderRadius: 10,
+  },
+  playNowContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  playTriangle: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#2A1800',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playTriangleText: {
+    color: '#FFBE0B',
+    fontSize: 12,
+    fontWeight: '900',
+    marginLeft: 2,
+  },
+  playNowText: {
+    color: '#2A1800',
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+  },
+
+  // Section Headers
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+    marginTop: 4,
+  },
+  sectionTitle: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+  },
+  viewAllRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  viewAllText: {
+    color: '#8CA0BA',
     fontSize: 11,
-    fontWeight: '900',
+    fontWeight: '700',
   },
-  playNowBtn: {
+  viewAllArrow: {
+    color: '#8CA0BA',
+    fontSize: 12,
+  },
+
+  // Featured 4 Cards Grid
+  featuredGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 10,
     marginBottom: 12,
   },
-  quickActionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-    width: '100%',
-    marginBottom: 16,
-  },
-  quickCard: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#331709',
+  featuredCard: {
+    width: (width - 42) / 2,
     borderRadius: 18,
     borderWidth: 2,
-    borderColor: '#7A3F1D',
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    position: 'relative',
+    padding: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 6,
-    elevation: 4,
+    elevation: 5,
   },
-  dailyCardBorder: { borderColor: '#B87333' },
-  ranksCardBorder: { borderColor: '#8A522A' },
-  cardPressed: {
-    opacity: 0.88,
-    transform: [{ scale: 0.98 }],
+  quickRushCard: {
+    backgroundColor: '#0F264A',
+    borderColor: '#1E60B5',
   },
-  quickIcon: {
-    fontSize: 24,
-    marginRight: 8,
+  animalCard: {
+    backgroundColor: '#4A1D0F',
+    borderColor: '#B54B1E',
   },
-  quickInfo: {
-    flex: 1,
+  emojiCard: {
+    backgroundColor: '#35104A',
+    borderColor: '#862AB5',
   },
-  quickTitle: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '900',
+  puzzleCard: {
+    backgroundColor: '#0F3C28',
+    borderColor: '#1EB56D',
   },
-  quickSub: {
-    color: '#8CA0BA',
-    fontSize: 9,
-    fontWeight: '700',
+  cardArtBox: {
+    height: 70,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    position: 'relative',
+    overflow: 'hidden',
   },
-  freeBadge: {
+  cardBigIcon: {
+    fontSize: 32,
+  },
+  blocksMiniRow: {
     position: 'absolute',
-    top: -6,
-    right: 8,
-    backgroundColor: '#2ED573',
-    paddingHorizontal: 6,
-    paddingVertical: 1.5,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#FFFFFF',
+    bottom: 4,
+    flexDirection: 'row',
+    gap: 4,
   },
-  freeBadgeText: {
-    color: '#04160D',
+  miniBlock: {
+    backgroundColor: '#00E5FF',
+    color: '#002B49',
     fontSize: 8,
     fontWeight: '900',
-  },
-  modesHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
     paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 3,
   },
-  sectionHeaderTitle: {
-    color: '#FFE082',
-    fontSize: 14,
+  miniAnimal: {
+    fontSize: 10,
+  },
+  miniEmoji: {
+    fontSize: 10,
+  },
+  matrixMiniGrid: {
+    position: 'absolute',
+    bottom: 4,
+    flexDirection: 'row',
+    gap: 3,
+  },
+  miniGridCell: {
+    backgroundColor: '#00E676',
+    color: '#003314',
+    fontSize: 8,
     fontWeight: '900',
-    letterSpacing: 1.2,
+    paddingHorizontal: 3,
+    borderRadius: 2,
   },
-  viewAllBtn: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+  featuredTitle: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    marginBottom: 2,
   },
-  viewAllText: {
-    color: '#2ED573',
+  featuredSubtitle: {
+    color: '#A0B2C6',
+    fontSize: 9,
+    lineHeight: 13,
+    height: 26,
+    marginBottom: 6,
+  },
+  featuredFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  bestBadge: {
+    color: '#FFD700',
+    fontSize: 9,
+    fontWeight: '900',
+  },
+  featuredChevron: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '900',
+  },
+
+  // Mini Chips
+  chipsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+  },
+  modeChip: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(15, 33, 64, 0.9)',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#244983',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+  },
+  chipIcon: {
+    fontSize: 16,
+  },
+  chipText: {
+    flex: 1,
+    color: '#FFFFFF',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  chipArrow: {
+    color: '#8CA0BA',
     fontSize: 12,
     fontWeight: '900',
   },
-  modesGrid: {
+
+  // Daily Rush Showcase Banner
+  dailyRushBanner: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  modeCard: {
-    width: (width - 44) / 2,
-    backgroundColor: '#2B1307',
+    alignItems: 'center',
+    backgroundColor: 'rgba(15, 36, 26, 0.95)',
     borderRadius: 20,
     borderWidth: 2,
-    borderColor: '#6E3A1A',
-    overflow: 'hidden',
+    borderColor: '#2ED573',
+    padding: 14,
+    marginVertical: 14,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
     shadowRadius: 6,
     elevation: 4,
   },
-  modeCardSelected: {
-    borderWidth: 2.5,
-    borderColor: '#FFD700',
-    backgroundColor: '#35180A',
-    shadowColor: '#FFD700',
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-  },
-  modeCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  calendarBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    justifyContent: 'center',
+    marginRight: 12,
+    borderWidth: 2,
+    borderColor: '#E2E8F0',
   },
-  modeCardBadge: {
-    color: '#071324',
-    fontSize: 9,
-    fontWeight: '900',
-  },
-  modeCardStar: {
-    color: '#071324',
+  calendarHeader: {
+    color: '#E11D48',
     fontSize: 8,
     fontWeight: '900',
+    letterSpacing: 0.5,
   },
-  modeCardBody: {
-    padding: 12,
+  calendarStar: {
+    fontSize: 22,
+    marginTop: -2,
+  },
+  dailyRushInfo: {
+    flex: 1,
+  },
+  dailyRushTitle: {
+    color: '#FFD700',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  dailyRushSub: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  dailyRushDesc: {
+    color: '#A0B2C6',
+    fontSize: 8,
+  },
+  playTodayBtn: {
+    backgroundColor: '#2ED573',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    shadowColor: '#2ED573',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+  },
+  playTodayText: {
+    color: '#061D12',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+
+  // Your Progress
+  progressRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+    marginBottom: 10,
+  },
+  progressCard: {
+    flex: 1,
+    backgroundColor: 'rgba(11, 23, 44, 0.92)',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: '#1E3A6E',
+    paddingVertical: 10,
+    paddingHorizontal: 6,
     alignItems: 'center',
   },
-  modeIcon: {
-    fontSize: 34,
-    marginVertical: 4,
+  progressIcon: {
+    fontSize: 18,
+    marginBottom: 4,
   },
-  modeName: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '900',
+  progressLabel: {
+    color: '#8CA0BA',
+    fontSize: 8,
+    fontWeight: '700',
     textAlign: 'center',
     marginBottom: 2,
   },
-  modeTagline: {
-    color: '#8CA0BA',
-    fontSize: 10,
-    fontWeight: '600',
-    textAlign: 'center',
-    lineHeight: 13,
-    marginBottom: 8,
-    height: 26,
-  },
-  playNowRow: {
-    marginTop: 4,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 12,
-  },
-  cardPlayText: {
-    fontSize: 10,
+  progressVal: {
+    color: '#FFFFFF',
+    fontSize: 13,
     fontWeight: '900',
-    letterSpacing: 0.5,
   },
 });
