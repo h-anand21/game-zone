@@ -171,11 +171,11 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   emblemBgImg: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     opacity: 0.45,
   },
   emblemOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(7, 17, 31, 0.55)',
     justifyContent: 'center',
     alignItems: 'center',
