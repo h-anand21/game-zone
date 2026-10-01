@@ -5,6 +5,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { MRIcon, MRIconName } from './MRIcon';
 import { MRColors } from '../constants/colors';
 import type { AppNavScreen } from '../types';
 
@@ -18,14 +19,14 @@ export interface BottomTabBarProps {
 interface TabItem {
   id: AppNavScreen;
   label: string;
-  icon: string;
+  iconName: MRIconName;
 }
 
 const TABS: TabItem[] = [
-  { id: 'home', label: 'HOME', icon: '⌂' },
-  { id: 'daily', label: 'CHALLENGE', icon: '✦' },
-  { id: 'stats', label: 'STATS', icon: '◨' },
-  { id: 'settings', label: 'SETTINGS', icon: '⚙' },
+  { id: 'home', label: 'HOME', iconName: 'play' },
+  { id: 'daily', label: 'CHALLENGE', iconName: 'star' },
+  { id: 'stats', label: 'STATS', iconName: 'bar-chart-2' },
+  { id: 'settings', label: 'SETTINGS', iconName: 'cpu' },
 ];
 
 export const BottomTabBar: React.FC<BottomTabBarProps> = ({
@@ -52,9 +53,11 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
               accessibilityLabel={`Navigate to ${tab.label}`}
             >
               {isActive && <View style={styles.activeTopPill} />}
-              <Text style={[styles.iconText, isActive && styles.activeIcon]}>
-                {tab.icon}
-              </Text>
+              <MRIcon
+                name={tab.iconName}
+                size={18}
+                color={isActive ? MRColors.cyanBright : MRColors.textMuted}
+              />
               <Text style={[styles.labelText, isActive && styles.activeLabel]}>
                 {tab.label}
               </Text>
@@ -78,8 +81,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     height: 60,
     borderRadius: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.25)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(34, 211, 238, 0.3)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.6,
@@ -92,11 +95,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+    gap: 3,
   },
   activeTopPill: {
     position: 'absolute',
     top: 4,
-    width: 22,
+    width: 24,
     height: 3,
     borderRadius: 1.5,
     backgroundColor: MRColors.primaryCyan,
@@ -105,25 +109,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.9,
     shadowRadius: 6,
   },
-  iconText: {
-    fontSize: 16,
-    color: MRColors.textMuted,
-  },
-  activeIcon: {
-    color: MRColors.cyanBright,
-  },
   labelText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '800',
     color: MRColors.textMuted,
     letterSpacing: 1,
-    marginTop: 2,
   },
   activeLabel: {
     color: MRColors.cyanBright,
     fontWeight: '900',
   },
   pressed: {
-    opacity: 0.8,
+    transform: [{ scale: 0.94 }],
   },
 });
