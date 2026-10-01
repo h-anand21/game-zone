@@ -72,11 +72,13 @@ export const EnvironmentalBackground: React.FC<EnvironmentalBackgroundProps> = (
   const colors = getGradientColors();
 
   const getBackgroundImage = () => {
+    if (theme === 'home') {
+      return require('../../../../../assets/images/rm_bg_home_master.jpg');
+    }
     if (theme === 'rewards' || theme === 'level-complete') {
       return require('../../../../../assets/images/rm_bg_treasure_rewards.jpg');
     }
     if (
-      theme === 'home' ||
       theme === 'rule-preview' ||
       theme === 'ready' ||
       theme === 'practice' ||
@@ -100,7 +102,11 @@ export const EnvironmentalBackground: React.FC<EnvironmentalBackgroundProps> = (
       {/* Layer 2: Real Full-Bleed Environmental Art Illustration */}
       <Image
         source={getBackgroundImage()}
-        style={[StyleSheet.absoluteFill, styles.bgArtImage]}
+        style={[
+          StyleSheet.absoluteFill,
+          styles.bgArtImage,
+          theme === 'home' && { opacity: 0.50 },
+        ]}
         resizeMode="cover"
       />
 
