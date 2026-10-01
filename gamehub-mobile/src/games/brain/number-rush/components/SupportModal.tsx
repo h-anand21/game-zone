@@ -11,7 +11,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { NRTheme } from '../theme';
-import { WoodPanel, GameButton } from './';
+import { WoodPanel } from './WoodPanel';
+import { GameButton } from './GameButton';
 
 export type SupportDocType = 'help' | 'privacy' | 'terms';
 

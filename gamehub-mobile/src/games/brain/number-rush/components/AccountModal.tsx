@@ -13,7 +13,8 @@ import {
 } from 'react-native';
 import { NRTheme } from '../theme';
 import { NRHaptics } from '../services/haptics';
-import { WoodPanel, GameButton } from './';
+import { WoodPanel } from './WoodPanel';
+import { GameButton } from './GameButton';
 
 interface AccountModalProps {
   visible: boolean;

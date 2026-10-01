@@ -6,7 +6,8 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal } from 'react-native';
 import { NRTheme } from '../theme';
 import { NRHaptics } from '../services/haptics';
-import { WoodPanel, GameButton } from './';
+import { WoodPanel } from './WoodPanel';
+import { GameButton } from './GameButton';
 
 interface DeleteAccountModalProps {
   visible: boolean;
