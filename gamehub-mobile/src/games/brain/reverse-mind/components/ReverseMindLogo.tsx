@@ -70,15 +70,19 @@ export const ReverseMindLogo: React.FC<LogoProps> = ({
         </Svg>
       </View>
 
-      {/* Chunky Dual-Toned Title */}
-      <View style={styles.titleRow}>
-        <Text style={[styles.wordFirst, styles.glowCyan]}>REVERSE</Text>
-        <Text style={[styles.wordSecond, styles.glowGold]}>MIND</Text>
+      {/* Chunky Dual-Toned Title Banner */}
+      <View style={styles.titleColumn}>
+        <View style={styles.wordRow}>
+          <Text style={[styles.wordFirst, styles.glowCyan]}>REVERSE</Text>
+        </View>
+        <View style={styles.wordRow}>
+          <Text style={[styles.wordSecond, styles.glowGold]}>MIND 🧠</Text>
+        </View>
       </View>
 
       {showSubtitle && (
         <View style={styles.subtitleBadge}>
-          <Text style={styles.subtitleText}>VISUAL MEMORY & INVERSION</Text>
+          <Text style={styles.subtitleText}>Remember. Flip. Think Different.</Text>
         </View>
       )}
     </View>
@@ -91,53 +95,57 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   badgeWrapper: {
-    marginBottom: 6,
+    marginBottom: 4,
     shadowColor: '#4DE7FF',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 10,
     elevation: 6,
   },
-  titleRow: {
+  titleColumn: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  wordRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   wordFirst: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '900',
     color: '#4DE7FF',
-    letterSpacing: 2.5,
+    letterSpacing: 2,
+    fontFamily: undefined,
   },
   wordSecond: {
-    fontSize: 26,
+    fontSize: 32,
     fontWeight: '900',
     color: '#FFD83D',
-    letterSpacing: 2.5,
+    letterSpacing: 2,
   },
   glowCyan: {
-    textShadowColor: 'rgba(77, 231, 255, 0.75)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 12,
+    textShadowColor: 'rgba(77, 231, 255, 0.85)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 14,
   },
   glowGold: {
-    textShadowColor: 'rgba(255, 216, 61, 0.75)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 12,
+    textShadowColor: 'rgba(255, 216, 61, 0.85)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 14,
   },
   subtitleBadge: {
-    marginTop: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 3,
+    marginTop: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 4,
     borderRadius: RMTheme.radii.full,
-    backgroundColor: 'rgba(77, 231, 255, 0.12)',
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
     borderWidth: 1,
-    borderColor: 'rgba(77, 231, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.18)',
   },
   subtitleText: {
-    fontSize: 9,
+    fontSize: 10,
     fontWeight: '800',
-    color: '#B2F5EA',
-    letterSpacing: 1.5,
+    color: '#E2F1FF',
+    letterSpacing: 1.2,
   },
 });

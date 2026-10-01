@@ -105,7 +105,7 @@ export const EnvironmentalBackground: React.FC<EnvironmentalBackgroundProps> = (
         style={[
           StyleSheet.absoluteFill,
           styles.bgArtImage,
-          theme === 'home' && { opacity: 0.50 },
+          theme === 'home' && { opacity: 0.78 },
         ]}
         resizeMode="cover"
       />
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     backgroundColor: RMTheme.colors.bgVoid,
   },
   bgArtImage: {
-    opacity: 0.38,
+    opacity: 0.85,
     width: '100%',
     height: '100%',
   },

@@ -77,10 +77,12 @@ interface ReverseMindState {
   };
 
   // Player Stats & Settings
+  showExitModal: boolean;
   playerStats: PlayerStats;
   settings: GameSettings;
 
   // Actions
+  setShowExitModal: (show: boolean) => void;
   setScreen: (screen: AppNavScreen) => void;
   setMode: (mode: GameMode) => void;
   setDifficulty: (diff: GameDifficulty) => void;
@@ -166,9 +168,11 @@ export const useReverseMindStore = create<ReverseMindState>((set, get) => ({
     xpEarned: 0,
   },
 
+  showExitModal: false,
   playerStats: INITIAL_PLAYER_STATS,
   settings: INITIAL_SETTINGS,
 
+  setShowExitModal: (showExitModal) => set({ showExitModal }),
   setScreen: (screen) => set({ currentScreen: screen }),
   setMode: (mode) => set({ mode }),
   setDifficulty: (difficulty) => set({ difficulty }),

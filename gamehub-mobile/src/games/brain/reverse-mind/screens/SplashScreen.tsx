@@ -1,12 +1,6 @@
-// ============================================================
-// REVERSE MIND — Splash Screen
-// ============================================================
-
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { GameBackground } from '../components/GameBackground';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Image, Animated } from 'react-native';
 import { ReverseMindLogo } from '../components/ReverseMindLogo';
-import { MascotCompanion } from '../components/MascotCompanion';
 import { RMTheme } from '../theme';
 
 interface SplashScreenProps {
@@ -14,80 +8,120 @@ interface SplashScreenProps {
 }
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onFinish }) => {
+  const progressAnim = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
-    const timer = setTimeout(() => {
+    Animated.timing(progressAnim, {
+      toValue: 1,
+      duration: 1800,
+      useNativeDriver: false,
+    }).start(() => {
       onFinish();
-    }, 2200);
-    return () => clearTimeout(timer);
-  }, [onFinish]);
+    });
+  }, [onFinish, progressAnim]);
+
+  const widthInterpolate = progressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['5%', '100%'],
+  });
 
   return (
-    <GameBackground>
-      <View style={styles.container}>
-        {/* Animated Mascot Duo */}
-        <View style={styles.mascotArea}>
-          <MascotCompanion
-            state="happy"
-            size="lg"
-            showSpeechBubble={true}
-            speechText="Ready to think in reverse?"
-          />
-        </View>
+    <View style={styles.container}>
+      {/* Full Bleed Loading Environment Background */}
+      <Image
+        source={require('../../../../../assets/images/rm_bg_home_master.jpg')}
+        style={StyleSheet.absoluteFill}
+        resizeMode="cover"
+      />
+      <View style={styles.darkOverlay} />
 
-        {/* Central Vector Logo */}
-        <View style={styles.logoArea}>
+      <View style={styles.contentContainer}>
+        {/* Top Header Logo */}
+        <View style={styles.logoWrapper}>
           <ReverseMindLogo size="lg" showSubtitle={true} />
         </View>
 
-        {/* Loading Indicator */}
-        <View style={styles.loadingArea}>
-          <View style={styles.loadingBarTrack}>
-            <View style={styles.loadingBarFill} />
+        {/* Hero Preview Card */}
+        <View style={styles.heroCard}>
+          <Image
+            source={require('../../../../../assets/images/rm_char_boy_study.jpg')}
+            style={styles.heroImg}
+            resizeMode="cover"
+          />
+        </View>
+
+        {/* Loading Progress Bar */}
+        <View style={styles.loadingBox}>
+          <View style={styles.loadingTrack}>
+            <Animated.View style={[styles.loadingFill, { width: widthInterpolate }]} />
           </View>
           <Text style={styles.loadingText}>SYNAPSE INVERSION READY...</Text>
         </View>
       </View>
-    </GameBackground>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#07111F',
+  },
+  darkOverlay: {
+    ...StyleSheet.absoluteFill as object,
+    backgroundColor: 'rgba(7, 17, 31, 0.45)',
+  },
+  contentContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 60,
+    paddingVertical: 55,
     paddingHorizontal: 24,
   },
-  mascotArea: {
-    marginTop: 40,
+  logoWrapper: {
+    marginTop: 20,
   },
-  logoArea: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingArea: {
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: 40,
-  },
-  loadingBarTrack: {
-    width: '100%',
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  heroCard: {
+    width: 220,
+    height: 220,
+    borderRadius: 24,
     overflow: 'hidden',
-    marginBottom: 10,
+    borderWidth: 2.5,
+    borderColor: RMTheme.colors.cyanNeon,
+    shadowColor: RMTheme.colors.cyanNeon,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.6,
+    shadowRadius: 16,
+    elevation: 8,
   },
-  loadingBarFill: {
-    width: '85%',
+  heroImg: {
+    width: '100%',
     height: '100%',
-    borderRadius: 3,
-    backgroundColor: RMTheme.colors.cyanNeon,
+  },
+  loadingBox: {
+    width: '100%',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  loadingTrack: {
+    width: '100%',
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(77, 231, 255, 0.3)',
+    marginBottom: 12,
+  },
+  loadingFill: {
+    height: '100%',
+    borderRadius: 5,
+    backgroundColor: RMTheme.colors.primaryGold,
   },
   loadingText: {
-    fontSize: 10,
-    fontWeight: '800',
+    fontSize: 11,
+    fontWeight: '900',
     color: RMTheme.colors.cyanNeon,
     letterSpacing: 2,
   },

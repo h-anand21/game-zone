@@ -23,6 +23,7 @@ import { DailyChallengeScreen } from './screens/DailyChallengeScreen';
 import { StatsScreen } from './screens/StatsScreen';
 import { ProfileScreen } from './screens/ProfileScreen';
 import { PracticeScreen } from './screens/PracticeScreen';
+import { ExitConfirmationModal } from './components/ExitConfirmationModal';
 import type { GameMode, GameDifficulty, ObjectCategory, AppNavScreen } from './types';
 
 interface ReverseMindAppProps {
@@ -34,6 +35,7 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
   const {
     currentScreen,
     setScreen,
+    setShowExitModal,
     startNewGame,
     mode,
     difficulty,
@@ -60,11 +62,11 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
       return true;
     }
     if (currentScreen === 'home') {
-      onExit?.();
+      setShowExitModal(true);
       return true;
     }
     return false;
-  }, [currentScreen, setScreen, onExit]);
+  }, [currentScreen, setScreen, setShowExitModal]);
 
   useEffect(() => {
     const backSub = BackHandler.addEventListener('hardwareBackPress', handleBack);
@@ -114,7 +116,7 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
 
       {/* Screen Router Across All 20 Screens & States */}
       {currentScreen === 'splash' && (
-        <SplashScreen onFinish={() => setScreen('welcome')} />
+        <SplashScreen onFinish={() => setScreen('home')} />
       )}
 
       {currentScreen === 'welcome' && (
@@ -251,6 +253,9 @@ export const ReverseMindApp: React.FC<ReverseMindAppProps> = ({ onExit }) => {
           onBack={() => setScreen('home')}
         />
       )}
+
+      {/* Global Exit Confirmation Dialog Modal */}
+      <ExitConfirmationModal onConfirmExit={onExit} />
     </View>
   );
 };
