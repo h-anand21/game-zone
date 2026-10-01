@@ -40,11 +40,11 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
           <GlassCard variant="glow" style={styles.heroCard}>
             <View style={styles.badgeRow}>
               <View style={styles.badge}>
-                <Feather name="zap" size={12} color={colors.accent} />
+                <MRIcon name="zap" size={12} color={colors.accent} />
                 <Text style={styles.badgeText}>SPECIAL MISSION</Text>
               </View>
               <View style={[styles.badge, { backgroundColor: 'rgba(250, 204, 21, 0.15)' }]}>
-                <Feather name="star" size={12} color={colors.warning} />
+                <MRIcon name="star" size={12} color={colors.warning} />
                 <Text style={[styles.badgeText, { color: colors.warning }]}>+500 XP</Text>
               </View>
             </View>
@@ -67,7 +67,7 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
 
             {isCompleted ? (
               <View style={styles.completedBox}>
-                <Feather name="check-circle" size={24} color={colors.success} />
+                <MRIcon name="check-circle" size={24} color={colors.success} />
                 <Text style={styles.completedText}>DAILY COMPLETE ✓</Text>
                 {dailyChallenge.score !== undefined && (
                   <Text style={styles.completedSub}>
@@ -88,15 +88,15 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
           <GlassCard style={styles.infoCard}>
             <Text style={styles.infoTitle}>CHALLENGE RULES</Text>
             <View style={styles.ruleItem}>
-              <Feather name="shield" size={16} color={colors.accent} />
+              <MRIcon name="shield" size={16} color={colors.accent} />
               <Text style={styles.ruleText}>Fixed round order across all 5 memory modes.</Text>
             </View>
             <View style={styles.ruleItem}>
-              <Feather name="clock" size={16} color={colors.accent} />
+              <MRIcon name="clock" size={16} color={colors.accent} />
               <Text style={styles.ruleText}>Strict timer pressure. Focus is key.</Text>
             </View>
             <View style={styles.ruleItem}>
-              <Feather name="award" size={16} color={colors.warning} />
+              <MRIcon name="award" size={16} color={colors.warning} />
               <Text style={styles.ruleText}>Earn +500 XP and streak multiplier bonuses.</Text>
             </View>
           </GlassCard>
