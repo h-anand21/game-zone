@@ -21,9 +21,7 @@ import { NRHaptics } from '../services/haptics';
 
 export const ExitConfirmationModal: React.FC = () => {
   const router = useRouter();
-  const { showExitModal, setShowExitModal, onExitApp, stats } = useNumberRushStore();
-
-  if (!showExitModal) return null;
+  const { showExitModal, setShowExitModal, onExitApp, stats, setIsExiting } = useNumberRushStore();
 
   const handleCancel = () => {
     NRAudio.playButton();
@@ -34,6 +32,7 @@ export const ExitConfirmationModal: React.FC = () => {
   const handleConfirmExit = () => {
     NRAudio.playButton();
     NRHaptics.heavy();
+    setIsExiting(true);
     setShowExitModal(false);
 
     if (onExitApp) {
@@ -51,6 +50,7 @@ export const ExitConfirmationModal: React.FC = () => {
       animationType="fade"
       visible={showExitModal}
       onRequestClose={handleCancel}
+      statusBarTranslucent
     >
       <View style={styles.overlay}>
         <WoodPanel style={styles.panel} variant="wood">

@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { getGameById } from '@/constants/games';
 import { getRegisteredGame } from '@/games/registry';
 import { GameWrapper } from '@/games/common/GameWrapper';
@@ -41,17 +41,20 @@ export default function GameScreen() {
   if ((cleanGameId === 'mind-lock' || cleanGameId === 'find-one' || cleanGameId === 'number-rush') && registeredGame) {
     const GameComponent = registeredGame.component;
     return (
-      <GameComponent
-        engine={undefined as any}
-        onFinish={() => {
-          if (router.canGoBack()) {
-            router.back();
-          } else {
-            router.replace('/(tabs)/games');
-          }
-        }}
-        isPaused={false}
-      />
+      <>
+        <Stack.Screen options={{ gestureEnabled: false, headerShown: false }} />
+        <GameComponent
+          engine={undefined as any}
+          onFinish={() => {
+            if (router.canGoBack()) {
+              router.back();
+            } else {
+              router.replace('/(tabs)/games');
+            }
+          }}
+          isPaused={false}
+        />
+      </>
     );
   }
 

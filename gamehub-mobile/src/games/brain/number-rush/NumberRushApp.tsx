@@ -26,12 +26,15 @@ import {
 import { PowerUpModal } from './components/PowerUpModal';
 import { ExitConfirmationModal } from './components/ExitConfirmationModal';
 
+import { useNavigation } from 'expo-router';
+
 interface NumberRushAppProps {
   onExit?: () => void;
   onFinishGame?: (score: number, won: boolean, metadata?: Record<string, unknown>) => void;
 }
 
 export const NumberRushApp: React.FC<NumberRushAppProps> = ({ onExit }) => {
+  const navigation = useNavigation();
   const {
     currentScreen,
     setScreen,
@@ -49,32 +52,75 @@ export const NumberRushApp: React.FC<NumberRushAppProps> = ({ onExit }) => {
     }
   }, [onExit]);
 
-  // Android Hardware Back Button Handling
+  // 1. Intercept Expo Router Navigation beforeRemove (Android gesture navigation / swipe back / route pop)
+  useEffect(() => {
+    if (!navigation) return;
+
+    const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+      const state = useNumberRushStore.getState();
+
+      // If user clicked confirm exit in the modal, allow navigation to pop
+      if (state.isExiting) {
+        return;
+      }
+
+      // Stop default OS exit/pop action
+      e.preventDefault();
+
+      if (state.showExitModal) {
+        state.setShowExitModal(false);
+        return;
+      }
+
+      if (state.currentScreen === 'home') {
+        state.setShowExitModal(true);
+        return;
+      }
+
+      if (state.currentScreen === 'gameplay') {
+        state.togglePause();
+        return;
+      }
+
+      // Any other subscreen returns cleanly to Home
+      state.setScreen('home');
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  // 2. Intercept Android Hardware Back Button (3-button navigation)
   useEffect(() => {
     const handleHardwareBack = () => {
-      if (showExitModal) {
-        setShowExitModal(false);
+      const state = useNumberRushStore.getState();
+
+      if (state.isExiting) {
+        return false;
+      }
+
+      if (state.showExitModal) {
+        state.setShowExitModal(false);
         return true;
       }
 
-      if (currentScreen === 'home') {
-        setShowExitModal(true);
+      if (state.currentScreen === 'home') {
+        state.setShowExitModal(true);
         return true;
       }
 
-      if (currentScreen === 'gameplay') {
-        togglePause();
+      if (state.currentScreen === 'gameplay') {
+        state.togglePause();
         return true;
       }
 
       // Any other subscreen returns cleanly to Home
-      setScreen('home');
+      state.setScreen('home');
       return true;
     };
 
     const sub = BackHandler.addEventListener('hardwareBackPress', handleHardwareBack);
     return () => sub.remove();
-  }, [currentScreen, showExitModal]);
+  }, []);
 
   const renderActiveScreen = () => {
     switch (currentScreen) {

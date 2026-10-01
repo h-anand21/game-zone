@@ -108,6 +108,8 @@ interface NumberRushState {
   // Exit Modal & Navigation
   showExitModal: boolean;
   setShowExitModal: (show: boolean) => void;
+  isExiting: boolean;
+  setIsExiting: (val: boolean) => void;
   onExitApp?: () => void;
   setOnExitApp: (fn: () => void) => void;
   advanceDailyGauntlet: () => void;
@@ -203,6 +205,8 @@ export const useNumberRushStore = create<NumberRushState>((set, get) => ({
 
   showExitModal: false,
   setShowExitModal: (show: boolean) => set({ showExitModal: show }),
+  isExiting: false,
+  setIsExiting: (val: boolean) => set({ isExiting: val }),
   onExitApp: undefined,
   setOnExitApp: (fn: () => void) => set({ onExitApp: fn }),
   advanceDailyGauntlet: () => {
