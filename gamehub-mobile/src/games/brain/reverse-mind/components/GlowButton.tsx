@@ -32,46 +32,46 @@ export const GlowButton: React.FC<GlowButtonProps> = ({
     switch (variant) {
       case 'gold':
         return {
-          gradient: ['#FFE082', '#FFD83D', '#FFA000'],
-          shadowLip: '#C68A00',
+          gradient: ['#FFE58F', '#FFD83D', '#FF9100'],
+          shadowLip: '#C67100',
           textColor: '#07111F',
           glow: RMTheme.colors.goldGlow,
         };
       case 'green':
         return {
-          gradient: ['#A5D6A7', '#57E389', '#2E7D32'],
-          shadowLip: '#1B5E20',
+          gradient: ['#B7F4C7', '#00E676', '#1B5E20'],
+          shadowLip: '#0F4616',
           textColor: '#07111F',
           glow: RMTheme.colors.emeraldGlow,
         };
       case 'blue':
         return {
-          gradient: ['#90CAF9', '#4DA3FF', '#1565C0'],
-          shadowLip: '#0D47A1',
-          textColor: '#FFFFFF',
+          gradient: ['#A0E8FF', '#00B0FF', '#0056B3'],
+          shadowLip: '#003975',
+          textColor: '#07111F',
           glow: RMTheme.colors.blueGlow,
         };
       case 'purple':
         return {
-          gradient: ['#CE93D8', '#8D6BFF', '#512DA8'],
-          shadowLip: '#311B92',
+          gradient: ['#E9D5FF', '#B57CFF', '#581C87'],
+          shadowLip: '#3B0764',
           textColor: '#FFFFFF',
           glow: RMTheme.colors.purpleGlow,
         };
       case 'red':
         return {
-          gradient: ['#FFCDD2', '#FF5E6C', '#C62828'],
-          shadowLip: '#8E0000',
+          gradient: ['#FFCDD2', '#FF5252', '#B71C1C'],
+          shadowLip: '#7F0000',
           textColor: '#FFFFFF',
           glow: RMTheme.colors.coralGlow,
         };
       case 'glass':
       default:
         return {
-          gradient: ['rgba(255,255,255,0.18)', 'rgba(255,255,255,0.08)'],
-          shadowLip: 'rgba(0,0,0,0.5)',
+          gradient: ['#1A3250', '#0E1F35'],
+          shadowLip: '#060E18',
           textColor: '#FFFFFF',
-          glow: 'transparent',
+          glow: 'rgba(77, 231, 255, 0.3)',
         };
     }
   };

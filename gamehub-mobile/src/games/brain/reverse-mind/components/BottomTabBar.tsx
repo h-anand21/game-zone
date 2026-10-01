@@ -61,7 +61,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={['rgba(22, 36, 58, 0.95)', 'rgba(16, 27, 43, 0.98)']}
+        colors={['#0E1F35', '#081424']}
         style={styles.barGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
