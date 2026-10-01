@@ -1,5 +1,5 @@
 // ============================================================
-// MEMORY RUSH — Dominant Cyan-Glow Primary CTA Button
+// MEMORY RUSH — Chunky 2.5D Cyber Arcade Primary CTA Button
 // ============================================================
 
 import React from 'react';
@@ -11,6 +11,7 @@ interface PrimaryButtonProps {
   title: string;
   onPress: () => void;
   size?: 'sm' | 'md' | 'lg';
+  variant?: 'cyan' | 'gold' | 'danger';
   icon?: React.ReactNode;
   disabled?: boolean;
   style?: ViewStyle;
@@ -21,68 +22,139 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   title,
   onPress,
   size = 'lg',
+  variant = 'cyan',
   icon,
   disabled = false,
   style,
   textStyle,
 }) => {
-  const height = size === 'sm' ? 42 : size === 'md' ? 50 : 58;
-  const fontSize = size === 'sm' ? 14 : size === 'md' ? 16 : 18;
+  const height = size === 'sm' ? 44 : size === 'md' ? 52 : 60;
+  const fontSize = size === 'sm' ? 13 : size === 'md' ? 15 : 18;
+  const lipHeight = size === 'sm' ? 3 : size === 'md' ? 4 : 5;
+
+  const getVariantStyles = () => {
+    switch (variant) {
+      case 'gold':
+        return {
+          gradient: ['#FDE047', '#EAB308', '#CA8A04'],
+          lipColor: '#A16207',
+          textColor: '#080A0D',
+          borderColor: '#FEF08A',
+          glow: 'rgba(250, 204, 21, 0.4)',
+        };
+      case 'danger':
+        return {
+          gradient: ['#FDA4AF', '#F43F5E', '#BE123C'],
+          lipColor: '#881337',
+          textColor: '#FFFFFF',
+          borderColor: '#FECDD3',
+          glow: 'rgba(251, 113, 133, 0.4)',
+        };
+      case 'cyan':
+      default:
+        return {
+          gradient: ['#67E8F9', '#22D3EE', '#0891B2'],
+          lipColor: '#155E75',
+          textColor: '#080A0D',
+          borderColor: '#A5F3FC',
+          glow: 'rgba(34, 211, 238, 0.5)',
+        };
+    }
+  };
+
+  const vConfig = getVariantStyles();
 
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled}
       style={({ pressed }) => [
-        styles.container,
-        { height, opacity: disabled ? 0.5 : 1 },
-        pressed && styles.pressed,
+        styles.outerContainer,
+        { opacity: disabled ? 0.4 : 1 },
         style,
       ]}
     >
-      <LinearGradient
-        colors={['#1F3A4B', '#112230', '#0B1722']}
-        style={[styles.gradient, { height }]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.topSpecular} />
-        <View style={styles.contentRow}>
-          <Text style={[styles.title, { fontSize }, textStyle]}>{title}</Text>
-          {icon && <View style={styles.iconBox}>{icon}</View>}
+      {({ pressed }) => (
+        <View
+          style={[
+            styles.buttonWrapper,
+            {
+              height: height + lipHeight,
+              backgroundColor: vConfig.lipColor,
+            },
+          ]}
+        >
+          <View
+            style={[
+              styles.lipBase,
+              {
+                height: height,
+                marginTop: pressed ? lipHeight : 0,
+                shadowColor: vConfig.glow,
+              },
+            ]}
+          >
+            <LinearGradient
+              colors={vConfig.gradient as any}
+              style={[
+                styles.gradientSurface,
+                { height: height, borderColor: vConfig.borderColor },
+              ]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            >
+              {/* Metallic Glass Highlights */}
+              <View style={styles.topLightGlow} />
+
+              <View style={styles.contentRow}>
+                <Text style={[styles.title, { fontSize, color: vConfig.textColor }, textStyle]}>
+                  {title}
+                </Text>
+                {icon && <View style={styles.iconBox}>{icon}</View>}
+              </View>
+            </LinearGradient>
+          </View>
         </View>
-      </LinearGradient>
+      )}
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  outerContainer: {
+    width: '100%',
+  },
+  buttonWrapper: {
+    width: '100%',
+    borderRadius: 18,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  lipBase: {
+    width: '100%',
+    borderRadius: 18,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.6,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  gradientSurface: {
     width: '100%',
     borderRadius: 18,
     borderWidth: 1.5,
-    borderColor: MRColors.primaryCyan,
-    overflow: 'hidden',
-    shadowColor: MRColors.primaryCyan,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 14,
-    elevation: 8,
-  },
-  gradient: {
-    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 20,
     position: 'relative',
+    overflow: 'hidden',
   },
-  topSpecular: {
+  topLightGlow: {
     position: 'absolute',
     top: 2,
-    left: '10%',
-    right: '10%',
-    height: 1.5,
-    backgroundColor: 'rgba(103, 232, 249, 0.6)',
+    left: '12%',
+    right: '12%',
+    height: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
     borderRadius: 1,
   },
   contentRow: {
@@ -93,15 +165,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: '900',
-    color: MRColors.cyanBright,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
   iconBox: {
     marginLeft: 4,
-  },
-  pressed: {
-    transform: [{ scale: 0.97 }],
-    opacity: 0.9,
   },
 });

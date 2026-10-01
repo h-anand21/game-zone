@@ -7,6 +7,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { GameBackground } from '../components/GameBackground';
 import { GlassCard } from '../components/GlassCard';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
 
@@ -33,18 +34,22 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({ onNextRoun
 
           <View style={styles.metricsGrid}>
             <View style={styles.metricCell}>
+              <MRIcon name="target" size={14} color={MRColors.yellowStatus} />
               <Text style={styles.metricLabel}>ACCURACY</Text>
               <Text style={styles.metricValYellow}>{accuracy}%</Text>
             </View>
             <View style={styles.metricCell}>
+              <MRIcon name="clock" size={14} color={MRColors.cyanBright} />
               <Text style={styles.metricLabel}>REACTION</Text>
               <Text style={styles.metricValCyan}>{(reactionTimeMs / 1000).toFixed(2)}s</Text>
             </View>
             <View style={styles.metricCell}>
+              <MRIcon name="zap" size={14} color={MRColors.textPrimary} />
               <Text style={styles.metricLabel}>COMBO</Text>
               <Text style={styles.metricValWhite}>×{combo}</Text>
             </View>
             <View style={styles.metricCell}>
+              <MRIcon name="star" size={14} color={MRColors.cyanBright} />
               <Text style={styles.metricLabel}>TIME BONUS</Text>
               <Text style={styles.metricValCyan}>+4s</Text>
             </View>
@@ -55,6 +60,7 @@ export const RoundResultScreen: React.FC<RoundResultScreenProps> = ({ onNextRoun
           <PrimaryButton
             title="NEXT ROUND →"
             size="lg"
+            variant="cyan"
             onPress={onNextRound}
           />
         </View>
@@ -102,6 +108,9 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: MRColors.cyanBright,
     marginVertical: 4,
+    textShadowColor: MRColors.cyanGlow,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
   },
   metricsGrid: {
     flexDirection: 'row',
@@ -112,12 +121,13 @@ const styles = StyleSheet.create({
   },
   metricCell: {
     width: '47%',
-    backgroundColor: 'rgba(8, 10, 13, 0.75)',
+    backgroundColor: 'rgba(8, 10, 13, 0.85)',
     borderRadius: 12,
     padding: 10,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(34, 211, 238, 0.2)',
+    gap: 2,
   },
   metricLabel: {
     fontSize: 8,

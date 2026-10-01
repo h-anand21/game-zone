@@ -1,5 +1,5 @@
 // ============================================================
-// MEMORY RUSH — 03 Mode Select Screen (5 Vertical Mode Cards)
+// MEMORY RUSH — 03 Mode Select Screen (5 Arcade Mode Cards)
 // ============================================================
 
 import React from 'react';
@@ -13,6 +13,7 @@ import {
 import { GameBackground } from '../components/GameBackground';
 import { GlassCard } from '../components/GlassCard';
 import { BottomTabBar } from '../components/BottomTabBar';
+import { MRIcon, MRIconName } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
 import type { GameMode, AppNavScreen } from '../types';
@@ -28,7 +29,7 @@ interface ModeCardData {
   title: string;
   desc: string;
   visual: string;
-  icon: string;
+  iconName: MRIconName;
   diffTag: string;
   isFusion?: boolean;
 }
@@ -39,7 +40,7 @@ const MODES_DATA: ModeCardData[] = [
     title: 'MEMORY GRID',
     desc: 'Remember positions. Locate target numbers after grid hides.',
     visual: '4   8   2  |  7   1   9',
-    icon: '◫',
+    iconName: 'grid',
     diffTag: 'SPATIAL MEMORY',
   },
   {
@@ -47,7 +48,7 @@ const MODES_DATA: ModeCardData[] = [
     title: 'SEQUENCE RUSH',
     desc: 'Remember order. Repeat exact sequence forward or in reverse.',
     visual: '3 → 8 → 1 → 6 → 4',
-    icon: '➔',
+    iconName: 'arrow-right',
     diffTag: 'ORDER RECALL',
   },
   {
@@ -55,7 +56,7 @@ const MODES_DATA: ModeCardData[] = [
     title: 'NUMBER SHIFT',
     desc: 'Spot the change. Identify which positions transformed.',
     visual: '[7 2 9]  ➜  [7 8 9]',
-    icon: '⇄',
+    iconName: 'refresh-cw',
     diffTag: 'PATTERN SHIFT',
   },
   {
@@ -63,7 +64,7 @@ const MODES_DATA: ModeCardData[] = [
     title: 'MISSING NUMBER',
     desc: 'Find what vanished. Select the missing number from options.',
     visual: '8   3   _   1',
-    icon: '?',
+    iconName: 'help-circle',
     diffTag: 'ELIMINATION',
   },
   {
@@ -71,7 +72,7 @@ const MODES_DATA: ModeCardData[] = [
     title: 'FUSION RUSH',
     desc: '4 challenges. ONE RUN. The signature endless memory rush.',
     visual: 'GRID ➔ SEQUENCE ➔ SHIFT ➔ MISSING',
-    icon: '✦',
+    iconName: 'zap',
     diffTag: 'SIGNATURE ENDLESS',
     isFusion: true,
   },
@@ -95,7 +96,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
         {/* Header */}
         <View style={styles.header}>
           <Pressable onPress={onBack} style={styles.backBtn}>
-            <Text style={styles.backText}>←</Text>
+            <MRIcon name="arrow-left" size={18} color={MRColors.textPrimary} />
           </Pressable>
           <View style={styles.headerTitleCol}>
             <Text style={styles.headerTitle}>CHOOSE YOUR</Text>
@@ -104,7 +105,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
           <View style={{ width: 36 }} />
         </View>
 
-        <Text style={styles.subtitle}>Test a different part of your memory.</Text>
+        <Text style={styles.subtitle}>TEST A DIFFERENT PART OF YOUR MEMORY.</Text>
 
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -121,14 +122,20 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
             >
               <GlassCard glowing={item.isFusion} style={styles.cardInner}>
                 <View style={styles.cardHeaderRow}>
-                  <View style={styles.iconBox}>
-                    <Text style={styles.iconText}>{item.icon}</Text>
+                  <View style={[styles.iconBox, item.isFusion && styles.fusionIconBox]}>
+                    <MRIcon
+                      name={item.iconName}
+                      size={20}
+                      color={item.isFusion ? MRColors.yellowStatus : MRColors.cyanBright}
+                    />
                   </View>
                   <View style={styles.titleCol}>
-                    <Text style={styles.diffTagText}>{item.diffTag}</Text>
+                    <Text style={[styles.diffTagText, item.isFusion && styles.fusionTagText]}>
+                      {item.diffTag}
+                    </Text>
                     <Text style={styles.cardTitle}>{item.title}</Text>
                   </View>
-                  <Text style={styles.chevron}>›</Text>
+                  <MRIcon name="chevron-right" size={20} color={MRColors.cyanBright} />
                 </View>
 
                 <Text style={styles.cardDesc}>{item.desc}</Text>
@@ -165,19 +172,14 @@ const styles = StyleSheet.create({
     backgroundColor: MRColors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-  },
-  backText: {
-    fontSize: 18,
-    color: MRColors.textPrimary,
-    fontWeight: 'bold',
+    borderWidth: 1.2,
+    borderColor: 'rgba(34, 211, 238, 0.3)',
   },
   headerTitleCol: {
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '900',
     color: MRColors.textPrimary,
     letterSpacing: 2,
@@ -189,12 +191,13 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 10,
     color: MRColors.textSecondary,
-    fontWeight: '600',
+    fontWeight: '800',
     textAlign: 'center',
     marginTop: 4,
     marginBottom: 12,
+    letterSpacing: 1,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -205,36 +208,38 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   cardInner: {
-    padding: 14,
+    padding: 16,
   },
   cardHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   iconBox: {
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     borderRadius: 12,
-    backgroundColor: MRColors.cyanMuted,
-    borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.3)',
+    backgroundColor: 'rgba(34, 211, 238, 0.12)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(34, 211, 238, 0.35)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconText: {
-    fontSize: 18,
-    color: MRColors.cyanBright,
-    fontWeight: '900',
+  fusionIconBox: {
+    backgroundColor: 'rgba(250, 204, 21, 0.15)',
+    borderColor: 'rgba(250, 204, 21, 0.4)',
   },
   titleCol: {
     flex: 1,
   },
   diffTagText: {
-    fontSize: 8,
+    fontSize: 8.5,
     fontWeight: '900',
     color: MRColors.cyanBright,
     letterSpacing: 1,
+  },
+  fusionTagText: {
+    color: MRColors.yellowStatus,
   },
   cardTitle: {
     fontSize: 16,
@@ -243,36 +248,31 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginTop: 1,
   },
-  chevron: {
-    fontSize: 22,
-    color: MRColors.cyanBright,
-    fontWeight: '900',
-  },
   cardDesc: {
     fontSize: 11,
     color: MRColors.textSecondary,
-    fontWeight: '600',
+    fontWeight: '700',
     marginTop: 8,
-    lineHeight: 15,
+    lineHeight: 16,
   },
   visualBox: {
     marginTop: 10,
-    backgroundColor: 'rgba(8, 10, 13, 0.75)',
+    backgroundColor: 'rgba(8, 10, 13, 0.85)',
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(34, 211, 238, 0.2)',
     alignItems: 'center',
   },
   visualText: {
-    fontSize: 12,
-    fontWeight: '800',
+    fontSize: 11,
+    fontWeight: '900',
     color: MRColors.cyanBright,
     letterSpacing: 1.5,
   },
   pressed: {
-    transform: [{ translateY: -3 }],
+    transform: [{ scale: 0.98 }],
     opacity: 0.9,
   },
 });

@@ -10,7 +10,7 @@ import { TimerBar } from '../components/TimerBar';
 import { ComboBadge } from '../components/ComboBadge';
 import { RoundFeedback } from '../components/RoundFeedback';
 import { PowerUpButton } from '../components/PowerUpButton';
-import { PrimaryButton } from '../components/PrimaryButton';
+import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
 import type { NumberTileData } from '../types';
@@ -38,6 +38,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     roundConfig,
     lastFeedback,
     powerUps,
+    startRound,
     advanceToHide,
     advanceToQuestion,
     handleTileSelect,
@@ -45,9 +46,14 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     usePowerUp,
   } = useMemoryRushStore();
 
-  const [remainingTimeMs, setRemainingTimeMs] = useState<number>(30000);
-  const [totalTimeMs, setTotalTimeMs] = useState<number>(30000);
+  const [remainingTimeMs, setRemainingTimeMs] = useState<number>(10000);
+  const [totalTimeMs, setTotalTimeMs] = useState<number>(10000);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Initialize round on mount
+  useEffect(() => {
+    startRound();
+  }, [startRound]);
 
   // 1. Preview Phase Timer
   useEffect(() => {
@@ -135,7 +141,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
         {/* Top Header Bar */}
         <View style={styles.topBar}>
           <Pressable onPress={onBack} style={styles.backBtn}>
-            <Text style={styles.backText}>←</Text>
+            <MRIcon name="arrow-left" size={18} color={MRColors.textPrimary} />
           </Pressable>
 
           <View style={styles.roundBadge}>
@@ -190,7 +196,10 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
                     <Pressable
                       key={`missing_${val}`}
                       onPress={() => onOptionPress(val)}
-                      style={styles.missingBtn}
+                      style={({ pressed }) => [
+                        styles.missingBtn,
+                        pressed && styles.missingBtnPressed,
+                      ]}
                     >
                       <Text style={styles.missingBtnText}>{val}</Text>
                     </Pressable>
@@ -203,7 +212,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
         {/* BOTTOM HUD STATUS */}
         <View style={styles.bottomHud}>
           <View style={styles.scoreRow}>
-            <View>
+            <View style={styles.scoreCard}>
               <Text style={styles.scoreLabel}>SCORE</Text>
               <Text style={styles.scoreVal}>{score.toLocaleString()}</Text>
             </View>
@@ -240,56 +249,50 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: 42,
     justifyContent: 'space-between',
-    paddingBottom: 16,
   },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    gap: 8,
+    paddingHorizontal: 20,
+    gap: 10,
   },
   backBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(23, 29, 36, 0.85)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: MRColors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  backText: {
-    fontSize: 18,
-    color: MRColors.textPrimary,
-    fontWeight: 'bold',
+    borderWidth: 1.2,
+    borderColor: 'rgba(34, 211, 238, 0.3)',
   },
   roundBadge: {
     backgroundColor: 'rgba(34, 211, 238, 0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.3)',
     borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderWidth: 1.2,
+    borderColor: 'rgba(34, 211, 238, 0.35)',
   },
   roundText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '900',
     color: MRColors.cyanBright,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   timerCol: {
-    flex: 1,
-    maxWidth: 140,
+    width: 100,
   },
   taskContainer: {
     alignItems: 'center',
     paddingHorizontal: 20,
+    marginVertical: 10,
     minHeight: 50,
     justifyContent: 'center',
   },
   taskLabel: {
-    fontSize: 22,
+    fontSize: 18,
     fontWeight: '900',
     color: MRColors.textPrimary,
     letterSpacing: 1.5,
@@ -299,55 +302,76 @@ const styles = StyleSheet.create({
     textShadowRadius: 10,
   },
   boardArea: {
-    alignItems: 'center',
-    justifyContent: 'center',
     flex: 1,
-  },
-  missingOptionsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginTop: 14,
-    flexWrap: 'wrap',
+    alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
+  missingOptionsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 20,
+    paddingHorizontal: 16,
+  },
   missingBtn: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 52,
     borderRadius: 14,
-    backgroundColor: 'rgba(23, 29, 36, 0.95)',
+    backgroundColor: MRColors.surfaceElevated,
     borderWidth: 1.5,
     borderColor: MRColors.primaryCyan,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: MRColors.primaryCyan,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  missingBtnPressed: {
+    transform: [{ scale: 0.94 }],
+    backgroundColor: MRColors.cyanMuted,
   },
   missingBtnText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '900',
     color: MRColors.cyanBright,
   },
   bottomHud: {
     paddingHorizontal: 20,
-    gap: 10,
+    paddingBottom: 24,
+    gap: 14,
   },
   scoreRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
+  scoreCard: {
+    backgroundColor: MRColors.surfaceGlass,
+    borderWidth: 1.2,
+    borderColor: 'rgba(34, 211, 238, 0.25)',
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
   scoreLabel: {
     fontSize: 9,
     fontWeight: '900',
     color: MRColors.textMuted,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   scoreVal: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '900',
-    color: MRColors.textPrimary,
+    color: MRColors.cyanBright,
+    letterSpacing: 1,
   },
   powerUpRow: {
     flexDirection: 'row',
     justifyContent: 'space-around',
+    gap: 10,
   },
 });

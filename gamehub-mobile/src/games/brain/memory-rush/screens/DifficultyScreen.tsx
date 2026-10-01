@@ -14,6 +14,7 @@ import {
 import { GameBackground } from '../components/GameBackground';
 import { GlassCard } from '../components/GlassCard';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
 import type { GameMode, GameDifficulty } from '../types';
@@ -40,7 +41,7 @@ const DIFF_OPTIONS: DiffOption[] = [
     gridDesc: '2 × 3 GRID',
     timeDesc: '30 SEC TIMER',
     previewDesc: '2.5 SEC PREVIEW',
-    tagline: 'Start here.',
+    tagline: 'Start here. Perfect for warming up.',
   },
   {
     id: 'medium',
@@ -48,7 +49,7 @@ const DIFF_OPTIONS: DiffOption[] = [
     gridDesc: '3 × 4 GRID',
     timeDesc: '20 SEC TIMER',
     previewDesc: '1.5 SEC PREVIEW',
-    tagline: 'Find your focus.',
+    tagline: 'Find your focus. Balanced rush.',
   },
   {
     id: 'hard',
@@ -56,7 +57,7 @@ const DIFF_OPTIONS: DiffOption[] = [
     gridDesc: '4 × 4 GRID',
     timeDesc: '15 SEC TIMER',
     previewDesc: '0.8 SEC PREVIEW',
-    tagline: 'Enter the rush.',
+    tagline: 'Enter the rush. Maximum pressure.',
   },
 ];
 
@@ -79,7 +80,7 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
         {/* Header */}
         <View style={styles.header}>
           <Pressable onPress={onBack} style={styles.backBtn}>
-            <Text style={styles.backText}>←</Text>
+            <MRIcon name="arrow-left" size={18} color={MRColors.textPrimary} />
           </Pressable>
           <View style={styles.headerTitleCol}>
             <Text style={styles.headerTitle}>{mode.toUpperCase()}</Text>
@@ -109,7 +110,7 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
                     <Text style={[styles.cardTitle, isSelected && styles.titleSelected]}>
                       {option.title}
                     </Text>
-                    <View style={styles.radioOuter}>
+                    <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
                       {isSelected && <View style={styles.radioInner} />}
                     </View>
                   </View>
@@ -136,13 +137,16 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
           <GlassCard style={styles.smartDiffCard}>
             <View style={styles.toggleRow}>
               <View style={styles.toggleTextCol}>
-                <Text style={styles.smartTitle}>SMART DIFFICULTY</Text>
-                <Text style={styles.smartSub}>AUTO-ADJUST PREVIEW BASED ON ACCURACY</Text>
+                <View style={styles.smartTitleRow}>
+                  <MRIcon name="cpu" size={16} color={MRColors.cyanBright} />
+                  <Text style={styles.smartTitle}>SMART DIFFICULTY</Text>
+                </View>
+                <Text style={styles.smartSub}>AUTO-ADJUST PREVIEW DURATION BASED ON ACCURACY</Text>
               </View>
               <Switch
                 value={settings.smartDifficulty}
                 onValueChange={() => toggleSetting('smartDifficulty')}
-                trackColor={{ false: 'rgba(255, 255, 255, 0.1)', true: MRColors.cyanMuted }}
+                trackColor={{ false: 'rgba(255, 255, 255, 0.1)', true: 'rgba(34, 211, 238, 0.4)' }}
                 thumbColor={settings.smartDifficulty ? MRColors.primaryCyan : '#8E9AA7'}
               />
             </View>
@@ -154,6 +158,7 @@ export const DifficultyScreen: React.FC<DifficultyScreenProps> = ({
           <PrimaryButton
             title="START GAME →"
             size="lg"
+            variant="cyan"
             onPress={handleStart}
           />
         </View>
@@ -181,19 +186,14 @@ const styles = StyleSheet.create({
     backgroundColor: MRColors.surfaceElevated,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-  },
-  backText: {
-    fontSize: 18,
-    color: MRColors.textPrimary,
-    fontWeight: 'bold',
+    borderWidth: 1.2,
+    borderColor: 'rgba(34, 211, 238, 0.3)',
   },
   headerTitleCol: {
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '900',
     color: MRColors.textSecondary,
     letterSpacing: 2,
@@ -238,9 +238,12 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 11,
     borderWidth: 2,
-    borderColor: MRColors.primaryCyan,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  radioOuterSelected: {
+    borderColor: MRColors.primaryCyan,
   },
   radioInner: {
     width: 10,
@@ -249,9 +252,9 @@ const styles = StyleSheet.create({
     backgroundColor: MRColors.primaryCyan,
   },
   taglineText: {
-    fontSize: 12,
+    fontSize: 11,
     color: MRColors.textSecondary,
-    fontWeight: '600',
+    fontWeight: '700',
     marginVertical: 6,
   },
   specsRow: {
@@ -261,12 +264,12 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   specBadge: {
-    backgroundColor: 'rgba(34, 211, 238, 0.10)',
+    backgroundColor: 'rgba(34, 211, 238, 0.12)',
     borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.2)',
+    borderColor: 'rgba(34, 211, 238, 0.25)',
   },
   specText: {
     fontSize: 9,
@@ -276,7 +279,7 @@ const styles = StyleSheet.create({
   },
   smartDiffCard: {
     marginTop: 6,
-    padding: 14,
+    padding: 16,
   },
   toggleRow: {
     flexDirection: 'row',
@@ -287,6 +290,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingRight: 10,
   },
+  smartTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
   smartTitle: {
     fontSize: 12,
     fontWeight: '900',
@@ -296,8 +305,8 @@ const styles = StyleSheet.create({
   smartSub: {
     fontSize: 9,
     color: MRColors.textSecondary,
-    fontWeight: '600',
-    marginTop: 2,
+    fontWeight: '700',
+    lineHeight: 12,
   },
   ctaWrapper: {
     paddingHorizontal: 20,

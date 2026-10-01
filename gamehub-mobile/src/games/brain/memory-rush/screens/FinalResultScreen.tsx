@@ -8,6 +8,7 @@ import { GameBackground } from '../components/GameBackground';
 import { GlassCard } from '../components/GlassCard';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SecondaryButton } from '../components/SecondaryButton';
+import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 import { useMemoryRushStore } from '../store/memoryRushStore';
 import { getPerformanceTitle } from '../logic/scoring';
@@ -34,6 +35,7 @@ export const FinalResultScreen: React.FC<FinalResultScreenProps> = ({
         <View style={styles.header}>
           <Text style={styles.title}>RUN COMPLETE</Text>
           <View style={styles.perfBadge}>
+            <MRIcon name="star" size={11} color={MRColors.cyanBright} />
             <Text style={styles.perfText}>{perfTitle}</Text>
           </View>
         </View>
@@ -50,18 +52,22 @@ export const FinalResultScreen: React.FC<FinalResultScreenProps> = ({
             {/* 4 Compact Metrics */}
             <View style={styles.metricsRow}>
               <View style={styles.metricCell}>
+                <MRIcon name="target" size={12} color={MRColors.yellowStatus} />
                 <Text style={styles.mLabel}>ACCURACY</Text>
                 <Text style={styles.mValYellow}>{accuracy}%</Text>
               </View>
               <View style={styles.metricCell}>
+                <MRIcon name="zap" size={12} color={MRColors.cyanBright} />
                 <Text style={styles.mLabel}>BEST COMBO</Text>
                 <Text style={styles.mValCyan}>×{maxCombo}</Text>
               </View>
               <View style={styles.metricCell}>
+                <MRIcon name="clock" size={12} color={MRColors.textPrimary} />
                 <Text style={styles.mLabel}>REACTION</Text>
                 <Text style={styles.mValWhite}>0.76s</Text>
               </View>
               <View style={styles.metricCell}>
+                <MRIcon name="award" size={12} color={MRColors.cyanBright} />
                 <Text style={styles.mLabel}>MEMORY LVL</Text>
                 <Text style={styles.mValCyan}>12</Text>
               </View>
@@ -70,24 +76,35 @@ export const FinalResultScreen: React.FC<FinalResultScreenProps> = ({
 
           {/* Simple Performance Chart */}
           <GlassCard style={styles.chartCard}>
-            <Text style={styles.chartTitle}>ROUND PERFORMANCE</Text>
+            <View style={styles.chartHeader}>
+              <MRIcon name="bar-chart-2" size={14} color={MRColors.cyanBright} />
+              <Text style={styles.chartTitle}>ROUND PERFORMANCE</Text>
+            </View>
 
             <View style={styles.chartStack}>
               <View style={styles.chartRow}>
                 <Text style={styles.rowLabel}>Round 1</Text>
-                <View style={[styles.barFill, { width: '85%' }]} />
+                <View style={styles.barTrack}>
+                  <View style={[styles.barFill, { width: '85%' }]} />
+                </View>
               </View>
               <View style={styles.chartRow}>
                 <Text style={styles.rowLabel}>Round 2</Text>
-                <View style={[styles.barFill, { width: '95%' }]} />
+                <View style={styles.barTrack}>
+                  <View style={[styles.barFill, { width: '95%' }]} />
+                </View>
               </View>
               <View style={styles.chartRow}>
                 <Text style={styles.rowLabel}>Round 3</Text>
-                <View style={[styles.barFill, { width: '70%' }]} />
+                <View style={styles.barTrack}>
+                  <View style={[styles.barFill, { width: '70%' }]} />
+                </View>
               </View>
               <View style={styles.chartRow}>
                 <Text style={styles.rowLabel}>Round 4</Text>
-                <View style={[styles.barFill, { width: '100%' }]} />
+                <View style={styles.barTrack}>
+                  <View style={[styles.barFill, { width: '100%' }]} />
+                </View>
               </View>
             </View>
           </GlassCard>
@@ -95,8 +112,9 @@ export const FinalResultScreen: React.FC<FinalResultScreenProps> = ({
           {/* Buttons Stack */}
           <View style={styles.btnStack}>
             <PrimaryButton
-              title="PLAY AGAIN ⟲"
+              title="PLAY AGAIN →"
               size="lg"
+              variant="cyan"
               onPress={onPlayAgain}
             />
             <SecondaryButton
@@ -131,12 +149,15 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   perfBadge: {
-    backgroundColor: MRColors.cyanMuted,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(34, 211, 238, 0.12)',
     borderRadius: 10,
     paddingHorizontal: 12,
-    paddingVertical: 3,
-    borderWidth: 1,
-    borderColor: 'rgba(34, 211, 238, 0.3)',
+    paddingVertical: 4,
+    borderWidth: 1.2,
+    borderColor: 'rgba(34, 211, 238, 0.35)',
     marginTop: 4,
   },
   perfText: {
@@ -165,6 +186,9 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: MRColors.cyanBright,
     marginVertical: 4,
+    textShadowColor: MRColors.cyanGlow,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,
   },
   metricsRow: {
     flexDirection: 'row',
@@ -174,12 +198,13 @@ const styles = StyleSheet.create({
   },
   metricCell: {
     flex: 1,
-    backgroundColor: 'rgba(8, 10, 13, 0.75)',
+    backgroundColor: 'rgba(8, 10, 13, 0.85)',
     borderRadius: 10,
     paddingVertical: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(34, 211, 238, 0.2)',
+    gap: 3,
   },
   mLabel: {
     fontSize: 7.5,
@@ -191,29 +216,31 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '900',
     color: MRColors.yellowStatus,
-    marginTop: 2,
   },
   mValCyan: {
     fontSize: 13,
     fontWeight: '900',
     color: MRColors.cyanBright,
-    marginTop: 2,
   },
   mValWhite: {
     fontSize: 13,
     fontWeight: '900',
     color: MRColors.textPrimary,
-    marginTop: 2,
   },
   chartCard: {
-    padding: 14,
+    padding: 16,
+  },
+  chartHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 12,
   },
   chartTitle: {
     fontSize: 11,
     fontWeight: '900',
     color: MRColors.textSecondary,
     letterSpacing: 1.2,
-    marginBottom: 10,
   },
   chartStack: {
     gap: 8,
@@ -225,12 +252,19 @@ const styles = StyleSheet.create({
   },
   rowLabel: {
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: '800',
     color: MRColors.textMuted,
     width: 55,
   },
-  barFill: {
+  barTrack: {
+    flex: 1,
     height: 8,
+    borderRadius: 4,
+    backgroundColor: MRColors.surfaceElevated,
+    overflow: 'hidden',
+  },
+  barFill: {
+    height: '100%',
     borderRadius: 4,
     backgroundColor: MRColors.primaryCyan,
   },

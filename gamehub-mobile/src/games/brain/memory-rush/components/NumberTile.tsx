@@ -1,5 +1,5 @@
 // ============================================================
-// MEMORY RUSH — Native React Native Accessible Number Tile
+// MEMORY RUSH — 2.5D Chunky Arcade Number Tile (Native RN Text)
 // ============================================================
 
 import React from 'react';
@@ -31,118 +31,163 @@ export const NumberTile: React.FC<NumberTileProps> = ({
   const isCorrect = state === 'correct';
   const isWrong = state === 'wrong';
 
-  const getBorderColor = () => {
-    if (isCorrect) return MRColors.successGreen;
-    if (isWrong) return MRColors.dangerRose;
-    if (isSelected) return MRColors.primaryCyan;
-    if (isPreview) return 'rgba(34, 211, 238, 0.4)';
-    return 'rgba(255, 255, 255, 0.12)';
+  const lipHeight = Math.max(3, Math.round(size * 0.06));
+  const borderRadius = Math.round(size * 0.24);
+  const fontSize = size > 80 ? 34 : size > 65 ? 28 : size > 50 ? 22 : 18;
+
+  const getColors = () => {
+    if (isCorrect) {
+      return {
+        gradient: ['#22C55E', '#16A34A', '#15803D'],
+        lipColor: '#166534',
+        textColor: '#FFFFFF',
+        borderColor: '#86EFAC',
+        glow: MRColors.successGreen,
+      };
+    }
+    if (isWrong) {
+      return {
+        gradient: ['#F43F5E', '#E11D48', '#BE123C'],
+        lipColor: '#881337',
+        textColor: '#FFFFFF',
+        borderColor: '#FECDD3',
+        glow: MRColors.dangerRose,
+      };
+    }
+    if (isSelected) {
+      return {
+        gradient: ['#38BDF8', '#0284C7', '#0369A1'],
+        lipColor: '#075985',
+        textColor: '#FFFFFF',
+        borderColor: '#BAE6FD',
+        glow: MRColors.primaryCyan,
+      };
+    }
+    if (isPreview) {
+      return {
+        gradient: ['#1E293B', '#0F172A', '#020617'],
+        lipColor: '#090D16',
+        textColor: MRColors.cyanBright,
+        borderColor: MRColors.primaryCyan,
+        glow: 'rgba(34, 211, 238, 0.4)',
+      };
+    }
+    // Hidden / Default tile state
+    return {
+      gradient: ['#1E293B', '#111827', '#0B0F19'],
+      lipColor: '#05070D',
+      textColor: MRColors.textSecondary,
+      borderColor: 'rgba(34, 211, 238, 0.25)',
+      glow: 'rgba(0, 0, 0, 0.5)',
+    };
   };
 
-  const getGlowStyle = () => {
-    if (isCorrect) return styles.glowCorrect;
-    if (isWrong) return styles.glowWrong;
-    if (isSelected) return styles.glowSelected;
-    return null;
-  };
-
-  const fontSize = size > 80 ? 32 : size > 65 ? 26 : 22;
+  const config = getColors();
 
   return (
     <Pressable
       onPress={onPress}
-      disabled={disabled || isHidden === false && isPreview === false && state === 'disabled'}
+      disabled={disabled || (isHidden === false && isPreview === false && state === 'disabled')}
       style={({ pressed }) => [
-        styles.tileOuter,
+        styles.outer,
         {
           width: size,
-          height: size,
-          borderRadius: Math.round(size * 0.22),
-          borderColor: getBorderColor(),
+          height: size + lipHeight,
         },
-        getGlowStyle(),
-        pressed && styles.pressed,
         style,
       ]}
       accessibilityLabel={isPreview ? `Number ${value}` : 'Hidden Tile'}
       accessibilityRole="button"
     >
-      <LinearGradient
-        colors={
-          isCorrect
-            ? ['#143823', '#0A2114']
-            : isWrong
-            ? ['#3D151B', '#240A0E']
-            : isSelected
-            ? ['#102E42', '#0A1E2C']
-            : ['rgba(23, 29, 36, 0.95)', 'rgba(15, 20, 26, 0.98)']
-        }
-        style={[styles.tileInner, { borderRadius: Math.round(size * 0.22) }]}
-      >
-        <Text
+      {({ pressed }) => (
+        <View
           style={[
-            styles.numberText,
-            { fontSize },
-            isCorrect && styles.textCorrect,
-            isWrong && styles.textWrong,
-            isSelected && styles.textSelected,
+            styles.lipWrapper,
+            {
+              width: size,
+              height: size + lipHeight,
+              backgroundColor: config.lipColor,
+              borderRadius,
+            },
           ]}
         >
-          {isPreview || isCorrect ? value : isHidden ? '?' : ''}
-        </Text>
-      </LinearGradient>
+          <View
+            style={[
+              styles.tileFace,
+              {
+                width: size,
+                height: size,
+                marginTop: pressed ? lipHeight : 0,
+                borderRadius,
+                borderColor: config.borderColor,
+                shadowColor: config.glow,
+              },
+            ]}
+          >
+            <LinearGradient
+              colors={config.gradient as any}
+              style={[styles.gradient, { borderRadius }]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+            >
+              {/* Glass Specular Spec */}
+              <View style={styles.topGlassHighlight} />
+
+              <Text
+                style={[
+                  styles.numberText,
+                  { fontSize, color: config.textColor },
+                  (isCorrect || isWrong || isSelected) && styles.textShadow,
+                ]}
+              >
+                {isPreview || isCorrect || isWrong ? value : isHidden ? '?' : ''}
+              </Text>
+            </LinearGradient>
+          </View>
+        </View>
+      )}
     </Pressable>
   );
 };
 
 const styles = StyleSheet.create({
-  tileOuter: {
+  outer: {
+    margin: 4,
+  },
+  lipWrapper: {
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  tileFace: {
     borderWidth: 1.5,
     overflow: 'hidden',
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.6,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 6,
   },
-  glowCorrect: {
-    borderColor: MRColors.successGreen,
-    shadowColor: MRColors.successGreen,
-    shadowOpacity: 0.6,
-    shadowRadius: 12,
-  },
-  glowWrong: {
-    borderColor: MRColors.dangerRose,
-    shadowColor: MRColors.dangerRose,
-    shadowOpacity: 0.6,
-    shadowRadius: 12,
-  },
-  glowSelected: {
-    borderColor: MRColors.primaryCyan,
-    shadowColor: MRColors.primaryCyan,
-    shadowOpacity: 0.6,
-    shadowRadius: 12,
-  },
-  tileInner: {
+  gradient: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  topGlassHighlight: {
+    position: 'absolute',
+    top: 2,
+    left: '12%',
+    right: '12%',
+    height: 1.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.45)',
+    borderRadius: 1,
   },
   numberText: {
     fontWeight: '900',
-    color: MRColors.textPrimary,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
-  textCorrect: {
-    color: MRColors.successGreen,
-  },
-  textWrong: {
-    color: MRColors.dangerRose,
-  },
-  textSelected: {
-    color: MRColors.cyanBright,
-  },
-  pressed: {
-    transform: [{ scale: 0.94 }],
+  textShadow: {
+    textShadowColor: 'rgba(0, 0, 0, 0.6)',
+    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowRadius: 3,
   },
 });
