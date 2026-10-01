@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Feather } from '@expo/vector-icons';
+import { MRIcon } from '../components/MRIcon';
 import { colors } from '../constants/colors';
 import { typography } from '../constants/typography';
 import { GameBackground } from '../components/GameBackground';
