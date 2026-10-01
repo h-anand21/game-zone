@@ -7,6 +7,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { GameBackground } from '../components/GameBackground';
 import { GlassCard } from '../components/GlassCard';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { MRIcon } from '../components/MRIcon';
 import { MRColors } from '../constants/colors';
 
 interface HowToPlayScreenProps {
@@ -30,6 +31,7 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({ onGotIt }) => 
           <GlassCard style={styles.stepCard}>
             <View style={styles.stepHeader}>
               <View style={styles.stepBadge}>
+                <MRIcon name="eye" size={14} color={MRColors.cyanBright} />
                 <Text style={styles.stepNum}>STEP 1</Text>
               </View>
               <Text style={styles.stepTitle}>LOOK</Text>
@@ -44,6 +46,7 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({ onGotIt }) => 
           <GlassCard style={styles.stepCard}>
             <View style={styles.stepHeader}>
               <View style={styles.stepBadge}>
+                <MRIcon name="grid" size={14} color={MRColors.cyanBright} />
                 <Text style={styles.stepNum}>STEP 2</Text>
               </View>
               <Text style={styles.stepTitle}>REMEMBER</Text>
@@ -58,6 +61,7 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({ onGotIt }) => 
           <GlassCard style={styles.stepCard}>
             <View style={styles.stepHeader}>
               <View style={styles.stepBadge}>
+                <MRIcon name="zap" size={14} color={MRColors.yellowStatus} />
                 <Text style={styles.stepNum}>STEP 3</Text>
               </View>
               <Text style={styles.stepTitle}>RESPOND</Text>
@@ -73,6 +77,7 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({ onGotIt }) => 
           <PrimaryButton
             title="GOT IT →"
             size="lg"
+            variant="cyan"
             onPress={onGotIt}
           />
         </View>
@@ -110,7 +115,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   stepCard: {
-    padding: 14,
+    padding: 16,
   },
   stepHeader: {
     flexDirection: 'row',
@@ -119,10 +124,13 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   stepBadge: {
-    backgroundColor: MRColors.cyanMuted,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(34, 211, 238, 0.12)',
     borderRadius: 8,
     paddingHorizontal: 8,
-    paddingVertical: 3,
+    paddingVertical: 4,
     borderWidth: 1,
     borderColor: 'rgba(34, 211, 238, 0.3)',
   },
@@ -141,21 +149,21 @@ const styles = StyleSheet.create({
   stepDesc: {
     fontSize: 12,
     color: MRColors.textSecondary,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   visualBox: {
     marginTop: 10,
-    backgroundColor: 'rgba(8, 10, 13, 0.8)',
+    backgroundColor: 'rgba(8, 10, 13, 0.85)',
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(34, 211, 238, 0.2)',
     alignItems: 'center',
   },
   visualText: {
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '900',
     color: MRColors.cyanBright,
     letterSpacing: 1.5,
   },
