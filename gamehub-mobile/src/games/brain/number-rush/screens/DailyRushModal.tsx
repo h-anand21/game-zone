@@ -13,7 +13,7 @@ import {
 import { Image as ExpoImage } from 'expo-image';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
-import { HeaderHUD, GameButton, WoodPanel, MascotIllustration } from '../components';
+import { HeaderHUD, GameButton, WoodPanel, MascotIllustration, BottomNavBar } from '../components';
 
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
@@ -168,8 +168,11 @@ export const DailyRushModal: React.FC = () => {
           style={styles.startBtn}
         />
 
-        <View style={{ height: 40 }} />
+        <View style={{ height: 110 }} />
       </ScrollView>
+
+      {/* Global Bottom Navigation */}
+      <BottomNavBar />
     </View>
   );
 };

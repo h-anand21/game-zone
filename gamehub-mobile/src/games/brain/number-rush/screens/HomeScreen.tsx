@@ -60,9 +60,15 @@ export const HomeScreen: React.FC = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 3. Hero Section: 3D Logo Signboard */}
+        {/* 3. Hero Section: 3D Logo Signboard (Carved Jungle Wood) */}
         <View style={styles.heroSection}>
           <View style={styles.logoBadge}>
+            {/* Corner Brass Rivets */}
+            <View style={[styles.rivet, styles.rivetTL]} />
+            <View style={[styles.rivet, styles.rivetTR]} />
+            <View style={[styles.rivet, styles.rivetBL]} />
+            <View style={[styles.rivet, styles.rivetBR]} />
+
             <Text style={styles.logoArcade}>ARCADE BRAIN CHALLENGE</Text>
             <Text style={styles.logoTitle}>NUMBER RUSH</Text>
             <Text style={styles.logoTagline}>THINK • TAP • RUSH</Text>
@@ -81,8 +87,8 @@ export const HomeScreen: React.FC = () => {
             <MascotIllustration size={175} character="runner_boy" mood="celebrate" />
           </View>
 
-          {/* Best Score & Streak Highlight Card */}
-          <WoodPanel style={styles.bestScoreCard} variant="glass" hasRivets={false}>
+          {/* Best Score & Streak Highlight Card (Warm Wood Panel) */}
+          <WoodPanel style={styles.bestScoreCard} variant="wood" hasRivets={false}>
             <View style={styles.bestScoreRow}>
               <View style={styles.bestScoreCol}>
                 <Text style={styles.bestScoreLabel}>BEST SCORE</Text>
@@ -220,18 +226,33 @@ const styles = StyleSheet.create({
   },
   logoBadge: {
     alignItems: 'center',
-    backgroundColor: 'rgba(7, 27, 52, 0.92)',
-    borderWidth: 2.5,
-    borderColor: '#FFC107',
+    backgroundColor: '#351A0D', // Rich warm wood brown
+    borderWidth: 3,
+    borderColor: '#7A3F1D', // Carved wood border
     borderRadius: 22,
     paddingHorizontal: 22,
     paddingVertical: 10,
-    shadowColor: '#FFB800',
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.5,
     shadowRadius: 14,
     elevation: 8,
+    position: 'relative',
   },
+  rivet: {
+    position: 'absolute',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FFD700',
+    borderWidth: 1.5,
+    borderColor: '#C67C00',
+    zIndex: 5,
+  },
+  rivetTL: { top: 6, left: 6 },
+  rivetTR: { top: 6, right: 6 },
+  rivetBL: { bottom: 6, left: 6 },
+  rivetBR: { bottom: 6, right: 6 },
   logoArcade: {
     color: '#00E5FF',
     fontSize: 9,
@@ -260,7 +281,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 14,
-    backgroundColor: 'rgba(11, 40, 72, 0.9)',
+    backgroundColor: '#2E1508',
     borderWidth: 2,
     borderColor: '#FFD700',
     justifyContent: 'center',
@@ -287,6 +308,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     marginBottom: 12,
+    backgroundColor: '#2D1407',
+    borderColor: '#6E3A1A',
+    borderWidth: 2,
   },
   bestScoreRow: {
     flexDirection: 'row',
@@ -341,20 +365,21 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(11, 40, 72, 0.85)',
+    backgroundColor: '#331709',
     borderRadius: 18,
     borderWidth: 2,
+    borderColor: '#7A3F1D',
     paddingHorizontal: 12,
     paddingVertical: 10,
     position: 'relative',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
     shadowRadius: 6,
     elevation: 4,
   },
-  dailyCardBorder: { borderColor: '#FFB800' },
-  ranksCardBorder: { borderColor: '#1E90FF' },
+  dailyCardBorder: { borderColor: '#B87333' },
+  ranksCardBorder: { borderColor: '#8A522A' },
   cardPressed: {
     opacity: 0.88,
     transform: [{ scale: 0.98 }],
@@ -422,13 +447,14 @@ const styles = StyleSheet.create({
   },
   modeCard: {
     width: (width - 44) / 2,
-    backgroundColor: 'rgba(7, 27, 52, 0.85)',
+    backgroundColor: '#2B1307',
     borderRadius: 20,
     borderWidth: 2,
+    borderColor: '#6E3A1A',
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
     shadowRadius: 6,
     elevation: 4,
   },

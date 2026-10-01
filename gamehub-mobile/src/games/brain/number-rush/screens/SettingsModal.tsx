@@ -96,23 +96,30 @@ export const SettingsModal: React.FC = () => {
               <View style={styles.rowInfo}>
                 <View style={styles.rowTitleRow}>
                   <Text style={styles.rowIcon}>🎵</Text>
-                  <Text style={styles.rowTitle}>Music</Text>
+                  <Text style={styles.rowTitle}>Background Music</Text>
                 </View>
-                <Text style={styles.rowSubtitle}>Background music during gameplay</Text>
+                <Text style={styles.rowSubtitle}>Jungle ambient arcade music</Text>
               </View>
 
-              <View style={styles.rowControls}>
+              <GameToggle
+                value={settings.backgroundMusic}
+                onValueChange={(val) => updateSettings({ backgroundMusic: val })}
+              />
+            </View>
+
+            {/* Music Volume Slider Sub-row */}
+            {settings.backgroundMusic && (
+              <View style={styles.sliderSubRow}>
+                <View style={styles.sliderLabelRow}>
+                  <Text style={styles.sliderLabelIcon}>🔈</Text>
+                  <Text style={styles.sliderLabelText}>Music Volume</Text>
+                </View>
                 <GameSlider
                   value={settings.bgVolume}
                   onValueChange={(val) => updateSettings({ bgVolume: val })}
-                  disabled={!settings.backgroundMusic}
-                />
-                <GameToggle
-                  value={settings.backgroundMusic}
-                  onValueChange={(val) => updateSettings({ backgroundMusic: val })}
                 />
               </View>
-            </View>
+            )}
 
             {/* Sound Effects Row */}
             <View style={[styles.settingRow, styles.borderTop]}>
@@ -121,30 +128,37 @@ export const SettingsModal: React.FC = () => {
                   <Text style={styles.rowIcon}>🔊</Text>
                   <Text style={styles.rowTitle}>Sound Effects</Text>
                 </View>
-                <Text style={styles.rowSubtitle}>Game sounds and effects</Text>
+                <Text style={styles.rowSubtitle}>Taps, combos & rush audio</Text>
               </View>
 
-              <View style={styles.rowControls}>
+              <GameToggle
+                value={settings.soundEffects}
+                onValueChange={(val) => updateSettings({ soundEffects: val })}
+              />
+            </View>
+
+            {/* SFX Volume Slider Sub-row */}
+            {settings.soundEffects && (
+              <View style={styles.sliderSubRow}>
+                <View style={styles.sliderLabelRow}>
+                  <Text style={styles.sliderLabelIcon}>🔉</Text>
+                  <Text style={styles.sliderLabelText}>SFX Volume</Text>
+                </View>
                 <GameSlider
                   value={settings.sfxVolume}
                   onValueChange={(val) => updateSettings({ sfxVolume: val })}
-                  disabled={!settings.soundEffects}
-                />
-                <GameToggle
-                  value={settings.soundEffects}
-                  onValueChange={(val) => updateSettings({ soundEffects: val })}
                 />
               </View>
-            </View>
+            )}
 
             {/* Vibration Row */}
             <View style={[styles.settingRow, styles.borderTop]}>
               <View style={styles.rowInfo}>
                 <View style={styles.rowTitleRow}>
                   <Text style={styles.rowIcon}>📳</Text>
-                  <Text style={styles.rowTitle}>Vibration</Text>
+                  <Text style={styles.rowTitle}>Device Vibration</Text>
                 </View>
-                <Text style={styles.rowSubtitle}>Device vibration for actions</Text>
+                <Text style={styles.rowSubtitle}>Haptic pulses on correct taps & streaks</Text>
               </View>
 
               <GameToggle
@@ -517,6 +531,31 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     marginTop: 2,
     lineHeight: 15,
+  },
+  sliderSubRow: {
+    paddingHorizontal: 12,
+    paddingBottom: 10,
+    paddingTop: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.25)',
+    borderRadius: 12,
+    marginHorizontal: 8,
+    marginBottom: 8,
+    marginTop: 2,
+    gap: 6,
+  },
+  sliderLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  sliderLabelIcon: {
+    fontSize: 13,
+    marginRight: 6,
+  },
+  sliderLabelText: {
+    color: '#FFE082',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   rowControls: {
     flexDirection: 'row',
