@@ -97,8 +97,10 @@ interface MemoryRushState {
   startRound: () => void;
   advanceToHide: () => void;
   advanceToQuestion: () => void;
+  advanceToNextRound: () => boolean;
   handleTileSelect: (tile: NumberTileData) => { isCorrect: boolean; isComplete: boolean };
-  handleAnswerChoice: (value: number) => { isCorrect: boolean };
+  handleAnswerChoice: (value: number) => { isCorrect: boolean; isComplete: boolean };
+  handleTimeoutMiss: () => void;
   usePowerUp: (type: PowerUpType) => boolean;
 }
 
@@ -331,6 +333,71 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
     }
   },
 
+  advanceToNextRound: () => {
+    const { round, totalRounds, mode, difficulty, settings } = get();
+    if (round >= totalRounds) {
+      return false;
+    }
+    const nextRound = round + 1;
+    const { config, initialTiles } = generateRoundConfig(mode, difficulty, nextRound, settings.smartDifficulty);
+
+    set({
+      round: nextRound,
+      roundConfig: config,
+      tiles: initialTiles,
+      playerInputSequence: [],
+      selectedTileIds: [],
+      phase: 'preview',
+      startTimeMs: Date.now(),
+      lastFeedback: { type: null, message: '' },
+    });
+    return true;
+  },
+
+  handleTimeoutMiss: () => {
+    const { roundConfig, tiles, totalAttempts } = get();
+    if (!roundConfig) return;
+
+    const newTotal = totalAttempts + 1;
+
+    let updatedTiles = [...tiles];
+    if (roundConfig.actualType === 'memoryGrid') {
+      updatedTiles = tiles.map((t) =>
+        t.row === roundConfig.targetPos?.row && t.col === roundConfig.targetPos?.col
+          ? { ...t, state: 'correct' as const, value: roundConfig.targetValue || t.value }
+          : t
+      );
+    } else if (roundConfig.actualType === 'sequenceRush') {
+      const expectedTileIds = roundConfig.sequenceTileIds || [];
+      updatedTiles = tiles.map((t) => {
+        const stepIdx = expectedTileIds.indexOf(t.id);
+        if (stepIdx !== -1) {
+          return { ...t, state: 'correct' as const, sequenceStep: stepIdx + 1 };
+        }
+        return t;
+      });
+    } else if (roundConfig.actualType === 'numberShift') {
+      updatedTiles = tiles.map((t) =>
+        t.id === roundConfig.changedTileId
+          ? { ...t, state: 'correct' as const, isChanged: true }
+          : t
+      );
+    } else if (roundConfig.actualType === 'missingNumber') {
+      updatedTiles = tiles.map((t) =>
+        t.isMissing
+          ? { ...t, state: 'correct' as const, value: roundConfig.vanishedValue! }
+          : t
+      );
+    }
+
+    set({
+      tiles: updatedTiles,
+      combo: 0,
+      totalAttempts: newTotal,
+      lastFeedback: { type: 'miss', message: 'TIME UP! CORRECT ANSWER REVEALED' },
+    });
+  },
+
   handleTileSelect: (tile) => {
     const { roundConfig, combo, maxCombo, score, difficulty, startTimeMs, correctAnswers, totalAttempts, playerInputSequence, tiles } = get();
     if (!roundConfig) return { isCorrect: false, isComplete: false };
@@ -349,7 +416,7 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
         const newScore = score + pts;
 
         const updatedTiles = tiles.map((t) =>
-          t.id === tile.id ? { ...t, state: 'correct' as const } : t
+          t.id === tile.id ? { ...t, state: 'correct' as const, value: roundConfig.targetValue || t.value } : t
         );
 
         set({
@@ -367,7 +434,7 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
         const updatedTiles = tiles.map((t) => {
           if (t.id === tile.id) return { ...t, state: 'wrong' as const };
           if (t.row === roundConfig.targetPos?.row && t.col === roundConfig.targetPos?.col) {
-            return { ...t, state: 'correct' as const };
+            return { ...t, state: 'correct' as const, value: roundConfig.targetValue || t.value };
           }
           return t;
         });
@@ -376,10 +443,13 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
           tiles: updatedTiles,
           combo: 0,
           totalAttempts: newTotal,
-          lastFeedback: { type: 'miss', message: 'WRONG TILE' },
+          lastFeedback: {
+            type: 'miss',
+            message: `MISTAKE! NUMBER ${roundConfig.targetValue ?? ''} WAS HERE`,
+          },
         });
 
-        return { isCorrect: false, isComplete: false };
+        return { isCorrect: false, isComplete: true };
       }
     }
 
@@ -429,18 +499,23 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
           return { isCorrect: true, isComplete: false };
         }
       } else {
-        const updatedTiles = tiles.map((t) =>
-          t.id === tile.id ? { ...t, state: 'wrong' as const } : t
-        );
+        const updatedTiles = tiles.map((t) => {
+          if (t.id === tile.id) return { ...t, state: 'wrong' as const };
+          const stepIdx = expectedTileIds.indexOf(t.id);
+          if (stepIdx !== -1) {
+            return { ...t, state: 'correct' as const, sequenceStep: stepIdx + 1 };
+          }
+          return t;
+        });
 
         set({
           tiles: updatedTiles,
           combo: 0,
           totalAttempts: newTotal,
-          lastFeedback: { type: 'miss', message: 'WRONG SEQUENCE' },
+          lastFeedback: { type: 'miss', message: 'WRONG SEQUENCE! CORRECT ORDER REVEALED' },
         });
 
-        return { isCorrect: false, isComplete: false };
+        return { isCorrect: false, isComplete: true };
       }
     }
 
@@ -473,7 +548,7 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
       } else {
         const updatedTiles = tiles.map((t) => {
           if (t.id === tile.id) return { ...t, state: 'wrong' as const };
-          if (t.id === roundConfig.changedTileId) return { ...t, state: 'correct' as const };
+          if (t.id === roundConfig.changedTileId) return { ...t, state: 'correct' as const, isChanged: true };
           return t;
         });
 
@@ -481,10 +556,13 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
           tiles: updatedTiles,
           combo: 0,
           totalAttempts: newTotal,
-          lastFeedback: { type: 'miss', message: 'NOT THAT NUMBER' },
+          lastFeedback: {
+            type: 'miss',
+            message: `WRONG! CHANGED WAS ${roundConfig.changedOriginalValue} ➔ ${roundConfig.changedNewValue}`,
+          },
         });
 
-        return { isCorrect: false, isComplete: false };
+        return { isCorrect: false, isComplete: true };
       }
     }
 
@@ -493,7 +571,7 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
 
   handleAnswerChoice: (value) => {
     const { roundConfig, combo, maxCombo, score, difficulty, startTimeMs, correctAnswers, totalAttempts, tiles } = get();
-    if (!roundConfig) return { isCorrect: false };
+    if (!roundConfig) return { isCorrect: false, isComplete: false };
 
     const reaction = Date.now() - startTimeMs;
     const isCorrect = value === roundConfig.vanishedValue;
@@ -520,15 +598,23 @@ export const useMemoryRushStore = create<MemoryRushState>((set, get) => ({
         lastFeedback: { type: 'perfect', message: 'VANISHED NUMBER FOUND!', points: pts },
       });
 
-      return { isCorrect: true };
+      return { isCorrect: true, isComplete: true };
     } else {
+      const updatedTiles = tiles.map((t) =>
+        t.isMissing ? { ...t, state: 'correct' as const, value: roundConfig.vanishedValue! } : t
+      );
+
       set({
+        tiles: updatedTiles,
         combo: 0,
         totalAttempts: newTotal,
-        lastFeedback: { type: 'miss', message: 'INCORRECT CHOICE' },
+        lastFeedback: {
+          type: 'miss',
+          message: `WRONG! MISSING NUMBER WAS ${roundConfig.vanishedValue}`,
+        },
       });
 
-      return { isCorrect: false };
+      return { isCorrect: false, isComplete: true };
     }
   },
 

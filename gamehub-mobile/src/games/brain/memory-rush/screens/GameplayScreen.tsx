@@ -2,7 +2,7 @@
 // MEMORY RUSH — 07 Gameplay Screen (State Machine & Fast Action)
 // ============================================================
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { GameBackground } from '../components/GameBackground';
 import { NumberGrid } from '../components/NumberGrid';
@@ -42,14 +42,28 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     startRound,
     advanceToHide,
     advanceToQuestion,
+    advanceToNextRound,
     handleTileSelect,
     handleAnswerChoice,
+    handleTimeoutMiss,
     usePowerUp,
   } = useMemoryRushStore();
 
   const [remainingTimeMs, setRemainingTimeMs] = useState<number>(10000);
   const [totalTimeMs, setTotalTimeMs] = useState<number>(10000);
+  const [isAnswerLocked, setIsAnswerLocked] = useState(false);
+  const [mistakeSecondsLeft, setMistakeSecondsLeft] = useState<number | null>(null);
+
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const cdIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Clean up timers on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (cdIntervalRef.current) clearInterval(cdIntervalRef.current);
+    };
+  }, []);
 
   // Initialize round on mount
   useEffect(() => {
@@ -79,9 +93,47 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     }
   }, [phase, advanceToQuestion]);
 
+  // Handler to advance to next round or finish run
+  const triggerNextRoundOrFinish = useCallback(
+    (isMistake: boolean) => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      setIsAnswerLocked(true);
+
+      if (isMistake) {
+        setMistakeSecondsLeft(2);
+        if (cdIntervalRef.current) clearInterval(cdIntervalRef.current);
+        cdIntervalRef.current = setInterval(() => {
+          setMistakeSecondsLeft((prev) => (prev && prev > 1 ? prev - 1 : null));
+        }, 700);
+
+        setTimeout(() => {
+          if (cdIntervalRef.current) clearInterval(cdIntervalRef.current);
+          setIsAnswerLocked(false);
+          setMistakeSecondsLeft(null);
+
+          if (round >= totalRounds) {
+            onFinalResult();
+          } else {
+            advanceToNextRound();
+          }
+        }, 1500);
+      } else {
+        setTimeout(() => {
+          setIsAnswerLocked(false);
+          if (round >= totalRounds) {
+            onFinalResult();
+          } else {
+            advanceToNextRound();
+          }
+        }, 750);
+      }
+    },
+    [round, totalRounds, advanceToNextRound, onFinalResult]
+  );
+
   // 3. Question / Answering Timer
   useEffect(() => {
-    if (phase === 'question' && roundConfig) {
+    if (phase === 'question' && roundConfig && !isAnswerLocked) {
       const timerMs = roundConfig.timerDurationMs;
       setRemainingTimeMs(timerMs);
       setTotalTimeMs(timerMs);
@@ -94,7 +146,8 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
 
         if (rem <= 0) {
           if (timerRef.current) clearInterval(timerRef.current);
-          handleAnswerChoice(-1); // Time out miss
+          handleTimeoutMiss();
+          triggerNextRoundOrFinish(true);
         }
       }, 50);
 
@@ -102,37 +155,23 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
         if (timerRef.current) clearInterval(timerRef.current);
       };
     }
-  }, [phase, roundConfig]);
+  }, [phase, roundConfig, isAnswerLocked, handleTimeoutMiss, triggerNextRoundOrFinish]);
 
   const onTilePress = (tile: NumberTileData) => {
-    if (phase !== 'question') return;
+    if (phase !== 'question' || isAnswerLocked) return;
     const res = handleTileSelect(tile);
 
     if (res.isComplete) {
-      if (timerRef.current) clearInterval(timerRef.current);
-      setTimeout(() => {
-        if (round >= totalRounds) {
-          onFinalResult();
-        } else {
-          onRoundComplete();
-        }
-      }, 700);
+      triggerNextRoundOrFinish(!res.isCorrect);
     }
   };
 
   const onOptionPress = (val: number) => {
-    if (phase !== 'question') return;
+    if (phase !== 'question' || isAnswerLocked) return;
     const res = handleAnswerChoice(val);
 
-    if (res.isCorrect) {
-      if (timerRef.current) clearInterval(timerRef.current);
-      setTimeout(() => {
-        if (round >= totalRounds) {
-          onFinalResult();
-        } else {
-          onRoundComplete();
-        }
-      }, 700);
+    if (res.isComplete) {
+      triggerNextRoundOrFinish(!res.isCorrect);
     }
   };
 
@@ -261,6 +300,16 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
             message={lastFeedback.message}
             points={lastFeedback.points}
           />
+
+          {/* Mistake Auto-Advance Seconds Indicator */}
+          {mistakeSecondsLeft !== null && (
+            <View style={styles.mistakeCountdownBanner}>
+              <MRIcon name="alert-triangle" size={15} color={MRColors.dangerRose} />
+              <Text style={styles.mistakeCountdownText}>
+                CORRECT ANSWER REVEALED • NEXT IN {mistakeSecondsLeft}s
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* MAIN GAME BOARD */}
@@ -271,7 +320,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
               rows={roundConfig.gridRows}
               cols={roundConfig.gridCols}
               onTilePress={onTilePress}
-              disabled={phase !== 'question'}
+              disabled={phase !== 'question' || isAnswerLocked}
             />
 
             {/* Answer Options for Missing Number Mode */}
@@ -283,9 +332,11 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
                     <Pressable
                       key={`missing_${val}`}
                       onPress={() => onOptionPress(val)}
+                      disabled={isAnswerLocked}
                       style={({ pressed }) => [
                         styles.missingBtn,
-                        pressed && styles.missingBtnPressed,
+                        pressed && !isAnswerLocked && styles.missingBtnPressed,
+                        isAnswerLocked && { opacity: 0.4 },
                       ]}
                     >
                       <Text style={styles.missingBtnText}>{val}</Text>
@@ -596,5 +647,26 @@ const styles = StyleSheet.create({
     color: MRColors.yellowStatus,
     letterSpacing: 1.5,
     marginBottom: 6,
+  },
+  mistakeCountdownBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 68, 68, 0.16)',
+    borderColor: 'rgba(255, 68, 68, 0.5)',
+    borderWidth: 1.5,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginTop: 4,
+    gap: 6,
+    alignSelf: 'center',
+  },
+  mistakeCountdownText: {
+    fontFamily: 'Orbitron-Bold',
+    fontSize: 10.5,
+    letterSpacing: 0.8,
+    color: MRColors.dangerRose,
+    fontWeight: '800',
   },
 });

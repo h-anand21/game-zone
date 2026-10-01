@@ -59,6 +59,7 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
     totalRounds,
     finalRunResult,
     dailyChallenge,
+    advanceToNextRound,
   } = useMemoryRushStore();
 
   // Android hardware back handler
@@ -143,8 +144,13 @@ export const MemoryRushApp: React.FC<MemoryRushAppProps> = ({ onExitGame }) => {
 
   // Handle Round Result Continue
   const handleContinueNextRound = useCallback(() => {
-    setCurrentScreen('gameplay');
-  }, []);
+    const hasMore = advanceToNextRound();
+    if (hasMore) {
+      setCurrentScreen('gameplay');
+    } else {
+      setCurrentScreen('final_result');
+    }
+  }, [advanceToNextRound]);
 
   // Handle Play Again from Final Result
   const handlePlayAgain = useCallback(() => {
