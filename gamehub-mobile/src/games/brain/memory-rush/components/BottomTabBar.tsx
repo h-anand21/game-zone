@@ -8,8 +8,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MRColors } from '../constants/colors';
 import type { AppNavScreen } from '../types';
 
-interface BottomTabBarProps {
-  currentScreen: AppNavScreen;
+export type TabType = 'home' | 'daily' | 'stats' | 'settings' | 'challenge';
+
+export interface BottomTabBarProps {
+  currentScreen: AppNavScreen | string;
   onNavigate: (screen: AppNavScreen) => void;
 }
 

@@ -23,4 +23,22 @@ export const MRColors = {
   yellowStatus: '#FACC15', // Small status / reward indicators ONLY
   successGreen: '#4ADE80',
   dangerRose: '#FB7185',
+
+  // Aliases for screen compatibility
+  backgroundPrimary: '#080A0D',
+  accent: '#22D3EE',
+  warning: '#FACC15',
+  success: '#4ADE80',
+  danger: '#FB7185',
 };
+
+export const colors = MRColors;
+
+export const GAME_MODES = [
+  { id: 'memoryGrid', title: 'Memory Grid', desc: 'Remember positions' },
+  { id: 'sequenceRush', title: 'Sequence Rush', desc: 'Remember order' },
+  { id: 'numberShift', title: 'Number Shift', desc: 'Spot the change' },
+  { id: 'missingNumber', title: 'Missing Number', desc: 'Find what vanished' },
+  { id: 'fusionRush', title: 'Fusion Rush', desc: '4 challenges in one' },
+];
+

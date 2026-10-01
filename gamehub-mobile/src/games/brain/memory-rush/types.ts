@@ -9,7 +9,17 @@ export type GameMode =
   | 'missingNumber'
   | 'fusionRush';
 
+export type GameModeId = GameMode;
 export type GameDifficulty = 'easy' | 'medium' | 'hard';
+export type DifficultyId = GameDifficulty;
+export type TabType = 'home' | 'daily' | 'stats' | 'settings' | 'challenge';
+
+export interface MemoryCard {
+  id: number;
+  symbol: string;
+  isFlipped: boolean;
+  isMatched: boolean;
+}
 
 export type RoundType = 'memoryGrid' | 'sequenceRush' | 'numberShift' | 'missingNumber';
 
