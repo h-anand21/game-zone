@@ -1,5 +1,5 @@
 // ============================================================
-// REVERSE MIND — Home Screen Game Hub (Compact Mind Focus & Exit Support)
+// REVERSE MIND — Home Screen Game Hub (Clean Mode Focus & Vector SVG Badges)
 // ============================================================
 
 import React from 'react';
@@ -21,7 +21,10 @@ import {
   PlayIconSvg,
   FlameIconSvg,
   BrainIconSvg,
-  TargetIconSvg,
+  ClassicModeIconSvg,
+  QuickFlipModeIconSvg,
+  MindShiftModeIconSvg,
+  DailyFlipModeIconSvg,
 } from '../components/SvgIcons';
 import { useReverseMindStore } from '../store/reverseMindStore';
 import type { GameMode, AppNavScreen } from '../types';
@@ -109,7 +112,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
           {/* Sleek Mind Matrix Hero Stage (Compact, Focused on Brain & Companions) */}
           <LinearGradient
-            colors={['rgba(15, 40, 68, 0.85)', 'rgba(8, 23, 41, 0.90)']}
+            colors={['rgba(15, 40, 68, 0.88)', 'rgba(8, 23, 41, 0.92)']}
             style={styles.compactMindBanner}
           >
             <View style={styles.mindBadgePair}>
@@ -144,7 +147,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             />
           </View>
 
-          {/* 4 Core Game Mode Cards Grid */}
+          {/* 4 Core Game Mode Cards Grid (Clean Vector SVG Badges) */}
           <View style={styles.modeSection}>
             <View style={styles.modeGrid}>
               {/* 1. CLASSIC */}
@@ -157,10 +160,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   style={[styles.modeCardGradient, { borderColor: '#4DE7FF' }]}
                 >
                   <View style={styles.modeCardIconBox}>
-                    <Image
-                      source={require('../../../../../assets/images/rm_char_corgi_hero.jpg')}
-                      style={styles.corgiThumb}
-                    />
+                    <ClassicModeIconSvg size={32} color="#4DE7FF" />
                   </View>
                   <Text style={styles.modeTitle}>CLASSIC</Text>
                   <Text style={styles.modeDesc}>
@@ -182,7 +182,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   style={[styles.modeCardGradient, { borderColor: '#B57CFF' }]}
                 >
                   <View style={styles.modeCardIconBox}>
-                    <Text style={styles.emojiBadge}>⏰🔥</Text>
+                    <QuickFlipModeIconSvg size={32} color="#B57CFF" />
                   </View>
                   <Text style={styles.modeTitle}>QUICK FLIP</Text>
                   <Text style={styles.modeDesc}>
@@ -204,7 +204,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   style={[styles.modeCardGradient, { borderColor: '#FF9100' }]}
                 >
                   <View style={styles.modeCardIconBox}>
-                    <Text style={styles.emojiBadge}>🤖🧠</Text>
+                    <MindShiftModeIconSvg size={32} color="#FF9100" />
                   </View>
                   <Text style={styles.modeTitle}>MIND SHIFT</Text>
                   <Text style={styles.modeDesc}>
@@ -226,7 +226,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   style={[styles.modeCardGradient, { borderColor: '#00E676' }]}
                 >
                   <View style={styles.modeCardIconBox}>
-                    <Text style={styles.emojiBadge}>📅👑</Text>
+                    <DailyFlipModeIconSvg size={32} color="#00E676" />
                   </View>
                   <Text style={styles.modeTitle}>DAILY FLIP</Text>
                   <Text style={styles.modeDesc}>
@@ -238,41 +238,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 </LinearGradient>
               </Pressable>
             </View>
-          </View>
-
-          {/* Quick Access Utility Cards (4 across) */}
-          <View style={styles.quickUtilsGrid}>
-            <Pressable onPress={() => onNavigate('stats')} style={styles.utilCard}>
-              <LinearGradient colors={['rgba(22, 37, 59, 0.9)', 'rgba(11, 21, 36, 0.9)']} style={styles.utilGradient}>
-                <Text style={styles.utilIcon}>📊</Text>
-                <Text style={styles.utilName}>Progress</Text>
-                <Text style={styles.utilSub}>View stats ➔</Text>
-              </LinearGradient>
-            </Pressable>
-
-            <Pressable onPress={() => onNavigate('stats')} style={styles.utilCard}>
-              <LinearGradient colors={['rgba(36, 26, 56, 0.9)', 'rgba(19, 12, 33, 0.9)']} style={styles.utilGradient}>
-                <Text style={styles.utilIcon}>🏆</Text>
-                <Text style={styles.utilName}>Achievements</Text>
-                <Text style={styles.utilSub}>Badges ➔</Text>
-              </LinearGradient>
-            </Pressable>
-
-            <Pressable onPress={() => onNavigate('practice')} style={styles.utilCard}>
-              <LinearGradient colors={['rgba(48, 36, 16, 0.9)', 'rgba(28, 19, 7, 0.9)']} style={styles.utilGradient}>
-                <Text style={styles.utilIcon}>🃟</Text>
-                <Text style={styles.utilName}>Collection</Text>
-                <Text style={styles.utilSub}>Items ➔</Text>
-              </LinearGradient>
-            </Pressable>
-
-            <Pressable onPress={() => onNavigate('practice')} style={styles.utilCard}>
-              <LinearGradient colors={['rgba(16, 45, 39, 0.9)', 'rgba(8, 26, 22, 0.9)']} style={styles.utilGradient}>
-                <TargetIconSvg size={18} color="#00E676" />
-                <Text style={styles.utilName}>Practice</Text>
-                <Text style={styles.utilSub}>Train mind ➔</Text>
-              </LinearGradient>
-            </Pressable>
           </View>
         </ScrollView>
 
@@ -292,7 +257,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     marginBottom: 6,
   },
   playerPill: {
@@ -301,7 +266,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(10, 24, 40, 0.85)',
     borderRadius: RMTheme.radii.full,
     paddingVertical: 3,
-    paddingHorizontal: 7,
+    paddingHorizontal: 8,
     borderWidth: 1,
     borderColor: 'rgba(77, 231, 255, 0.25)',
   },
@@ -405,8 +370,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   scrollContent: {
-    paddingHorizontal: 12,
-    paddingBottom: 28,
+    paddingHorizontal: 14,
+    paddingBottom: 32,
     alignItems: 'center',
   },
   logoContainer: {
@@ -414,7 +379,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   compactMindBanner: {
-    width: SCREEN_WIDTH - 24,
+    width: SCREEN_WIDTH - 28,
     borderRadius: 18,
     borderWidth: 1.5,
     borderColor: 'rgba(77, 231, 255, 0.35)',
@@ -484,98 +449,51 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 8,
+    gap: 10,
   },
   modeCard: {
-    width: (SCREEN_WIDTH - 32) / 2,
-    borderRadius: 16,
+    width: (SCREEN_WIDTH - 38) / 2,
+    borderRadius: 18,
     overflow: 'hidden',
   },
   modeCardGradient: {
-    padding: 12,
-    borderRadius: 16,
+    padding: 14,
+    borderRadius: 18,
     borderWidth: 1.5,
-    minHeight: 132,
+    minHeight: 145,
     justifyContent: 'space-between',
   },
   modeCardIconBox: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden',
-    marginBottom: 4,
-  },
-  corgiThumb: {
-    width: '100%',
-    height: '100%',
-  },
-  emojiBadge: {
-    fontSize: 16,
+    marginBottom: 6,
   },
   modeTitle: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '900',
     color: '#FFFFFF',
     letterSpacing: 1,
     marginTop: 2,
   },
   modeDesc: {
-    fontSize: 9.5,
+    fontSize: 10,
     fontWeight: '600',
     color: 'rgba(255, 255, 255, 0.8)',
-    marginVertical: 3,
-    lineHeight: 12,
+    marginVertical: 4,
+    lineHeight: 13,
   },
   playCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'flex-start',
     marginTop: 4,
-  },
-  quickUtilsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 12,
-    gap: 6,
-  },
-  utilCard: {
-    width: (SCREEN_WIDTH - 42) / 4,
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  utilGradient: {
-    paddingVertical: 8,
-    paddingHorizontal: 3,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  utilIcon: {
-    fontSize: 15,
-    marginBottom: 2,
-  },
-  utilName: {
-    fontSize: 9.5,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    marginTop: 1,
-    textAlign: 'center',
-  },
-  utilSub: {
-    fontSize: 7.5,
-    fontWeight: '600',
-    color: '#94A3B8',
-    marginTop: 1,
   },
   cardPressed: {
     transform: [{ scale: 0.96 }],

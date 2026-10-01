@@ -97,15 +97,13 @@ export const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
                   title="CONTINUE PLAYING ▶"
                   variant="gold"
                   size="md"
-                  fullWidth
                   onPress={handleCancel}
                 />
 
                 <GlowButton
                   title="EXIT TO GAMEHUB 🚪"
-                  variant="magenta"
+                  variant="red"
                   size="md"
-                  fullWidth
                   onPress={handleConfirmExit}
                 />
               </View>

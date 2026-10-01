@@ -153,3 +153,45 @@ export const ProfileNavIconSvg: React.FC<IconProps> = ({ size = 20, color = '#8C
     <Path d="M4 21C4 16.5817 7.58172 13 12 13C16.4183 13 20 16.5817 20 21" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
   </Svg>
 );
+
+// Dedicated High-Level Game Mode SVG Badges
+export const ClassicModeIconSvg: React.FC<IconProps> = ({ size = 26, color = '#4DE7FF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+    <Circle cx="16" cy="16" r="14" fill="#0D243B" stroke={color} strokeWidth="2" />
+    <Path d="M9 16C9 12.134 12.134 9 16 9C19.1 9 21.7 11 22.6 13.8" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+    <Path d="M23 16C23 19.866 19.866 23 16 23C12.9 23 10.3 21 9.4 18.2" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+    <Path d="M20 14L23.5 13.8L23 10.2" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <Path d="M12 18L8.5 18.2L9 21.8" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+    <Circle cx="16" cy="16" r="3" fill="#FFD83D" />
+  </Svg>
+);
+
+export const QuickFlipModeIconSvg: React.FC<IconProps> = ({ size = 26, color = '#B57CFF' }) => (
+  <Svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+    <Circle cx="16" cy="16" r="14" fill="#1C0F33" stroke={color} strokeWidth="2" />
+    <Circle cx="16" cy="17" r="9" stroke="#E2D4FF" strokeWidth="2" />
+    <Path d="M16 4V7M12 5L14 7M20 5L18 7" stroke="#FF9100" strokeWidth="2" strokeLinecap="round" />
+    <Path d="M16 11V17L20 15" stroke="#FFD83D" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+  </Svg>
+);
+
+export const MindShiftModeIconSvg: React.FC<IconProps> = ({ size = 26, color = '#FF9100' }) => (
+  <Svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+    <Circle cx="16" cy="16" r="14" fill="#241204" stroke={color} strokeWidth="2" />
+    <Rect x="9" y="11" width="14" height="11" rx="3" fill="#3D200A" stroke="#FFB84D" strokeWidth="1.8" />
+    <Circle cx="13" cy="15" r="1.8" fill="#4DE7FF" />
+    <Circle cx="19" cy="15" r="1.8" fill="#4DE7FF" />
+    <Path d="M13 19C14 20 18 20 19 19" stroke="#FFD83D" strokeWidth="1.8" strokeLinecap="round" />
+    <Path d="M16 6V11" stroke="#FF9100" strokeWidth="2" strokeLinecap="round" />
+    <Circle cx="16" cy="5" r="2" fill="#FFD83D" />
+  </Svg>
+);
+
+export const DailyFlipModeIconSvg: React.FC<IconProps> = ({ size = 26, color = '#00E676' }) => (
+  <Svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+    <Circle cx="16" cy="16" r="14" fill="#07241A" stroke={color} strokeWidth="2" />
+    <Rect x="8" y="10" width="16" height="14" rx="2.5" stroke="#A7F3D0" strokeWidth="1.8" fill="#0A3324" />
+    <Path d="M12 7V11M20 7V11M8 15H24" stroke="#00E676" strokeWidth="2" strokeLinecap="round" />
+    <Path d="M12 18L13 21L16 17L19 21L20 18" stroke="#FFD83D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="#FFD83D" opacity={0.8} />
+  </Svg>
+);
