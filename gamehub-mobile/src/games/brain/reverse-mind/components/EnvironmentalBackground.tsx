@@ -3,9 +3,9 @@
 // ============================================================
 
 import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet, Dimensions, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Circle, Defs, RadialGradient, Stop, Path } from 'react-native-svg';
+import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { RMTheme } from '../theme';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -71,9 +71,25 @@ export const EnvironmentalBackground: React.FC<EnvironmentalBackgroundProps> = (
 
   const colors = getGradientColors();
 
+  const getBackgroundImage = () => {
+    if (theme === 'rewards' || theme === 'level-complete') {
+      return require('../../../../../assets/images/rm_bg_treasure_rewards.jpg');
+    }
+    if (
+      theme === 'home' ||
+      theme === 'rule-preview' ||
+      theme === 'ready' ||
+      theme === 'practice' ||
+      theme === 'settings'
+    ) {
+      return require('../../../../../assets/images/rm_bg_cozy_study.jpg');
+    }
+    return require('../../../../../assets/images/rm_bg_adventure_world.jpg');
+  };
+
   return (
     <View style={styles.container}>
-      {/* Layer 1: Environmental Canvas Gradient */}
+      {/* Layer 1: Base Canvas Gradient */}
       <LinearGradient
         colors={colors}
         style={StyleSheet.absoluteFill}
@@ -81,16 +97,23 @@ export const EnvironmentalBackground: React.FC<EnvironmentalBackgroundProps> = (
         end={{ x: 0.5, y: 1 }}
       />
 
-      {/* Layer 2: Ambient Lighting & Radial Glow Auras */}
+      {/* Layer 2: Real Full-Bleed Environmental Art Illustration */}
+      <Image
+        source={getBackgroundImage()}
+        style={[StyleSheet.absoluteFill, styles.bgArtImage]}
+        resizeMode="cover"
+      />
+
+      {/* Layer 3: Ambient Lighting & Radial Glow Auras */}
       <Svg style={StyleSheet.absoluteFill} width={SCREEN_WIDTH} height={SCREEN_HEIGHT}>
         <Defs>
           <RadialGradient id="topAura" cx="50%" cy="12%" rx="65%" ry="40%">
-            <Stop offset="0%" stopColor="#4DE7FF" stopOpacity="0.14" />
-            <Stop offset="60%" stopColor="#4DA3FF" stopOpacity="0.04" />
+            <Stop offset="0%" stopColor="#4DE7FF" stopOpacity="0.18" />
+            <Stop offset="60%" stopColor="#4DA3FF" stopOpacity="0.05" />
             <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
           </RadialGradient>
           <RadialGradient id="bottomAura" cx="50%" cy="88%" rx="70%" ry="40%">
-            <Stop offset="0%" stopColor="#8D6BFF" stopOpacity="0.10" />
+            <Stop offset="0%" stopColor="#8D6BFF" stopOpacity="0.14" />
             <Stop offset="100%" stopColor="#000000" stopOpacity="0" />
           </RadialGradient>
         </Defs>
@@ -106,7 +129,7 @@ export const EnvironmentalBackground: React.FC<EnvironmentalBackgroundProps> = (
         <Circle cx={SCREEN_WIDTH * 0.1} cy={SCREEN_HEIGHT * 0.75} r={2.2} fill="#FFF" opacity={0.8} />
       </Svg>
 
-      {/* Layer 3: Foreground Content UI */}
+      {/* Layer 4: Foreground Content UI */}
       <View style={styles.content}>{children}</View>
     </View>
   );
@@ -116,6 +139,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: RMTheme.colors.bgVoid,
+  },
+  bgArtImage: {
+    opacity: 0.38,
+    width: '100%',
+    height: '100%',
   },
   content: {
     flex: 1,
