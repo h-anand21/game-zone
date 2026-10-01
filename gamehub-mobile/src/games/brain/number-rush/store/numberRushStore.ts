@@ -6,12 +6,14 @@ import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type {
   Achievement,
+  CategoryId,
   Difficulty,
   GameModeId,
   GameSettings,
   LeaderboardEntry,
   PlayerStats,
   PowerUpState,
+  PowerUpType,
   QuestionData,
   ScreenId,
 } from '../types';
@@ -29,8 +31,10 @@ interface NumberRushState {
   currentScreen: ScreenId;
   previousScreen: ScreenId;
   selectedMode: GameModeId;
+  selectedCategory: CategoryId;
   difficulty: Difficulty;
   isPaused: boolean;
+  powerUpModalVisible: boolean;
   countdownValue: number;
   showComboCelebration: boolean;
   comboCelebrationValue: number;
@@ -71,7 +75,10 @@ interface NumberRushState {
   // Action Methods
   setScreen: (screen: ScreenId) => void;
   setSelectedMode: (mode: GameModeId) => void;
+  setSelectedCategory: (category: CategoryId) => void;
   setDifficulty: (diff: Difficulty) => void;
+  setPowerUpModalVisible: (visible: boolean) => void;
+  buyPowerUp: (type: PowerUpType, cost: number) => boolean;
   togglePause: () => void;
   resumeGame: () => void;
 
@@ -147,8 +154,10 @@ export const useNumberRushStore = create<NumberRushState>((set, get) => ({
   currentScreen: 'home',
   previousScreen: 'home',
   selectedMode: 'animal-count',
+  selectedCategory: 'observe',
   difficulty: 'easy',
   isPaused: false,
+  powerUpModalVisible: false,
   countdownValue: 3,
   showComboCelebration: false,
   comboCelebrationValue: 0,
@@ -195,10 +204,42 @@ export const useNumberRushStore = create<NumberRushState>((set, get) => ({
     set({ selectedMode: mode });
   },
 
+  setSelectedCategory: (category) => {
+    NRAudio.playButton();
+    NRHaptics.buttonTap();
+    set({ selectedCategory: category });
+  },
+
   setDifficulty: (diff) => {
     NRAudio.playButton();
     NRHaptics.buttonTap();
     set({ difficulty: diff });
+  },
+
+  setPowerUpModalVisible: (visible) => {
+    NRAudio.playButton();
+    NRHaptics.buttonTap();
+    set({ powerUpModalVisible: visible });
+  },
+
+  buyPowerUp: (type: PowerUpType, cost: number) => {
+    const { stats } = get();
+    if (stats.coins < cost) {
+      NRAudio.playWrong();
+      NRHaptics.error();
+      return false;
+    }
+    NRAudio.playPowerUp();
+    NRHaptics.success();
+    set((state) => ({
+      stats: { ...state.stats, coins: state.stats.coins - cost },
+      powerUps: {
+        ...state.powerUps,
+        [type]: (state.powerUps[type] || 0) + 1,
+      },
+    }));
+    get().savePersistedData();
+    return true;
   },
 
   togglePause: () => {

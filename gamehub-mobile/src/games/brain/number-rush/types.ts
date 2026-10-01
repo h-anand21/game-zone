@@ -14,8 +14,12 @@ export type CategoryId = 'rush' | 'think' | 'observe' | 'puzzle';
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
 export type ScreenId =
+  | 'splash'
   | 'home'
   | 'mode-hub'
+  | 'category'
+  | 'mode-preview'
+  | 'difficulty'
   | 'countdown'
   | 'gameplay'
   | 'level-complete'

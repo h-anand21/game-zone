@@ -1,5 +1,5 @@
 // ============================================================
-// Number Rush — Main Arcade Home Dashboard
+// Number Rush — Screen 02: HOME (Neon Arcade Adventure Reference)
 // ============================================================
 
 import React from 'react';
@@ -9,7 +9,9 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
+  Dimensions,
 } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
 import {
@@ -22,41 +24,80 @@ import {
 import { MODE_CONFIGS } from '../data';
 import type { GameModeId } from '../types';
 
+const { width } = Dimensions.get('window');
+const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
+
 export const HomeScreen: React.FC = () => {
   const { stats, startCountdown, setScreen, setSelectedMode } = useNumberRushStore();
 
   const handlePlayNow = () => {
-    startCountdown('animal-count', 'easy');
+    setSelectedMode('animal-count');
+    setScreen('mode-preview');
   };
 
   const handleModeSelect = (modeId: GameModeId) => {
     setSelectedMode(modeId);
-    startCountdown(modeId, 'easy');
+    setScreen('mode-preview');
   };
 
-  const modesList = Object.values(MODE_CONFIGS);
+  const featuredModes = [
+    MODE_CONFIGS['animal-count'],
+    MODE_CONFIGS['quick-rush'],
+    MODE_CONFIGS['emoji-count'],
+    MODE_CONFIGS['number-box'],
+  ];
 
   return (
     <View style={styles.container}>
+      {/* 1. Atmospheric Jungle Background */}
+      <ExpoImage source={JUNGLE_BG} style={styles.bgImage} contentFit="cover" />
+      <View style={styles.darkVignette} />
+
+      {/* 2. Top Game HUD */}
       <HeaderHUD />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Game Title & Mascot Hero Section */}
+        {/* 3. Hero Section: 3D Logo Signboard */}
         <View style={styles.heroSection}>
           <View style={styles.logoBadge}>
-            <Text style={styles.logoSub}>ARCADE BRAIN CHALLENGE</Text>
+            <Text style={styles.logoArcade}>ARCADE BRAIN CHALLENGE</Text>
             <Text style={styles.logoTitle}>NUMBER RUSH</Text>
-            <Text style={styles.tagline}>THINK • TAP • RUSH</Text>
+            <Text style={styles.logoTagline}>THINK • TAP • RUSH</Text>
           </View>
 
+          {/* Floating Number Accents */}
+          <View style={[styles.floatingBadge, styles.badgeLeft]}>
+            <Text style={styles.badgeNum}>7</Text>
+          </View>
+          <View style={[styles.floatingBadge, styles.badgeRight]}>
+            <Text style={[styles.badgeNum, { color: '#00E5FF' }]}>+</Text>
+          </View>
+
+          {/* Mascot Centerpiece */}
           <View style={styles.mascotWrapper}>
-            <MascotIllustration size={160} mood="happy" />
+            <MascotIllustration size={175} character="runner_boy" mood="celebrate" />
           </View>
 
-          {/* Primary Action Button */}
+          {/* Best Score & Streak Highlight Card */}
+          <WoodPanel style={styles.bestScoreCard} variant="glass" hasRivets={false}>
+            <View style={styles.bestScoreRow}>
+              <View style={styles.bestScoreCol}>
+                <Text style={styles.bestScoreLabel}>BEST SCORE</Text>
+                <Text style={styles.bestScoreVal}>
+                  {stats.bestScore > 0 ? stats.bestScore.toLocaleString() : '12,480'} PTS
+                </Text>
+              </View>
+              <View style={styles.streakBadge}>
+                <Text style={styles.streakFlame}>🔥</Text>
+                <Text style={styles.streakVal}>{stats.dailyStreak}D STREAK</Text>
+              </View>
+            </View>
+          </WoodPanel>
+
+          {/* 4. Massive 2.5D Primary Action CTA */}
           <GameButton
             title="PLAY NOW"
             icon="▶"
@@ -67,54 +108,56 @@ export const HomeScreen: React.FC = () => {
             style={styles.playNowBtn}
           />
 
-          {/* Secondary Quick Action Row */}
+          {/* 5. Secondary Quick Action Row */}
           <View style={styles.quickActionRow}>
-            <GameButton
-              title="DAILY RUSH"
-              icon="🎁"
-              variant="gold"
-              size="md"
-              style={styles.halfBtn}
+            <Pressable
               onPress={() => setScreen('daily-rush')}
-            />
-            <GameButton
-              title="RANKS"
-              icon="🏆"
-              variant="blue"
-              size="md"
-              style={styles.halfBtn}
+              style={({ pressed }) => [
+                styles.quickCard,
+                styles.dailyCardBorder,
+                pressed && styles.cardPressed,
+              ]}
+            >
+              <Text style={styles.quickIcon}>🎁</Text>
+              <View style={styles.quickInfo}>
+                <Text style={styles.quickTitle}>DAILY RUSH</Text>
+                <Text style={styles.quickSub}>Claim Daily Chest</Text>
+              </View>
+              <View style={styles.freeBadge}>
+                <Text style={styles.freeBadgeText}>READY</Text>
+              </View>
+            </Pressable>
+
+            <Pressable
               onPress={() => setScreen('leaderboard')}
-            />
+              style={({ pressed }) => [
+                styles.quickCard,
+                styles.ranksCardBorder,
+                pressed && styles.cardPressed,
+              ]}
+            >
+              <Text style={styles.quickIcon}>🏆</Text>
+              <View style={styles.quickInfo}>
+                <Text style={styles.quickTitle}>LEADERBOARD</Text>
+                <Text style={styles.quickSub}>Top Champions</Text>
+              </View>
+              <View style={[styles.freeBadge, { backgroundColor: '#1E90FF' }]}>
+                <Text style={styles.freeBadgeText}>#42</Text>
+              </View>
+            </Pressable>
           </View>
         </View>
 
-        {/* Daily Challenge Banner */}
-        <Pressable
-          onPress={() => setScreen('daily-rush')}
-          style={styles.dailyBanner}
-        >
-          <View style={styles.dailyLeft}>
-            <Text style={styles.dailyFlame}>🔥</Text>
-            <View>
-              <Text style={styles.dailyTitle}>TODAY'S SPECIAL</Text>
-              <Text style={styles.dailySub}>Tiger Count Challenge</Text>
-            </View>
-          </View>
-          <View style={styles.rewardPill}>
-            <Text style={styles.rewardText}>+250 🪙</Text>
-          </View>
-        </Pressable>
-
-        {/* Featured Game Modes Section */}
-        <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitle}>CHOOSE YOUR RUSH</Text>
-          <Pressable onPress={() => setScreen('mode-hub')}>
-            <Text style={styles.seeAllText}>VIEW ALL →</Text>
+        {/* 6. Featured Game Modes Section */}
+        <View style={styles.modesHeaderRow}>
+          <Text style={styles.sectionHeaderTitle}>CHOOSE YOUR RUSH</Text>
+          <Pressable onPress={() => setScreen('mode-hub')} style={styles.viewAllBtn}>
+            <Text style={styles.viewAllText}>ALL MODES →</Text>
           </Pressable>
         </View>
 
         <View style={styles.modesGrid}>
-          {modesList.map((mode) => (
+          {featuredModes.map((mode) => (
             <Pressable
               key={mode.id}
               onPress={() => handleModeSelect(mode.id)}
@@ -124,20 +167,21 @@ export const HomeScreen: React.FC = () => {
                 pressed && styles.cardPressed,
               ]}
             >
-              <View style={[styles.cardHeader, { backgroundColor: mode.themeColor }]}>
-                <Text style={styles.cardBadge}>{mode.badge}</Text>
+              <View style={[styles.modeCardHeader, { backgroundColor: mode.themeColor }]}>
+                <Text style={styles.modeCardBadge}>{mode.badge}</Text>
+                <Text style={styles.modeCardStar}>⭐ READY</Text>
               </View>
 
-              <View style={styles.cardBody}>
+              <View style={styles.modeCardBody}>
                 <Text style={styles.modeIcon}>{mode.icon}</Text>
                 <Text style={styles.modeName}>{mode.name}</Text>
                 <Text style={styles.modeTagline} numberOfLines={2}>
                   {mode.tagline}
                 </Text>
 
-                <View style={styles.cardPlayRow}>
-                  <Text style={[styles.playText, { color: mode.themeColor }]}>
-                    START ▶
+                <View style={styles.playNowRow}>
+                  <Text style={[styles.cardPlayText, { color: mode.themeColor }]}>
+                    START RUSH ▶
                   </Text>
                 </View>
               </View>
@@ -145,33 +189,10 @@ export const HomeScreen: React.FC = () => {
           ))}
         </View>
 
-        {/* Player Stats Summary Panel */}
-        <WoodPanel style={styles.statsPanel} variant="card" hasRivets={false}>
-          <Text style={styles.statsHeader}>YOUR ARCADE RECORD</Text>
-          <View style={styles.statsGrid}>
-            <View style={styles.statBox}>
-              <Text style={styles.statVal}>{stats.bestScore}</Text>
-              <Text style={styles.statLabel}>BEST SCORE</Text>
-            </View>
-            <View style={styles.statBox}>
-              <Text style={styles.statVal}>x{stats.maxCombo}</Text>
-              <Text style={styles.statLabel}>MAX STREAK</Text>
-            </View>
-            <View style={styles.statBox}>
-              <Text style={styles.statVal}>{stats.accuracy}%</Text>
-              <Text style={styles.statLabel}>ACCURACY</Text>
-            </View>
-            <View style={styles.statBox}>
-              <Text style={styles.statVal}>{stats.gamesPlayed}</Text>
-              <Text style={styles.statLabel}>GAMES</Text>
-            </View>
-          </View>
-        </WoodPanel>
-
-        {/* Spacing for Bottom Nav */}
-        <View style={{ height: 90 }} />
+        <View style={{ height: 110 }} />
       </ScrollView>
 
+      {/* Floating Global Bottom Navigation */}
       <BottomNavBar />
     </View>
   );
@@ -180,7 +201,14 @@ export const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: NRTheme.colors.bgDark,
+    backgroundColor: '#06120D',
+  },
+  bgImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  darkVignette: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(6, 18, 13, 0.65)',
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -188,109 +216,203 @@ const styles = StyleSheet.create({
   },
   heroSection: {
     alignItems: 'center',
-    marginBottom: 16,
+    position: 'relative',
   },
   logoBadge: {
     alignItems: 'center',
-    marginBottom: 6,
+    backgroundColor: 'rgba(7, 27, 52, 0.92)',
+    borderWidth: 2.5,
+    borderColor: '#FFC107',
+    borderRadius: 22,
+    paddingHorizontal: 22,
+    paddingVertical: 10,
+    shadowColor: '#FFB800',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 14,
+    elevation: 8,
   },
-  logoSub: {
-    color: '#FFE082',
-    fontSize: 10,
+  logoArcade: {
+    color: '#00E5FF',
+    fontSize: 9,
     fontWeight: '900',
     letterSpacing: 2,
-    textTransform: 'uppercase',
+    marginBottom: 2,
   },
   logoTitle: {
     color: '#FFD700',
-    fontSize: 34,
+    fontSize: 28,
     fontWeight: '900',
-    letterSpacing: 2,
+    letterSpacing: 2.5,
     textShadowColor: '#FF6D00',
     textShadowOffset: { width: 0, height: 3 },
     textShadowRadius: 8,
   },
-  tagline: {
-    color: '#8CA0BA',
-    fontSize: 12,
-    fontWeight: '800',
+  logoTagline: {
+    color: '#2ED573',
+    fontSize: 11,
+    fontWeight: '900',
     letterSpacing: 1.5,
     marginTop: 2,
+  },
+  floatingBadge: {
+    position: 'absolute',
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: 'rgba(11, 40, 72, 0.9)',
+    borderWidth: 2,
+    borderColor: '#FFD700',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  badgeLeft: { top: 60, left: 16 },
+  badgeRight: { top: 75, right: 16, borderColor: '#00E5FF' },
+  badgeNum: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: '#FFD700',
   },
   mascotWrapper: {
     marginVertical: 4,
   },
+  bestScoreCard: {
+    width: '100%',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    marginBottom: 12,
+  },
+  bestScoreRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  bestScoreCol: {
+    justifyContent: 'center',
+  },
+  bestScoreLabel: {
+    color: '#8CA0BA',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  bestScoreVal: {
+    color: '#FFD700',
+    fontSize: 20,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  streakBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 109, 0, 0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: '#FF6D00',
+  },
+  streakFlame: {
+    fontSize: 14,
+    marginRight: 4,
+  },
+  streakVal: {
+    color: '#FFE082',
+    fontSize: 11,
+    fontWeight: '900',
+  },
   playNowBtn: {
-    marginVertical: 10,
+    marginBottom: 12,
   },
   quickActionRow: {
     flexDirection: 'row',
-    width: '100%',
     justifyContent: 'space-between',
     gap: 12,
+    width: '100%',
+    marginBottom: 16,
   },
-  halfBtn: {
+  quickCard: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(11, 40, 72, 0.85)',
+    borderRadius: 18,
+    borderWidth: 2,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  dailyCardBorder: { borderColor: '#FFB800' },
+  ranksCardBorder: { borderColor: '#1E90FF' },
+  cardPressed: {
+    opacity: 0.88,
+    transform: [{ scale: 0.98 }],
+  },
+  quickIcon: {
+    fontSize: 24,
+    marginRight: 8,
+  },
+  quickInfo: {
     flex: 1,
   },
-  dailyBanner: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#261805',
-    borderWidth: 2,
-    borderColor: '#FF9800',
-    borderRadius: NRTheme.radius.lg,
-    padding: 14,
-    marginVertical: 10,
-    ...NRTheme.shadows.glowGold,
-  },
-  dailyLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dailyFlame: {
-    fontSize: 26,
-    marginRight: 10,
-  },
-  dailyTitle: {
-    color: '#FFD700',
-    fontSize: 11,
-    fontWeight: '900',
-    letterSpacing: 1,
-  },
-  dailySub: {
+  quickTitle: {
     color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  rewardPill: {
-    backgroundColor: '#FF9800',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 14,
-  },
-  rewardText: {
-    color: '#FFFFFF',
-    fontWeight: '900',
-    fontSize: 13,
-  },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 10,
-  },
-  sectionTitle: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '900',
-    letterSpacing: 1,
-  },
-  seeAllText: {
-    color: '#1E90FF',
     fontSize: 12,
-    fontWeight: '800',
+    fontWeight: '900',
+  },
+  quickSub: {
+    color: '#8CA0BA',
+    fontSize: 9,
+    fontWeight: '700',
+  },
+  freeBadge: {
+    position: 'absolute',
+    top: -6,
+    right: 8,
+    backgroundColor: '#2ED573',
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FFFFFF',
+  },
+  freeBadgeText: {
+    color: '#04160D',
+    fontSize: 8,
+    fontWeight: '900',
+  },
+  modesHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 4,
+  },
+  sectionHeaderTitle: {
+    color: '#FFE082',
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+  },
+  viewAllBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  viewAllText: {
+    color: '#2ED573',
+    fontSize: 12,
+    fontWeight: '900',
   },
   modesGrid: {
     flexDirection: 'row',
@@ -299,28 +421,35 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   modeCard: {
-    width: '48%',
-    backgroundColor: '#0E223D',
-    borderRadius: NRTheme.radius.lg,
+    width: (width - 44) / 2,
+    backgroundColor: 'rgba(7, 27, 52, 0.85)',
+    borderRadius: 20,
     borderWidth: 2,
     overflow: 'hidden',
-    ...NRTheme.shadows.card,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
   },
-  cardPressed: {
-    transform: [{ scale: 0.98 }],
-  },
-  cardHeader: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+  modeCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
-  cardBadge: {
-    color: '#FFFFFF',
+  modeCardBadge: {
+    color: '#071324',
     fontSize: 9,
     fontWeight: '900',
-    letterSpacing: 0.5,
   },
-  cardBody: {
+  modeCardStar: {
+    color: '#071324',
+    fontSize: 8,
+    fontWeight: '900',
+  },
+  modeCardBody: {
     padding: 12,
     alignItems: 'center',
   },
@@ -330,57 +459,30 @@ const styles = StyleSheet.create({
   },
   modeName: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '900',
     textAlign: 'center',
+    marginBottom: 2,
   },
   modeTagline: {
     color: '#8CA0BA',
-    fontSize: 11,
+    fontSize: 10,
+    fontWeight: '600',
     textAlign: 'center',
+    lineHeight: 13,
+    marginBottom: 8,
+    height: 26,
+  },
+  playNowRow: {
     marginTop: 4,
-    minHeight: 28,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 12,
   },
-  cardPlayRow: {
-    marginTop: 8,
-    paddingTop: 6,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.1)',
-    width: '100%',
-    alignItems: 'center',
-  },
-  playText: {
-    fontSize: 12,
+  cardPlayText: {
+    fontSize: 10,
     fontWeight: '900',
     letterSpacing: 0.5,
-  },
-  statsPanel: {
-    marginTop: 18,
-  },
-  statsHeader: {
-    color: '#8CA0BA',
-    fontSize: 11,
-    fontWeight: '900',
-    letterSpacing: 1,
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  statBox: {
-    alignItems: 'center',
-  },
-  statVal: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '900',
-  },
-  statLabel: {
-    color: '#5C7491',
-    fontSize: 9,
-    fontWeight: '800',
-    marginTop: 2,
   },
 });
