@@ -24,6 +24,7 @@ export const LeaderboardModal: React.FC = () => {
   const top1 = leaderboard[0];
   const top2 = leaderboard[1];
   const top3 = leaderboard[2];
+  const rest = leaderboard.slice(3);
   const userRankNum = leaderboard.filter((e) => e.score > stats.bestScore).length + 1;
   const userRank = stats.bestScore > 0 ? `#${userRankNum}` : '#--';
 

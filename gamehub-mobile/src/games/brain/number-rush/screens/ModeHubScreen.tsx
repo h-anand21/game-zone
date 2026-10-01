@@ -1,5 +1,5 @@
 // ============================================================
-// Number Rush — Screen 03: MODE HUB (Choose Your Rush Game Hub Reference)
+// Number Rush — Screen 03: MODE HUB (Choose Your Rush Game Hub)
 // ============================================================
 
 import React from 'react';
@@ -15,19 +15,32 @@ import { Image as ExpoImage } from 'expo-image';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
 import { HeaderHUD, BottomNavBar } from '../components';
-import { CATEGORY_CONFIGS } from '../data';
-import type { CategoryId } from '../types';
+import { CATEGORY_CONFIGS, MODE_CONFIGS } from '../data';
+import type { CategoryId, GameModeId } from '../types';
 
 const { width } = Dimensions.get('window');
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const ModeHubScreen: React.FC = () => {
-  const { setScreen, setSelectedCategory } = useNumberRushStore();
+  const { setScreen, setSelectedCategory, setSelectedMode, selectedMode } = useNumberRushStore();
 
   const handleCategorySelect = (categoryId: CategoryId) => {
     setSelectedCategory(categoryId);
     setScreen('category');
   };
+
+  const handleDirectModeSelect = (modeId: GameModeId) => {
+    setSelectedMode(modeId);
+    setScreen('mode-preview');
+  };
+
+  const playableModes = [
+    MODE_CONFIGS['animal-count'],
+    MODE_CONFIGS['quick-rush'],
+    MODE_CONFIGS['emoji-count'],
+    MODE_CONFIGS['number-box'],
+    MODE_CONFIGS['mixed-rush'],
+  ];
 
   return (
     <View style={styles.container}>
@@ -45,10 +58,51 @@ export const ModeHubScreen: React.FC = () => {
         {/* Banner Tagline */}
         <View style={styles.hubBanner}>
           <Text style={styles.hubSub}>SELECT YOUR BRAIN DISCIPLINE</Text>
-          <Text style={styles.hubTitle}>4 ARENAS OF MASTERY</Text>
+          <Text style={styles.hubTitle}>ALL 5 GAME MODES</Text>
         </View>
 
-        {/* 3. 2x2 Category Selection Grid */}
+        {/* 3. Direct Play Modes List */}
+        <View style={styles.directModesList}>
+          {playableModes.map((mode) => (
+            <Pressable
+              key={mode.id}
+              onPress={() => handleDirectModeSelect(mode.id)}
+              style={({ pressed }) => [
+                styles.directModeCard,
+                { borderColor: mode.themeColor },
+                selectedMode === mode.id && styles.directModeActive,
+                pressed && styles.cardPressed,
+              ]}
+            >
+              <View style={[styles.directIconBox, { backgroundColor: mode.themeColor + '25', borderColor: mode.themeColor }]}>
+                <Text style={styles.directIcon}>{mode.icon}</Text>
+              </View>
+
+              <View style={styles.directInfo}>
+                <View style={styles.badgeRow}>
+                  <Text style={[styles.directBadge, { color: mode.themeColor }]}>{mode.badge}</Text>
+                  {selectedMode === mode.id && (
+                    <Text style={styles.activeCheck}>✓ CURRENT</Text>
+                  )}
+                </View>
+                <Text style={styles.directName}>{mode.name}</Text>
+                <Text style={styles.directDesc} numberOfLines={2}>{mode.description}</Text>
+              </View>
+
+              <View style={[styles.directPlayPill, { backgroundColor: mode.themeColor }]}>
+                <Text style={styles.directPlayText}>PLAY ▶</Text>
+              </View>
+            </Pressable>
+          ))}
+        </View>
+
+        {/* 4. Discipline Arenas Section */}
+        <View style={styles.arenasHeaderRow}>
+          <Text style={styles.arenasTitle}>4 DISCIPLINE ARENAS</Text>
+          <Text style={styles.arenasSub}>EXPLORE BY SKILL</Text>
+        </View>
+
+        {/* 2x2 Category Selection Grid */}
         <View style={styles.categoryGrid}>
           {CATEGORY_CONFIGS.map((cat) => (
             <Pressable
@@ -60,7 +114,6 @@ export const ModeHubScreen: React.FC = () => {
                 pressed && styles.cardPressed,
               ]}
             >
-              {/* Card Header Pill */}
               <View style={[styles.cardHeader, { backgroundColor: cat.color }]}>
                 <Text style={styles.modeCountBadge}>
                   {cat.modes.length} MODES
@@ -68,7 +121,6 @@ export const ModeHubScreen: React.FC = () => {
                 <Text style={styles.cardCrown}>★</Text>
               </View>
 
-              {/* Card Body */}
               <View style={styles.cardBody}>
                 <View
                   style={[
@@ -87,7 +139,6 @@ export const ModeHubScreen: React.FC = () => {
                   {cat.subtitle}
                 </Text>
 
-                {/* Enter Button Pill */}
                 <View
                   style={[
                     styles.enterPill,
@@ -141,12 +192,12 @@ const styles = StyleSheet.create({
   },
   hubBanner: {
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
     paddingVertical: 4,
   },
   hubSub: {
     color: '#00E5FF',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
     letterSpacing: 2,
     marginBottom: 2,
@@ -156,112 +207,205 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '900',
     letterSpacing: 1.5,
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
+  },
+  directModesList: {
+    gap: 10,
+    marginBottom: 20,
+  },
+  directModeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(43, 20, 8, 0.95)',
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: '#7A3F1D',
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 5,
+    elevation: 4,
+  },
+  directModeActive: {
+    borderColor: '#FFD700',
+    backgroundColor: 'rgba(53, 26, 12, 0.98)',
+  },
+  cardPressed: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
+  },
+  directIconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  directIcon: {
+    fontSize: 26,
+  },
+  directInfo: {
+    flex: 1,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 2,
+  },
+  directBadge: {
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  activeCheck: {
+    color: '#2ED573',
+    fontSize: 8,
+    fontWeight: '900',
+    backgroundColor: 'rgba(46, 213, 115, 0.2)',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 4,
+  },
+  directName: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+    marginBottom: 2,
+  },
+  directDesc: {
+    color: '#A0B2C6',
+    fontSize: 10,
+    lineHeight: 14,
+  },
+  directPlayPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  directPlayText: {
+    color: '#04160D',
+    fontSize: 11,
+    fontWeight: '900',
+  },
+  arenasHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 2,
+  },
+  arenasTitle: {
+    color: '#FFE082',
+    fontSize: 13,
+    fontWeight: '900',
+    letterSpacing: 1,
+  },
+  arenasSub: {
+    color: '#8CA0BA',
+    fontSize: 9,
+    fontWeight: '700',
   },
   categoryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    gap: 14,
+    gap: 12,
+    marginBottom: 16,
   },
   categoryCard: {
-    width: (width - 46) / 2,
-    backgroundColor: 'rgba(7, 27, 52, 0.88)',
-    borderRadius: 22,
-    borderWidth: 2.5,
+    width: (width - 44) / 2,
+    backgroundColor: 'rgba(43, 20, 8, 0.92)',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#FFC107',
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  cardPressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.97 }],
+    shadowRadius: 6,
+    elevation: 4,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   modeCountBadge: {
     color: '#071324',
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: '900',
-    letterSpacing: 0.5,
   },
   cardCrown: {
     color: '#071324',
     fontSize: 10,
-    fontWeight: '900',
   },
   cardBody: {
-    padding: 14,
+    padding: 12,
     alignItems: 'center',
   },
   iconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   catIcon: {
-    fontSize: 30,
+    fontSize: 22,
   },
   catName: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '900',
-    letterSpacing: 1.5,
-    marginBottom: 4,
-    textAlign: 'center',
+    letterSpacing: 1,
+    marginBottom: 2,
   },
   catSubtitle: {
     color: '#8CA0BA',
-    fontSize: 10,
-    fontWeight: '600',
+    fontSize: 9,
     textAlign: 'center',
-    lineHeight: 14,
-    height: 28,
     marginBottom: 10,
+    lineHeight: 12,
+    height: 24,
   },
   enterPill: {
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 12,
-    borderWidth: 1.5,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
   },
   enterText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   tipCard: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(11, 40, 72, 0.8)',
-    borderRadius: 18,
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+    borderRadius: 16,
     borderWidth: 1.5,
     borderColor: '#FFC107',
-    padding: 14,
-    marginTop: 20,
-    alignItems: 'center',
+    padding: 12,
+    marginBottom: 8,
   },
   tipLight: {
-    fontSize: 26,
-    marginRight: 12,
+    fontSize: 24,
+    marginRight: 10,
   },
   tipTextCol: {
     flex: 1,
   },
   tipTitle: {
-    color: '#FFE082',
+    color: '#FFD700',
     fontSize: 11,
     fontWeight: '900',
     letterSpacing: 1,
@@ -269,8 +413,7 @@ const styles = StyleSheet.create({
   },
   tipDesc: {
     color: '#D8E2DD',
-    fontSize: 11,
-    lineHeight: 15,
-    fontWeight: '500',
+    fontSize: 10,
+    lineHeight: 14,
   },
 });

@@ -269,12 +269,20 @@ const styles = StyleSheet.create({
   billboardBody: {
     alignItems: 'center',
   },
-  billboardSub: {
-    color: '#00E5FF',
-    fontSize: 9,
+  dateBadge: {
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    borderWidth: 1,
+    borderColor: '#FFD700',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    marginBottom: 6,
+  },
+  dateBadgeText: {
+    color: '#FFE082',
+    fontSize: 10,
     fontWeight: '900',
-    letterSpacing: 2,
-    marginBottom: 2,
+    letterSpacing: 0.8,
   },
   billboardTitle: {
     color: '#FFD700',
@@ -294,6 +302,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   streakHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 10,
   },
   streakTitleRow: {
@@ -310,10 +321,19 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 1,
   },
-  streakSubtitle: {
-    color: '#8CA0BA',
+  claimTodayBtn: {
+    backgroundColor: '#2ED573',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+  },
+  claimTodayBtnDisabled: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
+  claimTodayText: {
+    color: '#04160D',
     fontSize: 10,
-    marginTop: 2,
+    fontWeight: '900',
   },
   calendarRow: {
     flexDirection: 'row',
@@ -333,6 +353,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(46, 213, 115, 0.15)',
     borderColor: '#2ED573',
   },
+  dayCardToday: {
+    borderColor: '#FFD700',
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    borderWidth: 1.5,
+  },
   dayCardChest: {
     backgroundColor: 'rgba(255, 215, 0, 0.2)',
     borderColor: '#FFD700',
@@ -351,6 +376,12 @@ const styles = StyleSheet.create({
   checkMini: {
     color: '#2ED573',
     fontSize: 10,
+    fontWeight: '900',
+    marginTop: 2,
+  },
+  todayMini: {
+    color: '#FFD700',
+    fontSize: 8,
     fontWeight: '900',
     marginTop: 2,
   },
@@ -382,6 +413,10 @@ const styles = StyleSheet.create({
   challengeActive: {
     borderColor: '#FFD700',
     backgroundColor: 'rgba(11, 40, 72, 0.95)',
+  },
+  challengePressed: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
   },
   challengeBoss: {
     borderColor: '#FF4757',
