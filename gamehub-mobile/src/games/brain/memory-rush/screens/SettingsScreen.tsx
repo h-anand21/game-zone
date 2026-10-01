@@ -129,7 +129,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigateTab })
             <Text style={styles.sectionHeader}>DATA & SAVES</Text>
             <TouchableOpacity style={styles.dangerRow} onPress={handleReset} activeOpacity={0.7}>
               <View style={[styles.settingIconBox, { backgroundColor: 'rgba(251, 113, 133, 0.15)' }]}>
-                <Feather name="trash-2" size={18} color={colors.danger} />
+                <MRIcon name="trash-2" size={18} color={colors.danger} />
               </View>
               <View style={styles.settingInfo}>
                 <Text style={[styles.settingLabel, { color: colors.danger }]}>Reset Progress</Text>
