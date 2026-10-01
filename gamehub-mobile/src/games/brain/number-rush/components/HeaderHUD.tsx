@@ -30,7 +30,7 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
   isGameplay = false,
 }) => {
   const insets = useSafeAreaInsets();
-  const { stats, togglePause, setScreen } = useNumberRushStore();
+  const { stats, togglePause, setScreen, setShowExitModal } = useNumberRushStore();
 
   const handleProfilePress = () => {
     NRAudio.playButton();
@@ -59,14 +59,26 @@ export const HeaderHUD: React.FC<HeaderHUDProps> = ({
           <Text style={styles.backArrow}>←</Text>
         </Pressable>
       ) : (
-        <Pressable onPress={handleProfilePress} style={styles.profileBadge}>
-          <View style={styles.avatarCircle}>
-            <Text style={styles.avatarEmoji}>🏃</Text>
-          </View>
-          <View style={styles.levelBadge}>
-            <Text style={styles.levelText}>{stats.level}</Text>
-          </View>
-        </Pressable>
+        <View style={styles.leftGroup}>
+          <Pressable
+            onPress={() => {
+              NRAudio.playButton();
+              NRHaptics.buttonTap();
+              setShowExitModal(true);
+            }}
+            style={[styles.circleBtn, styles.exitCircleBtn]}
+          >
+            <Text style={styles.exitIcon}>🚪</Text>
+          </Pressable>
+          <Pressable onPress={handleProfilePress} style={styles.profileBadge}>
+            <View style={styles.avatarCircle}>
+              <Text style={styles.avatarEmoji}>🏃</Text>
+            </View>
+            <View style={styles.levelBadge}>
+              <Text style={styles.levelText}>{stats.level}</Text>
+            </View>
+          </Pressable>
+        </View>
       )}
 
       {/* Middle: Title or Currency Pills */}
@@ -113,6 +125,21 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     backgroundColor: 'transparent',
     zIndex: 10,
+  },
+  leftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  exitCircleBtn: {
+    backgroundColor: 'rgba(180, 40, 30, 0.35)',
+    borderColor: '#E74C3C',
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+  },
+  exitIcon: {
+    fontSize: 16,
   },
   profileBadge: {
     flexDirection: 'row',

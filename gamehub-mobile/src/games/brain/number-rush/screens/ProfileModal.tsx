@@ -18,11 +18,22 @@ import { HeaderHUD, WoodPanel, MascotIllustration, BottomNavBar } from '../compo
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const ProfileModal: React.FC = () => {
-  const { setScreen, stats } = useNumberRushStore();
+  const { setScreen, stats, achievements } = useNumberRushStore();
 
   const xpRequired = 500;
   const currentXpInLevel = stats.xp % xpRequired;
   const progressPercent = Math.min(100, Math.round((currentXpInLevel / xpRequired) * 100));
+
+  const getPlayerTitle = (level: number) => {
+    if (level >= 10) return '👑 ARCADE LEGEND';
+    if (level >= 5) return '🌿 JUNGLE MASTER';
+    if (level >= 3) return '⚡ NUMBER HUNTER';
+    if (level >= 2) return '🐾 JUNGLE SCOUT';
+    return '🌱 NOVICE EXPLORER';
+  };
+
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+  const totalStars = Math.floor(stats.totalScore / 250) + (stats.bestScore > 0 ? 3 : 0);
 
   return (
     <View style={styles.container}>
@@ -49,9 +60,9 @@ export const ProfileModal: React.FC = () => {
             </View>
           </View>
 
-          <Text style={styles.playerName}>Alex Rush</Text>
+          <Text style={styles.playerName}>{stats.playerName || 'Player 1'}</Text>
           <View style={styles.titlePill}>
-            <Text style={styles.titlePillText}>🌿 JUNGLE MASTER</Text>
+            <Text style={styles.titlePillText}>{getPlayerTitle(stats.level)}</Text>
           </View>
 
           {/* XP Progress Bar */}
@@ -72,7 +83,7 @@ export const ProfileModal: React.FC = () => {
             onPress={() => setScreen('settings')}
             style={styles.editProfileBtn}
           >
-            <Text style={styles.editProfileText}>EDIT PROFILE ✏️</Text>
+            <Text style={styles.editProfileText}>SETTINGS & PREFERENCES ⚙️</Text>
           </Pressable>
         </WoodPanel>
 
@@ -83,32 +94,32 @@ export const ProfileModal: React.FC = () => {
           <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
             <Text style={styles.statIcon}>🏆</Text>
             <Text style={styles.statVal}>
-              {stats.bestScore > 0 ? stats.bestScore.toLocaleString() : '12,480'}
+              {stats.bestScore.toLocaleString()}
             </Text>
             <Text style={styles.statLabel}>BEST SCORE</Text>
           </WoodPanel>
 
           <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
             <Text style={styles.statIcon}>🔥</Text>
-            <Text style={styles.statVal}>x{stats.maxCombo || 14}</Text>
+            <Text style={styles.statVal}>x{stats.maxCombo}</Text>
             <Text style={styles.statLabel}>MAX STREAK</Text>
           </WoodPanel>
 
           <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
             <Text style={styles.statIcon}>🎯</Text>
-            <Text style={styles.statVal}>{stats.accuracy || 94}%</Text>
+            <Text style={styles.statVal}>{stats.gamesPlayed > 0 ? stats.accuracy : 0}%</Text>
             <Text style={styles.statLabel}>ACCURACY</Text>
           </WoodPanel>
 
           <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
             <Text style={styles.statIcon}>🎮</Text>
-            <Text style={styles.statVal}>{stats.gamesPlayed || 48}</Text>
+            <Text style={styles.statVal}>{stats.gamesPlayed}</Text>
             <Text style={styles.statLabel}>GAMES PLAYED</Text>
           </WoodPanel>
 
           <WoodPanel style={styles.statCard} variant="glass" hasRivets={false}>
             <Text style={styles.statIcon}>⭐</Text>
-            <Text style={styles.statVal}>126</Text>
+            <Text style={styles.statVal}>{totalStars}</Text>
             <Text style={styles.statLabel}>TOTAL STARS</Text>
           </WoodPanel>
 
@@ -131,7 +142,9 @@ export const ProfileModal: React.FC = () => {
             <Text style={styles.achIcon}>🎖️</Text>
             <View>
               <Text style={styles.achTitle}>ACHIEVEMENTS COLLECTION</Text>
-              <Text style={styles.achSub}>18 / 32 Badges Unlocked (56%)</Text>
+              <Text style={styles.achSub}>
+                {unlockedCount} / {achievements.length} Badges Unlocked ({Math.round((unlockedCount / (achievements.length || 1)) * 100)}%)
+              </Text>
             </View>
           </View>
           <Text style={styles.achArrow}>VIEW ALL →</Text>

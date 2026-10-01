@@ -18,29 +18,61 @@ import { HeaderHUD, GameButton, WoodPanel, MascotIllustration, BottomNavBar } fr
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const DailyRushModal: React.FC = () => {
-  const { setScreen, startCountdown, stats, claimDailyReward } = useNumberRushStore();
+  const { setScreen, startCountdown, stats, claimDailyReward, setSelectedMode } =
+    useNumberRushStore();
 
-  const handleStartDailyChallenge = () => {
-    startCountdown('mixed-rush', 'medium');
-  };
+  const today = new Date();
+  const formattedToday = today.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+
+  const todayIso = today.toISOString().split('T')[0];
+  const isClaimedToday = stats.lastDailyClaimDate === todayIso;
+  const currentStreakDay = ((stats.dailyStreak - 1) % 7) + 1;
 
   const streakDays = [
-    { day: 1, reward: '100 🪙', claimed: true },
-    { day: 2, reward: '150 🪙', claimed: true },
-    { day: 3, reward: '200 🪙', claimed: stats.dailyStreak >= 3 },
-    { day: 4, reward: '250 🪙', claimed: stats.dailyStreak >= 4 },
-    { day: 5, reward: '300 🪙', claimed: stats.dailyStreak >= 5 },
-    { day: 6, reward: '400 🪙', claimed: stats.dailyStreak >= 6 },
-    { day: 7, reward: '🎁 CHEST', claimed: stats.dailyStreak >= 7, isChest: true },
+    { day: 1, reward: '100 🪙', claimed: currentStreakDay > 1 || (currentStreakDay === 1 && isClaimedToday), isToday: currentStreakDay === 1 },
+    { day: 2, reward: '150 🪙', claimed: currentStreakDay > 2 || (currentStreakDay === 2 && isClaimedToday), isToday: currentStreakDay === 2 },
+    { day: 3, reward: '200 🪙', claimed: currentStreakDay > 3 || (currentStreakDay === 3 && isClaimedToday), isToday: currentStreakDay === 3 },
+    { day: 4, reward: '250 🪙', claimed: currentStreakDay > 4 || (currentStreakDay === 4 && isClaimedToday), isToday: currentStreakDay === 4 },
+    { day: 5, reward: '300 🪙', claimed: currentStreakDay > 5 || (currentStreakDay === 5 && isClaimedToday), isToday: currentStreakDay === 5 },
+    { day: 6, reward: '400 🪙', claimed: currentStreakDay > 6 || (currentStreakDay === 6 && isClaimedToday), isToday: currentStreakDay === 6 },
+    { day: 7, reward: '🎁 CHEST', claimed: currentStreakDay === 7 && isClaimedToday, isChest: true, isToday: currentStreakDay === 7 },
   ];
 
-  const challenges = [
-    { num: 1, title: 'Wild Tiger Sprint', mode: 'Animal Count', reward: '+100 🪙', done: true },
-    { num: 2, title: 'Lightning Arithmetic', mode: 'Quick Rush', reward: '+120 🪙', done: true },
-    { num: 3, title: 'Emoji Radar', mode: 'Emoji Count', reward: '+150 🪙', done: false, active: true },
-    { num: 4, title: 'Matrix Mystery', mode: 'Number Box', reward: '+180 🪙', done: false },
-    { num: 5, title: 'Grand Jungle Finale', mode: 'Mixed Rush', reward: '+250 🪙 + 10 💎', done: false, isBoss: true },
+  const gauntletProgress = stats.dailyGauntletProgress || 0;
+
+  const rawChallenges: {
+    num: number;
+    title: string;
+    mode: 'animal-count' | 'quick-rush' | 'emoji-count' | 'number-box' | 'mixed-rush';
+    modeLabel: string;
+    reward: string;
+    isBoss?: boolean;
+  }[] = [
+    { num: 1, title: 'Wild Tiger Sprint', mode: 'animal-count', modeLabel: 'Animal Count', reward: '+100 🪙' },
+    { num: 2, title: 'Lightning Arithmetic', mode: 'quick-rush', modeLabel: 'Quick Rush', reward: '+120 🪙' },
+    { num: 3, title: 'Emoji Radar', mode: 'emoji-count', modeLabel: 'Emoji Count', reward: '+150 🪙' },
+    { num: 4, title: 'Matrix Mystery', mode: 'number-box', modeLabel: 'Number Box', reward: '+180 🪙' },
+    { num: 5, title: 'Grand Jungle Finale', mode: 'mixed-rush', modeLabel: 'Mixed Rush', reward: '+250 🪙 + 10 💎', isBoss: true },
   ];
+
+  const challenges = rawChallenges.map((c) => ({
+    ...c,
+    done: c.num <= gauntletProgress,
+    active: c.num === gauntletProgress + 1,
+    locked: c.num > gauntletProgress + 1,
+  }));
+
+  const activeChallenge = challenges.find((c) => c.active) || challenges[0];
+
+  const handleStartDailyChallenge = () => {
+    setSelectedMode(activeChallenge.mode);
+    startCountdown(activeChallenge.mode, 'medium');
+  };
 
   return (
     <View style={styles.container}>
@@ -61,7 +93,9 @@ export const DailyRushModal: React.FC = () => {
             <MascotIllustration size={80} character="tiger" mood="happy" showAura={false} />
           </View>
           <View style={styles.billboardBody}>
-            <Text style={styles.billboardSub}>DAILY BRAIN EXPEDITION</Text>
+            <View style={styles.dateBadge}>
+              <Text style={styles.dateBadgeText}>📅 TODAY: {formattedToday.toUpperCase()}</Text>
+            </View>
             <Text style={styles.billboardTitle}>DAILY RUSH</Text>
             <Text style={styles.billboardDesc}>
               Complete today's 5-stage gauntlet for exclusive rewards!
@@ -78,7 +112,18 @@ export const DailyRushModal: React.FC = () => {
                 {stats.dailyStreak}-DAY RUSH STREAK
               </Text>
             </View>
-            <Text style={styles.streakSubtitle}>Keep your streak alive!</Text>
+            <Pressable
+              onPress={() => claimDailyReward()}
+              disabled={isClaimedToday}
+              style={[
+                styles.claimTodayBtn,
+                isClaimedToday && styles.claimTodayBtnDisabled,
+              ]}
+            >
+              <Text style={styles.claimTodayText}>
+                {isClaimedToday ? '✓ CLAIMED TODAY' : 'CLAIM CHEST 🎁'}
+              </Text>
+            </Pressable>
           </View>
 
           <View style={styles.calendarRow}>
@@ -88,12 +133,17 @@ export const DailyRushModal: React.FC = () => {
                 style={[
                   styles.dayCard,
                   item.claimed && styles.dayCardClaimed,
+                  item.isToday && styles.dayCardToday,
                   item.isChest && styles.dayCardChest,
                 ]}
               >
                 <Text style={styles.dayLabel}>DAY {item.day}</Text>
                 <Text style={styles.dayRewardText}>{item.reward}</Text>
-                {item.claimed && <Text style={styles.checkMini}>✓</Text>}
+                {item.claimed ? (
+                  <Text style={styles.checkMini}>✓</Text>
+                ) : item.isToday ? (
+                  <Text style={styles.todayMini}>TODAY</Text>
+                ) : null}
               </View>
             ))}
           </View>
@@ -104,13 +154,19 @@ export const DailyRushModal: React.FC = () => {
 
         <View style={styles.challengeList}>
           {challenges.map((c) => (
-            <View
+            <Pressable
               key={c.num}
-              style={[
+              disabled={!c.active}
+              onPress={() => {
+                setSelectedMode(c.mode);
+                startCountdown(c.mode, 'medium');
+              }}
+              style={({ pressed }) => [
                 styles.challengeRow,
                 c.done && styles.challengeDone,
                 c.active && styles.challengeActive,
                 c.isBoss && styles.challengeBoss,
+                pressed && c.active && styles.challengePressed,
               ]}
             >
               <View
@@ -133,7 +189,7 @@ export const DailyRushModal: React.FC = () => {
               <View style={styles.challengeInfo}>
                 <Text style={styles.challengeTitle}>{c.title}</Text>
                 <Text style={styles.challengeMode}>
-                  {c.mode} • {c.reward}
+                  {c.modeLabel} • {c.reward}
                 </Text>
               </View>
 
@@ -150,22 +206,27 @@ export const DailyRushModal: React.FC = () => {
                     c.active && { color: '#04160D' },
                   ]}
                 >
-                  {c.done ? 'DONE' : c.active ? 'READY' : 'LOCKED'}
+                  {c.done ? 'DONE' : c.active ? 'READY ▶' : 'LOCKED 🔒'}
                 </Text>
               </View>
-            </View>
+            </Pressable>
           ))}
         </View>
 
         {/* 6. Primary Action CTA Button */}
         <GameButton
-          title="START TODAY'S RUSH"
+          title={
+            gauntletProgress >= 5
+              ? 'ALL 5 STAGES COMPLETED! 🏆'
+              : `START STAGE ${activeChallenge.num}: ${activeChallenge.title.toUpperCase()} ▶`
+          }
           icon="▶"
           variant="green"
           size="lg"
           fullWidth
           onPress={handleStartDailyChallenge}
           style={styles.startBtn}
+          disabled={gauntletProgress >= 5}
         />
 
         <View style={{ height: 110 }} />

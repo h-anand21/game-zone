@@ -105,6 +105,13 @@ interface NumberRushState {
   // Settings
   updateSettings: (newSettings: Partial<GameSettings>) => void;
 
+  // Exit Modal & Navigation
+  showExitModal: boolean;
+  setShowExitModal: (show: boolean) => void;
+  onExitApp?: () => void;
+  setOnExitApp: (fn: () => void) => void;
+  advanceDailyGauntlet: () => void;
+
   // Data persistence
   loadPersistedData: () => Promise<void>;
   savePersistedData: () => Promise<void>;
@@ -115,7 +122,7 @@ const DEFAULT_STATS: PlayerStats = {
   totalScore: 0,
   bestScore: 0,
   maxCombo: 0,
-  accuracy: 100,
+  accuracy: 0,
   totalCorrect: 0,
   totalWrong: 0,
   coins: 450,
@@ -124,6 +131,8 @@ const DEFAULT_STATS: PlayerStats = {
   xp: 0,
   dailyStreak: 1,
   lastDailyClaimDate: '',
+  playerName: 'Player 1',
+  dailyGauntletProgress: 0,
 };
 
 const DEFAULT_SETTINGS: GameSettings = {
@@ -191,6 +200,20 @@ export const useNumberRushStore = create<NumberRushState>((set, get) => ({
   powerUps: DEFAULT_POWER_UPS,
   achievements: INITIAL_ACHIEVEMENTS,
   leaderboard: INITIAL_LEADERBOARD,
+
+  showExitModal: false,
+  setShowExitModal: (show: boolean) => set({ showExitModal: show }),
+  onExitApp: undefined,
+  setOnExitApp: (fn: () => void) => set({ onExitApp: fn }),
+  advanceDailyGauntlet: () => {
+    const { stats } = get();
+    const current = stats.dailyGauntletProgress || 0;
+    if (current < 5) {
+      const updated = { ...stats, dailyGauntletProgress: current + 1 };
+      set({ stats: updated });
+      get().savePersistedData();
+    }
+  },
 
   setScreen: (screen) => {
     NRAudio.playButton();

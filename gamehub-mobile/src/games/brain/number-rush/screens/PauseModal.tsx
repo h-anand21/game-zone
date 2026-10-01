@@ -23,6 +23,7 @@ export const PauseModal: React.FC = () => {
     setScreen,
     settings,
     updateSettings,
+    setShowExitModal,
   } = useNumberRushStore();
 
   if (!isPaused) return null;
@@ -107,12 +108,22 @@ export const PauseModal: React.FC = () => {
 
             <GameButton
               title="QUIT TO HOME"
-              icon="🚪"
+              icon="🏠"
               variant="wood"
               size="md"
               fullWidth
               onPress={exitToHome}
             />
+
+            <Pressable
+              onPress={() => {
+                resumeGame();
+                setShowExitModal(true);
+              }}
+              style={styles.exitLinkBtn}
+            >
+              <Text style={styles.exitLinkText}>🚪 EXIT TO GAMEHUB</Text>
+            </Pressable>
           </View>
         </WoodPanel>
       </View>
@@ -185,5 +196,17 @@ const styles = StyleSheet.create({
   actions: {
     width: '100%',
     gap: 10,
+  },
+  exitLinkBtn: {
+    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+  },
+  exitLinkText: {
+    color: '#FF6B6B',
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 1,
   },
 });

@@ -28,10 +28,13 @@ const { width } = Dimensions.get('window');
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const HomeScreen: React.FC = () => {
-  const { stats, startCountdown, setScreen, setSelectedMode } = useNumberRushStore();
+  const { stats, setScreen, setSelectedMode, selectedMode, leaderboard } =
+    useNumberRushStore();
+
+  const activeMode = MODE_CONFIGS[selectedMode] || MODE_CONFIGS['animal-count'];
 
   const handlePlayNow = () => {
-    setSelectedMode('animal-count');
+    // Navigate to Mode Preview for the currently selected mode
     setScreen('mode-preview');
   };
 
@@ -40,12 +43,18 @@ export const HomeScreen: React.FC = () => {
     setScreen('mode-preview');
   };
 
-  const featuredModes = [
+  const allModes = [
     MODE_CONFIGS['animal-count'],
     MODE_CONFIGS['quick-rush'],
     MODE_CONFIGS['emoji-count'],
     MODE_CONFIGS['number-box'],
+    MODE_CONFIGS['mixed-rush'],
   ];
+
+  const userRank =
+    stats.bestScore > 0
+      ? `#${leaderboard.filter((e) => e.score > stats.bestScore).length + 1}`
+      : '#--';
 
   return (
     <View style={styles.container}>
@@ -93,7 +102,7 @@ export const HomeScreen: React.FC = () => {
               <View style={styles.bestScoreCol}>
                 <Text style={styles.bestScoreLabel}>BEST SCORE</Text>
                 <Text style={styles.bestScoreVal}>
-                  {stats.bestScore > 0 ? stats.bestScore.toLocaleString() : '12,480'} PTS
+                  {stats.bestScore.toLocaleString()} PTS
                 </Text>
               </View>
               <View style={styles.streakBadge}>
@@ -103,10 +112,21 @@ export const HomeScreen: React.FC = () => {
             </View>
           </WoodPanel>
 
+          {/* Selected Mode Banner Pill */}
+          <Pressable
+            onPress={() => setScreen('mode-hub')}
+            style={styles.selectedModePill}
+          >
+            <Text style={styles.selectedModeLabel}>SELECTED MODE:</Text>
+            <Text style={styles.selectedModeValue}>
+              {activeMode.icon} {activeMode.name.toUpperCase()}
+            </Text>
+            <Text style={styles.selectedModeChange}>CHANGE ❯</Text>
+          </Pressable>
+
           {/* 4. Massive 2.5D Primary Action CTA */}
           <GameButton
-            title="PLAY NOW"
-            icon="▶"
+            title={`PLAY: ${activeMode.name.toUpperCase()} ▶`}
             variant="green"
             size="lg"
             fullWidth
@@ -148,7 +168,7 @@ export const HomeScreen: React.FC = () => {
                 <Text style={styles.quickSub}>Top Champions</Text>
               </View>
               <View style={[styles.freeBadge, { backgroundColor: '#1E90FF' }]}>
-                <Text style={styles.freeBadgeText}>#42</Text>
+                <Text style={styles.freeBadgeText}>{userRank}</Text>
               </View>
             </Pressable>
           </View>
@@ -158,24 +178,27 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.modesHeaderRow}>
           <Text style={styles.sectionHeaderTitle}>CHOOSE YOUR RUSH</Text>
           <Pressable onPress={() => setScreen('mode-hub')} style={styles.viewAllBtn}>
-            <Text style={styles.viewAllText}>ALL MODES →</Text>
+            <Text style={styles.viewAllText}>ALL MODES (5) →</Text>
           </Pressable>
         </View>
 
         <View style={styles.modesGrid}>
-          {featuredModes.map((mode) => (
+          {allModes.map((mode) => (
             <Pressable
               key={mode.id}
               onPress={() => handleModeSelect(mode.id)}
               style={({ pressed }) => [
                 styles.modeCard,
                 { borderColor: mode.themeColor },
+                selectedMode === mode.id && styles.modeCardSelected,
                 pressed && styles.cardPressed,
               ]}
             >
               <View style={[styles.modeCardHeader, { backgroundColor: mode.themeColor }]}>
                 <Text style={styles.modeCardBadge}>{mode.badge}</Text>
-                <Text style={styles.modeCardStar}>⭐ READY</Text>
+                <Text style={styles.modeCardStar}>
+                  {selectedMode === mode.id ? '✓ ACTIVE' : '⭐ PLAY'}
+                </Text>
               </View>
 
               <View style={styles.modeCardBody}>
@@ -187,7 +210,7 @@ export const HomeScreen: React.FC = () => {
 
                 <View style={styles.playNowRow}>
                   <Text style={[styles.cardPlayText, { color: mode.themeColor }]}>
-                    START RUSH ▶
+                    SELECT & PLAY ▶
                   </Text>
                 </View>
               </View>
@@ -351,6 +374,35 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '900',
   },
+  selectedModePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    backgroundColor: 'rgba(43, 20, 8, 0.95)',
+    borderWidth: 1.5,
+    borderColor: '#FFD700',
+    borderRadius: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+  },
+  selectedModeLabel: {
+    color: '#FFC107',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+  selectedModeValue: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  selectedModeChange: {
+    color: '#2ED573',
+    fontSize: 11,
+    fontWeight: '900',
+  },
   playNowBtn: {
     marginBottom: 12,
   },
@@ -457,6 +509,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 6,
     elevation: 4,
+  },
+  modeCardSelected: {
+    borderWidth: 2.5,
+    borderColor: '#FFD700',
+    backgroundColor: '#35180A',
+    shadowColor: '#FFD700',
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
   },
   modeCardHeader: {
     flexDirection: 'row',

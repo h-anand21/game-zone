@@ -3,7 +3,7 @@
 // ============================================================
 
 import React, { useEffect } from 'react';
-import { View, StyleSheet, StatusBar } from 'react-native';
+import { View, StyleSheet, StatusBar, BackHandler } from 'react-native';
 import { NRTheme } from './theme';
 import { useNumberRushStore } from './store/numberRushStore';
 import {
@@ -24,18 +24,57 @@ import {
   DailyRushModal,
 } from './screens';
 import { PowerUpModal } from './components/PowerUpModal';
+import { ExitConfirmationModal } from './components/ExitConfirmationModal';
 
 interface NumberRushAppProps {
   onExit?: () => void;
   onFinishGame?: (score: number, won: boolean, metadata?: Record<string, unknown>) => void;
 }
 
-export const NumberRushApp: React.FC<NumberRushAppProps> = () => {
-  const { currentScreen, loadPersistedData } = useNumberRushStore();
+export const NumberRushApp: React.FC<NumberRushAppProps> = ({ onExit }) => {
+  const {
+    currentScreen,
+    setScreen,
+    loadPersistedData,
+    setOnExitApp,
+    setShowExitModal,
+    showExitModal,
+    togglePause,
+  } = useNumberRushStore();
 
   useEffect(() => {
     loadPersistedData();
-  }, []);
+    if (onExit) {
+      setOnExitApp(onExit);
+    }
+  }, [onExit]);
+
+  // Android Hardware Back Button Handling
+  useEffect(() => {
+    const handleHardwareBack = () => {
+      if (showExitModal) {
+        setShowExitModal(false);
+        return true;
+      }
+
+      if (currentScreen === 'home') {
+        setShowExitModal(true);
+        return true;
+      }
+
+      if (currentScreen === 'gameplay') {
+        togglePause();
+        return true;
+      }
+
+      // Any other subscreen returns cleanly to Home
+      setScreen('home');
+      return true;
+    };
+
+    const sub = BackHandler.addEventListener('hardwareBackPress', handleHardwareBack);
+    return () => sub.remove();
+  }, [currentScreen, showExitModal]);
 
   const renderActiveScreen = () => {
     switch (currentScreen) {
@@ -86,6 +125,7 @@ export const NumberRushApp: React.FC<NumberRushAppProps> = () => {
         backgroundColor="transparent"
       />
       {renderActiveScreen()}
+      <ExitConfirmationModal />
     </View>
   );
 };

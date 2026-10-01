@@ -40,7 +40,19 @@ export default function GameScreen() {
   // Dedicated Full-Screen Experience for Mind Lock, Find One & Number Rush
   if ((cleanGameId === 'mind-lock' || cleanGameId === 'find-one' || cleanGameId === 'number-rush') && registeredGame) {
     const GameComponent = registeredGame.component;
-    return <GameComponent engine={undefined as any} onFinish={() => {}} isPaused={false} />;
+    return (
+      <GameComponent
+        engine={undefined as any}
+        onFinish={() => {
+          if (router.canGoBack()) {
+            router.back();
+          } else {
+            router.replace('/(tabs)/games');
+          }
+        }}
+        isPaused={false}
+      />
+    );
   }
 
 

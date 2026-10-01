@@ -24,3 +24,4 @@ export * from './AccountModal';
 export * from './DeleteAccountModal';
 export * from './SupportModal';
 export * from './PowerUpModal';
+export * from './ExitConfirmationModal';

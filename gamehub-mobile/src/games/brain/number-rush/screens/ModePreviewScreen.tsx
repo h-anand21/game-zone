@@ -1,8 +1,8 @@
 // ============================================================
-// Number Rush — Screen 05: MODE PREVIEW (Animal Count Jungle Game Menu Reference)
+// Number Rush — Screen 05: MODE PREVIEW (Dynamic Multi-Mode Preview & Selector)
 // ============================================================
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -14,7 +14,8 @@ import { Image as ExpoImage } from 'expo-image';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
 import { HeaderHUD, GameButton, WoodPanel, MascotIllustration } from '../components';
-import type { Difficulty } from '../types';
+import { MODE_CONFIGS } from '../data';
+import type { Difficulty, GameModeId } from '../types';
 
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
@@ -23,14 +24,55 @@ export const ModePreviewScreen: React.FC = () => {
     setScreen,
     startCountdown,
     selectedMode,
+    setSelectedMode,
     difficulty,
     setDifficulty,
     stats,
   } = useNumberRushStore();
 
+  const modeConfig = MODE_CONFIGS[selectedMode] || MODE_CONFIGS['animal-count'];
+
   const handleStartGame = () => {
     startCountdown(selectedMode, difficulty);
   };
+
+  const getHowToPlaySteps = (mode: GameModeId) => {
+    switch (mode) {
+      case 'quick-rush':
+        return [
+          'Read the lightning arithmetic equation shown in the center.',
+          'Calculate the exact solution in your head at maximum sprint speed.',
+          'Tap the correct answer button to chain combo multipliers up to x3.5!',
+        ];
+      case 'emoji-count':
+        return [
+          'Look at the target emoji character specified in the challenge badge.',
+          'Scan the colorful emoji grid and count all exact matching instances.',
+          'Tap the correct count button before the rush countdown runs out!',
+        ];
+      case 'number-box':
+        return [
+          'Examine the 3×3 numbers matrix and deduce the hidden row/column pattern.',
+          'Calculate what number replaces the mysterious "?" tile.',
+          'Tap the matching solution button to clear the puzzle round!',
+        ];
+      case 'mixed-rush':
+        return [
+          'Brace for unpredictable rounds alternating math, counting & pattern logic.',
+          'Quickly adapt your perception strategy for each new incoming wave.',
+          'Rack up high streaks to conquer the global leaderboard halls!',
+        ];
+      case 'animal-count':
+      default:
+        return [
+          'Scan the lush scene to locate the requested target jungle animal.',
+          'Count only the matching creatures and ignore wilderness distractors.',
+          'Tap the matching count button before the timer expires!',
+        ];
+    }
+  };
+
+  const steps = getHowToPlaySteps(selectedMode);
 
   return (
     <View style={styles.container}>
@@ -39,95 +81,186 @@ export const ModePreviewScreen: React.FC = () => {
       <View style={styles.darkVignette} />
 
       {/* 2. Top Game HUD */}
-      <HeaderHUD showBack onBackPress={() => setScreen('category')} title="MODE PREVIEW" />
+      <HeaderHUD showBack onBackPress={() => setScreen('home')} title="MODE PREVIEW" />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 3. Mode Header Badge with Mascot */}
-        <View style={styles.modeHeaderCard}>
-          <View style={styles.headerLeft}>
-            <View style={styles.categoryPill}>
-              <Text style={styles.categoryPillText}>OBSERVE ARENA</Text>
+        {/* Prominent Mode Switcher Banner */}
+        <Pressable
+          onPress={() => setScreen('mode-hub')}
+          style={({ pressed }) => [
+            styles.changeModeBar,
+            pressed && styles.cardPressed,
+          ]}
+        >
+          <View style={styles.changeModeLeft}>
+            <Text style={styles.changeModeIcon}>🎯</Text>
+            <View>
+              <Text style={styles.changeModeTitle}>WANT A DIFFERENT CHALLENGE?</Text>
+              <Text style={styles.changeModeSub}>Tap to browse all 5 game modes</Text>
             </View>
-            <Text style={styles.modeTitle}>ANIMAL COUNT</Text>
-            <Text style={styles.modeSubtitle}>
-              Spot & Count Jungle Wildlife Under Time Pressure
-            </Text>
+          </View>
+          <View style={styles.changeModeBtn}>
+            <Text style={styles.changeModeBtnText}>SWITCH ❯</Text>
+          </View>
+        </Pressable>
+
+        {/* 3. Mode Header Badge with Mascot */}
+        <View style={[styles.modeHeaderCard, { borderColor: modeConfig.themeColor }]}>
+          <View style={styles.headerLeft}>
+            <View style={[styles.categoryPill, { backgroundColor: modeConfig.themeColor }]}>
+              <Text style={styles.categoryPillText}>{modeConfig.category.toUpperCase()} ARENA</Text>
+            </View>
+            <Text style={styles.modeTitle}>{modeConfig.icon} {modeConfig.name.toUpperCase()}</Text>
+            <Text style={styles.modeSubtitle}>{modeConfig.description}</Text>
           </View>
           <View style={styles.mascotHolder}>
             <MascotIllustration size={90} character="tiger" mood="happy" showAura={false} />
           </View>
         </View>
 
-        {/* 4. REAL CONSTRUCTED GAMEPLAY PREVIEW FRAME */}
-        <View style={styles.previewFrame}>
+        {/* 4. DYNAMIC GAMEPLAY PREVIEW FRAME */}
+        <View style={[styles.previewFrame, { borderColor: modeConfig.themeColor }]}>
           <View style={styles.frameHeader}>
             <Text style={styles.frameBadge}>LIVE GAMEPLAY PREVIEW</Text>
-            <Text style={styles.themeBadge}>🌿 JUNGLE SAFARI</Text>
+            <Text style={[styles.themeBadge, { color: modeConfig.themeColor }]}>
+              {modeConfig.badge}
+            </Text>
           </View>
 
-          {/* Constructed Mini-Scene with Real Animals */}
-          <View style={styles.miniScene}>
-            <ExpoImage source={JUNGLE_BG} style={styles.miniSceneBg} contentFit="cover" />
-            <View style={styles.miniVignette} />
+          {/* Render Customized Preview by Mode */}
+          {selectedMode === 'animal-count' && (
+            <View style={styles.miniScene}>
+              <ExpoImage source={JUNGLE_BG} style={styles.miniSceneBg} contentFit="cover" />
+              <View style={styles.miniVignette} />
+              <View style={[styles.animalSpot, { top: '18%', left: '15%' }]}>
+                <Text style={styles.animalEmoji}>🐵</Text>
+              </View>
+              <View style={[styles.animalSpot, { top: '22%', right: '20%' }]}>
+                <Text style={styles.animalEmoji}>🐯</Text>
+              </View>
+              <View style={[styles.animalSpot, { bottom: '26%', left: '30%' }]}>
+                <Text style={styles.animalEmoji}>🐵</Text>
+              </View>
+              <View style={[styles.animalSpot, { bottom: '22%', right: '15%' }]}>
+                <Text style={styles.animalEmoji}>🐘</Text>
+              </View>
+              <View style={[styles.animalSpot, { top: '48%', left: '55%' }]}>
+                <Text style={styles.animalEmoji}>🐵</Text>
+              </View>
+              <View style={styles.previewQuestionBanner}>
+                <Text style={styles.questionMascot}>🐵</Text>
+                <Text style={styles.questionText}>How many Monkeys?</Text>
+              </View>
+              <View style={styles.answerPillsRow}>
+                {['2', '3', '4', '5'].map((ans) => (
+                  <View key={ans} style={[styles.ansPill, ans === '3' && styles.ansPillCorrect]}>
+                    <Text style={[styles.ansPillText, ans === '3' && styles.ansPillCorrectText]}>
+                      {ans}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
 
-            {/* Floating Animals in Scene */}
-            <View style={[styles.animalSpot, { top: '18%', left: '15%' }]}>
-              <Text style={styles.animalEmoji}>🐵</Text>
-            </View>
-            <View style={[styles.animalSpot, { top: '22%', right: '20%' }]}>
-              <Text style={styles.animalEmoji}>🐯</Text>
-            </View>
-            <View style={[styles.animalSpot, { bottom: '26%', left: '30%' }]}>
-              <Text style={styles.animalEmoji}>🐵</Text>
-            </View>
-            <View style={[styles.animalSpot, { bottom: '22%', right: '15%' }]}>
-              <Text style={styles.animalEmoji}>🐘</Text>
-            </View>
-            <View style={[styles.animalSpot, { top: '48%', left: '55%' }]}>
-              <Text style={styles.animalEmoji}>🐵</Text>
-            </View>
-
-            {/* Question Signboard Thumbnail */}
-            <View style={styles.previewQuestionBanner}>
-              <Text style={styles.questionMascot}>🐵</Text>
-              <Text style={styles.questionText}>How many Monkeys?</Text>
-            </View>
-
-            {/* Answer Pills Preview */}
-            <View style={styles.answerPillsRow}>
-              {['2', '3', '4', '5'].map((ans, i) => (
-                <View
-                  key={ans}
-                  style={[
-                    styles.ansPill,
-                    ans === '3' && styles.ansPillCorrect,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.ansPillText,
-                      ans === '3' && styles.ansPillCorrectText,
-                    ]}
-                  >
-                    {ans}
-                  </Text>
+          {selectedMode === 'quick-rush' && (
+            <View style={[styles.miniScene, { backgroundColor: '#09182E', justifyContent: 'center' }]}>
+              <View style={styles.mathPreviewBox}>
+                <Text style={styles.mathExprText}>18 + 27 = ?</Text>
+                <View style={styles.mathTimerBadge}>
+                  <Text style={styles.mathTimerText}>⚡ 10s SPRINT</Text>
                 </View>
-              ))}
+              </View>
+              <View style={styles.answerPillsRow}>
+                {['42', '45', '47', '55'].map((ans) => (
+                  <View key={ans} style={[styles.ansPill, ans === '45' && styles.ansPillCorrect]}>
+                    <Text style={[styles.ansPillText, ans === '45' && styles.ansPillCorrectText]}>
+                      {ans}
+                    </Text>
+                  </View>
+                ))}
+              </View>
             </View>
-          </View>
+          )}
+
+          {selectedMode === 'emoji-count' && (
+            <View style={[styles.miniScene, { backgroundColor: '#211105' }]}>
+              <View style={styles.previewQuestionBanner}>
+                <Text style={styles.questionMascot}>😎</Text>
+                <Text style={styles.questionText}>Count the Cool Emojis!</Text>
+              </View>
+              <View style={styles.emojiMiniGrid}>
+                {['😎', '🤩', '😎', '🥳', '😎', '🤠', '😎', '🤩', '🤠'].map((e, idx) => (
+                  <View key={idx} style={styles.emojiMiniTile}>
+                    <Text style={{ fontSize: 20 }}>{e}</Text>
+                  </View>
+                ))}
+              </View>
+              <View style={styles.answerPillsRow}>
+                {['3', '4', '5', '6'].map((ans) => (
+                  <View key={ans} style={[styles.ansPill, ans === '4' && styles.ansPillCorrect]}>
+                    <Text style={[styles.ansPillText, ans === '4' && styles.ansPillCorrectText]}>
+                      {ans}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {selectedMode === 'number-box' && (
+            <View style={[styles.miniScene, { backgroundColor: '#1A0C2E' }]}>
+              <View style={styles.previewQuestionBanner}>
+                <Text style={styles.questionMascot}>🔢</Text>
+                <Text style={styles.questionText}>Solve the 3×3 Mystery Tile!</Text>
+              </View>
+              <View style={styles.matrixMiniGrid}>
+                {['2', '4', '6', '3', '6', '9', '4', '8', '?'].map((val, idx) => (
+                  <View key={idx} style={[styles.matrixMiniTile, val === '?' && styles.matrixTargetTile]}>
+                    <Text style={[styles.matrixMiniText, val === '?' && { color: '#00E5FF' }]}>
+                      {val}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+              <View style={styles.answerPillsRow}>
+                {['10', '12', '14', '16'].map((ans) => (
+                  <View key={ans} style={[styles.ansPill, ans === '12' && styles.ansPillCorrect]}>
+                    <Text style={[styles.ansPillText, ans === '12' && styles.ansPillCorrectText]}>
+                      {ans}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {selectedMode === 'mixed-rush' && (
+            <View style={[styles.miniScene, { backgroundColor: '#1F1703' }]}>
+              <View style={styles.mixedBannerCenter}>
+                <Text style={styles.mixedIconLarge}>🌀</Text>
+                <Text style={styles.mixedBannerTitle}>CHAMPIONSHIP GAUNTLET</Text>
+                <Text style={styles.mixedBannerSub}>Rotating Math • Observation • Matrix Logic</Text>
+              </View>
+              <View style={styles.answerPillsRow}>
+                {['CASUAL', 'SPEED', 'STREAK', 'BOSS'].map((tag, idx) => (
+                  <View key={idx} style={[styles.ansPill, idx === 0 && styles.ansPillCorrect]}>
+                    <Text style={[styles.ansPillText, idx === 0 && styles.ansPillCorrectText]}>
+                      {tag}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
         </View>
 
         {/* 5. Difficulty Selection Segment */}
         <View style={styles.diffSection}>
-          <View style={styles.diffHeaderRow}>
-            <Text style={styles.sectionTitle}>SELECT CHALLENGE LEVEL</Text>
-            <Pressable onPress={() => setScreen('difficulty')}>
-              <Text style={styles.viewDiffText}>DETAILS ⚙️</Text>
-            </Pressable>
-          </View>
+          <Text style={styles.sectionTitle}>SELECT CHALLENGE LEVEL</Text>
 
           <View style={styles.diffPillsRow}>
             {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => {
@@ -135,7 +268,7 @@ export const ModePreviewScreen: React.FC = () => {
               const color =
                 d === 'easy' ? '#2ED573' : d === 'medium' ? '#FFB800' : '#FF4757';
               const label =
-                d === 'easy' ? 'CASUAL (1.0x)' : d === 'medium' ? 'STANDARD (1.5x)' : 'INSANE (2.0x)';
+                d === 'easy' ? '🟢 EASY (1.0x)' : d === 'medium' ? '🟡 MEDIUM (1.5x)' : '🔴 HARD (2.0x)';
 
               return (
                 <Pressable
@@ -162,38 +295,26 @@ export const ModePreviewScreen: React.FC = () => {
 
         {/* 6. How To Play Summary Card */}
         <WoodPanel style={styles.tutorialSummaryCard} variant="card" hasRivets={false}>
-          <Text style={styles.tutorialTitle}>HOW TO PLAY</Text>
-          <View style={styles.stepRow}>
-            <Text style={styles.stepNum}>1.</Text>
-            <Text style={styles.stepText}>
-              Scan the lush scene to locate the requested target animal.
-            </Text>
-          </View>
-          <View style={styles.stepRow}>
-            <Text style={styles.stepNum}>2.</Text>
-            <Text style={styles.stepText}>
-              Sum up only the matching animals and ignore forest distractors.
-            </Text>
-          </View>
-          <View style={styles.stepRow}>
-            <Text style={styles.stepNum}>3.</Text>
-            <Text style={styles.stepText}>
-              Tap the matching number button before the sprint timer expires!
-            </Text>
-          </View>
+          <Text style={styles.tutorialTitle}>HOW TO PLAY: {modeConfig.name.toUpperCase()}</Text>
+          {steps.map((st, i) => (
+            <View key={i} style={styles.stepRow}>
+              <Text style={styles.stepNum}>{i + 1}.</Text>
+              <Text style={styles.stepText}>{st}</Text>
+            </View>
+          ))}
         </WoodPanel>
 
-        {/* 7. Best Score Highlight */}
+        {/* 7. Real Best Score Highlight */}
         <View style={styles.bestScoreCard}>
           <Text style={styles.bestScoreLabel}>YOUR BEST SCORE</Text>
           <Text style={styles.bestScoreValue}>
-            {stats.bestScore > 0 ? stats.bestScore.toLocaleString() : '2,840'} PTS ⭐⭐⭐
+            {stats.bestScore.toLocaleString()} PTS
           </Text>
         </View>
 
-        {/* 8. Large PLAY NOW CTA Button */}
+        {/* 8. Large Primary Start Rush CTA Button */}
         <GameButton
-          title="PLAY NOW"
+          title={`START ${modeConfig.name.toUpperCase()} ▶`}
           icon="▶"
           variant="green"
           size="lg"
@@ -224,10 +345,56 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
   },
+  changeModeBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(43, 20, 8, 0.95)',
+    borderWidth: 1.5,
+    borderColor: '#FFD700',
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+  },
+  cardPressed: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
+  },
+  changeModeLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  changeModeIcon: {
+    fontSize: 22,
+  },
+  changeModeTitle: {
+    color: '#FFE082',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  changeModeSub: {
+    color: '#8CA0BA',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  changeModeBtn: {
+    backgroundColor: '#2ED573',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  changeModeBtnText: {
+    color: '#04160D',
+    fontSize: 10,
+    fontWeight: '900',
+  },
   modeHeaderCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(7, 27, 52, 0.92)',
+    backgroundColor: 'rgba(43, 20, 8, 0.92)',
     borderRadius: 22,
     borderWidth: 2,
     borderColor: '#FFD700',
@@ -254,7 +421,7 @@ const styles = StyleSheet.create({
     color: '#FFD700',
     fontSize: 20,
     fontWeight: '900',
-    letterSpacing: 1.5,
+    letterSpacing: 1.2,
   },
   modeSubtitle: {
     color: '#D8E2DD',
@@ -269,7 +436,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   previewFrame: {
-    backgroundColor: 'rgba(7, 27, 52, 0.9)',
+    backgroundColor: 'rgba(43, 20, 8, 0.9)',
     borderRadius: 22,
     borderWidth: 2.5,
     borderColor: '#FFC107',
@@ -285,7 +452,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(11, 40, 72, 0.95)',
+    backgroundColor: 'rgba(28, 12, 5, 0.95)',
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderBottomWidth: 1.5,
@@ -355,14 +522,12 @@ const styles = StyleSheet.create({
     zIndex: 5,
   },
   ansPill: {
-    width: 38,
-    height: 32,
-    borderRadius: 10,
-    backgroundColor: 'rgba(7, 27, 52, 0.9)',
+    backgroundColor: '#1E3A5F',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 12,
     borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: '#4A90E2',
   },
   ansPillCorrect: {
     backgroundColor: '#2ED573',
@@ -376,58 +541,144 @@ const styles = StyleSheet.create({
   ansPillCorrectText: {
     color: '#04160D',
   },
+  mathPreviewBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 10,
+  },
+  mathExprText: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 2,
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  mathTimerBadge: {
+    backgroundColor: 'rgba(255, 109, 0, 0.25)',
+    borderWidth: 1,
+    borderColor: '#FF6D00',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    marginTop: 6,
+  },
+  mathTimerText: {
+    color: '#FF9100',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  emojiMiniGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 8,
+    width: 140,
+    alignSelf: 'center',
+    marginVertical: 6,
+  },
+  emojiMiniTile: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  matrixMiniGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 6,
+    width: 130,
+    alignSelf: 'center',
+    marginVertical: 6,
+  },
+  matrixMiniTile: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 1,
+    borderColor: '#9C27B0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  matrixTargetTile: {
+    borderColor: '#00E5FF',
+    backgroundColor: 'rgba(0, 229, 255, 0.15)',
+  },
+  matrixMiniText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  mixedBannerCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 12,
+  },
+  mixedIconLarge: {
+    fontSize: 32,
+  },
+  mixedBannerTitle: {
+    color: '#FFD700',
+    fontSize: 14,
+    fontWeight: '900',
+    marginTop: 4,
+  },
+  mixedBannerSub: {
+    color: '#8CA0BA',
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 2,
+  },
   diffSection: {
     marginBottom: 16,
   },
-  diffHeaderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
   sectionTitle: {
     color: '#FFE082',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '900',
     letterSpacing: 1,
-  },
-  viewDiffText: {
-    color: '#00E5FF',
-    fontSize: 11,
-    fontWeight: '900',
+    marginBottom: 8,
   },
   diffPillsRow: {
     flexDirection: 'row',
-    gap: 8,
+    justifyContent: 'space-between',
+    gap: 6,
   },
   diffButton: {
     flex: 1,
+    alignItems: 'center',
     paddingVertical: 10,
     borderRadius: 14,
-    backgroundColor: 'rgba(7, 27, 52, 0.85)',
+    backgroundColor: 'rgba(43, 20, 8, 0.9)',
     borderWidth: 1.5,
     borderColor: 'rgba(255, 255, 255, 0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   diffBtnText: {
     color: '#8CA0BA',
     fontSize: 10,
     fontWeight: '900',
+    letterSpacing: 0.5,
   },
   activeDiffBtnText: {
-    color: '#071324',
+    color: '#04160D',
   },
   tutorialSummaryCard: {
+    marginBottom: 16,
     padding: 14,
-    marginBottom: 14,
   },
   tutorialTitle: {
-    color: '#FFD700',
-    fontSize: 12,
+    color: '#FFE082',
+    fontSize: 13,
     fontWeight: '900',
     letterSpacing: 1,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   stepRow: {
     flexDirection: 'row',
@@ -437,34 +688,38 @@ const styles = StyleSheet.create({
     color: '#2ED573',
     fontWeight: '900',
     fontSize: 12,
-    width: 20,
+    marginRight: 8,
+    width: 14,
   },
   stepText: {
-    flex: 1,
     color: '#D8E2DD',
-    fontSize: 11,
-    lineHeight: 15,
+    fontSize: 12,
+    flex: 1,
+    lineHeight: 16,
   },
   bestScoreCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: 'rgba(11, 40, 72, 0.8)',
-    borderRadius: 16,
+    backgroundColor: 'rgba(43, 20, 8, 0.85)',
+    borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: '#FFD700',
-    paddingVertical: 10,
+    borderColor: '#7A3F1D',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     marginBottom: 16,
   },
   bestScoreLabel: {
     color: '#8CA0BA',
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '900',
     letterSpacing: 1,
   },
   bestScoreValue: {
     color: '#FFD700',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '900',
-    marginTop: 2,
+    letterSpacing: 1,
   },
   playCta: {
     marginBottom: 10,

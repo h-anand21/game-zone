@@ -24,7 +24,8 @@ export const LeaderboardModal: React.FC = () => {
   const top1 = leaderboard[0];
   const top2 = leaderboard[1];
   const top3 = leaderboard[2];
-  const rest = leaderboard.slice(3);
+  const userRankNum = leaderboard.filter((e) => e.score > stats.bestScore).length + 1;
+  const userRank = stats.bestScore > 0 ? `#${userRankNum}` : '#--';
 
   return (
     <View style={styles.container}>
@@ -150,17 +151,17 @@ export const LeaderboardModal: React.FC = () => {
       {/* 7. Sticky User Rank Row */}
       <View style={styles.userStickyRow}>
         <View style={styles.userRankPill}>
-          <Text style={styles.userRankText}>#42</Text>
+          <Text style={styles.userRankText}>{userRank}</Text>
         </View>
         <Text style={styles.userAvatar}>🏃</Text>
         <View style={styles.userInfo}>
-          <Text style={styles.userName}>YOU (Alex Rush)</Text>
+          <Text style={styles.userName}>YOU ({stats.playerName || 'Player 1'})</Text>
           <Text style={styles.userSub}>
             Level {stats.level} • {stats.dailyStreak}d Streak
           </Text>
         </View>
         <Text style={styles.userScore}>
-          {stats.bestScore > 0 ? stats.bestScore.toLocaleString() : '12,480'} 🪙
+          {stats.bestScore.toLocaleString()} 🪙
         </Text>
       </View>
 

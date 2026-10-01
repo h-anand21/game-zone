@@ -119,6 +119,8 @@ export interface PlayerStats {
   xp: number;
   dailyStreak: number;
   lastDailyClaimDate: string;
+  playerName?: string;
+  dailyGauntletProgress?: number;
 }
 
 export interface Achievement {
