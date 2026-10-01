@@ -642,7 +642,7 @@ export const useNumberRushStore = create<NumberRushState>((set, get) => ({
     NRAudio.setSoundEnabled(updated.soundEffects);
     NRAudio.setMusicEnabled(updated.backgroundMusic);
     NRAudio.setVolume(updated.bgVolume);
-    NRHaptics.setEnabled(updated.hapticFeedback);
+    NRHaptics.setEnabled(updated.hapticFeedback && updated.vibration);
 
     set({ settings: updated });
     get().savePersistedData();

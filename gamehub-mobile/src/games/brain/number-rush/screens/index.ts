@@ -14,4 +14,5 @@ export * from './LeaderboardModal';
 export * from './ProfileModal';
 export * from './AchievementsModal';
 export * from './SettingsModal';
+export { SettingsModal as SettingsScreen } from './SettingsModal';
 export * from './DailyRushModal';
