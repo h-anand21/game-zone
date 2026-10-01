@@ -134,6 +134,13 @@ export interface GameSettings {
   backgroundMusic: boolean;
   hapticFeedback: boolean;
   bgVolume: number;
+  sfxVolume: number;
+  vibration: boolean;
+  showHints: boolean;
+  confirmActions: boolean;
+  darkMode: boolean;
+  animations: boolean;
+  language: string;
 }
 
 export interface ModeConfig {

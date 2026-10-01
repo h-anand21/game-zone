@@ -124,6 +124,13 @@ const DEFAULT_SETTINGS: GameSettings = {
   backgroundMusic: true,
   hapticFeedback: true,
   bgVolume: 0.7,
+  sfxVolume: 0.8,
+  vibration: true,
+  showHints: true,
+  confirmActions: true,
+  darkMode: true,
+  animations: true,
+  language: 'en',
 };
 
 const DEFAULT_POWER_UPS: PowerUpState = {
