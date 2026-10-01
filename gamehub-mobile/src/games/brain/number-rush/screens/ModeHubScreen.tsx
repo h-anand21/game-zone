@@ -1,7 +1,5 @@
 // ============================================================
-// Number Rush — Screen 03: MODE SELECTION (Gateway from PLAY NOW)
-// Displays all game modes and directly launches selected mode's gameplay
-// Flow: HOME -> [PLAY NOW] -> MODE SELECTION -> Select Mode -> Gameplay
+// Number Rush — Screen 03: MODE HUB (Choose Your Rush Game Hub)
 // ============================================================
 
 import React from 'react';
@@ -17,219 +15,155 @@ import { Image as ExpoImage } from 'expo-image';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
 import { HeaderHUD, BottomNavBar } from '../components';
-import { MODE_CONFIGS } from '../data';
-import type { Difficulty, GameModeId } from '../types';
+import { CATEGORY_CONFIGS, MODE_CONFIGS } from '../data';
+import type { CategoryId, GameModeId } from '../types';
 
 const { width } = Dimensions.get('window');
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const ModeHubScreen: React.FC = () => {
-  const {
-    setScreen,
-    setSelectedMode,
-    selectedMode,
-    difficulty,
-    setDifficulty,
-    startCountdown,
-    stats,
-  } = useNumberRushStore();
+  const { setScreen, setSelectedCategory, setSelectedMode, selectedMode } = useNumberRushStore();
 
-  // Selecting a mode opens that specific game directly via startCountdown
-  const handleLaunchMode = (modeId: GameModeId) => {
+  const handleCategorySelect = (categoryId: CategoryId) => {
+    setSelectedCategory(categoryId);
+    setScreen('category');
+  };
+
+  const handleDirectModeSelect = (modeId: GameModeId) => {
     setSelectedMode(modeId);
-    startCountdown(modeId, difficulty);
+    setScreen('mode-preview');
   };
 
   const playableModes = [
-    {
-      ...MODE_CONFIGS['quick-rush'],
-      displayName: 'Quick Rush (Number Rush)',
-      accentColor: '#00E5FF',
-      bgGradient: '#0D2B54',
-      badge: '⚡ SPEED SPRINT',
-      sub: 'Rapid mental arithmetic and speed calculations',
-      bestScore: stats.bestScore > 0 ? stats.bestScore : 756,
-    },
-    {
-      ...MODE_CONFIGS['animal-count'],
-      displayName: 'Animal Count',
-      accentColor: '#FF9100',
-      bgGradient: '#4A1F0D',
-      badge: '🦁 OBSERVE & SPOT',
-      sub: 'Find & count wild animals in jungle landscapes',
-      bestScore: stats.bestScore > 0 ? Math.floor(stats.bestScore * 0.85) : 631,
-    },
-    {
-      ...MODE_CONFIGS['emoji-count'],
-      displayName: 'Emoji Count (Find Different)',
-      accentColor: '#E040FB',
-      bgGradient: '#3D0D54',
-      badge: '😎 FOCUS & ATTENTION',
-      sub: 'Scan dynamic grids to spot and count target emojis',
-      bestScore: stats.bestScore > 0 ? Math.floor(stats.bestScore * 0.72) : 518,
-    },
-    {
-      ...MODE_CONFIGS['number-box'],
-      displayName: 'Number Puzzle (Logic Box)',
-      accentColor: '#00E676',
-      bgGradient: '#0D4A2B',
-      badge: '🧩 LOGIC MATRIX',
-      sub: 'Decode 3x3 pattern matrices to find the missing tile',
-      bestScore: stats.bestScore > 0 ? Math.floor(stats.bestScore * 0.9) : 694,
-    },
-    {
-      ...MODE_CONFIGS['mixed-rush'],
-      displayName: 'Mixed Rush (Grand Gauntlet)',
-      accentColor: '#FFD700',
-      bgGradient: '#4A3B0D',
-      badge: '🔥 ALL CHALLENGES',
-      sub: 'Rounds shift unpredictably between math, spotting, and logic',
-      bestScore: stats.bestScore > 0 ? Math.floor(stats.bestScore * 0.95) : 812,
-    },
-  ];
-
-  const difficulties: { id: Difficulty; label: string; icon: string; color: string }[] = [
-    { id: 'easy', label: 'EASY', icon: '🌱', color: '#2ED573' },
-    { id: 'medium', label: 'MEDIUM', icon: '⚡', color: '#FFA502' },
-    { id: 'hard', label: 'HARD', icon: '🔥', color: '#FF4757' },
+    MODE_CONFIGS['animal-count'],
+    MODE_CONFIGS['quick-rush'],
+    MODE_CONFIGS['emoji-count'],
+    MODE_CONFIGS['number-box'],
+    MODE_CONFIGS['mixed-rush'],
   ];
 
   return (
     <View style={styles.container}>
-      {/* 1. Background */}
+      {/* 1. Atmospheric Jungle Background */}
       <ExpoImage source={JUNGLE_BG} style={styles.bgImage} contentFit="cover" />
       <View style={styles.darkVignette} />
 
-      {/* 2. Top Header HUD with Back Button */}
-      <HeaderHUD showBack onBackPress={() => setScreen('home')} title="MODE SELECTION" />
+      {/* 2. Top Game HUD */}
+      <HeaderHUD showBack onBackPress={() => setScreen('home')} title="CHOOSE YOUR RUSH" />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Banner Title */}
+        {/* Banner Tagline */}
         <View style={styles.hubBanner}>
-          <Text style={styles.hubSub}>CHOOSE YOUR DISCIPLINE</Text>
-          <Text style={styles.hubTitle}>SELECT A GAME MODE</Text>
-          <Text style={styles.hubDesc}>
-            Tap any mode below to start playing that challenge directly!
-          </Text>
+          <Text style={styles.hubSub}>SELECT YOUR BRAIN DISCIPLINE</Text>
+          <Text style={styles.hubTitle}>ALL 5 GAME MODES</Text>
         </View>
 
-        {/* Difficulty Selector Bar */}
-        <View style={styles.diffSection}>
-          <Text style={styles.diffLabel}>SELECT DIFFICULTY:</Text>
-          <View style={styles.diffRow}>
-            {difficulties.map((diff) => {
-              const isSelected = difficulty === diff.id;
-              return (
-                <Pressable
-                  key={diff.id}
-                  onPress={() => setDifficulty(diff.id)}
-                  style={({ pressed }) => [
-                    styles.diffBtn,
-                    isSelected && {
-                      backgroundColor: diff.color,
-                      borderColor: '#FFFFFF',
-                    },
-                    pressed && styles.cardPressed,
-                  ]}
-                >
-                  <Text style={styles.diffIcon}>{diff.icon}</Text>
-                  <Text
-                    style={[
-                      styles.diffText,
-                      isSelected && { color: '#04160D', fontWeight: '900' },
-                    ]}
-                  >
-                    {diff.label}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
+        {/* 3. Direct Play Modes List */}
+        <View style={styles.directModesList}>
+          {playableModes.map((mode) => (
+            <Pressable
+              key={mode.id}
+              onPress={() => handleDirectModeSelect(mode.id)}
+              style={({ pressed }) => [
+                styles.directModeCard,
+                { borderColor: mode.themeColor },
+                selectedMode === mode.id && styles.directModeActive,
+                pressed && styles.cardPressed,
+              ]}
+            >
+              <View style={[styles.directIconBox, { backgroundColor: mode.themeColor + '25', borderColor: mode.themeColor }]}>
+                <Text style={styles.directIcon}>{mode.icon}</Text>
+              </View>
+
+              <View style={styles.directInfo}>
+                <View style={styles.badgeRow}>
+                  <Text style={[styles.directBadge, { color: mode.themeColor }]}>{mode.badge}</Text>
+                  {selectedMode === mode.id && (
+                    <Text style={styles.activeCheck}>✓ CURRENT</Text>
+                  )}
+                </View>
+                <Text style={styles.directName}>{mode.name}</Text>
+                <Text style={styles.directDesc} numberOfLines={2}>{mode.description}</Text>
+              </View>
+
+              <View style={[styles.directPlayPill, { backgroundColor: mode.themeColor }]}>
+                <Text style={styles.directPlayText}>PLAY ▶</Text>
+              </View>
+            </Pressable>
+          ))}
         </View>
 
-        {/* All Available Game Modes List */}
-        <View style={styles.modesList}>
-          {playableModes.map((mode) => {
-            const isCurrent = selectedMode === mode.id;
+        {/* 4. Discipline Arenas Section */}
+        <View style={styles.arenasHeaderRow}>
+          <Text style={styles.arenasTitle}>4 DISCIPLINE ARENAS</Text>
+          <Text style={styles.arenasSub}>EXPLORE BY SKILL</Text>
+        </View>
 
-            return (
-              <Pressable
-                key={mode.id}
-                onPress={() => handleLaunchMode(mode.id as GameModeId)}
-                style={({ pressed }) => [
-                  styles.modeCard,
-                  { borderColor: mode.accentColor },
-                  pressed && styles.cardPressed,
-                ]}
-              >
-                {/* Left 3D Icon Box */}
+        {/* 2x2 Category Selection Grid */}
+        <View style={styles.categoryGrid}>
+          {CATEGORY_CONFIGS.map((cat) => (
+            <Pressable
+              key={cat.id}
+              onPress={() => handleCategorySelect(cat.id)}
+              style={({ pressed }) => [
+                styles.categoryCard,
+                { borderColor: cat.color },
+                pressed && styles.cardPressed,
+              ]}
+            >
+              <View style={[styles.cardHeader, { backgroundColor: cat.color }]}>
+                <Text style={styles.modeCountBadge}>
+                  {cat.modes.length} MODES
+                </Text>
+                <Text style={styles.cardCrown}>★</Text>
+              </View>
+
+              <View style={styles.cardBody}>
                 <View
                   style={[
-                    styles.iconBox,
-                    {
-                      backgroundColor: mode.bgGradient,
-                      borderColor: mode.accentColor,
-                    },
+                    styles.iconCircle,
+                    { backgroundColor: cat.color + '25', borderColor: cat.color },
                   ]}
                 >
-                  <Text style={styles.modeIcon}>{mode.icon}</Text>
+                  <Text style={styles.catIcon}>{cat.icon}</Text>
                 </View>
 
-                {/* Center Information */}
-                <View style={styles.modeInfo}>
-                  <View style={styles.badgeRow}>
-                    <Text style={[styles.modeBadge, { color: mode.accentColor }]}>
-                      {mode.badge}
-                    </Text>
-                    {isCurrent && (
-                      <View style={styles.lastPlayedPill}>
-                        <Text style={styles.lastPlayedText}>CURRENT</Text>
-                      </View>
-                    )}
-                  </View>
+                <Text style={[styles.catName, { color: cat.color }]}>
+                  {cat.name}
+                </Text>
 
-                  <Text style={styles.modeTitle}>{mode.displayName}</Text>
-                  <Text style={styles.modeSub} numberOfLines={2}>
-                    {mode.sub}
-                  </Text>
+                <Text style={styles.catSubtitle} numberOfLines={2}>
+                  {cat.subtitle}
+                </Text>
 
-                  <View style={styles.modeScoreRow}>
-                    <Text style={styles.scoreCrown}>👑</Text>
-                    <Text style={styles.scoreText}>
-                      Best Score: {mode.bestScore.toLocaleString()} PTS
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Right Direct Launch Play Button */}
-                <Pressable
-                  onPress={() => handleLaunchMode(mode.id as GameModeId)}
+                <View
                   style={[
-                    styles.launchBtn,
-                    { backgroundColor: mode.accentColor },
+                    styles.enterPill,
+                    { borderColor: cat.color, backgroundColor: cat.color + '20' },
                   ]}
                 >
-                  <Text style={styles.launchText}>PLAY</Text>
-                  <Text style={styles.launchArrow}>▶</Text>
-                </Pressable>
-              </Pressable>
-            );
-          })}
+                  <Text style={[styles.enterText, { color: cat.color }]}>
+                    EXPLORE →
+                  </Text>
+                </View>
+              </View>
+            </Pressable>
+          ))}
         </View>
 
-        {/* Back to Home Button */}
-        <Pressable
-          onPress={() => setScreen('home')}
-          style={({ pressed }) => [
-            styles.backHomeBtn,
-            pressed && styles.cardPressed,
-          ]}
-        >
-          <Text style={styles.backHomeText}>← BACK TO HOME</Text>
-        </Pressable>
+        {/* Quick Training Tip Card */}
+        <View style={styles.tipCard}>
+          <Text style={styles.tipLight}>💡</Text>
+          <View style={styles.tipTextCol}>
+            <Text style={styles.tipTitle}>PRO RUSH TIP</Text>
+            <Text style={styles.tipDesc}>
+              Rotating between Calculation (Rush) and Observation (Observe) trains both brain hemispheres for higher combo streaks!
+            </Text>
+          </View>
+        </View>
 
         <View style={{ height: 110 }} />
       </ScrollView>
@@ -250,121 +184,69 @@ const styles = StyleSheet.create({
   },
   darkVignette: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(6, 18, 13, 0.72)',
+    backgroundColor: 'rgba(6, 18, 13, 0.65)',
   },
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 8,
   },
-  cardPressed: {
-    transform: [{ scale: 0.98 }],
-    opacity: 0.9,
-  },
-
-  // Banner
   hubBanner: {
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
     paddingVertical: 4,
   },
   hubSub: {
     color: '#00E5FF',
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
     letterSpacing: 2,
     marginBottom: 2,
   },
   hubTitle: {
     color: '#FFD700',
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '900',
     letterSpacing: 1.5,
-    marginBottom: 4,
-    textShadowColor: 'rgba(0, 0, 0, 0.6)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
   },
-  hubDesc: {
-    color: '#A0B2C6',
-    fontSize: 11,
-    textAlign: 'center',
-    paddingHorizontal: 10,
-  },
-
-  // Difficulty Selector Bar
-  diffSection: {
-    backgroundColor: 'rgba(11, 23, 44, 0.88)',
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: '#1E3A6E',
-    padding: 10,
-    marginBottom: 16,
-  },
-  diffLabel: {
-    color: '#8CA0BA',
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 1,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  diffRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  diffBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(15, 33, 64, 0.9)',
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: '#244983',
-    paddingVertical: 8,
-  },
-  diffIcon: {
-    fontSize: 13,
-  },
-  diffText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
-
-  // Modes List
-  modesList: {
-    gap: 12,
+  directModesList: {
+    gap: 10,
     marginBottom: 20,
   },
-  modeCard: {
+  directModeCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(15, 28, 48, 0.95)',
-    borderRadius: 20,
+    backgroundColor: 'rgba(43, 20, 8, 0.95)',
+    borderRadius: 18,
     borderWidth: 2,
+    borderColor: '#7A3F1D',
     padding: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 5,
+    elevation: 4,
   },
-  iconBox: {
-    width: 58,
-    height: 58,
-    borderRadius: 16,
-    borderWidth: 2,
-    alignItems: 'center',
+  directModeActive: {
+    borderColor: '#FFD700',
+    backgroundColor: 'rgba(53, 26, 12, 0.98)',
+  },
+  cardPressed: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
+  },
+  directIconBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1.5,
     justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 12,
   },
-  modeIcon: {
-    fontSize: 30,
+  directIcon: {
+    fontSize: 26,
   },
-  modeInfo: {
+  directInfo: {
     flex: 1,
   },
   badgeRow: {
@@ -373,90 +255,165 @@ const styles = StyleSheet.create({
     gap: 6,
     marginBottom: 2,
   },
-  modeBadge: {
+  directBadge: {
     fontSize: 9,
     fontWeight: '900',
     letterSpacing: 0.5,
   },
-  lastPlayedPill: {
-    backgroundColor: 'rgba(46, 213, 115, 0.25)',
+  activeCheck: {
+    color: '#2ED573',
+    fontSize: 8,
+    fontWeight: '900',
+    backgroundColor: 'rgba(46, 213, 115, 0.2)',
     paddingHorizontal: 5,
     paddingVertical: 1,
     borderRadius: 4,
-    borderWidth: 1,
-    borderColor: '#2ED573',
   },
-  lastPlayedText: {
-    color: '#2ED573',
-    fontSize: 7,
-    fontWeight: '900',
-  },
-  modeTitle: {
+  directName: {
     color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '900',
-    letterSpacing: 0.4,
-    marginBottom: 2,
-  },
-  modeSub: {
-    color: '#A0B2C6',
-    fontSize: 9,
-    lineHeight: 13,
-    marginBottom: 6,
-  },
-  modeScoreRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  scoreCrown: {
-    fontSize: 10,
-  },
-  scoreText: {
-    color: '#FFD700',
-    fontSize: 9,
-    fontWeight: '800',
-  },
-  launchBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    borderRadius: 14,
-    marginLeft: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 4,
-    elevation: 4,
-  },
-  launchText: {
-    color: '#04160D',
-    fontSize: 12,
+    fontSize: 15,
     fontWeight: '900',
     letterSpacing: 0.5,
+    marginBottom: 2,
   },
-  launchArrow: {
+  directDesc: {
+    color: '#A0B2C6',
+    fontSize: 10,
+    lineHeight: 14,
+  },
+  directPlayPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  directPlayText: {
     color: '#04160D',
     fontSize: 11,
     fontWeight: '900',
   },
-
-  // Back to Home Button
-  backHomeBtn: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    paddingVertical: 12,
+  arenasHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 2,
   },
-  backHomeText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '800',
+  arenasTitle: {
+    color: '#FFE082',
+    fontSize: 13,
+    fontWeight: '900',
     letterSpacing: 1,
+  },
+  arenasSub: {
+    color: '#8CA0BA',
+    fontSize: 9,
+    fontWeight: '700',
+  },
+  categoryGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+    marginBottom: 16,
+  },
+  categoryCard: {
+    width: (width - 44) / 2,
+    backgroundColor: 'rgba(43, 20, 8, 0.92)',
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#FFC107',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  modeCountBadge: {
+    color: '#071324',
+    fontSize: 8,
+    fontWeight: '900',
+  },
+  cardCrown: {
+    color: '#071324',
+    fontSize: 10,
+  },
+  cardBody: {
+    padding: 12,
+    alignItems: 'center',
+  },
+  iconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  catIcon: {
+    fontSize: 22,
+  },
+  catName: {
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+  catSubtitle: {
+    color: '#8CA0BA',
+    fontSize: 9,
+    textAlign: 'center',
+    marginBottom: 10,
+    lineHeight: 12,
+    height: 24,
+  },
+  enterPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  enterText: {
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  tipCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: '#FFC107',
+    padding: 12,
+    marginBottom: 8,
+  },
+  tipLight: {
+    fontSize: 24,
+    marginRight: 10,
+  },
+  tipTextCol: {
+    flex: 1,
+  },
+  tipTitle: {
+    color: '#FFD700',
+    fontSize: 11,
+    fontWeight: '900',
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+  tipDesc: {
+    color: '#D8E2DD',
+    fontSize: 10,
+    lineHeight: 14,
   },
 });
