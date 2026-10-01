@@ -1,218 +1,181 @@
 // ============================================================
-// Number Rush — How To Play Tutorial Screen
+// Number Rush — Screen 07: HOW TO PLAY (Jungle Animal Count Tutorial Reference)
 // ============================================================
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
-  Pressable,
 } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
-import { HeaderHUD, GameButton, WoodPanel } from '../components';
-import type { GameModeId } from '../types';
+import { HeaderHUD, GameButton, MascotIllustration, WoodPanel } from '../components';
+
+const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const HowToPlayModal: React.FC = () => {
-  const { setScreen, startCountdown } = useNumberRushStore();
-  const [activeTab, setActiveTab] = useState<GameModeId>('animal-count');
+  const { setScreen, startCountdown, selectedMode, difficulty } = useNumberRushStore();
 
-  const tutorials: Record<
-    GameModeId,
-    { title: string; icon: string; steps: { title: string; desc: string }[] }
-  > = {
-    'animal-count': {
-      title: 'Animal Count Tutorial',
-      icon: '🐯',
-      steps: [
-        {
-          title: '1. READ THE TARGET',
-          desc: 'The question banner tells you which jungle animal to look for (e.g. "How many Tigers?").',
-        },
-        {
-          title: '2. SCAN THE JUNGLE',
-          desc: 'Carefully count the target animals hiding among vines and bushes. Beware of distractor animals!',
-        },
-        {
-          title: '3. TAP THE CORRECT BUTTON',
-          desc: 'Choose the matching number on the 4 chunky buttons below before the timer runs out!',
-        },
-        {
-          title: '4. STREAK MULTIPLIER',
-          desc: 'Consecutive correct answers trigger Combo Multipliers (x2, x3, x5, x10) and Special Rare Rounds!',
-        },
-      ],
-    },
-    'quick-rush': {
-      title: 'Quick Rush Tutorial',
-      icon: '⚡',
-      steps: [
-        {
-          title: '1. HIGH SPEED MATH',
-          desc: 'Solve addition, subtraction, multiplication, division, or number series under time pressure.',
-        },
-        {
-          title: '2. COMBO MOMENTUM',
-          desc: 'Every fast correct answer extends your timer and boosts your score multiplier!',
-        },
-        {
-          title: '3. ELIMINATE POWER-UP',
-          desc: 'Stuck on a tricky question? Use the 50:50 power-up to remove 2 wrong answers.',
-        },
-      ],
-    },
-    'emoji-count': {
-      title: 'Emoji Count Tutorial',
-      icon: '😎',
-      steps: [
-        {
-          title: '1. TARGET EMOJI',
-          desc: 'Look at the target emoji requested (e.g., Sunglasses, Rockets, Gems).',
-        },
-        {
-          title: '2. GRID SCANNING',
-          desc: 'Rapidly scan the grid rows and columns to sum all instances of that emoji.',
-        },
-        {
-          title: '3. SPEED BONUS',
-          desc: 'Tap the correct number quickly for maximum rush bonus points!',
-        },
-      ],
-    },
-    'number-box': {
-      title: 'Number Box Tutorial',
-      icon: '🔢',
-      steps: [
-        {
-          title: '1. 3×3 MATRIX PATTERN',
-          desc: 'Look across rows and columns to detect the math rule (Row Sums, Sequence Steps, or Addition).',
-        },
-        {
-          title: '2. SOLVE THE "?" TILE',
-          desc: 'Calculate what number must replace the golden mystery "?" tile to satisfy the pattern.',
-        },
-        {
-          title: '3. TAP THE ANSWER',
-          desc: 'Select the missing number to clear the matrix and advance to the next level.',
-        },
-      ],
-    },
-    'mixed-rush': {
-      title: 'Mixed Rush Gauntlet',
-      icon: '🌀',
-      steps: [
-        {
-          title: '1. SURPRISE EVERY ROUND',
-          desc: 'Rounds dynamically shift between Animals, Emojis, Mental Math, and Matrices!',
-        },
-        {
-          title: '2. TOTAL ADAPTABILITY',
-          desc: 'Test both your left brain (calculation) and right brain (visual observation) in one mode!',
-        },
-      ],
-    },
+  const handleStart = () => {
+    startCountdown(selectedMode, difficulty);
   };
-
-  const activeTutorial = tutorials[activeTab];
 
   return (
     <View style={styles.container}>
-      <HeaderHUD showBack onBackPress={() => setScreen('home')} title="HOW TO PLAY" />
+      {/* 1. Atmospheric Jungle Background */}
+      <ExpoImage source={JUNGLE_BG} style={styles.bgImage} contentFit="cover" />
+      <View style={styles.darkVignette} />
 
-      {/* Mode Tabs */}
-      <View style={styles.tabsRow}>
-        {(['animal-count', 'quick-rush', 'emoji-count', 'number-box'] as GameModeId[]).map(
-          (mId) => {
-            const isSelected = activeTab === mId;
-            return (
-              <Pressable
-                key={mId}
-                onPress={() => setActiveTab(mId)}
-                style={[styles.tab, isSelected && styles.activeTab]}
-              >
-                <Text style={styles.tabIcon}>{tutorials[mId].icon}</Text>
-                <Text style={[styles.tabLabel, isSelected && styles.activeTabLabel]}>
-                  {mId.split('-')[0].toUpperCase()}
-                </Text>
-              </Pressable>
-            );
-          }
-        )}
-      </View>
+      {/* 2. Top Game HUD */}
+      <HeaderHUD showBack onBackPress={() => setScreen('home')} title="TUTORIAL" />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <WoodPanel style={styles.guideCard} variant="card">
-          <View style={styles.cardHeader}>
-            <Text style={styles.headerIcon}>{activeTutorial.icon}</Text>
-            <Text style={styles.headerTitle}>{activeTutorial.title}</Text>
+        {/* 3. Carved Wooden Billboard Header with Baby Tiger Mascot */}
+        <View style={styles.headerBillboard}>
+          <View style={styles.mascotOnSign}>
+            <MascotIllustration size={80} character="tiger" mood="happy" showAura={false} />
           </View>
+          <View style={styles.billboardBody}>
+            <Text style={styles.billboardSub}>OFFICIAL JUNGLE GUIDE</Text>
+            <Text style={styles.billboardTitle}>HOW TO PLAY</Text>
+            <Text style={styles.billboardTagline}>
+              Master the Animal Count Rush in 4 Simple Steps
+            </Text>
+          </View>
+        </View>
 
-          <View style={styles.stepsList}>
-            {activeTutorial.steps.map((step, idx) => (
-              <View key={idx} style={styles.stepItem}>
-                <View style={styles.stepBadge}>
-                  <Text style={styles.stepNum}>{idx + 1}</Text>
+        {/* 4 Visual Instruction Cards */}
+        <View style={styles.cardsContainer}>
+          {/* STEP 1: SCAN THE SCENE */}
+          <WoodPanel style={styles.stepCard} variant="wood" hasRivets={false}>
+            <View style={styles.stepHeaderRow}>
+              <View style={styles.stepBadge}>
+                <Text style={styles.stepBadgeText}>STEP 1</Text>
+              </View>
+              <Text style={styles.stepTitle}>SCAN THE JUNGLE SCENE</Text>
+            </View>
+
+            <Text style={styles.stepDesc}>
+              Carefully look at the lush forest clearing. Animals are scattered across different positions and depths.
+            </Text>
+
+            {/* Visual Illustrated Component Box */}
+            <View style={styles.visualBox}>
+              <View style={styles.animalRow}>
+                <Text style={styles.visualEmoji}>🐵</Text>
+                <Text style={styles.visualEmoji}>🐯</Text>
+                <Text style={styles.visualEmoji}>🐵</Text>
+                <Text style={styles.visualEmoji}>🐘</Text>
+                <Text style={styles.visualEmoji}>🐵</Text>
+              </View>
+              <Text style={styles.visualCaption}>🌿 3 Monkeys hiding in the trees</Text>
+            </View>
+          </WoodPanel>
+
+          {/* STEP 2: READ THE MISSION */}
+          <WoodPanel style={styles.stepCard} variant="wood" hasRivets={false}>
+            <View style={styles.stepHeaderRow}>
+              <View style={styles.stepBadge}>
+                <Text style={styles.stepBadgeText}>STEP 2</Text>
+              </View>
+              <Text style={styles.stepTitle}>READ THE TARGET QUESTION</Text>
+            </View>
+
+            <Text style={styles.stepDesc}>
+              Check the carved signboard at the top of the scene. It specifies exactly which wildlife species to count.
+            </Text>
+
+            {/* Visual Illustrated Component Box */}
+            <View style={styles.visualBox}>
+              <View style={styles.questionSignboardThumb}>
+                <Text style={styles.signboardEmoji}>🐵</Text>
+                <Text style={styles.signboardText}>How many Monkeys?</Text>
+              </View>
+              <Text style={styles.visualCaption}>🎯 Ignore distractor tigers and elephants</Text>
+            </View>
+          </WoodPanel>
+
+          {/* STEP 3: CHOOSE THE ANSWER */}
+          <WoodPanel style={styles.stepCard} variant="wood" hasRivets={false}>
+            <View style={styles.stepHeaderRow}>
+              <View style={styles.stepBadge}>
+                <Text style={styles.stepBadgeText}>STEP 3</Text>
+              </View>
+              <Text style={styles.stepTitle}>TAP THE MATCHING BUTTON</Text>
+            </View>
+
+            <Text style={styles.stepDesc}>
+              Choose the correct number on the 4 chunky buttons below before the countdown clock runs out.
+            </Text>
+
+            {/* Visual Illustrated Component Box */}
+            <View style={styles.visualBox}>
+              <View style={styles.miniButtonsRow}>
+                <View style={[styles.miniBtn, { borderColor: '#00E5FF' }]}>
+                  <Text style={styles.miniBtnText}>2</Text>
                 </View>
-                <View style={styles.stepContent}>
-                  <Text style={styles.stepTitle}>{step.title}</Text>
-                  <Text style={styles.stepDesc}>{step.desc}</Text>
+                <View
+                  style={[
+                    styles.miniBtn,
+                    styles.miniBtnActive,
+                    { borderColor: '#2ED573', backgroundColor: '#2ED573' },
+                  ]}
+                >
+                  <Text style={[styles.miniBtnText, { color: '#04160D' }]}>3 ✓</Text>
+                </View>
+                <View style={[styles.miniBtn, { borderColor: '#FFB800' }]}>
+                  <Text style={styles.miniBtnText}>4</Text>
+                </View>
+                <View style={[styles.miniBtn, { borderColor: '#A55EEA' }]}>
+                  <Text style={styles.miniBtnText}>5</Text>
                 </View>
               </View>
-            ))}
-          </View>
-        </WoodPanel>
+              <Text style={styles.visualCaption}>✅ Tap button "3" for correct points</Text>
+            </View>
+          </WoodPanel>
 
-        {/* Power-Ups Guide Panel */}
-        <WoodPanel style={styles.powerUpPanel} variant="glass">
-          <Text style={styles.powerUpTitle}>POWER-UP GUIDE</Text>
-          <View style={styles.powerUpList}>
-            <View style={styles.powerUpRow}>
-              <Text style={styles.puIcon}>❄️</Text>
-              <View style={styles.puCol}>
-                <Text style={styles.puName}>FREEZE TIME</Text>
-                <Text style={styles.puDesc}>Pauses the countdown timer for 5 whole seconds.</Text>
+          {/* STEP 4: BE FAST & CHAIN COMBOS */}
+          <WoodPanel style={styles.stepCard} variant="wood" hasRivets={false}>
+            <View style={styles.stepHeaderRow}>
+              <View style={styles.stepBadge}>
+                <Text style={styles.stepBadgeText}>STEP 4</Text>
               </View>
+              <Text style={styles.stepTitle}>BE FAST & CHAIN COMBOS</Text>
             </View>
 
-            <View style={styles.powerUpRow}>
-              <Text style={styles.puIcon}>⚡</Text>
-              <View style={styles.puCol}>
-                <Text style={styles.puName}>50:50 ELIMINATE</Text>
-                <Text style={styles.puDesc}>Removes 2 incorrect choices immediately.</Text>
-              </View>
-            </View>
+            <Text style={styles.stepDesc}>
+              Consecutive correct answers trigger Streak Multipliers (x2, x3, x5, x10) and trigger Rare Lion Rushes!
+            </Text>
 
-            <View style={styles.powerUpRow}>
-              <Text style={styles.puIcon}>⏰</Text>
-              <View style={styles.puCol}>
-                <Text style={styles.puName}>EXTRA TIME</Text>
-                <Text style={styles.puDesc}>Instantly adds +5 seconds to your clock.</Text>
+            {/* Visual Illustrated Component Box */}
+            <View style={styles.visualBox}>
+              <View style={styles.comboThumbRow}>
+                <Text style={styles.flameIcon}>🔥</Text>
+                <Text style={styles.comboThumbText}>COMBO x5!</Text>
+                <View style={styles.bonusXpPill}>
+                  <Text style={styles.bonusXpText}>+250 XP ⚡</Text>
+                </View>
               </View>
+              <Text style={styles.visualCaption}>⭐ Unlocks 2x Bonus Rare Mascot Rounds</Text>
             </View>
+          </WoodPanel>
+        </View>
 
-            <View style={styles.powerUpRow}>
-              <Text style={styles.puIcon}>💡</Text>
-              <View style={styles.puCol}>
-                <Text style={styles.puName}>AUTO HINT</Text>
-                <Text style={styles.puDesc}>Highlights target animals or the correct answer tile.</Text>
-              </View>
-            </View>
-          </View>
-        </WoodPanel>
-
+        {/* Primary Action Button */}
         <GameButton
-          title="START PLAYING NOW"
+          title="GOT IT! LET'S RUSH"
           icon="▶"
           variant="green"
           size="lg"
           fullWidth
-          onPress={() => startCountdown(activeTab, 'easy')}
-          style={{ marginTop: 14 }}
+          onPress={handleStart}
+          style={styles.gotItBtn}
         />
 
         <View style={{ height: 40 }} />
@@ -224,83 +187,85 @@ export const HowToPlayModal: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: NRTheme.colors.bgDark,
+    backgroundColor: '#06120D',
   },
-  tabsRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    gap: 8,
+  bgImage: {
+    ...StyleSheet.absoluteFillObject,
   },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 8,
-    borderRadius: NRTheme.radius.md,
-    backgroundColor: '#0E223D',
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.1)',
-  },
-  activeTab: {
-    backgroundColor: '#1E4575',
-    borderColor: '#FFC107',
-  },
-  tabIcon: {
-    fontSize: 16,
-  },
-  tabLabel: {
-    color: '#8CA0BA',
-    fontSize: 10,
-    fontWeight: '900',
-    marginTop: 2,
-  },
-  activeTabLabel: {
-    color: '#FFC107',
+  darkVignette: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(6, 18, 13, 0.65)',
   },
   scrollContent: {
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingTop: 8,
   },
-  guideCard: {
+  headerBillboard: {
+    backgroundColor: 'rgba(7, 27, 52, 0.92)',
+    borderRadius: 22,
+    borderWidth: 2.5,
+    borderColor: '#FFC107',
     padding: 16,
-  },
-  cardHeader: {
-    flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
+    position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  headerIcon: {
-    fontSize: 28,
-    marginRight: 10,
+  mascotOnSign: {
+    marginBottom: 4,
   },
-  headerTitle: {
-    color: '#FFFFFF',
-    fontSize: 18,
+  billboardBody: {
+    alignItems: 'center',
+  },
+  billboardSub: {
+    color: '#00E5FF',
+    fontSize: 9,
     fontWeight: '900',
+    letterSpacing: 2,
+    marginBottom: 2,
   },
-  stepsList: {
+  billboardTitle: {
+    color: '#FFD700',
+    fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: 2,
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 6,
+  },
+  billboardTagline: {
+    color: '#D8E2DD',
+    fontSize: 11,
+    marginTop: 4,
+    fontWeight: '600',
+  },
+  cardsContainer: {
     gap: 14,
+    marginBottom: 18,
   },
-  stepItem: {
+  stepCard: {
+    padding: 14,
+  },
+  stepHeaderRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   stepBadge: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    backgroundColor: '#FF9800',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-    marginTop: 2,
+    backgroundColor: '#FF6D00',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginRight: 8,
   },
-  stepNum: {
+  stepBadgeText: {
     color: '#FFFFFF',
+    fontSize: 9,
     fontWeight: '900',
-    fontSize: 13,
-  },
-  stepContent: {
-    flex: 1,
   },
   stepTitle: {
     color: '#FFE082',
@@ -309,45 +274,101 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   stepDesc: {
-    color: '#A2B6CE',
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 2,
+    color: '#D8E2DD',
+    fontSize: 11,
+    lineHeight: 15,
+    marginBottom: 10,
   },
-  powerUpPanel: {
-    marginTop: 16,
-    padding: 16,
+  visualBox: {
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    borderRadius: 14,
+    padding: 10,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  powerUpTitle: {
-    color: '#FFD700',
-    fontSize: 14,
-    fontWeight: '900',
-    letterSpacing: 1,
-    marginBottom: 12,
+  animalRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 4,
   },
-  powerUpList: {
-    gap: 10,
+  visualEmoji: {
+    fontSize: 28,
   },
-  powerUpRow: {
+  visualCaption: {
+    color: '#8CA0BA',
+    fontSize: 10,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  questionSignboardThumb: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#382504',
+    borderWidth: 1.5,
+    borderColor: '#FFD700',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
   },
-  puIcon: {
-    fontSize: 22,
-    marginRight: 12,
-    width: 32,
-    textAlign: 'center',
+  signboardEmoji: {
+    fontSize: 20,
+    marginRight: 8,
   },
-  puCol: {
-    flex: 1,
-  },
-  puName: {
-    color: '#FFFFFF',
+  signboardText: {
+    color: '#FFE082',
     fontSize: 12,
     fontWeight: '900',
   },
-  puDesc: {
-    color: '#8CA0BA',
-    fontSize: 11,
+  miniButtonsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 4,
+  },
+  miniBtn: {
+    width: 38,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: 'rgba(7, 27, 52, 0.9)',
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  miniBtnActive: {
+    transform: [{ scale: 1.05 }],
+  },
+  miniBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '900',
+  },
+  comboThumbRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  flameIcon: {
+    fontSize: 24,
+  },
+  comboThumbText: {
+    color: '#FFD700',
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  bonusXpPill: {
+    backgroundColor: 'rgba(30, 144, 255, 0.3)',
+    borderWidth: 1,
+    borderColor: '#1E90FF',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  bonusXpText: {
+    color: '#00E5FF',
+    fontSize: 10,
+    fontWeight: '900',
+  },
+  gotItBtn: {
+    marginTop: 4,
   },
 });

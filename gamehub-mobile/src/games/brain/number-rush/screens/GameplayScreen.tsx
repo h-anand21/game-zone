@@ -1,14 +1,16 @@
 // ============================================================
-// Number Rush — Core Interactive Gameplay Screen
+// Number Rush — Screen 09: CORE GAMEPLAY (Colourful Jungle Game Reference)
 // ============================================================
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
+  Pressable,
 } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { NRTheme } from '../theme';
 import { useNumberRushStore } from '../store/numberRushStore';
 import {
@@ -23,6 +25,8 @@ import {
   SpecialRoundBanner,
   ComboMomentOverlay,
 } from '../components';
+
+const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const GameplayScreen: React.FC = () => {
   const {
@@ -41,12 +45,27 @@ export const GameplayScreen: React.FC = () => {
     submitAnswer,
     showComboCelebration,
     comboCelebrationValue,
+    tickTimer,
+    isTimerRunning,
   } = useNumberRushStore();
+
+  // Active game tick interval
+  useEffect(() => {
+    if (!isTimerRunning) return;
+
+    const interval = setInterval(() => {
+      tickTimer();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isTimerRunning]);
 
   if (!currentQuestion) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>PREPARING RUSH...</Text>
+        <ExpoImage source={JUNGLE_BG} style={styles.bgImage} contentFit="cover" />
+        <View style={styles.darkVignette} />
+        <Text style={styles.loadingText}>PREPARING JUNGLE RUSH...</Text>
       </View>
     );
   }
@@ -93,7 +112,7 @@ export const GameplayScreen: React.FC = () => {
         return (
           <View style={styles.mathEquationBox}>
             <Text style={styles.mathBadge}>
-              {currentQuestion.badgeText || '⚡ MENTAL MATH'}
+              {currentQuestion.badgeText || '⚡ MENTAL MATH SPRINT'}
             </Text>
             <Text style={styles.mathFormula}>
               {currentQuestion.quickRushData?.expression || currentQuestion.questionText}
@@ -110,9 +129,34 @@ export const GameplayScreen: React.FC = () => {
     return null;
   };
 
+  const getTargetIcon = () => {
+    if (currentQuestion.animalData) {
+      const type = currentQuestion.animalData.targetAnimal;
+      return type === 'tiger'
+        ? '🐯'
+        : type === 'lion'
+        ? '🦁'
+        : type === 'monkey'
+        ? '🐵'
+        : type === 'elephant'
+        ? '🐘'
+        : type === 'giraffe'
+        ? '🦒'
+        : '🦓';
+    }
+    if (currentQuestion.emojiData) {
+      return currentQuestion.emojiData.targetChar;
+    }
+    return '🎯';
+  };
+
   return (
     <View style={styles.container}>
-      {/* Top Header HUD */}
+      {/* 1. Atmospheric Jungle Background */}
+      <ExpoImage source={JUNGLE_BG} style={styles.bgImage} contentFit="cover" />
+      <View style={styles.darkVignette} />
+
+      {/* 2. Top Game HUD */}
       <HeaderHUD isGameplay />
 
       {/* In-Game Stats Header Strip */}
@@ -125,55 +169,57 @@ export const GameplayScreen: React.FC = () => {
 
         <View style={styles.scorePill}>
           <Text style={styles.scoreLabel}>SCORE</Text>
-          <Text style={styles.scoreVal}>{score}</Text>
+          <Text style={styles.scoreVal}>{score.toLocaleString()} 🪙</Text>
         </View>
 
         <ComboBadge combo={combo} />
       </View>
 
-      {/* Dynamic Animated Timer */}
+      {/* 3. Dynamic Animated Timer Bar */}
       <TimerBar
         timeLeft={timeLeft}
         maxTime={maxTime}
         isFrozen={isTimeFrozen}
       />
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Special Golden Mascot Round Banner */}
-        {currentQuestion.isSpecialRound && (
-          <SpecialRoundBanner
-            multiplier={currentQuestion.specialRoundMultiplier || 2}
-          />
-        )}
+      {/* 4. Special Round Banner if triggered */}
+      {currentQuestion.isSpecialRound && (
+        <SpecialRoundBanner multiplier={currentQuestion.specialRoundMultiplier || 2} />
+      )}
 
-        {/* Question Header Card */}
-        <View style={styles.questionCard}>
-          <Text style={styles.questionText}>
-            {currentQuestion.questionText}
-          </Text>
+      {/* 5. Carved Wooden Question Signboard */}
+      <View style={styles.questionBanner}>
+        <View style={styles.targetThumbnail}>
+          <Text style={styles.targetIcon}>{getTargetIcon()}</Text>
         </View>
+        <View style={styles.questionTextCol}>
+          <Text style={styles.questionMission}>MISSION OBJECTIVE</Text>
+          <Text style={styles.questionText}>{currentQuestion.questionText}</Text>
+        </View>
+      </View>
 
-        {/* Dynamic Game Challenge Area */}
-        <View style={styles.challengeArea}>{renderChallengeContent()}</View>
+      {/* 6. Main Interactive Challenge Viewport */}
+      <View style={styles.challengeContainer}>
+        {renderChallengeContent()}
+      </View>
 
-        {/* Power-Up Action Bar */}
-        <PowerUpTray />
+      {/* 7. Power-Up Action Tray */}
+      <PowerUpTray />
 
-        {/* 4 Chunky 2.5D Answer Buttons */}
+      {/* 8. 4 Chunky 2.5D Glossy Answer Buttons */}
+      <View style={styles.answerContainer}>
         <AnswerButtonGroup
           options={currentQuestion.options}
           correctAnswer={currentQuestion.correctAnswer}
           selectedAnswer={selectedAnswer}
           isSubmitted={isAnswerSubmitted}
           eliminatedOptions={eliminatedOptions}
-          onSelectOption={(val) => submitAnswer(val)}
+          onSelectOption={submitAnswer}
+          disabled={isAnswerSubmitted}
         />
-      </ScrollView>
+      </View>
 
-      {/* Milestone Combo Celebration Banner */}
+      {/* 9. Milestone Combo Celebration Overlay */}
       {showComboCelebration && (
         <ComboMomentOverlay comboValue={comboCelebrationValue} />
       )}
@@ -184,120 +230,152 @@ export const GameplayScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: NRTheme.colors.bgDark,
+    backgroundColor: '#06120D',
+  },
+  bgImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  darkVignette: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(6, 18, 13, 0.6)',
   },
   loadingContainer: {
     flex: 1,
-    backgroundColor: NRTheme.colors.bgDark,
+    backgroundColor: '#06120D',
     justifyContent: 'center',
     alignItems: 'center',
   },
   loadingText: {
     color: '#FFD700',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '900',
     letterSpacing: 2,
   },
   statsStrip: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 4,
+    marginBottom: 2,
   },
   roundPill: {
-    backgroundColor: '#0F2745',
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 14,
+    backgroundColor: 'rgba(7, 27, 52, 0.9)',
     borderWidth: 1.5,
-    borderColor: '#1E4575',
+    borderColor: '#00E5FF',
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
   roundText: {
-    color: '#8CA0BA',
+    color: '#00E5FF',
+    fontSize: 11,
     fontWeight: '900',
-    fontSize: 12,
-    letterSpacing: 0.5,
   },
   scorePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F2745',
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: 14,
+    backgroundColor: 'rgba(7, 27, 52, 0.9)',
     borderWidth: 1.5,
     borderColor: '#FFC107',
+    borderRadius: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
   },
   scoreLabel: {
-    color: '#FFE082',
-    fontSize: 10,
+    color: '#8CA0BA',
+    fontSize: 9,
     fontWeight: '900',
     marginRight: 6,
   },
   scoreVal: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: '#FFD700',
+    fontSize: 13,
     fontWeight: '900',
   },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
-  },
-  questionCard: {
-    backgroundColor: '#102744',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: NRTheme.radius.lg,
+  questionBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#382504',
     borderWidth: 2,
     borderColor: '#FFD700',
+    borderRadius: 18,
+    marginHorizontal: 16,
+    marginVertical: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  targetThumbnail: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+    backgroundColor: '#1E1205',
+    borderWidth: 1.5,
+    borderColor: '#FFA000',
+    justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 8,
-    ...NRTheme.shadows.card,
+    marginRight: 10,
+  },
+  targetIcon: {
+    fontSize: 24,
+  },
+  questionTextCol: {
+    flex: 1,
+  },
+  questionMission: {
+    color: '#FFB800',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 1,
   },
   questionText: {
     color: '#FFFFFF',
-    fontSize: 19,
+    fontSize: 15,
     fontWeight: '900',
-    textAlign: 'center',
-    letterSpacing: 0.5,
   },
-  challengeArea: {
-    width: '100%',
+  challengeContainer: {
+    flex: 1,
+    marginHorizontal: 16,
     marginVertical: 4,
-    minHeight: 240,
-    justifyContent: 'center',
+    borderRadius: 20,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.35)',
+    backgroundColor: 'rgba(7, 27, 52, 0.65)',
   },
   mathEquationBox: {
-    width: '100%',
-    padding: 24,
-    backgroundColor: '#0D233E',
-    borderRadius: NRTheme.radius.xl,
-    borderWidth: 2.5,
-    borderColor: '#1E90FF',
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    ...NRTheme.shadows.card,
+    padding: 20,
   },
   mathBadge: {
-    color: '#70A1FF',
-    fontSize: 12,
+    color: '#00E5FF',
+    fontSize: 11,
     fontWeight: '900',
-    letterSpacing: 1,
-    marginBottom: 10,
+    letterSpacing: 1.5,
+    marginBottom: 12,
   },
   mathFormula: {
     color: '#FFFFFF',
     fontSize: 38,
     fontWeight: '900',
+    textAlign: 'center',
     letterSpacing: 2,
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 6,
   },
   mathHint: {
     color: '#FFE082',
     fontSize: 13,
     fontWeight: '700',
-    marginTop: 10,
+    marginTop: 16,
+  },
+  answerContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 10,
   },
 });
