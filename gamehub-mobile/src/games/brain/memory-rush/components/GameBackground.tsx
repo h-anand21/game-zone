@@ -38,7 +38,7 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
         return 0.30;
       case 'home':
       default:
-        return 0.35;
+        return 0.60;
     }
   };
 
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
   },
   darkScrim: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: 'rgba(8, 10, 13, 0.40)',
+    backgroundColor: 'rgba(8, 10, 13, 0.22)',
   },
   content: {
     flex: 1,

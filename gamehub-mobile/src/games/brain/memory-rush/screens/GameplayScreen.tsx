@@ -38,6 +38,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     roundConfig,
     lastFeedback,
     powerUps,
+    playerInputSequence,
     startRound,
     advanceToHide,
     advanceToQuestion,
@@ -160,13 +161,99 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
 
         {/* TASK / PROMPT AREA */}
         <View style={styles.taskContainer}>
-          <Text style={styles.taskLabel}>
-            {phase === 'preview'
-              ? 'MEMORIZE THE NUMBERS'
-              : phase === 'hide'
-              ? 'HIDING GRID...'
-              : roundConfig?.questionPrompt || 'TAP THE NUMBER'}
-          </Text>
+          {phase === 'preview' && (
+            <View style={styles.phaseHeaderBox}>
+              <Text style={styles.phaseSubTitle}>
+                {roundConfig?.actualType === 'sequenceRush'
+                  ? 'MEMORIZE THE SEQUENCE ORDER'
+                  : roundConfig?.actualType === 'numberShift'
+                  ? 'MEMORIZE ALL NUMBERS'
+                  : roundConfig?.actualType === 'missingNumber'
+                  ? 'MEMORIZE BEFORE ONE VANISHES'
+                  : 'MEMORIZE NUMBER POSITIONS'}
+              </Text>
+              <Text style={styles.taskLabel}>GET READY...</Text>
+            </View>
+          )}
+
+          {phase === 'hide' && (
+            <View style={styles.phaseHeaderBox}>
+              <Text style={styles.taskLabel}>
+                {roundConfig?.actualType === 'numberShift'
+                  ? 'MUTATING ONE NUMBER...'
+                  : roundConfig?.actualType === 'missingNumber'
+                  ? 'ONE NUMBER VANISHED!'
+                  : 'HIDING TILES...'}
+              </Text>
+            </View>
+          )}
+
+          {phase === 'question' && (
+            <View style={styles.questionContainer}>
+              {/* 1. MEMORY GRID TARGET DISPLAY */}
+              {roundConfig?.actualType === 'memoryGrid' && (
+                <View style={styles.targetBanner}>
+                  <Text style={styles.targetPromptText}>WHERE WAS NUMBER</Text>
+                  <View style={styles.targetBadge}>
+                    <Text style={styles.targetBadgeNumber}>{roundConfig.targetValue}</Text>
+                  </View>
+                </View>
+              )}
+
+              {/* 2. SEQUENCE RUSH TRACKER */}
+              {roundConfig?.actualType === 'sequenceRush' && (
+                <View style={styles.sequenceTracker}>
+                  <Text style={styles.sequenceTrackerPrompt}>
+                    TAP IN ORDER: {playerInputSequence.length + 1} OF {roundConfig.sequenceOrder?.length || 0}
+                  </Text>
+                  <View style={styles.sequenceSlotsRow}>
+                    {(roundConfig.sequenceOrder || []).map((expectedVal, idx) => {
+                      const isFilled = idx < playerInputSequence.length;
+                      const isCurrent = idx === playerInputSequence.length;
+                      return (
+                        <View
+                          key={`seq_slot_${idx}`}
+                          style={[
+                            styles.seqSlot,
+                            isFilled && styles.seqSlotFilled,
+                            isCurrent && styles.seqSlotCurrent,
+                          ]}
+                        >
+                          <Text style={[styles.seqSlotText, isFilled && styles.seqSlotFilledText]}>
+                            {isFilled ? expectedVal : `${idx + 1}`}
+                          </Text>
+                        </View>
+                      );
+                    })}
+                  </View>
+                </View>
+              )}
+
+              {/* 3. NUMBER SHIFT PROMPT */}
+              {roundConfig?.actualType === 'numberShift' && (
+                <View style={styles.shiftPromptBanner}>
+                  <View style={styles.modePillShift}>
+                    <MRIcon name="refresh-cw" size={14} color={MRColors.yellowStatus} />
+                    <Text style={styles.modePillText}>NUMBER SHIFT</Text>
+                  </View>
+                  <Text style={styles.shiftPromptMain}>SPOT THE MUTATED NUMBER!</Text>
+                  <Text style={styles.shiftPromptSub}>Tap the tile that changed from preview</Text>
+                </View>
+              )}
+
+              {/* 4. MISSING NUMBER PROMPT */}
+              {roundConfig?.actualType === 'missingNumber' && (
+                <View style={styles.missingPromptBanner}>
+                  <View style={styles.modePillShift}>
+                    <MRIcon name="help-circle" size={14} color={MRColors.yellowStatus} />
+                    <Text style={styles.modePillText}>MISSING NUMBER</Text>
+                  </View>
+                  <Text style={styles.shiftPromptMain}>WHICH NUMBER VANISHED?</Text>
+                  <Text style={styles.shiftPromptSub}>Select from the options below</Text>
+                </View>
+              )}
+            </View>
+          )}
 
           {/* Feedback Toast */}
           <RoundFeedback
@@ -189,10 +276,10 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
 
             {/* Answer Options for Missing Number Mode */}
             {roundConfig.actualType === 'missingNumber' && phase === 'question' && (
-              <View style={styles.missingOptionsRow}>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9]
-                  .filter((n) => !tiles.some((t) => t.value === n))
-                  .map((val) => (
+              <View style={styles.missingOptionsContainer}>
+                <Text style={styles.missingOptionsHeader}>CHOOSE VANISHED NUMBER:</Text>
+                <View style={styles.missingOptionsRow}>
+                  {(roundConfig.missingOptions || []).map((val) => (
                     <Pressable
                       key={`missing_${val}`}
                       onPress={() => onOptionPress(val)}
@@ -204,6 +291,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
                       <Text style={styles.missingBtnText}>{val}</Text>
                     </Pressable>
                   ))}
+                </View>
               </View>
             )}
           </View>
@@ -373,5 +461,140 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     gap: 10,
+  },
+  phaseHeaderBox: {
+    alignItems: 'center',
+    gap: 2,
+  },
+  phaseSubTitle: {
+    fontSize: 9.5,
+    fontWeight: '800',
+    color: MRColors.yellowStatus,
+    letterSpacing: 1.5,
+  },
+  questionContainer: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  targetBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  targetPromptText: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: MRColors.textPrimary,
+    letterSpacing: 2,
+  },
+  targetBadge: {
+    backgroundColor: 'rgba(255, 216, 61, 0.18)',
+    borderWidth: 1.5,
+    borderColor: MRColors.yellowStatus,
+    paddingHorizontal: 14,
+    paddingVertical: 4,
+    borderRadius: 12,
+    shadowColor: MRColors.yellowStatus,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  targetBadgeNumber: {
+    fontSize: 22,
+    fontWeight: '900',
+    color: MRColors.yellowStatus,
+  },
+  sequenceTracker: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  sequenceTrackerPrompt: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: MRColors.yellowStatus,
+    letterSpacing: 1.5,
+  },
+  sequenceSlotsRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  seqSlot: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    borderWidth: 1.2,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(16, 27, 43, 0.8)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  seqSlotFilled: {
+    borderColor: MRColors.yellowStatus,
+    backgroundColor: 'rgba(255, 216, 61, 0.2)',
+  },
+  seqSlotCurrent: {
+    borderColor: '#FFF59D',
+    borderWidth: 2,
+  },
+  seqSlotText: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: MRColors.textMuted,
+  },
+  seqSlotFilledText: {
+    color: MRColors.yellowStatus,
+  },
+  shiftPromptBanner: {
+    alignItems: 'center',
+    gap: 3,
+  },
+  modePillShift: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255, 216, 61, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 216, 61, 0.35)',
+  },
+  modePillText: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: MRColors.yellowStatus,
+    letterSpacing: 1,
+  },
+  shiftPromptMain: {
+    fontSize: 16,
+    fontWeight: '900',
+    color: MRColors.textPrimary,
+    letterSpacing: 1.5,
+    textShadowColor: MRColors.goldGlow,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 8,
+  },
+  shiftPromptSub: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: MRColors.textSecondary,
+    letterSpacing: 1,
+  },
+  missingPromptBanner: {
+    alignItems: 'center',
+    gap: 3,
+  },
+  missingOptionsContainer: {
+    marginTop: 14,
+    alignItems: 'center',
+    width: '100%',
+  },
+  missingOptionsHeader: {
+    fontSize: 9.5,
+    fontWeight: '900',
+    color: MRColors.yellowStatus,
+    letterSpacing: 1.5,
+    marginBottom: 6,
   },
 });

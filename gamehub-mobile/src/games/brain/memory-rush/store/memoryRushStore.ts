@@ -43,11 +43,11 @@ interface MemoryRushState {
 
   tiles: NumberTileData[];
   roundConfig: RoundConfig | null;
-  playerInputSequence: number[];
+  playerInputSequence: (number | string)[];
   selectedTileIds: string[];
 
   lastFeedback: {
-    type: 'perfect' | 'miss' | null;
+    type: 'perfect' | 'miss' | 'streak' | null;
     message: string;
     points?: number;
   };
