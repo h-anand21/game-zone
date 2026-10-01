@@ -87,8 +87,14 @@ const OBSERVE_MODES: CategoryModeItem[] = [
 ];
 
 export const CategoryScreen: React.FC = () => {
-  const { setScreen, selectedCategory, setSelectedCategory, setSelectedMode } =
-    useNumberRushStore();
+  const {
+    setScreen,
+    selectedCategory,
+    setSelectedCategory,
+    setSelectedMode,
+    startCountdown,
+    difficulty,
+  } = useNumberRushStore();
 
   const [activeTab, setActiveTab] = useState<CategoryId>(selectedCategory || 'observe');
 
@@ -97,7 +103,7 @@ export const CategoryScreen: React.FC = () => {
 
   const handleModeTap = (mode: CategoryModeItem) => {
     setSelectedMode(mode.id);
-    setScreen('mode-preview');
+    startCountdown(mode.id, difficulty || 'medium');
   };
 
   return (

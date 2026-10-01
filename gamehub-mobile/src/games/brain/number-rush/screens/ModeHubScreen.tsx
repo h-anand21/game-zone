@@ -22,7 +22,14 @@ const { width } = Dimensions.get('window');
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const ModeHubScreen: React.FC = () => {
-  const { setScreen, setSelectedCategory, setSelectedMode, selectedMode } = useNumberRushStore();
+  const {
+    setScreen,
+    setSelectedCategory,
+    setSelectedMode,
+    selectedMode,
+    startCountdown,
+    difficulty,
+  } = useNumberRushStore();
 
   const handleCategorySelect = (categoryId: CategoryId) => {
     setSelectedCategory(categoryId);
@@ -31,7 +38,7 @@ export const ModeHubScreen: React.FC = () => {
 
   const handleDirectModeSelect = (modeId: GameModeId) => {
     setSelectedMode(modeId);
-    setScreen('mode-preview');
+    startCountdown(modeId, difficulty || 'medium');
   };
 
   const playableModes = [

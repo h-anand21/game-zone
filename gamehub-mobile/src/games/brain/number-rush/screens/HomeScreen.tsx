@@ -28,24 +28,29 @@ const { width } = Dimensions.get('window');
 const JUNGLE_BG = require('@/../assets/images/jungle/jungle_bg.webp');
 
 export const HomeScreen: React.FC = () => {
-  const { stats, setScreen, setSelectedMode, selectedMode, leaderboard } =
-    useNumberRushStore();
-
-  const activeMode = MODE_CONFIGS[selectedMode] || MODE_CONFIGS['animal-count'];
+  const {
+    stats,
+    setScreen,
+    selectedMode,
+    setSelectedMode,
+    leaderboard,
+    startCountdown,
+  } = useNumberRushStore();
 
   const handlePlayNow = () => {
-    // Navigate to Mode Preview for the currently selected mode
-    setScreen('mode-preview');
+    // Open the Mode Selection screen
+    setScreen('mode-hub');
   };
 
   const handleModeSelect = (modeId: GameModeId) => {
+    // Open that specific game directly
     setSelectedMode(modeId);
-    setScreen('mode-preview');
+    startCountdown(modeId, 'medium');
   };
 
   const allModes = [
-    MODE_CONFIGS['animal-count'],
     MODE_CONFIGS['quick-rush'],
+    MODE_CONFIGS['animal-count'],
     MODE_CONFIGS['emoji-count'],
     MODE_CONFIGS['number-box'],
     MODE_CONFIGS['mixed-rush'],
@@ -93,14 +98,14 @@ export const HomeScreen: React.FC = () => {
 
           {/* Mascot Centerpiece */}
           <View style={styles.mascotWrapper}>
-            <MascotIllustration size={175} character="runner_boy" mood="celebrate" />
+            <MascotIllustration size={175} character="runner_boy" mood="celebrate" showNumbers />
           </View>
 
           {/* Best Score & Streak Highlight Card (Warm Wood Panel) */}
           <WoodPanel style={styles.bestScoreCard} variant="wood" hasRivets={false}>
             <View style={styles.bestScoreRow}>
               <View style={styles.bestScoreCol}>
-                <Text style={styles.bestScoreLabel}>BEST SCORE</Text>
+                <Text style={styles.bestScoreLabel}>YOUR BEST SCORE</Text>
                 <Text style={styles.bestScoreVal}>
                   {stats.bestScore.toLocaleString()} PTS
                 </Text>
@@ -112,21 +117,10 @@ export const HomeScreen: React.FC = () => {
             </View>
           </WoodPanel>
 
-          {/* Selected Mode Banner Pill */}
-          <Pressable
-            onPress={() => setScreen('mode-hub')}
-            style={styles.selectedModePill}
-          >
-            <Text style={styles.selectedModeLabel}>SELECTED MODE:</Text>
-            <Text style={styles.selectedModeValue}>
-              {activeMode.icon} {activeMode.name.toUpperCase()}
-            </Text>
-            <Text style={styles.selectedModeChange}>CHANGE ❯</Text>
-          </Pressable>
-
-          {/* 4. Massive 2.5D Primary Action CTA */}
+          {/* 4. Massive 2.5D Primary Action CTA: PLAY NOW */}
           <GameButton
-            title={`PLAY: ${activeMode.name.toUpperCase()} ▶`}
+            title="PLAY NOW"
+            icon="▶"
             variant="green"
             size="lg"
             fullWidth
