@@ -70,7 +70,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onNavigateTab }) => {
           {/* Mode Performance */}
           <GlassCard style={styles.sectionCard}>
             <View style={styles.sectionHeader}>
-              <Feather name="bar-chart-2" size={18} color={colors.accent} />
+              <MRIcon name="bar-chart-2" size={18} color={colors.accent} />
               <Text style={styles.sectionTitle}>MODE PERFORMANCE</Text>
             </View>
 
@@ -93,7 +93,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ onNavigateTab }) => {
           {/* Recent Runs */}
           <GlassCard style={styles.sectionCard}>
             <View style={styles.sectionHeader}>
-              <Feather name="clock" size={18} color={colors.accent} />
+              <MRIcon name="clock" size={18} color={colors.accent} />
               <Text style={styles.sectionTitle}>RECENT RUNS</Text>
             </View>
 
