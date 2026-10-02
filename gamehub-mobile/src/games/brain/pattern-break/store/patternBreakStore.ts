@@ -339,6 +339,9 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
         return ach;
       });
 
+      const newXP = playerXP + 25;
+      const leveledUp = newXP >= 500;
+
       set({
         score: newScore,
         currentStreak: newStreak,
