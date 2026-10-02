@@ -17,6 +17,7 @@ export type BackgroundVariant = 'splash' | 'home' | 'observatory' | 'gameplay' |
 interface GameBackgroundProps {
   children?: React.ReactNode;
   variant?: BackgroundVariant;
+  blurRadius?: number;
 }
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -31,6 +32,7 @@ const BG_IMAGES = {
 export const GameBackground: React.FC<GameBackgroundProps> = ({
   children,
   variant = 'home',
+  blurRadius,
 }) => {
   // Determine background image based on screen role
   const bgSource =
@@ -39,6 +41,16 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
       : variant === 'gameplay'
       ? BG_IMAGES.gameplay
       : BG_IMAGES.home;
+
+  // Determine smooth blur radius per context
+  const effectiveBlur =
+    blurRadius !== undefined
+      ? blurRadius
+      : variant === 'splash'
+      ? 2
+      : variant === 'gameplay'
+      ? 3
+      : 3.5;
 
   // Generate stable ambient floating particles
   const particles = useMemo(() => {
@@ -60,18 +72,19 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
         source={bgSource}
         style={StyleSheet.absoluteFill}
         resizeMode="cover"
-        blurRadius={12}
+        blurRadius={16}
         fadeDuration={0}
       />
 
       {/* ============================================================ */}
-      {/* LAYER 1B: Crisp Hero Artwork (Properly centered & framed)    */}
+      {/* LAYER 1B: Soft-Blurred Hero Artwork (Depth of field effect)  */}
       {/* ============================================================ */}
       <View style={styles.heroCanvas} pointerEvents="none">
         <Image
           source={bgSource}
           style={styles.heroImage}
           resizeMode={SCREEN_WIDTH > 480 ? 'contain' : 'cover'}
+          blurRadius={effectiveBlur}
           fadeDuration={0}
         />
       </View>
