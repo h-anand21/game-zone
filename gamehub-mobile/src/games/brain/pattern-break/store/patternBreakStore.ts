@@ -21,8 +21,8 @@ const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
     title: 'FIRST BREAK',
     description: 'Spot your first pattern breaker.',
     icon: 'flash',
-    unlocked: true,
-    progress: 1,
+    unlocked: false,
+    progress: 0,
     maxProgress: 1,
   },
   {
@@ -31,7 +31,7 @@ const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
     description: 'Achieve 5 correct breaker taps in a row.',
     icon: 'eye',
     unlocked: false,
-    progress: 2,
+    progress: 0,
     maxProgress: 5,
   },
   {
@@ -49,7 +49,7 @@ const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
     description: 'Triumph across all 6 distinct rule families.',
     icon: 'trophy',
     unlocked: false,
-    progress: 3,
+    progress: 0,
     maxProgress: 6,
   },
   {
@@ -61,7 +61,9 @@ const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
     progress: 0,
     maxProgress: 1,
   },
-];interface PatternBreakState {
+];
+
+interface PatternBreakState {
   currentScreen: PBScreen;
   playMode: PBPlayMode;
   difficulty: PBDifficulty;
@@ -134,9 +136,9 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
   score: 0,
   round: 1,
   timeLeft: 20,
-  bestScore: 18,
+  bestScore: 0,
   currentStreak: 0,
-  bestStreak: 6,
+  bestStreak: 0,
   correctCount: 0,
   wrongCount: 0,
   timeBonus: 0,
@@ -154,23 +156,23 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
   isFrozen: false,
   scannedRule: null,
 
-  gamesPlayed: 12,
-  totalBreakersFound: 48,
-  totalWrongTaps: 6,
-  reactionTimes: [1.2, 1.4, 0.9, 1.1, 1.3],
-  playerLevel: 4,
-  playerXP: 220,
+  gamesPlayed: 0,
+  totalBreakersFound: 0,
+  totalWrongTaps: 0,
+  reactionTimes: [],
+  playerLevel: 1,
+  playerXP: 0,
   categoryMastery: {
-    NUMBER: { level: 3, progress: 65 },
-    SHAPE: { level: 2, progress: 45 },
-    COLOR: { level: 4, progress: 80 },
-    COUNT: { level: 2, progress: 35 },
-    DIRECTION: { level: 1, progress: 20 },
-    MIXED: { level: 3, progress: 60 },
+    NUMBER: { level: 1, progress: 0 },
+    SHAPE: { level: 1, progress: 0 },
+    COLOR: { level: 1, progress: 0 },
+    COUNT: { level: 1, progress: 0 },
+    DIRECTION: { level: 1, progress: 0 },
+    MIXED: { level: 1, progress: 0 },
   },
   achievements: INITIAL_ACHIEVEMENTS,
   dailyCompleted: false,
-  dailyStreak: 3,
+  dailyStreak: 0,
 
   screenHistory: [],
   showExitModal: false,
@@ -312,8 +314,30 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
       const updatedLevel = newProg >= 100 ? currentCat.level + 1 : currentCat.level;
       const updatedCatProg = newProg >= 100 ? newProg - 100 : newProg;
 
-      const newXP = playerXP + 25;
-      const leveledUp = newXP >= 500;
+      // Update Achievements dynamically
+      const achievements = get().achievements;
+      const updatedAchievements = achievements.map((ach) => {
+        if (ach.id === 'first_break') {
+          return { ...ach, unlocked: true, progress: 1 };
+        }
+        if (ach.id === 'sharp_eye') {
+          const prog = Math.min(5, Math.max(ach.progress, newBestStreak));
+          return { ...ach, progress: prog, unlocked: prog >= 5 };
+        }
+        if (ach.id === 'speed_mind') {
+          if (solveSeconds <= 2) {
+            return { ...ach, progress: 1, unlocked: true };
+          }
+        }
+        if (ach.id === 'rule_master') {
+          const activeCount = Object.values(categoryMastery).filter(
+            (c) => c.level > 1 || c.progress > 0
+          ).length;
+          const prog = Math.min(6, activeCount);
+          return { ...ach, progress: prog, unlocked: prog >= 6 };
+        }
+        return ach;
+      });
 
       set({
         score: newScore,
@@ -335,6 +359,7 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
             progress: updatedCatProg,
           },
         },
+        achievements: updatedAchievements,
       });
 
       return { isBreaker: true };

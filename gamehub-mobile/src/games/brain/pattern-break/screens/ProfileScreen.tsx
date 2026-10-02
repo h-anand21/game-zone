@@ -78,21 +78,21 @@ export const ProfileScreen: React.FC = () => {
 
   // Real Calculated Metrics
   const totalAttempts = totalBreakersFound + totalWrongTaps;
-  const accuracy = totalAttempts > 0 ? Math.round((totalBreakersFound / totalAttempts) * 100) : 92;
+  const accuracy = totalAttempts > 0 ? Math.round((totalBreakersFound / totalAttempts) * 100) : 100;
   const avgReaction =
     reactionTimes && reactionTimes.length > 0
       ? (reactionTimes.reduce((acc, val) => acc + val, 0) / reactionTimes.length).toFixed(1) + 's'
-      : '1.2s';
+      : '--';
 
   // Dynamic Strengths & Weaknesses
   const sortedCategories = Object.entries(categoryMastery).sort(
     (a, b) => b[1].level * 100 + b[1].progress - (a[1].level * 100 + a[1].progress)
   );
-  const strongestEntry = sortedCategories[0] || ['COLOR', { level: 4, progress: 80 }];
-  const weakestEntry = sortedCategories[sortedCategories.length - 1] || ['DIRECTION', { level: 1, progress: 20 }];
+  const strongestEntry = sortedCategories[0] || ['NUMBER', { level: 1, progress: 0 }];
+  const weakestEntry = sortedCategories[sortedCategories.length - 1] || ['MIXED', { level: 1, progress: 0 }];
 
-  const strongestMeta = CATEGORY_ASSET_MAP[strongestEntry[0]] || CATEGORY_ASSET_MAP.COLOR;
-  const weakestMeta = CATEGORY_ASSET_MAP[weakestEntry[0]] || CATEGORY_ASSET_MAP.DIRECTION;
+  const strongestMeta = CATEGORY_ASSET_MAP[strongestEntry[0]] || CATEGORY_ASSET_MAP.NUMBER;
+  const weakestMeta = CATEGORY_ASSET_MAP[weakestEntry[0]] || CATEGORY_ASSET_MAP.MIXED;
 
   const rankTitle =
     playerLevel >= 15
