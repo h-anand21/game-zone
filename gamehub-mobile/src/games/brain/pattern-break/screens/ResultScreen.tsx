@@ -29,7 +29,7 @@ export const ResultScreen: React.FC = () => {
   const accuracy = totalTaps > 0 ? Math.round((correctCount / totalTaps) * 100) : 100;
 
   return (
-    <GameBackground variant="portal">
+    <GameBackground variant="splash">
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.centerContainer}>
           {/* Mascot & Companion Celebration */}

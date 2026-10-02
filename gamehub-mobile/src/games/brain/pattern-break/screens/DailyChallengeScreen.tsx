@@ -22,7 +22,7 @@ export const DailyChallengeScreen: React.FC = () => {
   };
 
   return (
-    <GameBackground variant="portal">
+    <GameBackground variant="gameplay">
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
           title="DAILY BREAK"

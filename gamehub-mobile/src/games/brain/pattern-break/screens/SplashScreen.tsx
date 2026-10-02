@@ -24,7 +24,7 @@ export const SplashScreen: React.FC = () => {
   }, [setScreen]);
 
   return (
-    <GameBackground variant="portal">
+    <GameBackground variant="splash">
       <Pressable style={styles.container} onPress={() => setScreen('home')}>
         {/* Upper Floating Robot */}
         <View style={styles.robotWrapper}>

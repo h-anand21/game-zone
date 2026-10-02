@@ -26,7 +26,7 @@ export const HomeScreen: React.FC = () => {
   } = usePatternBreakStore();
 
   return (
-    <GameBackground variant="observatory">
+    <GameBackground variant="home">
       <SafeAreaView style={styles.safeArea}>
         {/* ============================================================ */}
         {/* TOP BAR: Profile Mini Card & Settings                        */}
