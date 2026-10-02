@@ -157,10 +157,14 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   scoreNumber: {
-    ...PBTypography.scoreHuge,
+    fontSize: 54,
+    fontWeight: '900',
+    letterSpacing: 1,
     color: PBColors.primary,
-    ...PBShadows.cyanGlow,
     lineHeight: 56,
+    textShadowColor: 'rgba(25, 211, 255, 0.75)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
   },
   scoreLabel: {
     fontSize: 11,

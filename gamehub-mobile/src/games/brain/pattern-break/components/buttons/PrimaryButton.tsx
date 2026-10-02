@@ -119,7 +119,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   label: {
-    ...PBTypography.buttonLabel,
+    fontSize: 15,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
   },
   pressed: {
     transform: [{ scale: 0.96 }],
