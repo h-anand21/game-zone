@@ -23,9 +23,9 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 // Background Image Assets
 const BG_IMAGES = {
-  splash: require('../../../../../assets/game/backgrounds/Pattern Breaker_ Ruins of Neon Logic.png'),
-  home: require('../../../../../assets/game/backgrounds/Pattern Breaker_ Neon Ruins Adventure (2).png'),
-  gameplay: require('../../../../../assets/game/backgrounds/Neon Cosmic Floating Arena.png'),
+  splash: require('../../../../../../assets/game/backgrounds/Pattern Breaker_ Ruins of Neon Logic.png'),
+  home: require('../../../../../../assets/game/backgrounds/Pattern Breaker_ Neon Ruins Adventure (2).png'),
+  gameplay: require('../../../../../../assets/game/backgrounds/Neon Cosmic Floating Arena.png'),
 };
 
 export const GameBackground: React.FC<GameBackgroundProps> = ({
