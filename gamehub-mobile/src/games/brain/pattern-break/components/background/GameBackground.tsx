@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   heroCanvas: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
   },

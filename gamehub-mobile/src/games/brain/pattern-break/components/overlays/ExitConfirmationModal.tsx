@@ -56,7 +56,7 @@ export const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
           {/* Floating Robot Companion */}
           <View style={styles.robotHolder}>
             <View style={styles.robotHalo}>
-              <RobotCompanion size={54} mood="curious" />
+              <RobotCompanion size={54} mood="scanning" />
             </View>
           </View>
 
