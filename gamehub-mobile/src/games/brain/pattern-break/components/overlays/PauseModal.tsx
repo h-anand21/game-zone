@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GameButton } from '../buttons/GameButton';
+import { ScreenPlaque } from '../common/ScreenPlaque';
 import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../../theme';
 
 interface PauseModalProps {
@@ -30,7 +31,8 @@ export const PauseModal: React.FC<PauseModalProps> = ({
         colors={['rgba(24, 47, 57, 0.96)', 'rgba(10, 23, 30, 0.98)']}
         style={styles.card}
       >
-        <Text style={styles.title}>GAME PAUSED</Text>
+        {/* 3D Sculpted Screen Name Badge */}
+        <ScreenPlaque type="pause" height={100} />
 
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
