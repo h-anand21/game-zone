@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { ScreenPlaque } from '../components/common/ScreenPlaque';
+import { SectionTitle } from '../components/common/SectionTitle';
 import { GlassCard } from '../components/cards/GlassCard';
 import { BottomNavigation } from '../components/navigation/BottomNavigation';
 import { PBColors, PBRadius, uiAssets } from '../theme';
@@ -124,15 +125,12 @@ export const ProgressScreen: React.FC = () => {
           </GlassCard>
 
           {/* Section Header: PATTERN FAMILY MASTERY */}
-          <View style={styles.sectionHeaderRow}>
-            <View style={styles.cyanAccentBar} />
-            <View style={styles.sectionTextGroup}>
-              <Text style={styles.sectionTitle}>PATTERN FAMILY MASTERY</Text>
-              <Text style={styles.sectionSubtitle}>
-                Level up each cognitive domain through practice
-              </Text>
-            </View>
-          </View>
+          <SectionTitle
+            title="PATTERN FAMILY MASTERY"
+            subtitle="Level up each cognitive domain through practice"
+            badge="6 CATEGORIES"
+            accentColor={PBColors.primary}
+          />
 
           {/* Authentic 3D Pattern Family Cards */}
           <View style={styles.masteryList}>

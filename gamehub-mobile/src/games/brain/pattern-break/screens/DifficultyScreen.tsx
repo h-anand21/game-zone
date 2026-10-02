@@ -18,6 +18,7 @@ import * as Haptics from 'expo-haptics';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { ScreenPlaque } from '../components/common/ScreenPlaque';
+import { SectionTitle } from '../components/common/SectionTitle';
 import { GameButton } from '../components/buttons/GameButton';
 import { PBDifficulty } from '../types';
 import { PBColors, PBRadius, uiAssets } from '../theme';
@@ -142,35 +143,43 @@ export const DifficultyScreen: React.FC = () => {
                     <Text style={styles.levelDescText}>{lvl.desc}</Text>
                   </View>
 
-                  {/* Right: Selected Glow Pip */}
+                  {/* Right: Selected Active / Tap Badge */}
                   <View
                     style={[
-                      styles.radioCircle,
-                      isSelected && styles.radioCircleSelected,
+                      styles.levelSelectPill,
+                      isSelected && styles.levelSelectPillActive,
                     ]}
                   >
-                    {isSelected && <View style={styles.radioDot} />}
+                    <Text
+                      style={[
+                        styles.levelSelectText,
+                        isSelected && styles.levelSelectTextActive,
+                      ]}
+                    >
+                      {isSelected ? '✓ ACTIVE' : 'TAP'}
+                    </Text>
                   </View>
                 </Pressable>
               );
             })}
           </View>
 
-          {/* Custom Game Mode Section */}
-          <View style={styles.customSectionHeader}>
-            <View style={styles.cyanPill} />
-            <View style={styles.customTextGroup}>
-              <Text style={styles.customSectionTitle}>CUSTOM GAMEPLAY MODE</Text>
-              <Text style={styles.customSectionSubtitle}>
-                Shuffles random rules each round by default
-              </Text>
-            </View>
-          </View>
+          {/* Custom Game Mode Section Title */}
+          <SectionTitle
+            title="CUSTOM GAMEPLAY MODE"
+            subtitle="Shuffles random rules each round by default"
+            badge="DEFAULT: RANDOM"
+            accentColor={PBColors.accent}
+          />
 
           {/* Custom Mode Card */}
           <Pressable
             onPress={() => setScreen('pattern_type')}
-            style={styles.customCard}
+            style={({ pressed }) => [
+              styles.customCard,
+              pressed && { opacity: 0.88, transform: [{ scale: 0.98 }] },
+            ]}
+            accessibilityRole="button"
           >
             <View style={styles.customCardLeft}>
               <View style={styles.iconCircle}>
@@ -191,7 +200,7 @@ export const DifficultyScreen: React.FC = () => {
             </View>
 
             <View style={styles.changeBadge}>
-              <Text style={styles.changeBadgeText}>CHANGE ⚙️</Text>
+              <Text style={styles.changeBadgeText}>TAP TO EDIT ➔</Text>
             </View>
           </Pressable>
 
@@ -289,24 +298,27 @@ const styles = StyleSheet.create({
     color: PBColors.textSecondary,
     lineHeight: 14,
   },
-  radioCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  levelSelectPill: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
-  radioCircleSelected: {
+  levelSelectPillActive: {
     borderColor: PBColors.primary,
-    backgroundColor: 'rgba(25, 211, 255, 0.2)',
+    backgroundColor: 'rgba(25, 211, 255, 0.25)',
   },
-  radioDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: PBColors.primary,
+  levelSelectText: {
+    fontSize: 9.5,
+    fontWeight: '800',
+    color: PBColors.textMuted,
+    letterSpacing: 0.8,
+  },
+  levelSelectTextActive: {
+    color: PBColors.primary,
+    fontWeight: '900',
   },
 
   // Custom Game Mode Section
