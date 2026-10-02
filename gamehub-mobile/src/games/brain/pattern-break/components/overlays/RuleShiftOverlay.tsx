@@ -72,7 +72,7 @@ export const RuleShiftOverlay: React.FC<RuleShiftOverlayProps> = ({
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(6, 16, 24, 0.85)',
     alignItems: 'center',
     justifyContent: 'center',

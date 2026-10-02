@@ -91,7 +91,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   screenTitle: {
-    ...PBTypography.screenTitle,
+    fontSize: 22,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+    lineHeight: 28,
+    textTransform: 'uppercase',
     color: PBColors.textPrimary,
   },
 });

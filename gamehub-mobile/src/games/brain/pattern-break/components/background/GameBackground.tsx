@@ -48,7 +48,7 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
       {/* ============================================================ */}
       <LinearGradient
         colors={[PBColors.backgroundElevated, PBColors.background, PBColors.backgroundDark]}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
       />
@@ -56,7 +56,7 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
       {/* ============================================================ */}
       {/* LAYER 2: Floating Sci-Fi Tech Ruins & Ancient Monoliths       */}
       {/* ============================================================ */}
-      <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
         <Svg width={SCREEN_WIDTH} height={SCREEN_HEIGHT} viewBox="0 0 400 800">
           <Defs>
             {/* Cyan Energy Glow */}
@@ -156,7 +156,7 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
           'rgba(8, 19, 26, 0.70)',
           'rgba(6, 16, 24, 0.88)',
         ]}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
 

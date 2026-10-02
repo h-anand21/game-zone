@@ -202,7 +202,11 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   sectionTitle: {
-    ...PBTypography.sectionTitle,
+    fontSize: 16,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    lineHeight: 22,
+    textTransform: 'uppercase',
     color: PBColors.textPrimary,
   },
   masteryList: {

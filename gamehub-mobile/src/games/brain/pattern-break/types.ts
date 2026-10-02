@@ -58,6 +58,12 @@ export interface PatternPuzzle {
   timeLimit: number;
 }
 
+export interface PatternQuestion {
+  items: (string | number)[];
+  breakerIndex: number;
+  ruleExplanation: string;
+}
+
 export type TileState =
   | 'default'
   | 'pressed'

@@ -100,7 +100,7 @@ export const PowerUpRadialMenu: React.FC<PowerUpRadialMenuProps> = ({
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(6, 16, 24, 0.75)',
     justifyContent: 'flex-end',
     paddingBottom: 90,

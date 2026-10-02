@@ -69,7 +69,11 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({ onComplete }
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(6, 16, 24, 0.88)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -86,12 +90,16 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: PBColors.primary,
     letterSpacing: 2,
-    ...PBShadows.cyanGlow,
+    textShadowColor: 'rgba(25, 211, 255, 0.85)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 14,
   },
   breakText: {
     fontSize: 52,
     color: PBColors.accent,
-    ...PBShadows.amberGlow,
+    textShadowColor: 'rgba(255, 213, 74, 0.85)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 14,
   },
   tagline: {
     fontSize: 12,

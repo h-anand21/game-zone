@@ -150,14 +150,19 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   title: {
-    ...PBTypography.cardTitle,
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    lineHeight: 20,
     color: PBColors.textPrimary,
   },
   selectedTitle: {
     color: PBColors.primary,
   },
   subtitle: {
-    ...PBTypography.bodySmall,
+    fontSize: 11.5,
+    fontWeight: '500',
+    lineHeight: 16,
     color: PBColors.textSecondary,
   },
   badgePill: {

@@ -93,7 +93,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   label: {
-    ...PBTypography.buttonLabel,
+    fontSize: 15,
+    fontWeight: '900',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
     color: PBColors.primary,
   },
   pressed: {

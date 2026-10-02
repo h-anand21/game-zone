@@ -276,11 +276,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   hudLabel: {
-    ...PBTypography.hudLabel,
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
     color: PBColors.textMuted,
   },
   hudValue: {
-    ...PBTypography.hudValue,
+    fontSize: 24,
+    fontWeight: '900',
+    letterSpacing: 0.5,
     color: '#FFFFFF',
     marginTop: 1,
   },
