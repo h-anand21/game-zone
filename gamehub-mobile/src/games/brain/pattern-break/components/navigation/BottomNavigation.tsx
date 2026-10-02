@@ -14,6 +14,7 @@ import {
   Image,
   ImageSourcePropType,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { PBScreen } from '../../types';
@@ -41,6 +42,9 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   currentScreen,
   onNavigate,
 }) => {
+  const insets = useSafeAreaInsets();
+  const bottomLift = Math.max(insets.bottom, 16) + 6;
+
   const handleTabPress = (tabId: PBScreen) => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -49,7 +53,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: bottomLift }]}>
       <LinearGradient
         colors={['rgba(24, 47, 57, 0.98)', 'rgba(10, 23, 30, 0.98)']}
         start={{ x: 0, y: 0 }}

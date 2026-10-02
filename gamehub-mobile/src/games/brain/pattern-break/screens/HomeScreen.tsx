@@ -65,8 +65,8 @@ export const HomeScreen: React.FC = () => {
           <View style={styles.playNowWrapper}>
             <GameButton
               asset={uiAssets.actions.playNow}
-              width="88%"
-              height={84}
+              width="94%"
+              height={98}
               onPress={() => setScreen('difficulty')}
               accessibilityLabel="Play Now"
               soundType="heavy"
