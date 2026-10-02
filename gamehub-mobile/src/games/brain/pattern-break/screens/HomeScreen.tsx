@@ -42,6 +42,7 @@ export const HomeScreen: React.FC = () => {
 
           <GameIconButton
             icon={uiAssets.icons.settings}
+            fallbackVectorName="settings-sharp"
             size={44}
             onPress={() => setScreen('settings')}
             accessibilityLabel="Open Settings"
@@ -49,22 +50,15 @@ export const HomeScreen: React.FC = () => {
         </View>
 
         {/* ============================================================ */}
-        {/* CENTER CONTENT: Mascot Duo, Title & "PLAY NOW" CTA           */}
+        {/* CENTER CONTENT: Mascot Duo & "PLAY NOW" CTA                  */}
         {/* ============================================================ */}
         <View style={styles.centerSection}>
           {/* Mascot Duo with Floating Robot */}
           <View style={styles.mascotArea}>
             <View style={styles.floatingBot}>
-              <RobotCompanion size={46} mood="happy" />
+              <RobotCompanion size={52} mood="happy" />
             </View>
-            <Mascot pose="confident" size={155} />
-          </View>
-
-          {/* Official Game Title: PATTERN BREAKER */}
-          <View style={styles.titleWrapper}>
-            <Text style={styles.titleTop}>PATTERN</Text>
-            <Text style={styles.titleBottom}>BREAKER</Text>
-            <Text style={styles.subtitle}>Train your eyes. Sharpen your mind.</Text>
+            <Mascot pose="confident" size={180} />
           </View>
 
           {/* Single Dominant Action: Authentic Sci-Fi PLAY NOW Image CTA */}
@@ -73,7 +67,7 @@ export const HomeScreen: React.FC = () => {
               asset={uiAssets.actions.playNow}
               width="88%"
               height={84}
-              onPress={() => setScreen('play_mode')}
+              onPress={() => setScreen('difficulty')}
               accessibilityLabel="Play Now"
               soundType="heavy"
             />
@@ -118,39 +112,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -12,
     right: -24,
-  },
-  titleWrapper: {
-    alignItems: 'center',
-    marginVertical: 2,
-  },
-  titleTop: {
-    fontSize: 34,
-    fontWeight: '900',
-    letterSpacing: 3,
-    lineHeight: 36,
-    textTransform: 'uppercase',
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.85)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
-  },
-  titleBottom: {
-    fontSize: 36,
-    fontWeight: '900',
-    letterSpacing: 3,
-    lineHeight: 38,
-    textTransform: 'uppercase',
-    color: PBColors.primary,
-    textShadowColor: 'rgba(25, 211, 255, 0.85)',
-    textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 10,
-  },
-  subtitle: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: PBColors.textSecondary,
-    marginTop: 6,
-    letterSpacing: 0.8,
   },
   playNowWrapper: {
     width: '100%',

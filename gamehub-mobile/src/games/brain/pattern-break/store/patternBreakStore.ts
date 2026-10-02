@@ -123,10 +123,10 @@ interface PatternBreakState {
 }
 
 export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
-  currentScreen: 'splash',
+  currentScreen: 'home',
   playMode: 'quick',
   difficulty: 'MEDIUM',
-  patternType: 'RANDOM',
+  patternType: 'MIXED',
 
   score: 0,
   round: 1,

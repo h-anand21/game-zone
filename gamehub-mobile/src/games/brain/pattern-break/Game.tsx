@@ -107,7 +107,6 @@ export const PatternBreakGame: React.FC<PatternBreakProps> = ({
   const renderActiveScreen = () => {
     switch (currentScreen) {
       case 'splash':
-        return <SplashScreen />;
       case 'home':
         return <HomeScreen />;
       case 'play_mode':

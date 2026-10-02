@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { ScreenPlaque } from '../components/common/ScreenPlaque';
 import { GameButton } from '../components/buttons/GameButton';
 import { GlassCard } from '../components/cards/GlassCard';
 import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../theme';
@@ -20,12 +21,14 @@ export const DailyChallengeScreen: React.FC = () => {
     <GameBackground variant="gameplay">
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
-          title="DAILY BREAK"
           onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
 
         <View style={styles.centerContainer}>
+          {/* 3D Sculpted Screen Name Badge */}
+          <ScreenPlaque type="daily_challenge" height={95} />
+
           {/* Main Event Card */}
           <GlassCard variant="amber" style={styles.eventCard}>
             <View style={styles.eventHeader}>

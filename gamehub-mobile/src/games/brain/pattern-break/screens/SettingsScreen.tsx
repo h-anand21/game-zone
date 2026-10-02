@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, ScrollView, Switch, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { ScreenPlaque } from '../components/common/ScreenPlaque';
 import { GameButton } from '../components/buttons/GameButton';
 import { GlassCard } from '../components/cards/GlassCard';
 import { PBColors, PBTypography, PBRadius, uiAssets } from '../theme';
@@ -63,14 +64,16 @@ export const SettingsScreen: React.FC = () => {
     <GameBackground variant="observatory">
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
-          title="SETTINGS"
           onBack={goBack}
+          showSettings={false}
         />
 
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          {/* 3D Sculpted Screen Name Badge */}
+          <ScreenPlaque type="settings" height={105} />
           {/* Section 1: Gameplay & Audio */}
           <Text style={styles.sectionHeader}>GAMEPLAY & AUDIO</Text>
           <GlassCard variant="neutral" style={styles.card}>

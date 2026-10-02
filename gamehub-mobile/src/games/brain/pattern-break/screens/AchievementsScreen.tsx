@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { ScreenPlaque } from '../components/common/ScreenPlaque';
 import { AchievementBadge } from '../components/badges/AchievementBadge';
 import { PBColors, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
@@ -22,7 +23,6 @@ export const AchievementsScreen: React.FC = () => {
     <GameBackground variant="observatory">
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
-          title="ACHIEVEMENTS"
           onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
@@ -31,6 +31,9 @@ export const AchievementsScreen: React.FC = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          {/* 3D Sculpted Screen Name Badge */}
+          <ScreenPlaque type="achievements" height={105} />
+
           <View style={styles.headerInfo}>
             <View style={styles.badgeCounterRow}>
               <Image source={uiAssets.icons.trophy} style={{ width: 18, height: 18, marginRight: 6 }} resizeMode="contain" />

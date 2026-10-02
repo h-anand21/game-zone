@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { ScreenPlaque } from '../components/common/ScreenPlaque';
 import { Mascot } from '../components/mascot/Mascot';
 import { GlassCard } from '../components/cards/GlassCard';
 import { BottomNavigation } from '../components/navigation/BottomNavigation';
@@ -30,7 +31,6 @@ export const ProfileScreen: React.FC = () => {
     <GameBackground variant="observatory">
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
-          title="PLAYER PROFILE"
           onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
@@ -39,6 +39,9 @@ export const ProfileScreen: React.FC = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          {/* 3D Sculpted Screen Name Badge */}
+          <ScreenPlaque type="profile_stats" height={105} />
+
           {/* Hero Profile Identification Card */}
           <GlassCard variant="cyan" style={styles.profileCard}>
             <View style={styles.profileRow}>

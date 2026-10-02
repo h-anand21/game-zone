@@ -8,6 +8,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { ScreenPlaque } from '../components/common/ScreenPlaque';
 import { GameCard } from '../components/cards/GameCard';
 import { BottomNavigation } from '../components/navigation/BottomNavigation';
 import { PBPlayMode } from '../types';
@@ -30,7 +31,6 @@ export const PlayModeScreen: React.FC = () => {
     <GameBackground variant="observatory">
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
-          title="CHALLENGE MODE"
           onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
@@ -39,9 +39,8 @@ export const PlayModeScreen: React.FC = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.headerInfo}>
-            <Text style={styles.subtext}>SELECT YOUR RUN TYPE</Text>
-          </View>
+          {/* 3D Sculpted Screen Name Badge */}
+          <ScreenPlaque type="play_mode" height={105} />
 
           {/* Card 1: QUICK BREAK */}
           <GameCard

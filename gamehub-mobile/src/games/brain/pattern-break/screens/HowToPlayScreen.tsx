@@ -10,6 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { ScreenPlaque } from '../components/common/ScreenPlaque';
 import { GameButton } from '../components/buttons/GameButton';
 import { Mascot } from '../components/mascot/Mascot';
 import { PatternTile } from '../components/game/PatternTile';
@@ -28,12 +29,13 @@ export const HowToPlayScreen: React.FC = () => {
     <GameBackground variant="observatory">
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
-          title="HOW TO PLAY"
           onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
 
         <View style={styles.centerContainer}>
+          {/* 3D Sculpted Screen Name Badge */}
+          <ScreenPlaque type="how_to_play" height={90} />
           {/* Mascot Pointing Toward the Demo Board */}
           <View style={styles.mascotArea}>
             <Mascot pose="pointing" size={110} />

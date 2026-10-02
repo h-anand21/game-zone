@@ -32,7 +32,7 @@ interface NavTab {
 
 const TABS: NavTab[] = [
   { id: 'home', label: 'HOME', asset: uiAssets.navigation.home },
-  { id: 'play_mode', label: 'PLAY', asset: uiAssets.navigation.play },
+  { id: 'difficulty', label: 'PLAY', asset: uiAssets.navigation.play },
   { id: 'progress', label: 'PROGRESS', asset: uiAssets.navigation.progress },
   { id: 'profile', label: 'PROFILE', asset: uiAssets.navigation.profile },
 ];
@@ -62,8 +62,9 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
         {TABS.map((tab) => {
           const isActive =
             currentScreen === tab.id ||
-            (tab.id === 'play_mode' &&
+            (tab.id === 'difficulty' &&
               (currentScreen === 'difficulty' ||
+                currentScreen === 'play_mode' ||
                 currentScreen === 'pattern_type' ||
                 currentScreen === 'how_to_play'));
 

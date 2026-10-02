@@ -4,16 +4,18 @@
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { IconButton } from '../buttons/IconButton';
-import { PBColors, PBTypography } from '../../theme';
+import { GameIconButton } from '../buttons/GameIconButton';
+import { PBColors, PBTypography, uiAssets } from '../../theme';
+import { usePatternBreakStore } from '../../store/patternBreakStore';
 
 interface ScreenHeaderProps {
   title?: string;
   onBack?: () => void;
   onSettings?: () => void;
+  showSettings?: boolean;
   rightElement?: React.ReactNode;
 }
 
@@ -21,8 +23,11 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
   title,
   onBack,
   onSettings,
+  showSettings = true,
   rightElement,
 }) => {
+  const { setScreen } = usePatternBreakStore();
+
   const handleBack = () => {
     if (!onBack) return;
     try {
@@ -30,6 +35,8 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
     } catch (e) {}
     onBack();
   };
+
+  const handleSettings = onSettings || (() => setScreen('settings'));
 
   return (
     <View style={styles.header}>
@@ -51,17 +58,16 @@ export const ScreenHeader: React.FC<ScreenHeaderProps> = ({
         {title ? <Text style={styles.screenTitle}>{title}</Text> : null}
       </View>
 
-      {/* Right Action */}
+      {/* Right Action: Authentic Settings Icon Button */}
       <View style={[styles.sideCol, styles.rightCol]}>
         {rightElement ? (
           rightElement
-        ) : onSettings ? (
-          <IconButton
-            name="settings-outline"
+        ) : showSettings ? (
+          <GameIconButton
+            icon={uiAssets.icons.settings}
+            fallbackVectorName="settings-sharp"
             size={40}
-            iconSize={19}
-            color={PBColors.accent}
-            onPress={onSettings}
+            onPress={handleSettings}
             accessibilityLabel="Settings"
           />
         ) : null}

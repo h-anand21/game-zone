@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { ScreenPlaque } from '../components/common/ScreenPlaque';
 import { GlassCard } from '../components/cards/GlassCard';
 import { BottomNavigation } from '../components/navigation/BottomNavigation';
 import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../theme';
@@ -35,7 +36,6 @@ export const ProgressScreen: React.FC = () => {
     <GameBackground variant="observatory">
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
-          title="PROGRESSION"
           onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
@@ -44,6 +44,9 @@ export const ProgressScreen: React.FC = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          {/* 3D Sculpted Screen Name Badge */}
+          <ScreenPlaque type="progress" height={105} />
+
           {/* Level & XP Hero Card */}
           <GlassCard variant="cyan" style={styles.heroCard}>
             <View style={styles.levelRow}>

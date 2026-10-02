@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { ScreenPlaque } from '../components/common/ScreenPlaque';
 import { GameButton } from '../components/buttons/GameButton';
 import { PBPatternType } from '../types';
 import { PBColors, PBRadius, PBShadows, uiAssets } from '../theme';
@@ -29,17 +30,24 @@ const CATEGORIES: CategoryOption[] = [
 ];
 
 export const PatternTypeScreen: React.FC = () => {
-  const { patternType, setPatternType, setScreen, goBack } = usePatternBreakStore();
+  const {
+    patternType,
+    setPatternType,
+    playMode,
+    setPlayMode,
+    setScreen,
+    goBack,
+    startNewRun,
+  } = usePatternBreakStore();
 
   const handleStart = () => {
-    setScreen('how_to_play');
+    startNewRun();
   };
 
   return (
     <GameBackground variant="observatory">
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
-          title="RULE FAMILY"
           onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
@@ -48,8 +56,34 @@ export const PatternTypeScreen: React.FC = () => {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
         >
+          {/* 3D Sculpted Screen Name Badge */}
+          <ScreenPlaque type="pattern_type" height={105} />
+
+          {/* Challenge Mode Selector */}
           <View style={styles.headerInfo}>
-            <Text style={styles.subtext}>WHAT DO YOU WANT TO BREAK?</Text>
+            <Text style={styles.subtext}>CHALLENGE RUN TYPE</Text>
+          </View>
+
+          <View style={styles.modeSwitcherBar}>
+            {(['quick', 'shift', 'daily'] as const).map((m) => {
+              const isModeActive = playMode === m;
+              return (
+                <Pressable
+                  key={m}
+                  onPress={() => setPlayMode(m)}
+                  style={[styles.modeTab, isModeActive && styles.modeTabActive]}
+                >
+                  <Text style={[styles.modeTabText, isModeActive && styles.modeTabTextActive]}>
+                    {m === 'quick' ? '⚡ QUICK' : m === 'shift' ? '🔄 SHIFT' : '📅 DAILY'}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          {/* Rule Family Selector */}
+          <View style={styles.headerInfo}>
+            <Text style={styles.subtext}>RULE FAMILY (DEFAULT: MIXED)</Text>
           </View>
 
           <View style={styles.grid}>
@@ -104,7 +138,37 @@ const styles = StyleSheet.create({
   },
   headerInfo: {
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
+  },
+  modeSwitcherBar: {
+    flexDirection: 'row',
+    gap: 8,
+    width: '100%',
+    marginBottom: 16,
+  },
+  modeTab: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: PBRadius.md,
+    backgroundColor: 'rgba(24, 47, 57, 0.85)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(25, 211, 255, 0.25)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modeTabActive: {
+    backgroundColor: 'rgba(25, 211, 255, 0.25)',
+    borderColor: PBColors.primary,
+  },
+  modeTabText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: PBColors.textMuted,
+    letterSpacing: 1,
+  },
+  modeTabTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '900',
   },
   subtext: {
     fontSize: 10.5,

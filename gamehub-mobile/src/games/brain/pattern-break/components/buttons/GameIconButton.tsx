@@ -1,7 +1,7 @@
 // ============================================================
 // PATTERN BREAKER — GameIconButton Component
 // High-Fidelity Icon Button using authentic Neon Fantasy UI Icons
-// Preserves neon glow, metallic bevels & comfortable touch padding
+// Preserves neon glow, metallic bevels, glass disc & tactile haptics
 // ============================================================
 
 import React from 'react';
@@ -15,10 +15,14 @@ import {
   View,
   Text,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { Ionicons } from '@expo/vector-icons';
+import { PBColors, PBShadows } from '../../theme';
 
 interface GameIconButtonProps {
   icon: ImageSourcePropType;
+  fallbackVectorName?: keyof typeof Ionicons.glyphMap;
   size?: number;
   onPress?: () => void;
   disabled?: boolean;
@@ -29,13 +33,16 @@ interface GameIconButtonProps {
 
 export const GameIconButton: React.FC<GameIconButtonProps> = ({
   icon,
-  size = 48,
+  fallbackVectorName,
+  size = 44,
   onPress,
   disabled = false,
   style,
   accessibilityLabel,
   badge,
 }) => {
+  const [imageFailed, setImageFailed] = React.useState(false);
+
   const handlePress = () => {
     if (disabled || !onPress) return;
     try {
@@ -43,6 +50,8 @@ export const GameIconButton: React.FC<GameIconButtonProps> = ({
     } catch (e) {}
     onPress();
   };
+
+  const iconDimension = Math.round(size * 0.68);
 
   return (
     <Pressable
@@ -52,18 +61,39 @@ export const GameIconButton: React.FC<GameIconButtonProps> = ({
       accessibilityRole="button"
       style={({ pressed }) => [
         styles.container,
-        { width: size, height: size },
+        { width: size, height: size, borderRadius: size / 2 },
         disabled && styles.disabled,
         pressed && styles.pressed,
         style,
       ]}
     >
-      <Image source={icon} style={styles.icon} resizeMode="contain" />
-      {badge !== undefined && badge !== null && (
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>{badge}</Text>
-        </View>
-      )}
+      <LinearGradient
+        colors={['rgba(24, 47, 57, 0.95)', 'rgba(12, 26, 34, 0.95)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.8, y: 1 }}
+        style={[styles.gradientDisc, { borderRadius: size / 2 }]}
+      >
+        {!imageFailed ? (
+          <Image
+            source={icon}
+            style={{ width: iconDimension, height: iconDimension }}
+            resizeMode="contain"
+            onError={() => setImageFailed(true)}
+          />
+        ) : fallbackVectorName ? (
+          <Ionicons
+            name={fallbackVectorName}
+            size={Math.round(size * 0.5)}
+            color={PBColors.primary}
+          />
+        ) : null}
+
+        {badge !== undefined && badge !== null && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{badge}</Text>
+          </View>
+        )}
+      </LinearGradient>
     </Pressable>
   );
 };
@@ -72,9 +102,24 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 44,
-    minHeight: 44,
+    minWidth: 40,
+    minHeight: 40,
     position: 'relative',
+    borderWidth: 1.5,
+    borderColor: 'rgba(25, 211, 255, 0.45)',
+    backgroundColor: 'rgba(10, 23, 30, 0.8)',
+    shadowColor: '#19D3FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 5,
+    elevation: 4,
+  },
+  gradientDisc: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
   pressed: {
     transform: [{ scale: 0.92 }],
@@ -82,10 +127,6 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.45,
-  },
-  icon: {
-    width: '100%',
-    height: '100%',
   },
   badge: {
     position: 'absolute',
