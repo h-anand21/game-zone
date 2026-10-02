@@ -25,6 +25,9 @@ import { MemoryRushGame } from './brain/memory-rush/Game';
 import { PATTERN_BREAK_CONFIG } from './brain/pattern-break/config';
 import { PatternBreakGame } from './brain/pattern-break/Game';
 
+import { PATTERN_QUEST_CONFIG } from './brain/pattern-quest/config';
+import { PatternQuestGame } from './brain/pattern-quest/Game';
+
 import { CODE_BREAKER_CONFIG } from './brain/code-breaker/config';
 import { CodeBreakerGame } from './brain/code-breaker/Game';
 
@@ -134,6 +137,7 @@ export const GAME_COMPONENT_REGISTRY: Record<string, GameRegistryEntry> = {
   'reverse-mind': { config: REVERSE_MIND_CONFIG, component: ReverseMindGame },
   'memory-rush': { config: MEMORY_RUSH_CONFIG, component: MemoryRushGame },
   'pattern-break': { config: PATTERN_BREAK_CONFIG, component: PatternBreakGame },
+  'pattern-quest': { config: PATTERN_QUEST_CONFIG, component: PatternQuestGame },
   'code-breaker': { config: CODE_BREAKER_CONFIG, component: CodeBreakerGame },
   'path-mind': { config: PATH_MIND_CONFIG, component: PathMindGame },
 

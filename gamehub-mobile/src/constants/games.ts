@@ -52,6 +52,13 @@ export const GAME_REGISTRY: GameConfig[] = [
     saveSupport: 'none', description: 'Find the rule-breaking element',
   },
   {
+    id: 'pattern-quest', name: 'Pattern Quest', category: 'brain',
+    offline: true, multiplayer: false, route: '/games/pattern-quest',
+    icon: '🧭', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
+    validation: { maxScore: 50000, minDuration: 3, maxDuration: 600 },
+    saveSupport: 'none', description: 'Find the pattern. Continue the adventure.',
+  },
+  {
     id: 'code-breaker', name: 'Code Breaker', category: 'brain',
     offline: true, multiplayer: false, route: '/games/code-breaker',
     icon: '🔐', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',

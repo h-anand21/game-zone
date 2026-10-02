@@ -47,3 +47,6 @@ example
 
 # scratch / build scripts
 scripts/*.py
+scratch/
+extract_pattern_quest_perfect.py
+organize_assets.py
