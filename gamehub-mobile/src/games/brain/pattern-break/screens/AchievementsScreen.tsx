@@ -63,6 +63,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
+  badgeCounterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   badgeCounter: {
     fontSize: 11,
     fontWeight: '900',

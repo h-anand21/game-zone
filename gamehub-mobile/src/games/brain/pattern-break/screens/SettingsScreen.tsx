@@ -14,7 +14,7 @@ import { PBColors, PBTypography, PBRadius } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const SettingsScreen: React.FC = () => {
-  const { setScreen, resetProgress } = usePatternBreakStore();
+  const { setScreen, resetProgress, goBack } = usePatternBreakStore();
 
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [hapticEnabled, setHapticEnabled] = useState(true);
@@ -64,7 +64,7 @@ export const SettingsScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
           title="SETTINGS"
-          onBack={() => setScreen('home')}
+          onBack={goBack}
         />
 
         <ScrollView
