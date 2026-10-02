@@ -1,7 +1,6 @@
 // ============================================================
 // PATTERN BREAKER — Section Title Component
-// Clear architectural section divider: Accent pip, title tag & dividing neon rule
-// Unmistakably distinct from clickable cards & buttons
+// High-contrast, glowing Sci-Fi typography for category & mode headers
 // ============================================================
 
 import React from 'react';
@@ -25,40 +24,15 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({
 }) => {
   return (
     <View style={[styles.container, style]}>
-      {/* Non-Clickable Section Divider Banner */}
-      <View style={styles.dividerRow}>
-        <View
-          style={[
-            styles.titlePill,
-            {
-              borderLeftColor: accentColor,
-              backgroundColor: `${accentColor}15`,
-            },
-          ]}
-        >
-          <View style={[styles.diamondPip, { backgroundColor: accentColor }]} />
-          <Text style={[styles.titleText, { color: accentColor }]}>{title}</Text>
-          {badge ? (
-            <View
-              style={[
-                styles.badgePill,
-                { borderColor: accentColor, backgroundColor: `${accentColor}20` },
-              ]}
-            >
-              <Text style={[styles.badgeText, { color: accentColor }]}>{badge}</Text>
-            </View>
-          ) : null}
-        </View>
-
-        {/* Clean Sci-Fi Neon Horizontal Divider Line */}
-        <View
-          style={[
-            styles.horizontalRule,
-            { backgroundColor: `${accentColor}35` },
-          ]}
-        />
+      <View style={styles.titleRow}>
+        <View style={[styles.accentPill, { backgroundColor: accentColor }]} />
+        <Text style={[styles.titleText, { color: accentColor }]}>{title}</Text>
+        {badge ? (
+          <View style={[styles.badgePill, { borderColor: accentColor }]}>
+            <Text style={[styles.badgeText, { color: accentColor }]}>{badge}</Text>
+          </View>
+        ) : null}
       </View>
-
       {subtitle ? <Text style={styles.subtitleText}>{subtitle}</Text> : null}
     </View>
   );
@@ -66,56 +40,49 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 12,
-    marginBottom: 6,
+    marginVertical: 6,
+    paddingHorizontal: 2,
   },
-  dividerRow: {
+  titleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  titlePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
-    borderLeftWidth: 3.5,
-    gap: 7,
-  },
-  diamondPip: {
-    width: 6,
-    height: 6,
-    transform: [{ rotate: '45deg' }],
+  accentPill: {
+    width: 4,
+    height: 16,
+    borderRadius: 2,
+    shadowColor: PBColors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
+    elevation: 3,
   },
   titleText: {
-    fontSize: 12,
+    fontSize: 13.5,
     fontWeight: '900',
-    letterSpacing: 1.5,
+    letterSpacing: 2,
     textTransform: 'uppercase',
   },
   badgePill: {
-    paddingHorizontal: 6,
+    paddingHorizontal: 7,
     paddingVertical: 1.5,
-    borderRadius: 4,
+    borderRadius: 6,
     borderWidth: 1,
-    marginLeft: 4,
+    backgroundColor: 'rgba(25, 211, 255, 0.12)',
+    marginLeft: 'auto',
   },
   badgeText: {
-    fontSize: 8.5,
+    fontSize: 9.5,
     fontWeight: '900',
-    letterSpacing: 0.8,
-  },
-  horizontalRule: {
-    flex: 1,
-    height: 1.5,
-    borderRadius: 1,
+    letterSpacing: 1,
   },
   subtitleText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '500',
     color: PBColors.textSecondary,
     marginTop: 3,
-    marginLeft: 6,
+    marginLeft: 12,
+    lineHeight: 15,
   },
 });

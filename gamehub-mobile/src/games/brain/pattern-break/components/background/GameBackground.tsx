@@ -92,11 +92,19 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
       {/* LAYER 2: Luminous Atmospheric Scrim (Artwork remains vibrant) */}
       {/* ============================================================ */}
       <LinearGradient
-        colors={[
-          variant === 'splash' ? 'rgba(6, 16, 24, 0.12)' : 'rgba(6, 16, 24, 0.22)',
-          variant === 'gameplay' ? 'rgba(8, 19, 26, 0.38)' : 'rgba(8, 19, 26, 0.30)',
-          'rgba(6, 16, 24, 0.65)',
-        ]}
+        colors={
+          isHome || variant === 'splash'
+            ? [
+                variant === 'splash' ? 'rgba(6, 16, 24, 0.12)' : 'rgba(6, 16, 24, 0.18)',
+                'rgba(8, 19, 26, 0.28)',
+                'rgba(6, 16, 24, 0.65)',
+              ]
+            : [
+                'rgba(5, 14, 20, 0.72)',
+                'rgba(6, 16, 24, 0.85)',
+                'rgba(5, 12, 18, 0.95)',
+              ]
+        }
         style={StyleSheet.absoluteFill}
         pointerEvents="none"
       />
