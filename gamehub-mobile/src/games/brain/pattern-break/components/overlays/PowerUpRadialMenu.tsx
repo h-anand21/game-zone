@@ -1,11 +1,7 @@
-// ============================================================
-// PATTERN BREAKER — PowerUpRadialMenu Component
-// Radial tech gadget menu emerging from CLUE button with live charges
-// ============================================================
-
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { PowerUpType } from '../../types';
 import { PBColors, PBRadius, PBShadows } from '../../theme';
@@ -51,7 +47,7 @@ export const PowerUpRadialMenu: React.FC<PowerUpRadialMenuProps> = ({
               style={[styles.itemBox, charges.reveal <= 0 && styles.disabledBox]}
             >
               <View style={styles.iconCircle}>
-                <Text style={styles.emoji}>👁️</Text>
+                <Ionicons name="eye-outline" size={24} color={PBColors.accent} />
               </View>
               <Text style={styles.itemTitle}>REVEAL</Text>
               <Text style={styles.desc}>Eliminates 2 safe tiles</Text>
@@ -67,7 +63,7 @@ export const PowerUpRadialMenu: React.FC<PowerUpRadialMenuProps> = ({
               style={[styles.itemBox, charges.freeze <= 0 && styles.disabledBox]}
             >
               <View style={[styles.iconCircle, { borderColor: PBColors.primary }]}>
-                <Text style={styles.emoji}>❄️</Text>
+                <Ionicons name="snow-outline" size={24} color={PBColors.primary} />
               </View>
               <Text style={styles.itemTitle}>FREEZE</Text>
               <Text style={styles.desc}>Halts timer for 4s</Text>
@@ -83,7 +79,7 @@ export const PowerUpRadialMenu: React.FC<PowerUpRadialMenuProps> = ({
               style={[styles.itemBox, charges.scan <= 0 && styles.disabledBox]}
             >
               <View style={[styles.iconCircle, { borderColor: PBColors.positive }]}>
-                <Text style={styles.emoji}>📡</Text>
+                <Ionicons name="radio-outline" size={24} color={PBColors.positive} />
               </View>
               <Text style={styles.itemTitle}>SCAN</Text>
               <Text style={styles.desc}>Decodes active rule</Text>

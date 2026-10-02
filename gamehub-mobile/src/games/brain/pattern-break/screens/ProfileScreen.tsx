@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { Mascot } from '../components/mascot/Mascot';
@@ -22,6 +23,7 @@ export const ProfileScreen: React.FC = () => {
     bestStreak,
     playerLevel,
     playerXP,
+    goBack,
   } = usePatternBreakStore();
 
   return (
@@ -29,7 +31,7 @@ export const ProfileScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
           title="PLAYER PROFILE"
-          onBack={() => setScreen('home')}
+          onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
 
@@ -65,7 +67,10 @@ export const ProfileScreen: React.FC = () => {
             </View>
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>BEST STREAK</Text>
-              <Text style={[styles.statVal, { color: PBColors.accent }]}>🔥 {bestStreak}</Text>
+              <View style={styles.streakValueRow}>
+                <Ionicons name="flame" size={16} color={PBColors.accent} style={{ marginRight: 3 }} />
+                <Text style={[styles.statVal, { color: PBColors.accent }]}>{bestStreak}</Text>
+              </View>
             </View>
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>AVG REACTION</Text>
@@ -77,7 +82,9 @@ export const ProfileScreen: React.FC = () => {
           <View style={styles.analysisRow}>
             <GlassCard variant="cyan" style={styles.analysisCard}>
               <Text style={styles.analysisHeader}>STRONGEST PATTERN</Text>
-              <Text style={styles.analysisIcon}>🎨</Text>
+              <View style={styles.analysisIconBox}>
+                <Ionicons name="color-palette-outline" size={30} color={PBColors.positive} />
+              </View>
               <Text style={[styles.analysisResult, { color: PBColors.positive }]}>
                 COLOR
               </Text>
@@ -86,7 +93,9 @@ export const ProfileScreen: React.FC = () => {
 
             <GlassCard variant="amber" style={styles.analysisCard}>
               <Text style={styles.analysisHeader}>TRAINING NEEDED</Text>
-              <Text style={styles.analysisIcon}>🧭</Text>
+              <View style={styles.analysisIconBox}>
+                <Ionicons name="compass-outline" size={30} color={PBColors.accent} />
+              </View>
               <Text style={[styles.analysisResult, { color: PBColors.accent }]}>
                 DIRECTION
               </Text>
@@ -100,7 +109,7 @@ export const ProfileScreen: React.FC = () => {
             onPress={() => setScreen('achievements')}
           >
             <View style={styles.shortcutLeft}>
-              <Text style={styles.trophyEmoji}>🏆</Text>
+              <Ionicons name="trophy" size={20} color={PBColors.accent} style={{ marginRight: 8 }} />
               <Text style={styles.shortcutTitle}>VIEW ALL ACHIEVEMENTS</Text>
             </View>
             <Text style={styles.shortcutArrow}>➔</Text>
@@ -190,6 +199,10 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#FFFFFF',
   },
+  streakValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   analysisRow: {
     flexDirection: 'row',
     gap: 10,
@@ -207,9 +220,10 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     textAlign: 'center',
   },
-  analysisIcon: {
-    fontSize: 24,
+  analysisIconBox: {
     marginVertical: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   analysisResult: {
     fontSize: 14,

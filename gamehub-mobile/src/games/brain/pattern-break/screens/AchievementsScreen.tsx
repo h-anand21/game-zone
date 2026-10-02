@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { AchievementBadge } from '../components/badges/AchievementBadge';
@@ -13,7 +14,7 @@ import { PBColors } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const AchievementsScreen: React.FC = () => {
-  const { achievements, setScreen } = usePatternBreakStore();
+  const { achievements, setScreen, goBack } = usePatternBreakStore();
 
   const unlockedCount = achievements.filter((a) => a.unlocked).length;
 
@@ -22,7 +23,7 @@ export const AchievementsScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
           title="ACHIEVEMENTS"
-          onBack={() => setScreen('profile')}
+          onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
 
@@ -31,9 +32,12 @@ export const AchievementsScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.headerInfo}>
-            <Text style={styles.badgeCounter}>
-              🏆 {unlockedCount} / {achievements.length} UNLOCKED
-            </Text>
+            <View style={styles.badgeCounterRow}>
+              <Ionicons name="trophy" size={14} color={PBColors.accent} style={{ marginRight: 6 }} />
+              <Text style={styles.badgeCounter}>
+                {unlockedCount} / {achievements.length} UNLOCKED
+              </Text>
+            </View>
           </View>
 
           {achievements.map((ach) => (

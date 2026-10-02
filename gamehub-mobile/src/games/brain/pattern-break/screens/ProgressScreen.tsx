@@ -1,11 +1,7 @@
-// ============================================================
-// PATTERN BREAKER — 15 Progress Screen
-// Player Level, XP progression, 6 Category Masteries & Achievements preview
-// ============================================================
-
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { GlassCard } from '../components/cards/GlassCard';
@@ -13,13 +9,13 @@ import { BottomNavigation } from '../components/navigation/BottomNavigation';
 import { PBColors, PBTypography, PBRadius, PBShadows } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
-const CATEGORY_ICONS: Record<string, string> = {
-  NUMBER: '🔢',
-  SHAPE: '🔺',
-  COLOR: '🎨',
-  COUNT: '💎',
-  DIRECTION: '🧭',
-  MIXED: '⚡',
+const CATEGORY_VECTOR_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  NUMBER: 'calculator-outline',
+  SHAPE: 'triangle-outline',
+  COLOR: 'color-palette-outline',
+  COUNT: 'diamond-outline',
+  DIRECTION: 'compass-outline',
+  MIXED: 'flash-outline',
 };
 
 export const ProgressScreen: React.FC = () => {
@@ -29,6 +25,7 @@ export const ProgressScreen: React.FC = () => {
     playerLevel,
     playerXP,
     categoryMastery,
+    goBack,
   } = usePatternBreakStore();
 
   const xpNeeded = 500;
@@ -39,7 +36,7 @@ export const ProgressScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
           title="PROGRESSION"
-          onBack={() => setScreen('home')}
+          onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
 
@@ -55,7 +52,7 @@ export const ProgressScreen: React.FC = () => {
                 <Text style={styles.levelTitle}>LEVEL {playerLevel}</Text>
               </View>
               <View style={styles.rankBadge}>
-                <Text style={styles.rankEmoji}>👑</Text>
+                <Ionicons name="trophy" size={20} color={PBColors.accent} />
               </View>
             </View>
 
@@ -80,12 +77,23 @@ export const ProgressScreen: React.FC = () => {
 
           <View style={styles.masteryList}>
             {Object.entries(categoryMastery).map(([cat, data]) => {
-              const icon = CATEGORY_ICONS[cat] || '★';
+              const iconName = CATEGORY_VECTOR_ICONS[cat] || 'shapes-outline';
+              const iconColor =
+                cat === 'COLOR'
+                  ? '#FF6EA7'
+                  : cat === 'SHAPE'
+                  ? '#FFD54A'
+                  : cat === 'COUNT'
+                  ? '#38E58C'
+                  : PBColors.primary;
+
               return (
                 <GlassCard key={cat} variant="neutral" style={styles.categoryCard}>
                   <View style={styles.catHeader}>
                     <View style={styles.catTitleGroup}>
-                      <Text style={styles.catIcon}>{icon}</Text>
+                      <View style={[styles.catIconCircle, { borderColor: iconColor }]}>
+                        <Ionicons name={iconName} size={15} color={iconColor} />
+                      </View>
                       <Text style={styles.catName}>{cat}</Text>
                     </View>
                     <Text style={styles.catLvl}>LVL {data.level}</Text>
@@ -97,14 +105,7 @@ export const ProgressScreen: React.FC = () => {
                         styles.catBarFill,
                         {
                           width: `${data.progress}%`,
-                          backgroundColor:
-                            cat === 'COLOR'
-                              ? '#FF6EA7'
-                              : cat === 'SHAPE'
-                              ? '#FFD54A'
-                              : cat === 'COUNT'
-                              ? '#38E58C'
-                              : PBColors.primary,
+                          backgroundColor: iconColor,
                         },
                       ]}
                     />
@@ -226,8 +227,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  catIcon: {
-    fontSize: 16,
+  catIconCircle: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    borderWidth: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   catName: {
     fontSize: 12,

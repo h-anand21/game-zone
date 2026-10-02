@@ -1,11 +1,7 @@
-// ============================================================
-// PATTERN BREAKER — 14 Result Celebration Screen
-// Victory celebration: Score tally, Streak, Accuracy & Next Challenge
-// ============================================================
-
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { Mascot } from '../components/mascot/Mascot';
 import { RobotCompanion } from '../components/mascot/RobotCompanion';
@@ -44,7 +40,8 @@ export const ResultScreen: React.FC = () => {
           <View style={styles.titleWrapper}>
             <Text style={styles.completeTitle}>ROUND COMPLETE!</Text>
             <View style={styles.badgePill}>
-              <Text style={styles.badgeText}>👑 PATTERN SCOUT RANK</Text>
+              <Ionicons name="trophy" size={12} color={PBColors.accent} style={{ marginRight: 4 }} />
+              <Text style={styles.badgeText}>PATTERN SCOUT RANK</Text>
             </View>
           </View>
 
@@ -69,9 +66,12 @@ export const ResultScreen: React.FC = () => {
               </View>
               <View style={styles.statCell}>
                 <Text style={styles.statLabel}>STREAK</Text>
-                <Text style={[styles.statValue, { color: PBColors.accent }]}>
-                  🔥 {bestStreak}
-                </Text>
+                <View style={styles.streakRow}>
+                  <Ionicons name="flame" size={15} color={PBColors.accent} style={{ marginRight: 2 }} />
+                  <Text style={[styles.statValue, { color: PBColors.accent }]}>
+                    {bestStreak}
+                  </Text>
+                </View>
               </View>
               <View style={styles.statCell}>
                 <Text style={styles.statLabel}>ACCURACY</Text>
@@ -144,12 +144,19 @@ const styles = StyleSheet.create({
     borderRadius: PBRadius.full,
     borderWidth: 1,
     borderColor: PBColors.accent,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   badgeText: {
     fontSize: 10,
     fontWeight: '900',
     color: PBColors.accent,
     letterSpacing: 1,
+  },
+  streakRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
   },
   scoreCard: {
     width: '100%',

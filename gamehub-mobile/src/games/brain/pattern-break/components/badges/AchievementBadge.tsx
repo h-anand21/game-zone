@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
 import Svg, { Polygon, Circle } from 'react-native-svg';
 import { AchievementItem } from '../../types';
 import { PBColors, PBTypography, PBRadius, PBShadows } from '../../theme';
@@ -14,9 +15,18 @@ interface AchievementBadgeProps {
   achievement: AchievementItem;
 }
 
+const getAchievementIconName = (icon: string): keyof typeof Ionicons.glyphMap => {
+  if (icon === 'flash' || icon === '⚡') return 'flash';
+  if (icon === 'eye' || icon === '👁️') return 'eye';
+  if (icon === 'trophy' || icon === '👑') return 'trophy';
+  if (icon === 'sync' || icon === '🌀') return 'sync';
+  return 'ribbon-outline';
+};
+
 export const AchievementBadge: React.FC<AchievementBadgeProps> = ({ achievement }) => {
   const { title, description, icon, unlocked, progress, maxProgress } = achievement;
   const percent = Math.min(100, Math.round((progress / maxProgress) * 100));
+  const iconName = getAchievementIconName(icon);
 
   return (
     <View style={[styles.container, unlocked && PBShadows.amberGlow]}>
@@ -46,7 +56,13 @@ export const AchievementBadge: React.FC<AchievementBadgeProps> = ({ achievement 
               fill={unlocked ? 'rgba(255, 213, 74, 0.25)' : 'rgba(0, 0, 0, 0.4)'}
             />
           </Svg>
-          <Text style={styles.iconEmoji}>{icon}</Text>
+          <View style={styles.vectorIconHolder}>
+            <Ionicons
+              name={iconName}
+              size={18}
+              color={unlocked ? PBColors.accent : '#64748B'}
+            />
+          </View>
         </View>
 
         {/* Right Details */}
@@ -105,9 +121,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-  iconEmoji: {
+  vectorIconHolder: {
     position: 'absolute',
-    fontSize: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   detailsCol: {
     flex: 1,

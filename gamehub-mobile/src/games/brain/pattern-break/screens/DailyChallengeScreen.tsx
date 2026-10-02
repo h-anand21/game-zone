@@ -1,11 +1,7 @@
-// ============================================================
-// PATTERN BREAKER — 16 Daily Challenge Screen
-// Daily Break: Event Calendar motif, Mystery Pattern, 6-Day Streak
-// ============================================================
-
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { PrimaryButton } from '../components/buttons/PrimaryButton';
@@ -15,7 +11,7 @@ import { PBColors, PBTypography, PBRadius, PBShadows } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const DailyChallengeScreen: React.FC = () => {
-  const { setScreen, startNewRun, dailyStreak } = usePatternBreakStore();
+  const { setScreen, startNewRun, dailyStreak, goBack } = usePatternBreakStore();
 
   const handleStartDaily = () => {
     startNewRun();
@@ -26,7 +22,7 @@ export const DailyChallengeScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
           title="DAILY BREAK"
-          onBack={() => setScreen('play_mode')}
+          onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
 
@@ -37,13 +33,17 @@ export const DailyChallengeScreen: React.FC = () => {
           <GlassCard variant="amber" style={styles.eventCard}>
             <View style={styles.eventHeader}>
               <View style={styles.badgePill}>
-                <Text style={styles.badgeText}>📅 SACRED MATRIX OF THE DAY</Text>
+                <Ionicons name="calendar-outline" size={13} color="#FFFFFF" style={{ marginRight: 4 }} />
+                <Text style={styles.badgeText}>SACRED MATRIX OF THE DAY</Text>
               </View>
-              <Text style={styles.rewardText}>🎁 +50 XP REWARD</Text>
+              <View style={styles.rewardPill}>
+                <Ionicons name="gift-outline" size={13} color={PBColors.accent} style={{ marginRight: 4 }} />
+                <Text style={styles.rewardText}>+50 XP REWARD</Text>
+              </View>
             </View>
 
             <View style={styles.mysteryBox}>
-              <Text style={styles.mysteryIcon}>❓</Text>
+              <Ionicons name="help-circle-outline" size={48} color={PBColors.accent} style={styles.mysteryIcon} />
               <Text style={styles.mysteryTitle}>MYSTERY ANOMALY</Text>
               <Text style={styles.mysteryDesc}>
                 10-round gauntlet with rapid rule shifts and no second chances.
@@ -58,9 +58,12 @@ export const DailyChallengeScreen: React.FC = () => {
               <View style={styles.statDivider} />
               <View style={styles.statCol}>
                 <Text style={styles.statLabel}>DAILY STREAK</Text>
-                <Text style={[styles.statVal, { color: PBColors.accent }]}>
-                  🔥 {dailyStreak} DAYS
-                </Text>
+                <View style={styles.streakValRow}>
+                  <Ionicons name="flame" size={16} color={PBColors.accent} style={{ marginRight: 3 }} />
+                  <Text style={[styles.statVal, { color: PBColors.accent }]}>
+                    {dailyStreak} DAYS
+                  </Text>
+                </View>
               </View>
             </View>
           </GlassCard>
@@ -132,6 +135,8 @@ const styles = StyleSheet.create({
     borderRadius: PBRadius.full,
     borderWidth: 1,
     borderColor: PBColors.accent,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   badgeText: {
     fontSize: 9.5,
@@ -139,10 +144,19 @@ const styles = StyleSheet.create({
     color: PBColors.accent,
     letterSpacing: 1,
   },
+  rewardPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   rewardText: {
     fontSize: 11,
     fontWeight: '900',
     color: PBColors.positive,
+  },
+  streakValRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
   },
   mysteryBox: {
     alignItems: 'center',

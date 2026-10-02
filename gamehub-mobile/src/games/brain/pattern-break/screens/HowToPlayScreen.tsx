@@ -96,15 +96,15 @@ export const HowToPlayScreen: React.FC = () => {
           {/* Core Rules Callout */}
           <View style={styles.rulesPills}>
             <View style={styles.rulePill}>
-              <Text style={styles.ruleEmoji}>⚡</Text>
+              <Ionicons name="flash-outline" size={16} color={PBColors.accent} />
               <Text style={styles.ruleText}>Tap breaker before time expires</Text>
             </View>
             <View style={styles.rulePill}>
-              <Text style={styles.ruleEmoji}>🎯</Text>
+              <Ionicons name="disc-outline" size={16} color={PBColors.primary} />
               <Text style={styles.ruleText}>Correct tap adds +2s & +1 Point</Text>
             </View>
             <View style={styles.rulePill}>
-              <Text style={styles.ruleEmoji}>⚠️</Text>
+              <Ionicons name="warning-outline" size={16} color={PBColors.danger} />
               <Text style={styles.ruleText}>Wrong tap deducts -3s penalty</Text>
             </View>
           </View>
