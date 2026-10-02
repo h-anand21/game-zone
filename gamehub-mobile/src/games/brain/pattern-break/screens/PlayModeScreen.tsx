@@ -15,7 +15,7 @@ import { PBColors } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const PlayModeScreen: React.FC = () => {
-  const { playMode, setPlayMode, setScreen, currentScreen } = usePatternBreakStore();
+  const { playMode, setPlayMode, setScreen, currentScreen, goBack } = usePatternBreakStore();
 
   const handleSelectMode = (mode: PBPlayMode) => {
     setPlayMode(mode);
@@ -31,7 +31,7 @@ export const PlayModeScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
           title="CHALLENGE MODE"
-          onBack={() => setScreen('home')}
+          onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
 
@@ -47,7 +47,8 @@ export const PlayModeScreen: React.FC = () => {
           <GameCard
             title="QUICK BREAK"
             subtitle="Rapid-fire random puzzles. Test your raw cognitive speed."
-            icon="⚡"
+            iconName="flash"
+            iconColor="#FFD54A"
             badge="CLASSIC"
             selected={playMode === 'quick'}
             onPress={() => handleSelectMode('quick')}
@@ -58,7 +59,8 @@ export const PlayModeScreen: React.FC = () => {
           <GameCard
             title="PATTERN SHIFT"
             subtitle="Rules dynamically mutate mid-game. Adapt without breaking streak!"
-            icon="🌀"
+            iconName="sync"
+            iconColor="#19D3FF"
             badge="DYNAMIC"
             selected={playMode === 'shift'}
             onPress={() => handleSelectMode('shift')}
@@ -69,7 +71,8 @@ export const PlayModeScreen: React.FC = () => {
           <GameCard
             title="DAILY BREAK"
             subtitle="One handcrafted daily matrix challenge with streak rewards."
-            icon="📅"
+            iconName="calendar"
+            iconColor="#38E58C"
             badge="EVENT"
             selected={playMode === 'daily'}
             onPress={() => handleSelectMode('daily')}

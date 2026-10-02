@@ -5,9 +5,10 @@
 // ============================================================
 
 import React, { useEffect } from 'react';
-import { View, StyleSheet, StatusBar } from 'react-native';
+import { View, StyleSheet, StatusBar, BackHandler } from 'react-native';
 import type { GameEngine } from '../../engine/GameEngine';
 import { usePatternBreakStore } from './store/patternBreakStore';
+import { ExitConfirmationModal } from './components/overlays/ExitConfirmationModal';
 
 // Screen imports
 import { SplashScreen } from './screens/SplashScreen';
@@ -34,7 +35,16 @@ export const PatternBreakGame: React.FC<PatternBreakProps> = ({
   onFinish,
   isPaused: enginePaused,
 }) => {
-  const { currentScreen, isPaused, togglePause, score, bestScore } = usePatternBreakStore();
+  const {
+    currentScreen,
+    isPaused,
+    togglePause,
+    score,
+    showExitModal,
+    setShowExitModal,
+    setScreen,
+    goBack,
+  } = usePatternBreakStore();
 
   // Sync engine pause state if needed
   useEffect(() => {
@@ -42,6 +52,57 @@ export const PatternBreakGame: React.FC<PatternBreakProps> = ({
       togglePause();
     }
   }, [enginePaused, isPaused, currentScreen, togglePause]);
+
+  // Robust Android Hardware Back Button Handling
+  useEffect(() => {
+    const onHardwareBack = () => {
+      // 1. If Exit Modal is open, close it
+      if (showExitModal) {
+        setShowExitModal(false);
+        return true;
+      }
+
+      // 2. If in active gameplay/countdown/rule_shift
+      if (
+        currentScreen === 'gameplay' ||
+        currentScreen === 'countdown' ||
+        currentScreen === 'rule_shift' ||
+        currentScreen === 'feedback'
+      ) {
+        if (!isPaused) {
+          togglePause(); // Safely open Pause modal instead of abruptly exiting
+        } else {
+          setScreen('home'); // If already paused, exit gameplay to home
+        }
+        return true;
+      }
+
+      // 3. If in Result screen, return to Home
+      if (currentScreen === 'result') {
+        setScreen('home');
+        return true;
+      }
+
+      // 4. If in Splash screen, advance to Home
+      if (currentScreen === 'splash') {
+        setScreen('home');
+        return true;
+      }
+
+      // 5. If in any sub-screen (difficulty, pattern_type, settings, etc.)
+      if (currentScreen !== 'home') {
+        goBack();
+        return true;
+      }
+
+      // 6. If on Home screen, show Exit confirmation modal instead of killing the app
+      setShowExitModal(true);
+      return true;
+    };
+
+    const backSub = BackHandler.addEventListener('hardwareBackPress', onHardwareBack);
+    return () => backSub.remove();
+  }, [currentScreen, isPaused, showExitModal, togglePause, setScreen, goBack, setShowExitModal]);
 
   const renderActiveScreen = () => {
     switch (currentScreen) {
@@ -84,6 +145,7 @@ export const PatternBreakGame: React.FC<PatternBreakProps> = ({
     <View style={styles.root}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
       {renderActiveScreen()}
+      <ExitConfirmationModal onConfirmExit={() => onFinish(score, false)} />
     </View>
   );
 };

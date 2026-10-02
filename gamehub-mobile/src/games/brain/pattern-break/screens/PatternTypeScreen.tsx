@@ -1,11 +1,7 @@
-// ============================================================
-// PATTERN BREAKER — 06 Pattern Type Screen
-// Select category: Number, Shape, Color, Count, Direction, Mixed, Random
-// ============================================================
-
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { PrimaryButton } from '../components/buttons/PrimaryButton';
@@ -17,22 +13,22 @@ interface CategoryOption {
   id: PBPatternType;
   title: string;
   desc: string;
-  icon: string;
+  iconName: keyof typeof Ionicons.glyphMap;
   color: string;
 }
 
 const CATEGORIES: CategoryOption[] = [
-  { id: 'RANDOM', title: 'RANDOM', desc: 'Surprise me with any pattern!', icon: '🎲', color: '#19D3FF' },
-  { id: 'NUMBER', title: 'NUMBER', desc: 'Sequence & arithmetic', icon: '🔢', color: '#19D3FF' },
-  { id: 'SHAPE', title: 'SHAPE', desc: 'Visual geometry', icon: '🔺', color: '#FFD54A' },
-  { id: 'COLOR', title: 'COLOR', desc: 'Harmonic hue rhythm', icon: '🎨', color: '#FF6EA7' },
-  { id: 'COUNT', title: 'COUNT', desc: 'Quantity resonance', icon: '💎', color: '#38E58C' },
-  { id: 'DIRECTION', title: 'DIRECTION', desc: 'Vector & rotation', icon: '🧭', color: '#A78BFA' },
-  { id: 'MIXED', title: 'MIXED', desc: 'Fusion multi-rules', icon: '⚡', color: '#FB923C' },
+  { id: 'RANDOM', title: 'RANDOM', desc: 'Surprise me with any pattern!', iconName: 'dice-outline', color: '#19D3FF' },
+  { id: 'NUMBER', title: 'NUMBER', desc: 'Sequence & arithmetic', iconName: 'calculator-outline', color: '#19D3FF' },
+  { id: 'SHAPE', title: 'SHAPE', desc: 'Visual geometry', iconName: 'triangle-outline', color: '#FFD54A' },
+  { id: 'COLOR', title: 'COLOR', desc: 'Harmonic hue rhythm', iconName: 'color-palette-outline', color: '#FF6EA7' },
+  { id: 'COUNT', title: 'COUNT', desc: 'Quantity resonance', iconName: 'diamond-outline', color: '#38E58C' },
+  { id: 'DIRECTION', title: 'DIRECTION', desc: 'Vector & rotation', iconName: 'compass-outline', color: '#A78BFA' },
+  { id: 'MIXED', title: 'MIXED', desc: 'Fusion multi-rules', iconName: 'flash-outline', color: '#FB923C' },
 ];
 
 export const PatternTypeScreen: React.FC = () => {
-  const { patternType, setPatternType, setScreen } = usePatternBreakStore();
+  const { patternType, setPatternType, setScreen, goBack } = usePatternBreakStore();
 
   const handleStart = () => {
     setScreen('how_to_play');
@@ -43,7 +39,7 @@ export const PatternTypeScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
           title="RULE FAMILY"
-          onBack={() => setScreen('difficulty')}
+          onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
 
@@ -69,7 +65,7 @@ export const PatternTypeScreen: React.FC = () => {
                   ]}
                 >
                   <View style={[styles.iconCircle, { borderColor: cat.color }]}>
-                    <Text style={styles.icon}>{cat.icon}</Text>
+                    <Ionicons name={cat.iconName} size={22} color={cat.color} />
                   </View>
                   <Text style={[styles.title, isSelected && { color: cat.color }]}>
                     {cat.title}

@@ -15,7 +15,7 @@ import { PBColors } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const DifficultyScreen: React.FC = () => {
-  const { difficulty, setDifficulty, setScreen } = usePatternBreakStore();
+  const { difficulty, setDifficulty, setScreen, goBack } = usePatternBreakStore();
 
   const handleSelect = (diff: PBDifficulty) => {
     setDifficulty(diff);
@@ -30,7 +30,7 @@ export const DifficultyScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
           title="SELECT LEVEL"
-          onBack={() => setScreen('play_mode')}
+          onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
 
@@ -46,7 +46,8 @@ export const DifficultyScreen: React.FC = () => {
           <GameCard
             title="EXPLORER"
             subtitle="Single property rules. Relaxed 30s clock for beginners."
-            icon="🌱"
+            iconName="leaf-outline"
+            iconColor="#38E58C"
             badge="EASY • 30s"
             selected={difficulty === 'EASY'}
             onPress={() => handleSelect('EASY')}
@@ -56,7 +57,8 @@ export const DifficultyScreen: React.FC = () => {
           <GameCard
             title="THINKER"
             subtitle="Dual-layer relationships. Balanced 20s clock for agile minds."
-            icon="🧠"
+            iconName="bulb-outline"
+            iconColor="#19D3FF"
             badge="MEDIUM • 20s"
             selected={difficulty === 'MEDIUM'}
             onPress={() => handleSelect('MEDIUM')}
@@ -66,7 +68,8 @@ export const DifficultyScreen: React.FC = () => {
           <GameCard
             title="BREAKER"
             subtitle="Multi-vector complex rules. Intense 12s adrenaline clock."
-            icon="👑"
+            iconName="flash"
+            iconColor="#FF5C61"
             badge="HARD • 12s"
             selected={difficulty === 'HARD'}
             onPress={() => handleSelect('HARD')}

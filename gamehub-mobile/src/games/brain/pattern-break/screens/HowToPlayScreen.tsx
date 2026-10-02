@@ -7,6 +7,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { Mascot } from '../components/mascot/Mascot';
@@ -17,7 +18,7 @@ import { PBColors, PBTypography, PBRadius, PBShadows } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const HowToPlayScreen: React.FC = () => {
-  const { setScreen, startNewRun } = usePatternBreakStore();
+  const { setScreen, startNewRun, goBack } = usePatternBreakStore();
 
   const handleStartGame = () => {
     startNewRun();
@@ -28,7 +29,7 @@ export const HowToPlayScreen: React.FC = () => {
       <SafeAreaView style={styles.safeArea}>
         <ScreenHeader
           title="HOW TO PLAY"
-          onBack={() => setScreen('pattern_type')}
+          onBack={goBack}
           onSettings={() => setScreen('settings')}
         />
 

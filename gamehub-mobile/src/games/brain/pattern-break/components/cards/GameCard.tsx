@@ -7,12 +7,15 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable, ViewStyle, StyleProp } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { Ionicons } from '@expo/vector-icons';
 import { PBColors, PBTypography, PBRadius, PBShadows } from '../../theme';
 
 interface GameCardProps {
   title: string;
   subtitle: string;
-  icon?: string;
+  icon?: string | React.ReactNode;
+  iconName?: keyof typeof Ionicons.glyphMap;
+  iconColor?: string;
   badge?: string;
   selected?: boolean;
   onPress?: () => void;
@@ -24,6 +27,8 @@ export const GameCard: React.FC<GameCardProps> = ({
   title,
   subtitle,
   icon,
+  iconName,
+  iconColor = PBColors.primary,
   badge,
   selected = false,
   onPress,
@@ -66,9 +71,17 @@ export const GameCard: React.FC<GameCardProps> = ({
         <View style={[styles.topBevel, selected && styles.selectedTopBevel]} />
 
         {/* Left Icon or Badge */}
-        {icon ? (
+        {iconName ? (
           <View style={styles.iconCircle}>
-            <Text style={styles.iconText}>{icon}</Text>
+            <Ionicons name={iconName} size={22} color={iconColor} />
+          </View>
+        ) : icon ? (
+          <View style={styles.iconCircle}>
+            {typeof icon === 'string' ? (
+              <Text style={styles.iconText}>{icon}</Text>
+            ) : (
+              icon
+            )}
           </View>
         ) : null}
 

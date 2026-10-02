@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { Mascot } from '../components/mascot/Mascot';
 import { RobotCompanion } from '../components/mascot/RobotCompanion';
@@ -23,28 +24,39 @@ export const HomeScreen: React.FC = () => {
     bestScore,
     bestStreak,
     playerLevel,
+    setShowExitModal,
   } = usePatternBreakStore();
 
   return (
     <GameBackground variant="home">
       <SafeAreaView style={styles.safeArea}>
         {/* ============================================================ */}
-        {/* TOP BAR: Profile Mini Card & Settings                        */}
+        {/* TOP BAR: Exit Button, Profile Mini Card & Settings           */}
         {/* ============================================================ */}
         <View style={styles.topBar}>
-          <Pressable
-            style={styles.profileMiniCard}
-            onPress={() => setScreen('profile')}
-            accessibilityLabel="Open Profile"
-          >
-            <View style={styles.avatarCircle}>
-              <Text style={styles.avatarEmoji}>🧭</Text>
-            </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.profileName}>SCOUT</Text>
-              <Text style={styles.levelBadge}>LVL {playerLevel}</Text>
-            </View>
-          </Pressable>
+          <View style={styles.topLeftGroup}>
+            <IconButton
+              name="chevron-back"
+              size={42}
+              iconSize={22}
+              color={PBColors.textSecondary}
+              onPress={() => setShowExitModal(true)}
+              accessibilityLabel="Exit to GameHub"
+            />
+            <Pressable
+              style={styles.profileMiniCard}
+              onPress={() => setScreen('profile')}
+              accessibilityLabel="Open Profile"
+            >
+              <View style={styles.avatarCircle}>
+                <Ionicons name="compass" size={18} color={PBColors.accent} />
+              </View>
+              <View style={styles.profileInfo}>
+                <Text style={styles.profileName}>SCOUT</Text>
+                <Text style={styles.levelBadge}>LVL {playerLevel}</Text>
+              </View>
+            </Pressable>
+          </View>
 
           <IconButton
             name="settings-outline"
@@ -125,6 +137,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 8,
+  },
+  topLeftGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   profileMiniCard: {
     flexDirection: 'row',

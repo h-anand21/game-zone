@@ -54,26 +54,52 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
   return (
     <View style={styles.container}>
       {/* ============================================================ */}
-      {/* LAYER 1: Deep Environmental Sci-Fi Artwork                   */}
+      {/* LAYER 1A: Soft Ambient Fill (Prevents distortion on wide screens) */}
       {/* ============================================================ */}
       <Image
         source={bgSource}
         style={StyleSheet.absoluteFill}
         resizeMode="cover"
+        blurRadius={12}
         fadeDuration={0}
       />
 
       {/* ============================================================ */}
-      {/* LAYER 2: Atmospheric Volumetric Scrim & Depth Vignette        */}
-      {/* Controls center contrast so gameplay tiles pop brilliantly   */}
+      {/* LAYER 1B: Crisp Hero Artwork (Properly centered & framed)    */}
+      {/* ============================================================ */}
+      <View style={styles.heroCanvas} pointerEvents="none">
+        <Image
+          source={bgSource}
+          style={styles.heroImage}
+          resizeMode={SCREEN_WIDTH > 480 ? 'contain' : 'cover'}
+          fadeDuration={0}
+        />
+      </View>
+
+      {/* ============================================================ */}
+      {/* LAYER 2: Luminous Atmospheric Scrim (Artwork remains vibrant) */}
       {/* ============================================================ */}
       <LinearGradient
         colors={[
-          variant === 'splash' ? 'rgba(6, 16, 24, 0.40)' : 'rgba(6, 16, 24, 0.65)',
-          variant === 'gameplay' ? 'rgba(8, 19, 26, 0.78)' : 'rgba(8, 19, 26, 0.70)',
-          'rgba(6, 16, 24, 0.92)',
+          variant === 'splash' ? 'rgba(6, 16, 24, 0.12)' : 'rgba(6, 16, 24, 0.22)',
+          variant === 'gameplay' ? 'rgba(8, 19, 26, 0.38)' : 'rgba(8, 19, 26, 0.30)',
+          'rgba(6, 16, 24, 0.65)',
         ]}
         style={StyleSheet.absoluteFill}
+        pointerEvents="none"
+      />
+
+      {/* Top Subtle Sky Rim Glow */}
+      <LinearGradient
+        colors={['rgba(25, 211, 255, 0.18)', 'transparent']}
+        style={styles.topSkyGlow}
+        pointerEvents="none"
+      />
+
+      {/* Bottom Deep Grounding Shadow for Buttons/Nav */}
+      <LinearGradient
+        colors={['transparent', 'rgba(6, 16, 24, 0.68)']}
+        style={styles.bottomShadow}
         pointerEvents="none"
       />
 
@@ -108,6 +134,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: PBColors.backgroundDark,
     position: 'relative',
+    overflow: 'hidden',
+  },
+  heroCanvas: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    maxWidth: 520,
+    alignSelf: 'center',
+  },
+  topSkyGlow: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 100,
+  },
+  bottomShadow: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 120,
   },
   content: {
     flex: 1,

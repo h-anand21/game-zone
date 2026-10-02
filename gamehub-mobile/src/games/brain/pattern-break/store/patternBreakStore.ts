@@ -20,7 +20,7 @@ const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
     id: 'first_break',
     title: 'FIRST BREAK',
     description: 'Spot your first pattern breaker.',
-    icon: '⚡',
+    icon: 'flash',
     unlocked: true,
     progress: 1,
     maxProgress: 1,
@@ -29,7 +29,7 @@ const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
     id: 'sharp_eye',
     title: 'SHARP EYE',
     description: 'Achieve 5 correct breaker taps in a row.',
-    icon: '👁️',
+    icon: 'eye',
     unlocked: false,
     progress: 2,
     maxProgress: 5,
@@ -38,7 +38,7 @@ const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
     id: 'speed_mind',
     title: 'SPEED MIND',
     description: 'Break a complex pattern in under 2 seconds.',
-    icon: '⚡',
+    icon: 'flash',
     unlocked: false,
     progress: 0,
     maxProgress: 1,
@@ -47,7 +47,7 @@ const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
     id: 'rule_master',
     title: 'RULE MASTER',
     description: 'Triumph across all 6 distinct rule families.',
-    icon: '👑',
+    icon: 'trophy',
     unlocked: false,
     progress: 3,
     maxProgress: 6,
@@ -56,7 +56,7 @@ const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
     id: 'shift_survivor',
     title: 'SHIFT SURVIVOR',
     description: 'Clear a live mid-game Rule Shift seamlessly.',
-    icon: '🌀',
+    icon: 'sync',
     unlocked: false,
     progress: 0,
     maxProgress: 1,
@@ -101,6 +101,12 @@ interface PatternBreakState {
   achievements: AchievementItem[];
   dailyCompleted: boolean;
   dailyStreak: number;
+
+  // Navigation History & Exit Modal
+  screenHistory: PBScreen[];
+  showExitModal: boolean;
+  setShowExitModal: (show: boolean) => void;
+  goBack: () => void;
 
   // Actions
   setScreen: (screen: PBScreen) => void;
@@ -158,7 +164,35 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
   dailyCompleted: false,
   dailyStreak: 6,
 
-  setScreen: (screen) => set({ currentScreen: screen }),
+  screenHistory: [],
+  showExitModal: false,
+  setShowExitModal: (showExitModal) => set({ showExitModal }),
+
+  setScreen: (screen) => {
+    const current = get().currentScreen;
+    if (current === screen) return;
+    set((state) => ({
+      // Don't push intermediate game flow screens (countdown, rule_shift, feedback) to history
+      screenHistory:
+        current === 'countdown' || current === 'rule_shift' || current === 'feedback'
+          ? state.screenHistory
+          : [...state.screenHistory, current],
+      currentScreen: screen,
+    }));
+  },
+
+  goBack: () => {
+    const history = get().screenHistory;
+    if (history.length > 0) {
+      const prev = history[history.length - 1];
+      set({
+        screenHistory: history.slice(0, -1),
+        currentScreen: prev,
+      });
+    } else {
+      set({ currentScreen: 'home' });
+    }
+  },
   setPlayMode: (playMode) => set({ playMode }),
   setDifficulty: (difficulty) => set({ difficulty }),
   setPatternType: (patternType) => set({ patternType }),
