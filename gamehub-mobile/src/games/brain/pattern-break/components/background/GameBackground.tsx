@@ -25,7 +25,7 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 // Background Image Assets
 const BG_IMAGES = {
   splash: require('../../../../../../assets/game/backgrounds/Pattern Breaker_ Ruins of Neon Logic.png'),
-  home: require('../../../../../../assets/game/backgrounds/Pattern Breaker_ Neon Ruins Adventure (2).png'),
+  home: require('../../../../../../assets/game/backgrounds/Pattern Breaker_ Neon Ruins Adventure (1).png'),
   gameplay: require('../../../../../../assets/game/backgrounds/Neon Cosmic Floating Arena.png'),
 };
 
@@ -42,15 +42,14 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
       ? BG_IMAGES.gameplay
       : BG_IMAGES.home;
 
-  // Determine smooth blur radius per context
+  // Determine smooth blur radius per context: HOME has 0 blur; others have subtle 1.5 blur
+  const isHome = variant === 'home';
   const effectiveBlur =
     blurRadius !== undefined
       ? blurRadius
-      : variant === 'splash'
-      ? 2
-      : variant === 'gameplay'
-      ? 3
-      : 3.5;
+      : isHome
+      ? 0
+      : 1.5;
 
   // Generate stable ambient floating particles
   const particles = useMemo(() => {
@@ -72,18 +71,18 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
         source={bgSource}
         style={StyleSheet.absoluteFill}
         resizeMode="cover"
-        blurRadius={16}
+        blurRadius={isHome ? 0 : 3}
         fadeDuration={0}
       />
 
       {/* ============================================================ */}
-      {/* LAYER 1B: Soft-Blurred Hero Artwork (Depth of field effect)  */}
+      {/* LAYER 1B: Primary Environment Artwork (Zero blur on Home)    */}
       {/* ============================================================ */}
       <View style={styles.heroCanvas} pointerEvents="none">
         <Image
           source={bgSource}
           style={styles.heroImage}
-          resizeMode={SCREEN_WIDTH > 480 ? 'contain' : 'cover'}
+          resizeMode="cover"
           blurRadius={effectiveBlur}
           fadeDuration={0}
         />
@@ -157,8 +156,6 @@ const styles = StyleSheet.create({
   heroImage: {
     width: '100%',
     height: '100%',
-    maxWidth: 520,
-    alignSelf: 'center',
   },
   topSkyGlow: {
     position: 'absolute',

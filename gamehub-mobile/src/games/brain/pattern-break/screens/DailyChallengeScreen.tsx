@@ -1,13 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
-import { PrimaryButton } from '../components/buttons/PrimaryButton';
+import { GameButton } from '../components/buttons/GameButton';
 import { GlassCard } from '../components/cards/GlassCard';
-import { Mascot } from '../components/mascot/Mascot';
-import { PBColors, PBTypography, PBRadius, PBShadows } from '../theme';
+import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const DailyChallengeScreen: React.FC = () => {
@@ -27,17 +26,15 @@ export const DailyChallengeScreen: React.FC = () => {
         />
 
         <View style={styles.centerContainer}>
-          <Mascot pose="ready" size={110} />
-
           {/* Main Event Card */}
           <GlassCard variant="amber" style={styles.eventCard}>
             <View style={styles.eventHeader}>
               <View style={styles.badgePill}>
-                <Ionicons name="calendar-outline" size={13} color="#FFFFFF" style={{ marginRight: 4 }} />
+                <Image source={uiAssets.icons.calendar} style={styles.headerIcon} resizeMode="contain" />
                 <Text style={styles.badgeText}>SACRED MATRIX OF THE DAY</Text>
               </View>
               <View style={styles.rewardPill}>
-                <Ionicons name="gift-outline" size={13} color={PBColors.accent} style={{ marginRight: 4 }} />
+                <Image source={uiAssets.icons.gift} style={styles.headerIcon} resizeMode="contain" />
                 <Text style={styles.rewardText}>+50 XP REWARD</Text>
               </View>
             </View>
@@ -94,11 +91,11 @@ export const DailyChallengeScreen: React.FC = () => {
         </View>
 
         <View style={styles.bottomBar}>
-          <PrimaryButton
-            title="PLAY DAILY BREAK ▶"
-            variant="amber"
-            size="lg"
+          <GameButton
+            asset={uiAssets.actions.challenge}
+            height={72}
             onPress={handleStartDaily}
+            accessibilityLabel="Play Daily Break Challenge"
           />
         </View>
       </SafeAreaView>
@@ -147,6 +144,11 @@ const styles = StyleSheet.create({
   rewardPill: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  headerIcon: {
+    width: 14,
+    height: 14,
+    marginRight: 4,
   },
   rewardText: {
     fontSize: 11,

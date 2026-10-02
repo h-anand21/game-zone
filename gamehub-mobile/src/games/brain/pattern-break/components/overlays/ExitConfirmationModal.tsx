@@ -9,9 +9,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { usePatternBreakStore } from '../../store/patternBreakStore';
 import { RobotCompanion } from '../mascot/RobotCompanion';
-import { PrimaryButton } from '../buttons/PrimaryButton';
-import { SecondaryButton } from '../buttons/SecondaryButton';
-import { PBColors, PBRadius, PBShadows } from '../../theme';
+import { GameButton } from '../buttons/GameButton';
+import { PBColors, PBRadius, PBShadows, uiAssets } from '../../theme';
 
 interface ExitConfirmationModalProps {
   onConfirmExit?: () => void;
@@ -103,17 +102,18 @@ export const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
 
               {/* Action Buttons */}
               <View style={styles.buttonStack}>
-                <PrimaryButton
-                  title="CONTINUE EXPEDITION"
-                  variant="cyan"
-                  size="md"
+                <GameButton
+                  asset={uiAssets.actions.continue}
+                  height={58}
                   onPress={handleCancel}
+                  accessibilityLabel="Continue Expedition"
                 />
 
-                <SecondaryButton
-                  title="EXIT TO GAMEHUB"
+                <GameButton
+                  asset={uiAssets.actions.exit}
+                  height={54}
                   onPress={handleConfirm}
-                  style={styles.exitBtn}
+                  accessibilityLabel="Exit to GameHub"
                 />
               </View>
             </View>

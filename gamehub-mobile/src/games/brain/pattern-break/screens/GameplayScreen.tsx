@@ -11,11 +11,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { PatternTile } from '../components/game/PatternTile';
 import { TimerRing } from '../components/game/TimerRing';
+import { GameButton } from '../components/buttons/GameButton';
+import { GameIconButton } from '../components/buttons/GameIconButton';
 import { RuleShiftOverlay } from '../components/overlays/RuleShiftOverlay';
 import { PowerUpRadialMenu } from '../components/overlays/PowerUpRadialMenu';
 import { CountdownOverlay } from '../components/overlays/CountdownOverlay';
 import { PauseModal } from '../components/overlays/PauseModal';
-import { PBColors, PBTypography, PBRadius, PBShadows } from '../theme';
+import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -99,13 +101,12 @@ export const GameplayScreen: React.FC = () => {
         {/* ============================================================ */}
         <View style={styles.topHud}>
           {/* Pause Button */}
-          <Pressable
-            style={styles.hudIconBtn}
+          <GameIconButton
+            icon={uiAssets.icons.pause}
+            size={42}
             onPress={togglePause}
             accessibilityLabel="Pause Game"
-          >
-            <Ionicons name="pause" size={18} color={PBColors.textSecondary} />
-          </Pressable>
+          />
 
           {/* Score Counter */}
           <View style={styles.statBox}>
@@ -187,19 +188,13 @@ export const GameplayScreen: React.FC = () => {
         {/* 5. BOTTOM ACTIONS: CLUE RADIAL POWER-UP BUTTON               */}
         {/* ============================================================ */}
         <View style={styles.bottomBar}>
-          <Pressable
-            style={styles.clueButton}
+          <GameButton
+            asset={uiAssets.gameplay.clue}
+            height={56}
+            width={210}
             onPress={() => setIsRadialOpen(true)}
-            accessibilityLabel="Open Power-Up Menu"
-          >
-            <Text style={styles.clueIcon}>💡</Text>
-            <Text style={styles.clueText}>CLUE GADGETS</Text>
-            <View style={styles.totalChargesPill}>
-              <Text style={styles.chargesText}>
-                {powerUps.reveal + powerUps.freeze + powerUps.scan}
-              </Text>
-            </View>
-          </Pressable>
+            accessibilityLabel="Open Clue Gadgets"
+          />
         </View>
 
         {/* ============================================================ */}

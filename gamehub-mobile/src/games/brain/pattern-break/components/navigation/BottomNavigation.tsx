@@ -1,16 +1,23 @@
 // ============================================================
 // PATTERN BREAKER — Bottom Navigation Component
 // Exactly 4 tabs: HOME, PLAY, PROGRESS, PROFILE
-// Dark glass panel, rounded top rim, glowing cyan underline & haptics
+// Powered by authentic Glowing Fantasy Game Menu Icons
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  Platform,
+  Image,
+  ImageSourcePropType,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { PBScreen } from '../../types';
-import { PBColors, PBTypography, PBRadius } from '../../theme';
+import { PBColors, PBRadius, uiAssets } from '../../theme';
 
 interface BottomNavigationProps {
   currentScreen: PBScreen;
@@ -20,15 +27,14 @@ interface BottomNavigationProps {
 interface NavTab {
   id: PBScreen;
   label: string;
-  icon: keyof typeof Ionicons.glyphMap;
-  activeIcon: keyof typeof Ionicons.glyphMap;
+  asset: ImageSourcePropType;
 }
 
 const TABS: NavTab[] = [
-  { id: 'home', label: 'HOME', icon: 'home-outline', activeIcon: 'home' },
-  { id: 'play_mode', label: 'PLAY', icon: 'game-controller-outline', activeIcon: 'game-controller' },
-  { id: 'progress', label: 'PROGRESS', icon: 'bar-chart-outline', activeIcon: 'bar-chart' },
-  { id: 'profile', label: 'PROFILE', icon: 'person-outline', activeIcon: 'person' },
+  { id: 'home', label: 'HOME', asset: uiAssets.navigation.home },
+  { id: 'play_mode', label: 'PLAY', asset: uiAssets.navigation.play },
+  { id: 'progress', label: 'PROGRESS', asset: uiAssets.navigation.progress },
+  { id: 'profile', label: 'PROFILE', asset: uiAssets.navigation.profile },
 ];
 
 export const BottomNavigation: React.FC<BottomNavigationProps> = ({
@@ -74,12 +80,14 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
               {/* Active Indicator Underline Bar */}
               {isActive && <View style={styles.activePill} />}
 
-              {/* Icon */}
-              <Ionicons
-                name={isActive ? tab.activeIcon : tab.icon}
-                size={22}
-                color={isActive ? PBColors.primary : PBColors.textMuted}
-              />
+              {/* Authentic Glowing Fantasy Icon */}
+              <View style={[styles.iconWrapper, isActive && styles.iconActive]}>
+                <Image
+                  source={tab.asset}
+                  style={styles.navIcon}
+                  resizeMode="contain"
+                />
+              </View>
 
               {/* Label */}
               <Text style={[styles.label, isActive && styles.activeLabel]}>
@@ -97,7 +105,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     paddingHorizontal: 12,
-    paddingBottom: Platform.OS === 'ios' ? 28 : 14,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 10,
     backgroundColor: 'transparent',
     zIndex: 100,
   },
@@ -105,10 +113,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    height: 66,
+    height: 72,
     borderRadius: PBRadius.xl,
     borderWidth: 1.5,
-    borderColor: 'rgba(25, 211, 255, 0.28)',
+    borderColor: 'rgba(25, 211, 255, 0.32)',
     position: 'relative',
     overflow: 'hidden',
   },
@@ -117,29 +125,44 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 2,
-    backgroundColor: 'rgba(25, 211, 255, 0.45)',
+    height: 2.5,
+    backgroundColor: 'rgba(25, 211, 255, 0.55)',
   },
   tabBtn: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
-    gap: 3,
+    gap: 2,
     position: 'relative',
   },
   activePill: {
     position: 'absolute',
     top: 0,
-    width: 32,
+    width: 36,
     height: 3,
-    backgroundColor: PBColors.primary,
+    backgroundColor: PBColors.accent,
     borderRadius: 2,
-    shadowColor: PBColors.primary,
+    shadowColor: PBColors.accent,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
+    shadowOpacity: 0.9,
     shadowRadius: 6,
     elevation: 4,
+  },
+  iconWrapper: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.65,
+  },
+  iconActive: {
+    opacity: 1,
+    transform: [{ scale: 1.08 }],
+  },
+  navIcon: {
+    width: '100%',
+    height: '100%',
   },
   label: {
     fontSize: 9.5,
@@ -148,11 +171,11 @@ const styles = StyleSheet.create({
     color: PBColors.textMuted,
   },
   activeLabel: {
-    color: PBColors.primary,
+    color: PBColors.accent,
     fontWeight: '900',
   },
   pressed: {
     opacity: 0.8,
-    transform: [{ scale: 0.95 }],
+    transform: [{ scale: 0.94 }],
   },
 });

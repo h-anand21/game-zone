@@ -1,6 +1,9 @@
 // ============================================================
 // PATTERN BREAKER — 01 Splash Screen
-// Cinematic Game Intro: World Background, 3D Title, Mascot & Tagline
+// Cinematic Game Intro:
+// TITLE: PATTERN BREAKER (NOT Home!)
+// MASCOT: Explorer Scout & Robot Companion
+// TAGLINE: SPOT THE RULE. BREAK THE PATTERN.
 // ============================================================
 
 import React, { useEffect } from 'react';
@@ -15,10 +18,10 @@ export const SplashScreen: React.FC = () => {
   const { setScreen } = usePatternBreakStore();
 
   useEffect(() => {
-    // Cinematic delay 2.2 seconds before transitioning to Home
+    // Cinematic delay 2.4 seconds before transitioning to Home
     const timer = setTimeout(() => {
       setScreen('home');
-    }, 2200);
+    }, 2400);
 
     return () => clearTimeout(timer);
   }, [setScreen]);
@@ -26,23 +29,25 @@ export const SplashScreen: React.FC = () => {
   return (
     <GameBackground variant="splash">
       <Pressable style={styles.container} onPress={() => setScreen('home')}>
-        {/* Upper Floating Robot */}
-        <View style={styles.robotWrapper}>
-          <RobotCompanion size={54} mood="happy" />
+        {/* Floating Robot Companion */}
+        <View style={styles.robotHolder}>
+          <RobotCompanion size={52} mood="happy" />
         </View>
 
-        {/* Center Hero Mascot */}
-        <View style={styles.mascotWrapper}>
-          <Mascot pose="ready" size={170} />
-        </View>
-
-        {/* Hero 3D Title */}
+        {/* Cinematic PATTERN BREAKER Title */}
         <View style={styles.titleBox}>
           <Text style={styles.gameTitleTop}>PATTERN</Text>
           <Text style={styles.gameTitleBottom}>BREAKER</Text>
-          <View style={styles.taglinePill}>
-            <Text style={styles.taglineText}>SPOT THE RULE. BREAK THE PATTERN.</Text>
-          </View>
+        </View>
+
+        {/* Hero Scout Mascot */}
+        <View style={styles.mascotHolder}>
+          <Mascot pose="ready" size={180} />
+        </View>
+
+        {/* Tagline */}
+        <View style={styles.taglinePill}>
+          <Text style={styles.taglineText}>SPOT THE RULE. BREAK THE PATTERN.</Text>
         </View>
 
         {/* Touch to Skip Prompt */}
@@ -59,60 +64,63 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 24,
     position: 'relative',
+    gap: 12,
   },
-  robotWrapper: {
+  robotHolder: {
     position: 'absolute',
-    top: 90,
-    right: 50,
-  },
-  mascotWrapper: {
-    marginBottom: 20,
-    ...PBShadows.cyanGlow,
+    top: 70,
+    right: 48,
   },
   titleBox: {
     alignItems: 'center',
-    gap: 2,
+    gap: 0,
+    marginBottom: 4,
   },
   gameTitleTop: {
-    fontSize: 42,
+    fontSize: 46,
     fontWeight: '900',
-    letterSpacing: 2,
-    lineHeight: 44,
+    letterSpacing: 4,
+    lineHeight: 48,
     textTransform: 'uppercase',
     color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 0, 0, 0.85)',
+    textShadowColor: 'rgba(0, 0, 0, 0.9)',
     textShadowOffset: { width: 0, height: 3 },
-    textShadowRadius: 6,
+    textShadowRadius: 8,
   },
   gameTitleBottom: {
-    fontSize: 42,
+    fontSize: 48,
     fontWeight: '900',
-    letterSpacing: 2,
-    lineHeight: 46,
+    letterSpacing: 4,
+    lineHeight: 50,
     textTransform: 'uppercase',
     color: PBColors.primary,
-    textShadowColor: 'rgba(25, 211, 255, 0.9)',
+    textShadowColor: 'rgba(25, 211, 255, 0.95)',
     textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 10,
+    textShadowRadius: 14,
+  },
+  mascotHolder: {
+    marginVertical: 8,
+    ...PBShadows.cyanGlow,
   },
   taglinePill: {
-    backgroundColor: 'rgba(255, 213, 74, 0.15)',
-    paddingHorizontal: 14,
-    paddingVertical: 5,
+    backgroundColor: 'rgba(24, 47, 57, 0.85)',
+    paddingHorizontal: 16,
+    paddingVertical: 7,
     borderRadius: PBRadius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 213, 74, 0.4)',
-    marginTop: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 213, 74, 0.55)',
+    marginTop: 8,
+    ...PBShadows.amberGlow,
   },
   taglineText: {
-    fontSize: 10.5,
+    fontSize: 11,
     fontWeight: '900',
     color: PBColors.accent,
-    letterSpacing: 1.5,
+    letterSpacing: 1.8,
   },
   tapPrompt: {
     position: 'absolute',
-    bottom: 40,
+    bottom: 36,
     fontSize: 11,
     fontWeight: '800',
     color: PBColors.textMuted,

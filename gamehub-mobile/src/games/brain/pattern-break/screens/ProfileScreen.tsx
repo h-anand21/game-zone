@@ -4,7 +4,7 @@
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
@@ -12,7 +12,7 @@ import { ScreenHeader } from '../components/common/ScreenHeader';
 import { Mascot } from '../components/mascot/Mascot';
 import { GlassCard } from '../components/cards/GlassCard';
 import { BottomNavigation } from '../components/navigation/BottomNavigation';
-import { PBColors, PBTypography, PBRadius, PBShadows } from '../theme';
+import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const ProfileScreen: React.FC = () => {
@@ -82,23 +82,17 @@ export const ProfileScreen: React.FC = () => {
           <View style={styles.analysisRow}>
             <GlassCard variant="cyan" style={styles.analysisCard}>
               <Text style={styles.analysisHeader}>STRONGEST PATTERN</Text>
-              <View style={styles.analysisIconBox}>
-                <Ionicons name="color-palette-outline" size={30} color={PBColors.positive} />
+              <View style={styles.patternAssetBox}>
+                <Image source={uiAssets.pattern.color} style={styles.patternAssetImg} resizeMode="contain" />
               </View>
-              <Text style={[styles.analysisResult, { color: PBColors.positive }]}>
-                COLOR
-              </Text>
               <Text style={styles.analysisAccuracy}>95% ACCURACY</Text>
             </GlassCard>
 
             <GlassCard variant="amber" style={styles.analysisCard}>
               <Text style={styles.analysisHeader}>TRAINING NEEDED</Text>
-              <View style={styles.analysisIconBox}>
-                <Ionicons name="compass-outline" size={30} color={PBColors.accent} />
+              <View style={styles.patternAssetBox}>
+                <Image source={uiAssets.pattern.direction} style={styles.patternAssetImg} resizeMode="contain" />
               </View>
-              <Text style={[styles.analysisResult, { color: PBColors.accent }]}>
-                DIRECTION
-              </Text>
               <Text style={styles.analysisAccuracy}>35% ACCURACY</Text>
             </GlassCard>
           </View>
@@ -109,7 +103,7 @@ export const ProfileScreen: React.FC = () => {
             onPress={() => setScreen('achievements')}
           >
             <View style={styles.shortcutLeft}>
-              <Ionicons name="trophy" size={20} color={PBColors.accent} style={{ marginRight: 8 }} />
+              <Image source={uiAssets.icons.trophy} style={styles.trophyIcon} resizeMode="contain" />
               <Text style={styles.shortcutTitle}>VIEW ALL ACHIEVEMENTS</Text>
             </View>
             <Text style={styles.shortcutArrow}>➔</Text>
@@ -220,20 +214,24 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     textAlign: 'center',
   },
-  analysisIconBox: {
+  patternAssetBox: {
     marginVertical: 4,
     alignItems: 'center',
     justifyContent: 'center',
+    height: 38,
   },
-  analysisResult: {
-    fontSize: 14,
-    fontWeight: '900',
-    letterSpacing: 1,
+  patternAssetImg: {
+    width: 100,
+    height: 36,
   },
   analysisAccuracy: {
     fontSize: 9,
     fontWeight: '800',
     color: PBColors.textSecondary,
+  },
+  trophyIcon: {
+    width: 22,
+    height: 22,
   },
   achievementsShortcut: {
     flexDirection: 'row',

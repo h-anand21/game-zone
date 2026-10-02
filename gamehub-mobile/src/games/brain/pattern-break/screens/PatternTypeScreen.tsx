@@ -4,27 +4,28 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
-import { PrimaryButton } from '../components/buttons/PrimaryButton';
+import { GameButton } from '../components/buttons/GameButton';
 import { PBPatternType } from '../types';
-import { PBColors, PBRadius, PBShadows } from '../theme';
+import { PBColors, PBRadius, PBShadows, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
+import { Image, ImageSourcePropType } from 'react-native';
 
 interface CategoryOption {
   id: PBPatternType;
   title: string;
   desc: string;
-  iconName: keyof typeof Ionicons.glyphMap;
+  asset: ImageSourcePropType;
   color: string;
 }
 
 const CATEGORIES: CategoryOption[] = [
-  { id: 'RANDOM', title: 'RANDOM', desc: 'Surprise me with any pattern!', iconName: 'dice-outline', color: '#19D3FF' },
-  { id: 'NUMBER', title: 'NUMBER', desc: 'Sequence & arithmetic', iconName: 'calculator-outline', color: '#19D3FF' },
-  { id: 'SHAPE', title: 'SHAPE', desc: 'Visual geometry', iconName: 'triangle-outline', color: '#FFD54A' },
-  { id: 'COLOR', title: 'COLOR', desc: 'Harmonic hue rhythm', iconName: 'color-palette-outline', color: '#FF6EA7' },
-  { id: 'COUNT', title: 'COUNT', desc: 'Quantity resonance', iconName: 'diamond-outline', color: '#38E58C' },
-  { id: 'DIRECTION', title: 'DIRECTION', desc: 'Vector & rotation', iconName: 'compass-outline', color: '#A78BFA' },
-  { id: 'MIXED', title: 'MIXED', desc: 'Fusion multi-rules', iconName: 'flash-outline', color: '#FB923C' },
+  { id: 'RANDOM', title: 'RANDOM', desc: 'Surprise me with any pattern!', asset: uiAssets.pattern.random, color: '#19D3FF' },
+  { id: 'NUMBER', title: 'NUMBER', desc: 'Sequence & arithmetic', asset: uiAssets.pattern.number, color: '#19D3FF' },
+  { id: 'SHAPE', title: 'SHAPE', desc: 'Visual geometry', asset: uiAssets.pattern.shape, color: '#FFD54A' },
+  { id: 'COLOR', title: 'COLOR', desc: 'Harmonic hue rhythm', asset: uiAssets.pattern.color, color: '#FF6EA7' },
+  { id: 'COUNT', title: 'COUNT', desc: 'Quantity resonance', asset: uiAssets.pattern.count, color: '#38E58C' },
+  { id: 'DIRECTION', title: 'DIRECTION', desc: 'Vector & rotation', asset: uiAssets.pattern.direction, color: '#A78BFA' },
+  { id: 'MIXED', title: 'MIXED', desc: 'Fusion multi-rules', asset: uiAssets.pattern.mixed, color: '#FB923C' },
 ];
 
 export const PatternTypeScreen: React.FC = () => {
@@ -64,12 +65,13 @@ export const PatternTypeScreen: React.FC = () => {
                     isSelected && PBShadows.cyanGlow,
                   ]}
                 >
-                  <View style={[styles.iconCircle, { borderColor: cat.color }]}>
-                    <Ionicons name={cat.iconName} size={22} color={cat.color} />
+                  <View style={styles.patternBtnHolder}>
+                    <Image
+                      source={cat.asset}
+                      style={styles.patternBtnImg}
+                      resizeMode="contain"
+                    />
                   </View>
-                  <Text style={[styles.title, isSelected && { color: cat.color }]}>
-                    {cat.title}
-                  </Text>
                   <Text style={styles.desc}>{cat.desc}</Text>
                 </Pressable>
               );
@@ -78,11 +80,11 @@ export const PatternTypeScreen: React.FC = () => {
         </ScrollView>
 
         <View style={styles.bottomBar}>
-          <PrimaryButton
-            title="START ADVENTURE ▶"
-            variant="cyan"
-            size="lg"
+          <GameButton
+            asset={uiAssets.actions.start}
+            height={68}
             onPress={handleStart}
+            accessibilityLabel="Start Adventure"
           />
         </View>
       </SafeAreaView>
@@ -126,25 +128,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: 120,
   },
-  iconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderWidth: 1,
+  patternBtnHolder: {
+    width: '100%',
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
-  icon: {
-    fontSize: 20,
-  },
-  title: {
-    fontSize: 13,
-    fontWeight: '900',
-    color: PBColors.textPrimary,
-    letterSpacing: 1,
-    marginBottom: 2,
+  patternBtnImg: {
+    width: '100%',
+    height: '100%',
   },
   desc: {
     fontSize: 9.5,

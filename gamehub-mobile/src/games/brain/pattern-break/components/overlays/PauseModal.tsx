@@ -6,10 +6,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { PrimaryButton } from '../buttons/PrimaryButton';
-import { SecondaryButton } from '../buttons/SecondaryButton';
-import { Mascot } from '../mascot/Mascot';
-import { PBColors, PBTypography, PBRadius, PBShadows } from '../../theme';
+import { GameButton } from '../buttons/GameButton';
+import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../../theme';
 
 interface PauseModalProps {
   score: number;
@@ -32,7 +30,6 @@ export const PauseModal: React.FC<PauseModalProps> = ({
         colors={['rgba(24, 47, 57, 0.96)', 'rgba(10, 23, 30, 0.98)']}
         style={styles.card}
       >
-        <Mascot pose="confident" size={80} />
         <Text style={styles.title}>GAME PAUSED</Text>
 
         <View style={styles.statsRow}>
@@ -48,12 +45,23 @@ export const PauseModal: React.FC<PauseModalProps> = ({
         </View>
 
         <View style={styles.actionsCol}>
-          <PrimaryButton title="RESUME" variant="cyan" onPress={onResume} />
-          <SecondaryButton title="RESTART" onPress={onRestart} />
-          <SecondaryButton
-            title="EXIT TO HOME"
+          <GameButton
+            asset={uiAssets.actions.resume}
+            height={58}
+            onPress={onResume}
+            accessibilityLabel="Resume Game"
+          />
+          <GameButton
+            asset={uiAssets.actions.restart}
+            height={54}
+            onPress={onRestart}
+            accessibilityLabel="Restart Level"
+          />
+          <GameButton
+            asset={uiAssets.actions.exit}
+            height={54}
             onPress={onExit}
-            style={styles.exitBtn}
+            accessibilityLabel="Exit to Home"
           />
         </View>
       </LinearGradient>

@@ -8,10 +8,10 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { GameButton } from '../components/buttons/GameButton';
 import { GameCard } from '../components/cards/GameCard';
-import { PrimaryButton } from '../components/buttons/PrimaryButton';
 import { PBDifficulty } from '../types';
-import { PBColors } from '../theme';
+import { PBColors, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const DifficultyScreen: React.FC = () => {
@@ -46,8 +46,7 @@ export const DifficultyScreen: React.FC = () => {
           <GameCard
             title="EXPLORER"
             subtitle="Single property rules. Relaxed 30s clock for beginners."
-            iconName="leaf-outline"
-            iconColor="#38E58C"
+            iconAsset={uiAssets.difficulty.easy}
             badge="EASY • 30s"
             selected={difficulty === 'EASY'}
             onPress={() => handleSelect('EASY')}
@@ -57,8 +56,7 @@ export const DifficultyScreen: React.FC = () => {
           <GameCard
             title="THINKER"
             subtitle="Dual-layer relationships. Balanced 20s clock for agile minds."
-            iconName="bulb-outline"
-            iconColor="#19D3FF"
+            iconAsset={uiAssets.difficulty.medium}
             badge="MEDIUM • 20s"
             selected={difficulty === 'MEDIUM'}
             onPress={() => handleSelect('MEDIUM')}
@@ -68,8 +66,7 @@ export const DifficultyScreen: React.FC = () => {
           <GameCard
             title="BREAKER"
             subtitle="Multi-vector complex rules. Intense 12s adrenaline clock."
-            iconName="flash"
-            iconColor="#FF5C61"
+            iconAsset={uiAssets.difficulty.hard}
             badge="HARD • 12s"
             selected={difficulty === 'HARD'}
             onPress={() => handleSelect('HARD')}
@@ -77,11 +74,11 @@ export const DifficultyScreen: React.FC = () => {
         </ScrollView>
 
         <View style={styles.bottomBar}>
-          <PrimaryButton
-            title="CONFIRM & CHOOSE PATTERN"
-            variant="cyan"
-            size="lg"
+          <GameButton
+            asset={uiAssets.actions.continue}
+            height={68}
             onPress={handleProceed}
+            accessibilityLabel="Continue to Pattern Selection"
           />
         </View>
       </SafeAreaView>

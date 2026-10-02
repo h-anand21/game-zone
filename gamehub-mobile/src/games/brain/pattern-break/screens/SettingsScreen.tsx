@@ -8,9 +8,9 @@ import { View, Text, StyleSheet, ScrollView, Switch, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { GameButton } from '../components/buttons/GameButton';
 import { GlassCard } from '../components/cards/GlassCard';
-import { SecondaryButton } from '../components/buttons/SecondaryButton';
-import { PBColors, PBTypography, PBRadius } from '../theme';
+import { PBColors, PBTypography, PBRadius, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const SettingsScreen: React.FC = () => {
@@ -90,10 +90,11 @@ export const SettingsScreen: React.FC = () => {
           {/* Section 3: Data & Storage */}
           <Text style={styles.sectionHeader}>ACCOUNT & DATA</Text>
           <GlassCard variant="neutral" style={styles.card}>
-            <SecondaryButton
-              title="RESET PROGRESS DATA"
+            <GameButton
+              asset={uiAssets.actions.remove}
+              height={52}
               onPress={handleReset}
-              style={styles.dangerBtn}
+              accessibilityLabel="Reset Progress Data"
             />
           </GlassCard>
 

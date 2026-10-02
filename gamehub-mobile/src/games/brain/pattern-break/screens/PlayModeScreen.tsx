@@ -11,7 +11,7 @@ import { ScreenHeader } from '../components/common/ScreenHeader';
 import { GameCard } from '../components/cards/GameCard';
 import { BottomNavigation } from '../components/navigation/BottomNavigation';
 import { PBPlayMode } from '../types';
-import { PBColors } from '../theme';
+import { PBColors, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const PlayModeScreen: React.FC = () => {
@@ -47,8 +47,7 @@ export const PlayModeScreen: React.FC = () => {
           <GameCard
             title="QUICK BREAK"
             subtitle="Rapid-fire random puzzles. Test your raw cognitive speed."
-            iconName="flash"
-            iconColor="#FFD54A"
+            iconAsset={uiAssets.icons.energy}
             badge="CLASSIC"
             selected={playMode === 'quick'}
             onPress={() => handleSelectMode('quick')}
@@ -59,8 +58,7 @@ export const PlayModeScreen: React.FC = () => {
           <GameCard
             title="PATTERN SHIFT"
             subtitle="Rules dynamically mutate mid-game. Adapt without breaking streak!"
-            iconName="sync"
-            iconColor="#19D3FF"
+            iconAsset={uiAssets.icons.shuffle}
             badge="DYNAMIC"
             selected={playMode === 'shift'}
             onPress={() => handleSelectMode('shift')}
@@ -71,8 +69,7 @@ export const PlayModeScreen: React.FC = () => {
           <GameCard
             title="DAILY BREAK"
             subtitle="One handcrafted daily matrix challenge with streak rewards."
-            iconName="calendar"
-            iconColor="#38E58C"
+            iconAsset={uiAssets.icons.calendar}
             badge="EVENT"
             selected={playMode === 'daily'}
             onPress={() => handleSelectMode('daily')}

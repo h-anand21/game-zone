@@ -10,11 +10,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
+import { GameButton } from '../components/buttons/GameButton';
 import { Mascot } from '../components/mascot/Mascot';
 import { PatternTile } from '../components/game/PatternTile';
-import { PrimaryButton } from '../components/buttons/PrimaryButton';
 import { GlassCard } from '../components/cards/GlassCard';
-import { PBColors, PBTypography, PBRadius, PBShadows } from '../theme';
+import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const HowToPlayScreen: React.FC = () => {
@@ -111,11 +111,11 @@ export const HowToPlayScreen: React.FC = () => {
         </View>
 
         <View style={styles.bottomBar}>
-          <PrimaryButton
-            title="LET'S PLAY ▶"
-            variant="cyan"
-            size="lg"
+          <GameButton
+            asset={uiAssets.actions.start}
+            height={68}
             onPress={handleStartGame}
+            accessibilityLabel="Start Playing"
           />
         </View>
       </SafeAreaView>

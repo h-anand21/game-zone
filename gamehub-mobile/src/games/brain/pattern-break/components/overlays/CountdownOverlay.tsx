@@ -6,7 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { Mascot } from '../mascot/Mascot';
+import { ScreenPlaque } from '../common/ScreenPlaque';
 import { PBColors, PBTypography, PBShadows } from '../../theme';
 
 interface CountdownOverlayProps {
@@ -56,7 +56,7 @@ export const CountdownOverlay: React.FC<CountdownOverlayProps> = ({ onComplete }
 
   return (
     <View style={styles.overlay}>
-      <Mascot pose="ready" size={130} />
+      <ScreenPlaque type="countdown" height={140} />
       <View style={styles.numberBox}>
         <Text style={[styles.countText, count === 'BREAK!' && styles.breakText]}>
           {count}

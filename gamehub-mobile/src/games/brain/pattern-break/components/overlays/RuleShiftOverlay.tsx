@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
+import { ScreenPlaque } from '../common/ScreenPlaque';
 import { PBColors, PBTypography, PBRadius, PBShadows } from '../../theme';
 
 interface RuleShiftOverlayProps {
@@ -47,8 +48,7 @@ export const RuleShiftOverlay: React.FC<RuleShiftOverlayProps> = ({
         colors={['rgba(6, 16, 24, 0.94)', 'rgba(8, 23, 32, 0.98)']}
         style={styles.card}
       >
-        <Text style={styles.badge}>⚡ ANOMALY DETECTED</Text>
-        <Text style={styles.shiftTitle}>RULE SHIFT</Text>
+        <ScreenPlaque type="rule_shift" height={130} />
 
         <View style={styles.morphRow}>
           <View style={styles.categoryPill}>

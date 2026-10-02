@@ -3,12 +3,10 @@ import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
-import { Mascot } from '../components/mascot/Mascot';
-import { RobotCompanion } from '../components/mascot/RobotCompanion';
-import { PrimaryButton } from '../components/buttons/PrimaryButton';
-import { SecondaryButton } from '../components/buttons/SecondaryButton';
+import { ScreenPlaque } from '../components/common/ScreenPlaque';
+import { GameButton } from '../components/buttons/GameButton';
 import { GlassCard } from '../components/cards/GlassCard';
-import { PBColors, PBTypography, PBRadius, PBShadows } from '../theme';
+import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const ResultScreen: React.FC = () => {
@@ -28,22 +26,8 @@ export const ResultScreen: React.FC = () => {
     <GameBackground variant="splash">
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.centerContainer}>
-          {/* Mascot & Companion Celebration */}
-          <View style={styles.mascotArea}>
-            <View style={styles.robotPos}>
-              <RobotCompanion size={50} mood="happy" />
-            </View>
-            <Mascot pose="victory" size={135} />
-          </View>
-
-          {/* Result Title */}
-          <View style={styles.titleWrapper}>
-            <Text style={styles.completeTitle}>ROUND COMPLETE!</Text>
-            <View style={styles.badgePill}>
-              <Ionicons name="trophy" size={12} color={PBColors.accent} style={{ marginRight: 4 }} />
-              <Text style={styles.badgeText}>PATTERN SCOUT RANK</Text>
-            </View>
-          </View>
+          {/* 3D Sculpted Result Plaque */}
+          <ScreenPlaque type="result" height={190} />
 
           {/* Big Score Card */}
           <GlassCard variant="cyan" style={styles.scoreCard}>
@@ -85,16 +69,17 @@ export const ResultScreen: React.FC = () => {
 
         {/* Action Buttons */}
         <View style={styles.actionsBar}>
-          <PrimaryButton
-            title="PLAY AGAIN"
-            variant="cyan"
-            size="lg"
-            icon="🔄"
+          <GameButton
+            asset={uiAssets.actions.playAgain}
+            height={64}
             onPress={startNewRun}
+            accessibilityLabel="Play Again"
           />
-          <SecondaryButton
-            title="RETURN TO HOME"
+          <GameButton
+            asset={uiAssets.actions.exit}
+            height={56}
             onPress={() => setScreen('home')}
+            accessibilityLabel="Return to Home"
           />
         </View>
       </SafeAreaView>
@@ -112,46 +97,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
-  },
-  mascotArea: {
-    position: 'relative',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  robotPos: {
-    position: 'absolute',
-    top: -12,
-    right: -28,
-  },
-  titleWrapper: {
-    alignItems: 'center',
-    gap: 6,
-  },
-  completeTitle: {
-    fontSize: 26,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    letterSpacing: 2,
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 6,
-  },
-  badgePill: {
-    backgroundColor: 'rgba(255, 213, 74, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: PBRadius.full,
-    borderWidth: 1,
-    borderColor: PBColors.accent,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  badgeText: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: PBColors.accent,
-    letterSpacing: 1,
+    gap: 10,
   },
   streakRow: {
     flexDirection: 'row',

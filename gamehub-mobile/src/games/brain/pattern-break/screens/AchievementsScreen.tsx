@@ -4,13 +4,13 @@
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { AchievementBadge } from '../components/badges/AchievementBadge';
-import { PBColors } from '../theme';
+import { PBColors, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 export const AchievementsScreen: React.FC = () => {
@@ -33,7 +33,7 @@ export const AchievementsScreen: React.FC = () => {
         >
           <View style={styles.headerInfo}>
             <View style={styles.badgeCounterRow}>
-              <Ionicons name="trophy" size={14} color={PBColors.accent} style={{ marginRight: 6 }} />
+              <Image source={uiAssets.icons.trophy} style={{ width: 18, height: 18, marginRight: 6 }} resizeMode="contain" />
               <Text style={styles.badgeCounter}>
                 {unlockedCount} / {achievements.length} UNLOCKED
               </Text>

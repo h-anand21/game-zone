@@ -4,29 +4,28 @@
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
 import Svg, { Polygon, Circle } from 'react-native-svg';
 import { AchievementItem } from '../../types';
-import { PBColors, PBTypography, PBRadius, PBShadows } from '../../theme';
+import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../../theme';
 
 interface AchievementBadgeProps {
   achievement: AchievementItem;
 }
 
-const getAchievementIconName = (icon: string): keyof typeof Ionicons.glyphMap => {
-  if (icon === 'flash' || icon === '⚡') return 'flash';
-  if (icon === 'eye' || icon === '👁️') return 'eye';
-  if (icon === 'trophy' || icon === '👑') return 'trophy';
-  if (icon === 'sync' || icon === '🌀') return 'sync';
-  return 'ribbon-outline';
+const getAchievementIconAsset = (icon: string) => {
+  if (icon === 'flash' || icon === '⚡') return uiAssets.icons.energy;
+  if (icon === 'eye' || icon === '👁️') return uiAssets.icons.search;
+  if (icon === 'trophy' || icon === '👑') return uiAssets.icons.crown;
+  if (icon === 'sync' || icon === '🌀') return uiAssets.icons.shuffle;
+  return uiAssets.icons.star;
 };
 
 export const AchievementBadge: React.FC<AchievementBadgeProps> = ({ achievement }) => {
   const { title, description, icon, unlocked, progress, maxProgress } = achievement;
   const percent = Math.min(100, Math.round((progress / maxProgress) * 100));
-  const iconName = getAchievementIconName(icon);
+  const iconAsset = getAchievementIconAsset(icon);
 
   return (
     <View style={[styles.container, unlocked && PBShadows.amberGlow]}>
@@ -57,10 +56,10 @@ export const AchievementBadge: React.FC<AchievementBadgeProps> = ({ achievement 
             />
           </Svg>
           <View style={styles.vectorIconHolder}>
-            <Ionicons
-              name={iconName}
-              size={18}
-              color={unlocked ? PBColors.accent : '#64748B'}
+            <Image
+              source={iconAsset}
+              style={[styles.crestIcon, !unlocked && { opacity: 0.4 }]}
+              resizeMode="contain"
             />
           </View>
         </View>
@@ -125,6 +124,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  crestIcon: {
+    width: 22,
+    height: 22,
   },
   detailsCol: {
     flex: 1,

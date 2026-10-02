@@ -4,7 +4,7 @@
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, ViewStyle, StyleProp } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ViewStyle, StyleProp, Image, ImageSourcePropType } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,7 @@ interface GameCardProps {
   subtitle: string;
   icon?: string | React.ReactNode;
   iconName?: keyof typeof Ionicons.glyphMap;
+  iconAsset?: ImageSourcePropType;
   iconColor?: string;
   badge?: string;
   selected?: boolean;
@@ -28,6 +29,7 @@ export const GameCard: React.FC<GameCardProps> = ({
   subtitle,
   icon,
   iconName,
+  iconAsset,
   iconColor = PBColors.primary,
   badge,
   selected = false,
@@ -71,7 +73,11 @@ export const GameCard: React.FC<GameCardProps> = ({
         <View style={[styles.topBevel, selected && styles.selectedTopBevel]} />
 
         {/* Left Icon or Badge */}
-        {iconName ? (
+        {iconAsset ? (
+          <View style={styles.iconCircle}>
+            <Image source={iconAsset} style={styles.assetIcon} resizeMode="contain" />
+          </View>
+        ) : iconName ? (
           <View style={styles.iconCircle}>
             <Ionicons name={iconName} size={22} color={iconColor} />
           </View>
@@ -152,6 +158,10 @@ const styles = StyleSheet.create({
   },
   iconText: {
     fontSize: 22,
+  },
+  assetIcon: {
+    width: 30,
+    height: 30,
   },
   infoCol: {
     flex: 1,

@@ -1,12 +1,12 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { GlassCard } from '../components/cards/GlassCard';
 import { BottomNavigation } from '../components/navigation/BottomNavigation';
-import { PBColors, PBTypography, PBRadius, PBShadows } from '../theme';
+import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
 const CATEGORY_VECTOR_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
@@ -52,7 +52,7 @@ export const ProgressScreen: React.FC = () => {
                 <Text style={styles.levelTitle}>LEVEL {playerLevel}</Text>
               </View>
               <View style={styles.rankBadge}>
-                <Ionicons name="trophy" size={20} color={PBColors.accent} />
+                <Image source={uiAssets.icons.trophy} style={{ width: 24, height: 24 }} resizeMode="contain" />
               </View>
             </View>
 
@@ -77,7 +77,8 @@ export const ProgressScreen: React.FC = () => {
 
           <View style={styles.masteryList}>
             {Object.entries(categoryMastery).map(([cat, data]) => {
-              const iconName = CATEGORY_VECTOR_ICONS[cat] || 'shapes-outline';
+              const catKey = cat.toLowerCase() as keyof typeof uiAssets.pattern;
+              const patternAsset = uiAssets.pattern[catKey];
               const iconColor =
                 cat === 'COLOR'
                   ? '#FF6EA7'
@@ -91,10 +92,11 @@ export const ProgressScreen: React.FC = () => {
                 <GlassCard key={cat} variant="neutral" style={styles.categoryCard}>
                   <View style={styles.catHeader}>
                     <View style={styles.catTitleGroup}>
-                      <View style={[styles.catIconCircle, { borderColor: iconColor }]}>
-                        <Ionicons name={iconName} size={15} color={iconColor} />
-                      </View>
-                      <Text style={styles.catName}>{cat}</Text>
+                      {patternAsset ? (
+                        <Image source={patternAsset} style={{ width: 70, height: 26 }} resizeMode="contain" />
+                      ) : (
+                        <Text style={styles.catName}>{cat}</Text>
+                      )}
                     </View>
                     <Text style={styles.catLvl}>LVL {data.level}</Text>
                   </View>
