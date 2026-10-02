@@ -1,22 +1,32 @@
+// ============================================================
+// PATTERN BREAKER — Progress & Mastery Screen
+// Authentic 3D Pattern Family Badges, Level Progression & XP
+// ============================================================
+
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, ImageSourcePropType } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { ScreenPlaque } from '../components/common/ScreenPlaque';
 import { GlassCard } from '../components/cards/GlassCard';
 import { BottomNavigation } from '../components/navigation/BottomNavigation';
-import { PBColors, PBTypography, PBRadius, PBShadows, uiAssets } from '../theme';
+import { PBColors, PBRadius, uiAssets } from '../theme';
 import { usePatternBreakStore } from '../store/patternBreakStore';
 
-const CATEGORY_VECTOR_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
-  NUMBER: 'calculator-outline',
-  SHAPE: 'triangle-outline',
-  COLOR: 'color-palette-outline',
-  COUNT: 'diamond-outline',
-  DIRECTION: 'compass-outline',
-  MIXED: 'flash-outline',
+interface CategoryConfig {
+  name: string;
+  asset: ImageSourcePropType;
+  color: string;
+}
+
+const CATEGORY_MAP: Record<string, CategoryConfig> = {
+  NUMBER: { name: 'NUMBER RULES', asset: uiAssets.pattern.number, color: '#19D3FF' },
+  SHAPE: { name: 'SHAPE GEOMETRY', asset: uiAssets.pattern.shape, color: '#FFD54A' },
+  COLOR: { name: 'COLOR HARMONY', asset: uiAssets.pattern.color, color: '#FF6EA7' },
+  COUNT: { name: 'COUNT LOGIC', asset: uiAssets.pattern.count, color: '#38E58C' },
+  DIRECTION: { name: 'DIRECTION VECTORS', asset: uiAssets.pattern.direction, color: '#A78BFA' },
+  MIXED: { name: 'HYBRID MATRIX', asset: uiAssets.pattern.mixed, color: '#FB923C' },
 };
 
 export const ProgressScreen: React.FC = () => {
@@ -26,11 +36,23 @@ export const ProgressScreen: React.FC = () => {
     playerLevel,
     playerXP,
     categoryMastery,
+    gamesPlayed,
+    totalBreakersFound,
+    bestStreak,
     goBack,
   } = usePatternBreakStore();
 
   const xpNeeded = 500;
   const xpPercent = Math.min(100, Math.round((playerXP / xpNeeded) * 100));
+
+  const rankTitle =
+    playerLevel >= 15
+      ? 'GRAND ARCHON'
+      : playerLevel >= 10
+      ? 'CHIEF COGNITIVE SCOUT'
+      : playerLevel >= 5
+      ? 'PATTERN VOYAGER'
+      : 'ACADEMY EXPLORER';
 
   return (
     <GameBackground variant="observatory">
@@ -45,77 +67,123 @@ export const ProgressScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
         >
           {/* 3D Sculpted Screen Name Badge */}
-          <ScreenPlaque type="progress" height={105} />
+          <ScreenPlaque type="progress" height={100} />
 
-          {/* Level & XP Hero Card */}
+          {/* Observatory Hero Progress Card */}
           <GlassCard variant="cyan" style={styles.heroCard}>
             <View style={styles.levelRow}>
-              <View>
-                <Text style={styles.levelSubtitle}>OBSERVATORY RANK</Text>
+              <View style={styles.rankInfo}>
+                <View style={styles.rankPill}>
+                  <Text style={styles.rankPillText}>{rankTitle}</Text>
+                </View>
                 <Text style={styles.levelTitle}>LEVEL {playerLevel}</Text>
               </View>
               <View style={styles.rankBadge}>
-                <Image source={uiAssets.icons.trophy} style={{ width: 24, height: 24 }} resizeMode="contain" />
+                <Image
+                  source={uiAssets.icons.trophy}
+                  style={styles.trophyIcon}
+                  resizeMode="contain"
+                />
               </View>
             </View>
 
             {/* XP Bar */}
             <View style={styles.xpBarContainer}>
               <View style={styles.xpInfoRow}>
-                <Text style={styles.xpLabel}>EXPERIENCE (XP)</Text>
+                <Text style={styles.xpLabel}>EXPERIENCE TO NEXT LEVEL</Text>
                 <Text style={styles.xpNumbers}>
-                  {playerXP} / {xpNeeded} XP
+                  {playerXP} / {xpNeeded} XP ({xpPercent}%)
                 </Text>
               </View>
               <View style={styles.xpTrack}>
                 <View style={[styles.xpFill, { width: `${xpPercent}%` }]} />
               </View>
             </View>
+
+            {/* Quick Metrics Strip */}
+            <View style={styles.metricsStrip}>
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>GAMES</Text>
+                <Text style={styles.metricValue}>{gamesPlayed}</Text>
+              </View>
+              <View style={styles.metricDivider} />
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>BREAKERS FOUND</Text>
+                <Text style={[styles.metricValue, { color: PBColors.primary }]}>
+                  {totalBreakersFound}
+                </Text>
+              </View>
+              <View style={styles.metricDivider} />
+              <View style={styles.metricItem}>
+                <Text style={styles.metricLabel}>BEST STREAK</Text>
+                <Text style={[styles.metricValue, { color: PBColors.accent }]}>
+                  {bestStreak}🔥
+                </Text>
+              </View>
+            </View>
           </GlassCard>
 
-          {/* Pattern Mastery Breakdown */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>PATTERN FAMILY MASTERY</Text>
+          {/* Section Header: PATTERN FAMILY MASTERY */}
+          <View style={styles.sectionHeaderRow}>
+            <View style={styles.cyanAccentBar} />
+            <View style={styles.sectionTextGroup}>
+              <Text style={styles.sectionTitle}>PATTERN FAMILY MASTERY</Text>
+              <Text style={styles.sectionSubtitle}>
+                Level up each cognitive domain through practice
+              </Text>
+            </View>
           </View>
 
+          {/* Authentic 3D Pattern Family Cards */}
           <View style={styles.masteryList}>
             {Object.entries(categoryMastery).map(([cat, data]) => {
-              const catKey = cat.toLowerCase() as keyof typeof uiAssets.pattern;
-              const patternAsset = uiAssets.pattern[catKey];
-              const iconColor =
-                cat === 'COLOR'
-                  ? '#FF6EA7'
-                  : cat === 'SHAPE'
-                  ? '#FFD54A'
-                  : cat === 'COUNT'
-                  ? '#38E58C'
-                  : PBColors.primary;
+              const cfg = CATEGORY_MAP[cat] || {
+                name: cat,
+                asset: uiAssets.pattern.mixed,
+                color: PBColors.primary,
+              };
 
               return (
-                <GlassCard key={cat} variant="neutral" style={styles.categoryCard}>
-                  <View style={styles.catHeader}>
-                    <View style={styles.catTitleGroup}>
-                      {patternAsset ? (
-                        <Image source={patternAsset} style={{ width: 70, height: 26 }} resizeMode="contain" />
-                      ) : (
-                        <Text style={styles.catName}>{cat}</Text>
-                      )}
-                    </View>
-                    <Text style={styles.catLvl}>LVL {data.level}</Text>
-                  </View>
-
-                  <View style={styles.catBarTrack}>
-                    <View
-                      style={[
-                        styles.catBarFill,
-                        {
-                          width: `${data.progress}%`,
-                          backgroundColor: iconColor,
-                        },
-                      ]}
+                <View key={cat} style={styles.masteryCard}>
+                  {/* Left: Authentic 3D Carved Badge Artwork */}
+                  <View style={styles.badgeContainer}>
+                    <Image
+                      source={cfg.asset}
+                      style={styles.patternBadgeImage}
+                      resizeMode="contain"
                     />
                   </View>
-                </GlassCard>
+
+                  {/* Right: Info + Level + Progress Bar */}
+                  <View style={styles.cardRightContent}>
+                    <View style={styles.cardHeaderLine}>
+                      <Text style={styles.categoryNameText}>{cfg.name}</Text>
+                      <View style={[styles.levelPill, { borderColor: cfg.color }]}>
+                        <Text style={[styles.levelPillText, { color: cfg.color }]}>
+                          LVL {data.level}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* Progress Bar with Percentage Tag */}
+                    <View style={styles.progressRow}>
+                      <View style={styles.barTrack}>
+                        <View
+                          style={[
+                            styles.barFill,
+                            {
+                              width: `${Math.max(6, data.progress)}%`,
+                              backgroundColor: cfg.color,
+                            },
+                          ]}
+                        />
+                      </View>
+                      <Text style={[styles.progressPercentText, { color: cfg.color }]}>
+                        {data.progress}%
+                      </Text>
+                    </View>
+                  </View>
+                </View>
               );
             })}
           </View>
@@ -136,42 +204,56 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 10,
+    paddingTop: 6,
     gap: 12,
   },
   heroCard: {
-    padding: 18,
+    padding: 16,
+    gap: 12,
   },
   levelRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
   },
-  levelSubtitle: {
-    fontSize: 10,
+  rankInfo: {
+    gap: 2,
+  },
+  rankPill: {
+    backgroundColor: 'rgba(255, 213, 74, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: PBColors.accent,
+    alignSelf: 'flex-start',
+    marginBottom: 2,
+  },
+  rankPillText: {
+    fontSize: 9,
     fontWeight: '900',
     color: PBColors.accent,
-    letterSpacing: 1.5,
+    letterSpacing: 1.2,
   },
   levelTitle: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '900',
     color: '#FFFFFF',
     letterSpacing: 1,
   },
   rankBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: 'rgba(255, 213, 74, 0.15)',
     borderWidth: 1.5,
     borderColor: PBColors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  rankEmoji: {
-    fontSize: 24,
+  trophyIcon: {
+    width: 26,
+    height: 26,
   },
   xpBarContainer: {
     gap: 6,
@@ -187,79 +269,158 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   xpNumbers: {
-    fontSize: 10,
+    fontSize: 10.5,
     fontWeight: '900',
     color: PBColors.primary,
   },
   xpTrack: {
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(25, 211, 255, 0.25)',
+    borderColor: 'rgba(25, 211, 255, 0.35)',
   },
   xpFill: {
     height: '100%',
     backgroundColor: PBColors.primary,
     borderRadius: 4,
   },
-  sectionHeader: {
-    marginTop: 6,
+  metricsStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    backgroundColor: 'rgba(0, 0, 0, 0.35)',
+    paddingVertical: 8,
+    borderRadius: PBRadius.md,
+    borderWidth: 1,
+    borderColor: 'rgba(25, 211, 255, 0.18)',
+  },
+  metricItem: {
+    alignItems: 'center',
+  },
+  metricLabel: {
+    fontSize: 8.5,
+    fontWeight: '900',
+    color: PBColors.textMuted,
+    letterSpacing: 1,
+    marginBottom: 2,
+  },
+  metricValue: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  metricDivider: {
+    width: 1,
+    height: 20,
+    backgroundColor: 'rgba(25, 211, 255, 0.2)',
+  },
+
+  // Section Header
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginTop: 4,
+    marginBottom: 2,
+  },
+  cyanAccentBar: {
+    width: 4,
+    height: 26,
+    borderRadius: 2,
+    backgroundColor: PBColors.primary,
+  },
+  sectionTextGroup: {
+    flex: 1,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    letterSpacing: 1.2,
-    lineHeight: 22,
+    fontSize: 14,
+    fontWeight: '900',
+    color: '#19D3FF',
+    letterSpacing: 1.5,
     textTransform: 'uppercase',
-    color: PBColors.textPrimary,
   },
+  sectionSubtitle: {
+    fontSize: 10.5,
+    fontWeight: '500',
+    color: PBColors.textSecondary,
+    marginTop: 1,
+  },
+
+  // Mastery Cards
   masteryList: {
     gap: 8,
   },
-  categoryCard: {
-    padding: 12,
+  masteryCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(16, 35, 44, 0.9)',
+    borderRadius: PBRadius.md,
+    borderWidth: 1.5,
+    borderColor: 'rgba(25, 211, 255, 0.22)',
+    padding: 10,
+    gap: 12,
   },
-  catHeader: {
+  badgeContainer: {
+    width: 106,
+    height: 46,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  patternBadgeImage: {
+    width: '100%',
+    height: '100%',
+  },
+  cardRightContent: {
+    flex: 1,
+    gap: 6,
+  },
+  cardHeaderLine: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
   },
-  catTitleGroup: {
+  categoryNameText: {
+    fontSize: 12.5,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 0.8,
+  },
+  levelPill: {
+    paddingHorizontal: 7,
+    paddingVertical: 1.5,
+    borderRadius: 6,
+    borderWidth: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  },
+  levelPillText: {
+    fontSize: 9.5,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+  progressRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  catIconCircle: {
-    width: 26,
-    height: 26,
-    borderRadius: 8,
-    borderWidth: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  catName: {
-    fontSize: 12,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    letterSpacing: 1,
-  },
-  catLvl: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: PBColors.accent,
-  },
-  catBarTrack: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  barTrack: {
+    flex: 1,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
-  catBarFill: {
+  barFill: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 3.5,
+  },
+  progressPercentText: {
+    fontSize: 11,
+    fontWeight: '900',
+    minWidth: 32,
+    textAlign: 'right',
   },
 });

@@ -61,9 +61,7 @@ const INITIAL_ACHIEVEMENTS: AchievementItem[] = [
     progress: 0,
     maxProgress: 1,
   },
-];
-
-interface PatternBreakState {
+];interface PatternBreakState {
   currentScreen: PBScreen;
   playMode: PBPlayMode;
   difficulty: PBDifficulty;
@@ -85,6 +83,7 @@ interface PatternBreakState {
   puzzle: PatternPuzzle | null;
   tileStates: Record<number, TileState>;
   revealedTileIndices: number[];
+  roundStartTime: number | null;
 
   // Modals & PowerUps
   isPaused: boolean;
@@ -94,7 +93,11 @@ interface PatternBreakState {
   isFrozen: boolean;
   scannedRule: string | null;
 
-  // Meta Progression
+  // Meta Progression & Real Player Analytics
+  gamesPlayed: number;
+  totalBreakersFound: number;
+  totalWrongTaps: number;
+  reactionTimes: number[];
   playerLevel: number;
   playerXP: number;
   categoryMastery: Record<string, { level: number; progress: number }>;
@@ -126,14 +129,14 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
   currentScreen: 'home',
   playMode: 'quick',
   difficulty: 'MEDIUM',
-  patternType: 'MIXED',
+  patternType: 'RANDOM', // Default is RANDOM / SHUFFLE
 
   score: 0,
   round: 1,
   timeLeft: 20,
-  bestScore: 24,
+  bestScore: 18,
   currentStreak: 0,
-  bestStreak: 7,
+  bestStreak: 6,
   correctCount: 0,
   wrongCount: 0,
   timeBonus: 0,
@@ -142,6 +145,7 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
   puzzle: null,
   tileStates: {},
   revealedTileIndices: [],
+  roundStartTime: null,
 
   isPaused: false,
   isRuleShift: false,
@@ -150,19 +154,23 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
   isFrozen: false,
   scannedRule: null,
 
-  playerLevel: 12,
-  playerXP: 340,
+  gamesPlayed: 12,
+  totalBreakersFound: 48,
+  totalWrongTaps: 6,
+  reactionTimes: [1.2, 1.4, 0.9, 1.1, 1.3],
+  playerLevel: 4,
+  playerXP: 220,
   categoryMastery: {
-    NUMBER: { level: 4, progress: 85 },
-    SHAPE: { level: 3, progress: 65 },
-    COLOR: { level: 5, progress: 95 },
-    COUNT: { level: 3, progress: 50 },
-    DIRECTION: { level: 2, progress: 35 },
-    MIXED: { level: 4, progress: 70 },
+    NUMBER: { level: 3, progress: 65 },
+    SHAPE: { level: 2, progress: 45 },
+    COLOR: { level: 4, progress: 80 },
+    COUNT: { level: 2, progress: 35 },
+    DIRECTION: { level: 1, progress: 20 },
+    MIXED: { level: 3, progress: 60 },
   },
   achievements: INITIAL_ACHIEVEMENTS,
   dailyCompleted: false,
-  dailyStreak: 6,
+  dailyStreak: 3,
 
   screenHistory: [],
   showExitModal: false,
@@ -198,9 +206,10 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
   setPatternType: (patternType) => set({ patternType }),
 
   startNewRun: () => {
-    const { patternType, difficulty } = get();
+    const { patternType, difficulty, gamesPlayed } = get();
     const puzzle = generatePatternPuzzle(patternType, difficulty, 9);
     set({
+      gamesPlayed: gamesPlayed + 1,
       score: 0,
       round: 1,
       timeLeft: puzzle.timeLimit,
@@ -211,6 +220,7 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
       puzzle,
       tileStates: {},
       revealedTileIndices: [],
+      roundStartTime: Date.now(),
       powerUps: { reveal: 2, freeze: 1, scan: 3 },
       isFrozen: false,
       scannedRule: null,
@@ -225,7 +235,7 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
     const { round, patternType, difficulty, playMode } = get();
     const nextRound = round + 1;
 
-    // Trigger Rule Shift every 4 rounds in Shift mode
+    // Trigger Rule Shift every 3 rounds in Shift mode
     if (playMode === 'shift' && nextRound % 3 === 0) {
       const fromType = patternType;
       const allTypes: PBPatternType[] = ['NUMBER', 'SHAPE', 'COLOR', 'COUNT', 'DIRECTION'];
@@ -239,6 +249,7 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
         timeLeft: puzzle.timeLimit,
         tileStates: {},
         revealedTileIndices: [],
+        roundStartTime: Date.now(),
         scannedRule: null,
         isRuleShift: true,
         ruleShiftData: { from: fromType, to: nextType },
@@ -248,12 +259,14 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
     }
 
     const puzzle = generatePatternPuzzle(patternType, difficulty, 9);
+
     set({
       round: nextRound,
       puzzle,
       timeLeft: puzzle.timeLimit,
       tileStates: {},
       revealedTileIndices: [],
+      roundStartTime: Date.now(),
       scannedRule: null,
       isRuleShift: false,
       lastFeedback: null,
@@ -262,8 +275,27 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
   },
 
   selectTile: (index: number) => {
-    const { puzzle, score, currentStreak, bestStreak, correctCount, wrongCount, timeLeft, bestScore } = get();
+    const {
+      puzzle,
+      score,
+      currentStreak,
+      bestStreak,
+      correctCount,
+      wrongCount,
+      timeLeft,
+      bestScore,
+      totalBreakersFound,
+      totalWrongTaps,
+      reactionTimes,
+      roundStartTime,
+      playerXP,
+      playerLevel,
+      categoryMastery,
+    } = get();
     if (!puzzle) return { isBreaker: false };
+
+    const now = Date.now();
+    const solveSeconds = roundStartTime ? Math.max(0.4, Math.min(10, (now - roundStartTime) / 1000)) : 1.2;
 
     if (index === puzzle.breakerIndex) {
       // Correct Breaker!
@@ -273,15 +305,36 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
       const newBestScore = Math.max(bestScore, newScore);
       const newTime = Math.min(30, timeLeft + 2); // +2s reward
 
+      // Update Category Mastery dynamically
+      const catKey = puzzle.patternType === 'RANDOM' ? 'MIXED' : puzzle.patternType;
+      const currentCat = categoryMastery[catKey] || { level: 1, progress: 0 };
+      const newProg = currentCat.progress + 10;
+      const updatedLevel = newProg >= 100 ? currentCat.level + 1 : currentCat.level;
+      const updatedCatProg = newProg >= 100 ? newProg - 100 : newProg;
+
+      const newXP = playerXP + 25;
+      const leveledUp = newXP >= 500;
+
       set({
         score: newScore,
         currentStreak: newStreak,
         bestStreak: newBestStreak,
         bestScore: newBestScore,
         correctCount: correctCount + 1,
+        totalBreakersFound: totalBreakersFound + 1,
+        reactionTimes: [...reactionTimes.slice(-19), Number(solveSeconds.toFixed(2))],
         timeLeft: newTime,
         lastFeedback: 'perfect',
         tileStates: { [index]: 'correct' },
+        playerXP: leveledUp ? newXP - 500 : newXP,
+        playerLevel: leveledUp ? playerLevel + 1 : playerLevel,
+        categoryMastery: {
+          ...categoryMastery,
+          [catKey]: {
+            level: updatedLevel,
+            progress: updatedCatProg,
+          },
+        },
       });
 
       return { isBreaker: true };
@@ -291,6 +344,7 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
       set({
         currentStreak: 0,
         wrongCount: wrongCount + 1,
+        totalWrongTaps: totalWrongTaps + 1,
         timeLeft: newTime,
         lastFeedback: 'wrong',
         tileStates: { [index]: 'wrong' },
@@ -368,6 +422,10 @@ export const usePatternBreakStore = create<PatternBreakState>((set, get) => ({
       bestStreak: 0,
       correctCount: 0,
       wrongCount: 0,
+      gamesPlayed: 0,
+      totalBreakersFound: 0,
+      totalWrongTaps: 0,
+      reactionTimes: [],
       playerLevel: 1,
       playerXP: 0,
       dailyStreak: 0,

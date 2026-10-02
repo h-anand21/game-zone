@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { GameBackground } from '../components/background/GameBackground';
 import { ScreenHeader } from '../components/common/ScreenHeader';
 import { ScreenPlaque } from '../components/common/ScreenPlaque';
+import { SectionTitle } from '../components/common/SectionTitle';
 import { GameButton } from '../components/buttons/GameButton';
 import { PBPatternType } from '../types';
 import { PBColors, PBRadius, PBShadows, uiAssets } from '../theme';
@@ -20,7 +21,7 @@ interface CategoryOption {
 }
 
 const CATEGORIES: CategoryOption[] = [
-  { id: 'RANDOM', title: 'RANDOM', desc: 'Surprise me with any pattern!', asset: uiAssets.pattern.random, color: '#19D3FF' },
+  { id: 'RANDOM', title: 'RANDOM', desc: 'Surprise me with any pattern!', asset: uiAssets.icons.shuffle, color: '#19D3FF' },
   { id: 'NUMBER', title: 'NUMBER', desc: 'Sequence & arithmetic', asset: uiAssets.pattern.number, color: '#19D3FF' },
   { id: 'SHAPE', title: 'SHAPE', desc: 'Visual geometry', asset: uiAssets.pattern.shape, color: '#FFD54A' },
   { id: 'COLOR', title: 'COLOR', desc: 'Harmonic hue rhythm', asset: uiAssets.pattern.color, color: '#FF6EA7' },
@@ -60,9 +61,12 @@ export const PatternTypeScreen: React.FC = () => {
           <ScreenPlaque type="pattern_type" height={105} />
 
           {/* Challenge Mode Selector */}
-          <View style={styles.headerInfo}>
-            <Text style={styles.subtext}>CHALLENGE RUN TYPE</Text>
-          </View>
+          <SectionTitle
+            title="CHALLENGE RUN TYPE"
+            subtitle="Choose speedrun pacing or dynamic rule-shifting"
+            badge="ACTIVE MODE"
+            accentColor={PBColors.primary}
+          />
 
           <View style={styles.modeSwitcherBar}>
             {(['quick', 'shift', 'daily'] as const).map((m) => {
@@ -82,9 +86,13 @@ export const PatternTypeScreen: React.FC = () => {
           </View>
 
           {/* Rule Family Selector */}
-          <View style={styles.headerInfo}>
-            <Text style={styles.subtext}>RULE FAMILY (DEFAULT: MIXED)</Text>
-          </View>
+          <SectionTitle
+            title="RULE FAMILY SELECTION"
+            subtitle="Lock into one family or keep dynamic random shuffle"
+            badge="DEFAULT: RANDOM"
+            accentColor={PBColors.accent}
+            style={{ marginTop: 12 }}
+          />
 
           <View style={styles.grid}>
             {CATEGORIES.map((cat) => {
