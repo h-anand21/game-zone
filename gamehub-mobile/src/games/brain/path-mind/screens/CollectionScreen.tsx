@@ -154,11 +154,11 @@ export const CollectionScreen: React.FC = () => {
           {filteredItems.map((item) => (
             <GamePanel
               key={item.id}
-              variant={item.unlocked ? 'stone' : 'dark'}
-              style={[
+              variant="stone"
+              style={StyleSheet.flatten([
                 styles.relicCard,
                 !item.unlocked && styles.lockedCard,
-              ]}
+              ])}
             >
               <View style={styles.iconCircle}>
                 <Text style={styles.relicIcon}>{item.unlocked ? item.icon : '🔒'}</Text>

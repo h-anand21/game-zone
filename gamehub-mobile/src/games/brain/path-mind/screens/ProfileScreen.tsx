@@ -55,7 +55,7 @@ export const ProfileScreen: React.FC = () => {
         <GamePanel variant="wood" style={styles.heroPanel}>
           <View style={styles.heroRow}>
             <View style={styles.avatarWrap}>
-              <ExplorerCharacter size={80} animated={true} />
+              <ExplorerCharacter size={80} />
             </View>
 
             <View style={styles.heroDetails}>
@@ -75,28 +75,24 @@ export const ProfileScreen: React.FC = () => {
           <StatCard
             label="CHAMBERS CONQUERED"
             value={`${currentLevel}`}
-            iconName="map"
             variant="cyan"
             style={styles.statItem}
           />
           <StatCard
             label="STARS GATHERED"
             value={`${stars} ★`}
-            iconName="star"
             variant="gold"
             style={styles.statItem}
           />
           <StatCard
             label="EXPEDITION STREAK"
             value={`${streak} DAYS`}
-            iconName="compass"
-            variant="wood"
+            variant="purple"
             style={styles.statItem}
           />
           <StatCard
             label="ACCURACY RATE"
             value="94.8%"
-            iconName="compass"
             variant="green"
             style={styles.statItem}
           />
