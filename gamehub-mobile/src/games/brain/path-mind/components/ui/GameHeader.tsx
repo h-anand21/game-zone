@@ -34,15 +34,13 @@ export const GameHeader: React.FC<GameHeaderProps> = ({
         {onBack && (
           <Pressable
             onPress={onBack}
-            style={styles.iconCircle}
             accessibilityLabel="Go Back"
           >
             <Image
-              source={pmAssets.buttons.wood}
-              style={styles.iconBg}
-              resizeMode="stretch"
+              source={pmAssets.buttons.back}
+              style={{ width: 72, height: 44 }}
+              resizeMode="contain"
             />
-            <Text style={styles.backArrowText}>←</Text>
           </Pressable>
         )}
       </View>

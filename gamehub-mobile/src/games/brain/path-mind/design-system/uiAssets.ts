@@ -12,14 +12,43 @@ export const pmAssets = {
     universal: require('../../../../../assets/game/path-mind/backgrounds/bg_universal.png') as ImageSourcePropType,
   },
   buttons: {
-    // Primary Large Buttons
-    green: require('../../../../../assets/game/path-mind/buttons/btn_01_250x115.png') as ImageSourcePropType,
-    gold: require('../../../../../assets/game/path-mind/buttons/btn_02_241x111.png') as ImageSourcePropType,
-    wood: require('../../../../../assets/game/path-mind/buttons/btn_03_232x108.png') as ImageSourcePropType,
-    blue: require('../../../../../assets/game/path-mind/buttons/btn_05_206x111.png') as ImageSourcePropType,
-    red: require('../../../../../assets/game/path-mind/buttons/btn_16_169x106.png') as ImageSourcePropType,
-    purple: require('../../../../../assets/game/path-mind/buttons/btn_20_227x112.png') as ImageSourcePropType,
-    cyan: require('../../../../../assets/game/path-mind/buttons/btn_10_209x110.png') as ImageSourcePropType,
+    // Primary CTAs (Illustrated 3D Text Included in Artwork)
+    playNow: require('../../../../../assets/game/path-mind/buttons/btn_play_now.png') as ImageSourcePropType,
+    playDaily: require('../../../../../assets/game/path-mind/buttons/btn_play_daily.png') as ImageSourcePropType,
+    startGame: require('../../../../../assets/game/path-mind/buttons/btn_start_game.png') as ImageSourcePropType,
+    play: require('../../../../../assets/game/path-mind/buttons/btn_play.png') as ImageSourcePropType,
+
+    // Modes & Editing
+    customMode: require('../../../../../assets/game/path-mind/buttons/btn_custom_mode.png') as ImageSourcePropType,
+    editPath: require('../../../../../assets/game/path-mind/buttons/btn_edit_path.png') as ImageSourcePropType,
+    lockPath: require('../../../../../assets/game/path-mind/buttons/btn_lock_path.png') as ImageSourcePropType,
+    dailyPath: require('../../../../../assets/game/path-mind/buttons/btn_daily_path.png') as ImageSourcePropType,
+    challenge: require('../../../../../assets/game/path-mind/buttons/btn_challenge.png') as ImageSourcePropType,
+
+    // Navigation & Core Sections
+    collection: require('../../../../../assets/game/path-mind/buttons/btn_collection.png') as ImageSourcePropType,
+    profile: require('../../../../../assets/game/path-mind/buttons/btn_profile.png') as ImageSourcePropType,
+    settings: require('../../../../../assets/game/path-mind/buttons/btn_settings.png') as ImageSourcePropType,
+    maps: require('../../../../../assets/game/path-mind/buttons/btn_maps.png') as ImageSourcePropType,
+    relics: require('../../../../../assets/game/path-mind/buttons/btn_relics.png') as ImageSourcePropType,
+    keys: require('../../../../../assets/game/path-mind/buttons/btn_keys.png') as ImageSourcePropType,
+    leaderboard: require('../../../../../assets/game/path-mind/buttons/btn_leaderboard.png') as ImageSourcePropType,
+    achievements: require('../../../../../assets/game/path-mind/buttons/btn_achievements.png') as ImageSourcePropType,
+    statistics: require('../../../../../assets/game/path-mind/buttons/btn_statistics.png') as ImageSourcePropType,
+    quests: require('../../../../../assets/game/path-mind/buttons/btn_quests.png') as ImageSourcePropType,
+    guide: require('../../../../../assets/game/path-mind/buttons/btn_guide.png') as ImageSourcePropType,
+
+    // Gameplay Controls
+    back: require('../../../../../assets/game/path-mind/buttons/btn_back.png') as ImageSourcePropType,
+    home: require('../../../../../assets/game/path-mind/buttons/btn_home.png') as ImageSourcePropType,
+    continueBtn: require('../../../../../assets/game/path-mind/buttons/btn_continue.png') as ImageSourcePropType,
+    restart: require('../../../../../assets/game/path-mind/buttons/btn_restart.png') as ImageSourcePropType,
+    pause: require('../../../../../assets/game/path-mind/buttons/btn_pause.png') as ImageSourcePropType,
+    undo: require('../../../../../assets/game/path-mind/buttons/btn_undo.png') as ImageSourcePropType,
+    clear: require('../../../../../assets/game/path-mind/buttons/btn_clear.png') as ImageSourcePropType,
+    exit: require('../../../../../assets/game/path-mind/buttons/btn_exit.png') as ImageSourcePropType,
+    next: require('../../../../../assets/game/path-mind/buttons/btn_next.png') as ImageSourcePropType,
+    share: require('../../../../../assets/game/path-mind/buttons/btn_share.png') as ImageSourcePropType,
   },
   icons: {
     heart: require('../../../../../assets/game/path-mind/icons/icon_18_165x146.png') as ImageSourcePropType,

@@ -1,31 +1,22 @@
 // ============================================================
 // PATH MIND — Component 03: GameButton
-// Unified tactile game button with artwork, haptic press, and glow
+// Authentic RPG Button with clean aspect ratio, NO stretching, NO duplicate text
 // ============================================================
 
 import React, { useRef } from 'react';
 import {
   Pressable,
-  Text,
   StyleSheet,
   ViewStyle,
   Image,
   ImageSourcePropType,
   Animated,
-  View,
 } from 'react-native';
-import { pmColors } from '../../design-system/colors';
-import { pmTypography } from '../../design-system/typography';
-import { pmRadii } from '../../design-system/radii';
-import { pmShadows } from '../../design-system/shadows';
 import { pmAssets } from '../../design-system/uiAssets';
 
 interface GameButtonProps {
-  label?: string;
-  icon?: ImageSourcePropType;
   buttonAsset?: ImageSourcePropType;
-  variant?: 'gold' | 'green' | 'blue' | 'wood' | 'cyan' | 'red';
-  size?: 'large' | 'medium' | 'small' | 'icon';
+  variant?: 'playNow' | 'playDaily' | 'startGame' | 'customMode' | 'collection' | 'profile' | 'settings' | 'back' | 'continue' | 'restart' | 'pause' | 'exit';
   width?: number;
   height?: number;
   disabled?: boolean;
@@ -35,11 +26,8 @@ interface GameButtonProps {
 }
 
 export const GameButton: React.FC<GameButtonProps> = ({
-  label,
-  icon,
   buttonAsset,
-  variant = 'gold',
-  size = 'medium',
+  variant = 'playNow',
   width,
   height,
   disabled = false,
@@ -52,7 +40,7 @@ export const GameButton: React.FC<GameButtonProps> = ({
   const handlePressIn = () => {
     Animated.timing(scaleAnim, {
       toValue: 0.94,
-      duration: 80,
+      duration: 70,
       useNativeDriver: true,
     }).start();
   };
@@ -61,38 +49,69 @@ export const GameButton: React.FC<GameButtonProps> = ({
     Animated.spring(scaleAnim, {
       toValue: 1,
       friction: 4,
-      tension: 100,
+      tension: 120,
       useNativeDriver: true,
     }).start();
   };
 
-  const getAsset = () => {
+  const getAsset = (): ImageSourcePropType => {
     if (buttonAsset) return buttonAsset;
     switch (variant) {
-      case 'green':
-        return pmAssets.buttons.green;
-      case 'blue':
-        return pmAssets.buttons.blue;
-      case 'wood':
-        return pmAssets.buttons.wood;
-      case 'cyan':
-        return pmAssets.buttons.cyan;
-      case 'red':
-        return pmAssets.buttons.red;
-      case 'gold':
+      case 'playDaily':
+        return pmAssets.buttons.playDaily;
+      case 'startGame':
+        return pmAssets.buttons.startGame;
+      case 'customMode':
+        return pmAssets.buttons.customMode;
+      case 'collection':
+        return pmAssets.buttons.collection;
+      case 'profile':
+        return pmAssets.buttons.profile;
+      case 'settings':
+        return pmAssets.buttons.settings;
+      case 'back':
+        return pmAssets.buttons.back;
+      case 'continue':
+        return pmAssets.buttons.continueBtn;
+      case 'restart':
+        return pmAssets.buttons.restart;
+      case 'pause':
+        return pmAssets.buttons.pause;
+      case 'exit':
+        return pmAssets.buttons.exit;
+      case 'playNow':
       default:
-        return pmAssets.buttons.gold;
+        return pmAssets.buttons.playNow;
     }
   };
 
-  const getDefaultDimensions = () => {
-    if (size === 'icon') return { w: width || 48, h: height || 48 };
-    if (size === 'large') return { w: width || 260, h: height || 64 };
-    if (size === 'small') return { w: width || 140, h: height || 42 };
-    return { w: width || 210, h: height || 52 };
+  // Natural aspect ratio for these buttons is roughly 2.1 to 2.2
+  // We specify clean proportional dimensions with NO STRETCHING
+  const getDimensions = () => {
+    if (width && height) return { w: width, h: height };
+    if (width && !height) return { w: width, h: Math.round(width / 2.1) };
+    if (!width && height) return { w: Math.round(height * 2.1), h: height };
+
+    // Standard preset sizes
+    switch (variant) {
+      case 'playNow':
+        return { w: 250, h: 72 };
+      case 'playDaily':
+      case 'startGame':
+      case 'customMode':
+        return { w: 220, h: 62 };
+      case 'collection':
+      case 'profile':
+        return { w: 160, h: 54 };
+      case 'back':
+      case 'continue':
+        return { w: 150, h: 50 };
+      default:
+        return { w: 200, h: 58 };
+    }
   };
 
-  const dims = getDefaultDimensions();
+  const dims = getDimensions();
 
   return (
     <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, disabled && styles.disabled, style]}>
@@ -101,44 +120,14 @@ export const GameButton: React.FC<GameButtonProps> = ({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={disabled}
-        accessibilityLabel={accessibilityLabel || label}
+        accessibilityLabel={accessibilityLabel || variant}
         style={[styles.pressable, { width: dims.w, height: dims.h }]}
       >
-        {/* Layer 1: Authentic RPG Button Artwork */}
         <Image
           source={getAsset()}
-          style={[styles.buttonBg, { width: dims.w, height: dims.h }]}
-          resizeMode="stretch"
+          style={{ width: dims.w, height: dims.h }}
+          resizeMode="contain"
         />
-
-        {/* Layer 2: Label & Icon Content */}
-        <View style={styles.contentRow}>
-          {icon && (
-            <Image
-              source={icon}
-              style={[
-                styles.buttonIcon,
-                size === 'large' ? styles.iconLarge : size === 'small' ? styles.iconSmall : styles.iconMedium,
-              ]}
-              resizeMode="contain"
-            />
-          )}
-          {label && (
-            <Text
-              style={[
-                size === 'large'
-                  ? pmTypography.buttonLarge
-                  : size === 'small'
-                  ? pmTypography.buttonSmall
-                  : pmTypography.buttonMedium,
-                styles.labelText,
-              ]}
-              numberOfLines={1}
-            >
-              {label}
-            </Text>
-          )}
-        </View>
       </Pressable>
     </Animated.View>
   );
@@ -148,40 +137,8 @@ const styles = StyleSheet.create({
   pressable: {
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
-    ...pmShadows.medium,
-  },
-  buttonBg: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-  },
-  contentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingHorizontal: 12,
-  },
-  labelText: {
-    textAlign: 'center',
-  },
-  buttonIcon: {
-    marginRight: 4,
-  },
-  iconLarge: {
-    width: 26,
-    height: 26,
-  },
-  iconMedium: {
-    width: 22,
-    height: 22,
-  },
-  iconSmall: {
-    width: 18,
-    height: 18,
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.45,
   },
 });

@@ -1,16 +1,14 @@
 // ============================================================
 // PATH MIND — Screen 02: HomeScreen (Master Reference Implementation)
-// Full-screen Pixel Adventure background, Hero Title Plaque,
-// Tactical Button Family, Resource HUD, and Explorer Hero
+// Pure fantasy world illustration, authentic RPG buttons with NO text overlay,
+// NO stretching, and unobstructed background artwork
 // ============================================================
 
 import React from 'react';
 import { View, StyleSheet, Dimensions, Text, Pressable, Image } from 'react-native';
 import { GameBackground } from '../components/ui/GameBackground';
-import { TitlePlaque } from '../components/ui/TitlePlaque';
 import { GameButton } from '../components/ui/GameButton';
 import { HudResourceBar } from '../components/ui/HudResourceBar';
-import { ExplorerCharacter } from '../components/ui/ExplorerCharacter';
 import { usePathMindStore } from '../store/pathMindStore';
 import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
@@ -31,10 +29,10 @@ export const HomeScreen: React.FC = () => {
   } = usePathMindStore();
 
   return (
-    <GameBackground variant="home" overlayDarkness={0.12}>
+    <GameBackground variant="home" overlayDarkness={0.08}>
       <View style={styles.container}>
         {/* ============================================================ */}
-        {/* 1. TOP HUD BAR: Exit, Title, Hearts & Coins                  */}
+        {/* 1. TOP HUD BAR: Exit, Hearts, Coins & Settings               */}
         {/* ============================================================ */}
         <View style={styles.topBar}>
           {/* Exit to GameHub */}
@@ -44,11 +42,10 @@ export const HomeScreen: React.FC = () => {
             accessibilityLabel="Exit to GameHub"
           >
             <Image
-              source={pmAssets.buttons.wood}
-              style={styles.iconBg}
-              resizeMode="stretch"
+              source={pmAssets.buttons.back}
+              style={styles.backBtnImage}
+              resizeMode="contain"
             />
-            <Text style={styles.backArrowText}>←</Text>
           </Pressable>
 
           {/* Right Resource Counters & Settings */}
@@ -69,100 +66,75 @@ export const HomeScreen: React.FC = () => {
         </View>
 
         {/* ============================================================ */}
-        {/* 2. CENTER HERO: PATH MIND Title Plaque                       */}
+        {/* 2. ARTWORK STAGE: Clean breathing space                     */}
+        {/* Shows the majestic Path Mind logo & explorer in background   */}
         {/* ============================================================ */}
-        <View style={styles.titleArea}>
-          <TitlePlaque
-            title="PATH MIND"
-            subtitle="REMEMBER THE WAY"
-            variant="gold"
-            size="large"
-            style={styles.titlePlaque}
-          />
-
-          {/* Daily Streak & Expedition Region Badge */}
+        <View style={styles.sceneryStage}>
+          {/* Subtle Chamber Region Tag */}
           <View style={styles.expeditionBadge}>
             <Image source={pmAssets.icons.compass} style={styles.badgeIcon} resizeMode="contain" />
             <Text style={styles.expeditionText}>
               CHAMBER {currentLevel} • ANCIENT VALLEY
             </Text>
             <View style={styles.streakPill}>
-              <Text style={styles.streakText}>🔥 {streak} STREAK</Text>
+              <Text style={styles.streakText}>🔥 {streak}</Text>
             </View>
           </View>
         </View>
 
         {/* ============================================================ */}
-        {/* 3. HERO ENVIRONMENT: Explorer Character                     */}
-        {/* ============================================================ */}
-        <View style={styles.heroArea}>
-          <ExplorerCharacter size={80} mood="idle" />
-        </View>
-
-        {/* ============================================================ */}
-        {/* 4. ACTIONS STACK: Play Now, Build Path, Play Daily           */}
+        {/* 3. PRIMARY ACTIONS: Pure authentic RPG buttons, NO stretch  */}
         {/* ============================================================ */}
         <View style={styles.actionSection}>
-          {/* Main Primary Action: PLAY NOW */}
+          {/* PLAY NOW CTA */}
           <GameButton
-            label="PLAY NOW"
-            icon={pmAssets.icons.crown}
-            variant="gold"
-            size="large"
-            width={Math.min(SCREEN_WIDTH - 60, 270)}
-            height={66}
+            variant="playNow"
+            width={Math.min(SCREEN_WIDTH - 64, 250)}
+            height={72}
             onPress={() => setScreen('modes')}
-            accessibilityLabel="Play Game"
+            accessibilityLabel="Play Now"
           />
 
-          {/* Secondary Action: BUILD YOUR PATH */}
+          {/* PLAY DAILY CTA */}
           <GameButton
-            label="BUILD YOUR PATH"
-            icon={pmAssets.icons.map}
-            variant="wood"
-            size="medium"
-            width={Math.min(SCREEN_WIDTH - 80, 240)}
-            height={52}
-            onPress={() => setScreen('builder')}
-            accessibilityLabel="Build Custom Path"
-            style={{ marginTop: 10 }}
-          />
-
-          {/* Tertiary Action: PLAY DAILY */}
-          <GameButton
-            label="PLAY DAILY"
-            icon={pmAssets.icons.star}
-            variant="cyan"
-            size="medium"
-            width={Math.min(SCREEN_WIDTH - 80, 240)}
-            height={50}
+            variant="playDaily"
+            width={Math.min(SCREEN_WIDTH - 90, 220)}
+            height={62}
             onPress={() => setScreen('daily')}
-            accessibilityLabel="Play Daily Challenge"
-            style={{ marginTop: 8 }}
+            accessibilityLabel="Play Daily"
+            style={{ marginTop: 6 }}
+          />
+
+          {/* CUSTOM MODE CTA */}
+          <GameButton
+            variant="customMode"
+            width={Math.min(SCREEN_WIDTH - 90, 220)}
+            height={62}
+            onPress={() => setScreen('builder')}
+            accessibilityLabel="Custom Mode"
+            style={{ marginTop: 6 }}
           />
         </View>
 
         {/* ============================================================ */}
-        {/* 5. BOTTOM NAVIGATION: Profile & Collection                   */}
+        {/* 4. BOTTOM NAVIGATION: Authentic Collection & Profile buttons */}
         {/* ============================================================ */}
         <View style={styles.bottomBar}>
-          <Pressable
-            style={styles.navCard}
-            onPress={() => setScreen('profile')}
-            accessibilityLabel="Open Profile"
-          >
-            <Image source={pmAssets.icons.backpack} style={styles.navIcon} resizeMode="contain" />
-            <Text style={styles.navLabel}>PROFILE</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.navCard}
+          <GameButton
+            variant="collection"
+            width={150}
+            height={52}
             onPress={() => setScreen('collection')}
-            accessibilityLabel="Open Relic Collection"
-          >
-            <Image source={pmAssets.icons.chest} style={styles.navIcon} resizeMode="contain" />
-            <Text style={styles.navLabel}>COLLECTION</Text>
-          </Pressable>
+            accessibilityLabel="Collection"
+          />
+
+          <GameButton
+            variant="profile"
+            width={150}
+            height={52}
+            onPress={() => setScreen('profile')}
+            accessibilityLabel="Profile"
+          />
         </View>
       </View>
     </GameBackground>
@@ -174,7 +146,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     justifyContent: 'space-between',
-    paddingBottom: 8,
+    paddingBottom: 10,
   },
   topBar: {
     flexDirection: 'row',
@@ -184,24 +156,12 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   iconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
-    overflow: 'hidden',
-    ...pmShadows.medium,
   },
-  iconBg: {
-    ...StyleSheet.absoluteFill,
-    width: '100%',
-    height: '100%',
-  },
-  backArrowText: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: pmColors.textGold,
+  backBtnImage: {
+    width: 68,
+    height: 44,
   },
   topRightGroup: {
     flexDirection: 'row',
@@ -223,24 +183,23 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
-  titleArea: {
+  sceneryStage: {
+    flex: 1,
     alignItems: 'center',
-    marginTop: 8,
-  },
-  titlePlaque: {
-    width: Math.min(SCREEN_WIDTH - 40, 310),
+    justifyContent: 'flex-start',
+    paddingTop: 110, // Lets the background's built-in "PATH MIND - REMEMBER THE WAY" logo shine clearly
   },
   expeditionBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(9, 16, 22, 0.88)',
+    backgroundColor: 'rgba(9, 16, 22, 0.9)',
     borderWidth: 1.5,
-    borderColor: '#263745',
+    borderColor: '#2D3E4F',
     borderRadius: pmRadii.pill,
     paddingHorizontal: 12,
     paddingVertical: 4,
-    marginTop: 10,
     gap: 6,
+    ...pmShadows.medium,
   },
   badgeIcon: {
     width: 14,
@@ -264,42 +223,15 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: pmColors.goldBright,
   },
-  heroArea: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 90,
-  },
   actionSection: {
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   bottomBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 16,
-    marginBottom: 6,
-  },
-  navCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(14, 24, 34, 0.92)',
-    borderWidth: 1.5,
-    borderColor: pmColors.stoneBorder,
-    borderRadius: pmRadii.lg,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    gap: 8,
-    ...pmShadows.soft,
-  },
-  navIcon: {
-    width: 22,
-    height: 22,
-  },
-  navLabel: {
-    ...pmTypography.caption,
-    fontSize: 11,
-    color: pmColors.textGold,
+    marginBottom: 4,
   },
 });
