@@ -1,7 +1,7 @@
 // ============================================================
 // PATH MIND — Screen 02: HomeScreen (Master Reference Implementation)
-// Pure fantasy world illustration, authentic RPG buttons with NO text overlay,
-// NO stretching, and unobstructed background artwork
+// Pure fantasy world illustration, authentic vector RPG buttons,
+// unobstructed background artwork, and tactile navigation
 // ============================================================
 
 import React from 'react';
@@ -29,24 +29,23 @@ export const HomeScreen: React.FC = () => {
   } = usePathMindStore();
 
   return (
-    <GameBackground variant="home" overlayDarkness={0.08}>
+    <GameBackground variant="home" overlayDarkness={0.06}>
       <View style={styles.container}>
         {/* ============================================================ */}
         {/* 1. TOP HUD BAR: Exit, Hearts, Coins & Settings               */}
         {/* ============================================================ */}
         <View style={styles.topBar}>
           {/* Exit to GameHub */}
-          <Pressable
-            style={styles.iconCircle}
+          <GameButton
+            label="EXIT"
+            iconName="arrow-left"
+            variant="red"
+            size="small"
+            width={84}
+            height={38}
             onPress={() => setShowExitModal(true)}
             accessibilityLabel="Exit to GameHub"
-          >
-            <Image
-              source={pmAssets.buttons.back}
-              style={styles.backBtnImage}
-              resizeMode="contain"
-            />
-          </Pressable>
+          />
 
           {/* Right Resource Counters & Settings */}
           <View style={styles.topRightGroup}>
@@ -67,7 +66,7 @@ export const HomeScreen: React.FC = () => {
 
         {/* ============================================================ */}
         {/* 2. ARTWORK STAGE: Clean breathing space                     */}
-        {/* Shows the majestic Path Mind logo & explorer in background   */}
+        {/* Background showcases the majestic Path Mind logo & explorer */}
         {/* ============================================================ */}
         <View style={styles.sceneryStage}>
           {/* Subtle Chamber Region Tag */}
@@ -83,55 +82,70 @@ export const HomeScreen: React.FC = () => {
         </View>
 
         {/* ============================================================ */}
-        {/* 3. PRIMARY ACTIONS: Pure authentic RPG buttons, NO stretch  */}
+        {/* 3. PRIMARY ACTIONS: Tactile Vector RPG Buttons               */}
         {/* ============================================================ */}
         <View style={styles.actionSection}>
           {/* PLAY NOW CTA */}
           <GameButton
-            variant="playNow"
-            width={Math.min(SCREEN_WIDTH - 64, 250)}
-            height={72}
+            label="PLAY NOW"
+            iconName="play"
+            variant="gold"
+            size="large"
+            width={Math.min(SCREEN_WIDTH - 64, 260)}
+            height={64}
             onPress={() => setScreen('modes')}
             accessibilityLabel="Play Now"
           />
 
           {/* PLAY DAILY CTA */}
           <GameButton
-            variant="playDaily"
-            width={Math.min(SCREEN_WIDTH - 90, 220)}
-            height={62}
+            label="PLAY DAILY"
+            iconName="star"
+            variant="cyan"
+            size="medium"
+            width={Math.min(SCREEN_WIDTH - 84, 230)}
+            height={52}
             onPress={() => setScreen('daily')}
             accessibilityLabel="Play Daily"
-            style={{ marginTop: 6 }}
+            style={{ marginTop: 8 }}
           />
 
-          {/* CUSTOM MODE CTA */}
+          {/* BUILD YOUR PATH CTA */}
           <GameButton
-            variant="customMode"
-            width={Math.min(SCREEN_WIDTH - 90, 220)}
-            height={62}
+            label="BUILD YOUR PATH"
+            iconName="map"
+            variant="wood"
+            size="medium"
+            width={Math.min(SCREEN_WIDTH - 84, 230)}
+            height={52}
             onPress={() => setScreen('builder')}
-            accessibilityLabel="Custom Mode"
-            style={{ marginTop: 6 }}
+            accessibilityLabel="Build Your Path"
+            style={{ marginTop: 8 }}
           />
         </View>
 
         {/* ============================================================ */}
-        {/* 4. BOTTOM NAVIGATION: Authentic Collection & Profile buttons */}
+        {/* 4. BOTTOM NAVIGATION: Collection & Profile buttons           */}
         {/* ============================================================ */}
         <View style={styles.bottomBar}>
           <GameButton
-            variant="collection"
-            width={150}
-            height={52}
+            label="COLLECTION"
+            iconName="chest"
+            variant="wood"
+            size="small"
+            width={140}
+            height={44}
             onPress={() => setScreen('collection')}
             accessibilityLabel="Collection"
           />
 
           <GameButton
-            variant="profile"
-            width={150}
-            height={52}
+            label="PROFILE"
+            iconName="user"
+            variant="cyan"
+            size="small"
+            width={140}
+            height={44}
             onPress={() => setScreen('profile')}
             accessibilityLabel="Profile"
           />
@@ -154,14 +168,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     zIndex: 10,
     paddingTop: 4,
-  },
-  iconCircle: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  backBtnImage: {
-    width: 68,
-    height: 44,
   },
   topRightGroup: {
     flexDirection: 'row',
@@ -225,7 +231,7 @@ const styles = StyleSheet.create({
   },
   actionSection: {
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   bottomBar: {
     flexDirection: 'row',

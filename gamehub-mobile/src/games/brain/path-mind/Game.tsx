@@ -8,6 +8,17 @@ import { View, StyleSheet, BackHandler } from 'react-native';
 import type { GameEngine } from '../../engine/GameEngine';
 import { usePathMindStore } from './store/pathMindStore';
 import { HomeScreen } from './screens/HomeScreen';
+import { ModeSelectionScreen } from './screens/ModeSelectionScreen';
+import { DifficultyScreen } from './screens/DifficultyScreen';
+import { HowToPlayScreen } from './screens/HowToPlayScreen';
+import { WorldMapScreen } from './screens/WorldMapScreen';
+import { GameplayScreen } from './screens/GameplayScreen';
+import { ResultScreen } from './screens/ResultScreen';
+import { BuildPathScreen } from './screens/BuildPathScreen';
+import { DailyPathScreen } from './screens/DailyPathScreen';
+import { CollectionScreen } from './screens/CollectionScreen';
+import { ProfileScreen } from './screens/ProfileScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
 import { ExitConfirmationModal } from './components/overlays/ExitConfirmationModal';
 
 interface PathMindProps {
@@ -58,6 +69,28 @@ export const PathMindGame: React.FC<PathMindProps> = ({ onFinish }) => {
 
   const renderActiveScreen = () => {
     switch (currentScreen) {
+      case 'modes':
+        return <ModeSelectionScreen />;
+      case 'difficulty':
+        return <DifficultyScreen />;
+      case 'how_to_play':
+        return <HowToPlayScreen />;
+      case 'world_map':
+        return <WorldMapScreen />;
+      case 'gameplay':
+        return <GameplayScreen />;
+      case 'result':
+        return <ResultScreen />;
+      case 'builder':
+        return <BuildPathScreen />;
+      case 'daily':
+        return <DailyPathScreen />;
+      case 'collection':
+        return <CollectionScreen />;
+      case 'profile':
+        return <ProfileScreen />;
+      case 'settings':
+        return <SettingsScreen />;
       case 'home':
       default:
         return <HomeScreen />;
