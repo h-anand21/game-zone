@@ -109,6 +109,32 @@ export const GameplayScreen: React.FC = () => {
     return () => clearInterval(interval);
   }, [phase, hapticsEnabled]);
 
+  // Advance to next chamber immediately without any Next button
+  const advanceToNextChamber = useCallback(() => {
+    nextLevel();
+    const nextLvl = currentLevel + 1;
+
+    const nextTargetLength =
+      selectedDifficulty === 'HARD'
+        ? Math.min(8 + Math.floor(nextLvl / 2), 12)
+        : selectedDifficulty === 'MEDIUM'
+        ? Math.min(6 + Math.floor(nextLvl / 3), 9)
+        : Math.min(4 + Math.floor(nextLvl / 4), 6);
+
+    const newPath = generatePath(gridSize, nextTargetLength);
+    setPath(newPath);
+    setPlayerPath([]);
+    setWrongPos(null);
+    setIsAdvancing(false);
+
+    const memoSeconds =
+      selectedDifficulty === 'HARD' ? 2.5 : selectedDifficulty === 'MEDIUM' ? 3.5 : 4.5;
+    setTotalMemoTime(memoSeconds);
+    setTimeLeft(memoSeconds);
+    setPhase('memorize');
+    setStatusMessage('MEMORIZE THE PATH');
+  }, [currentLevel, gridSize, nextLevel, selectedDifficulty]);
+
   // Handle tile press or continuous finger drag
   const handleTilePress = (row: number, col: number) => {
     if (phase !== 'recall' || isAdvancing) return;
@@ -164,13 +190,13 @@ export const GameplayScreen: React.FC = () => {
         setStatusMessage(`CHAMBER ${currentLevel} CONQUERED! ★★★`);
         addCoins(25);
         if (hapticsEnabled) {
-          Vibration.vibrate([0, 60, 40, 80]);
+          Vibration.vibrate([0, 50, 40, 70]);
         }
 
-        // Automatic progression to next level without any Next button!
+        // Automatic progression to next level in 750ms!
         setTimeout(() => {
-          nextLevel(); // Automatically increments currentLevel in store, triggering initChamber
-        }, 1100);
+          advanceToNextChamber();
+        }, 750);
       } else {
         setStatusMessage(`STEP ${nextPlayerPath.length}/${path.length} • COMBO x${newCombo}`);
       }

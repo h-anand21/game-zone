@@ -145,6 +145,7 @@ export const ModeSelectionScreen: React.FC = () => {
             }}
           >
             <GameTitlePlaque
+              imageSource={pmAssets.plaques.gameplay}
               title="CHOOSE YOUR MODE"
               subtitle="SELECT EXPEDITION DISCIPLINE"
               style={styles.titlePlaque}

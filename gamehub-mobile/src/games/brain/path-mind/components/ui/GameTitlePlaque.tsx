@@ -1,12 +1,12 @@
 // ============================================================
 // PATH MIND — Component: GameTitlePlaque
 // Carved Stone & Wood Fantasy Plaque with Metal Bolts & Glowing Trim
-// Reusable across screens for dominant, tactile title signage
+// Supports authentic atlas image plaque from user reference or vector signage
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions, ViewStyle } from 'react-native';
-import Svg, { Path, Circle, Rect } from 'react-native-svg';
+import { View, Text, StyleSheet, Dimensions, ViewStyle, Image, ImageSourcePropType } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { pmColors } from '../../design-system/colors';
 import { pmTypography } from '../../design-system/typography';
 import { pmRadii } from '../../design-system/radii';
@@ -15,16 +15,41 @@ import { pmShadows } from '../../design-system/shadows';
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface GameTitlePlaqueProps {
+  imageSource?: ImageSourcePropType;
   title?: string;
   subtitle?: string;
+  width?: number;
+  height?: number;
   style?: ViewStyle;
 }
 
 export const GameTitlePlaque: React.FC<GameTitlePlaqueProps> = ({
+  imageSource,
   title = 'CHOOSE YOUR MODE',
   subtitle = 'SELECT EXPEDITION DISCIPLINE',
+  width,
+  height,
   style,
 }) => {
+  // 1. If an authentic cropped plaque atlas image is provided (from user reference), render it directly
+  if (imageSource) {
+    const plaqueWidth = width || Math.min(SCREEN_WIDTH - 36, 320);
+    const plaqueHeight = height || Math.round(plaqueWidth * (170 / 400)); // Natural ~2.35:1 aspect ratio
+
+    return (
+      <View style={[styles.outerContainer, style]}>
+        <View style={styles.imageWrapper}>
+          <Image
+            source={imageSource}
+            style={{ width: plaqueWidth, height: plaqueHeight }}
+            resizeMode="contain"
+          />
+        </View>
+      </View>
+    );
+  }
+
+  // 2. Fallback: Procedural stone frame with carved timber plate & Minecraft typography
   return (
     <View style={[styles.outerContainer, style]}>
       {/* 1. OUTER STONE FRAME WITH RIVETS */}
@@ -78,6 +103,15 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingHorizontal: 16,
     marginVertical: 4,
+  },
+  imageWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.65,
+    shadowRadius: 8,
+    elevation: 8,
   },
   stoneFrame: {
     width: Math.min(SCREEN_WIDTH - 32, 345),
