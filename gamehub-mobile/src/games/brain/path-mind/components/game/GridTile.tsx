@@ -133,7 +133,7 @@ const GridTileComponent: React.FC<GridTileProps> = ({
   return (
     <Animated.View style={[{ transform: [{ scale: scaleAnim }] }]}>
       <Pressable
-        onPress={() => onPress(row, col)}
+        onPress={() => onPress?.(row, col)}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={disabled}
