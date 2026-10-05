@@ -1,332 +1,278 @@
 // ============================================================
-// PATH MIND — Screen 03: ModeSelectionScreen
-// Choose Your Mode: Classic, Number Trail, Mixed, Challenge, Daily
-// Auto-scroll on selection, authentic button assets, responsive layout
+// PATH MIND — Screen 03: ModeSelectionScreen ("CHOOSE YOUR MODE")
+// Premium Fantasy Adventure Memory Game — 4 Expedition Disciplines
+// Built with GameScreen, GameResourceHUD, GameTitlePlaque, ModeCard
+// Staggered entrance, tactile 2.5D stone/wood materials, responsive mobile UI
 // ============================================================
 
-import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
-import { GameBackground } from '../components/ui/GameBackground';
-import { GameHeader } from '../components/ui/GameHeader';
-import { TitlePlaque } from '../components/ui/TitlePlaque';
+import React, { useRef, useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Animated,
+  useWindowDimensions,
+  Vibration,
+} from 'react-native';
+import { GameScreen } from '../components/ui/GameScreen';
+import { GameResourceHUD } from '../components/ui/GameResourceHUD';
+import { GameTitlePlaque } from '../components/ui/GameTitlePlaque';
+import { ModeCard } from '../components/ui/ModeCard';
 import { GameButton } from '../components/ui/GameButton';
+import { ExplorerCharacter } from '../components/ui/ExplorerCharacter';
 import { usePathMindStore } from '../store/pathMindStore';
-import { pmColors } from '../design-system/colors';
-import { pmTypography } from '../design-system/typography';
-import { pmRadii } from '../design-system/radii';
-import { pmShadows } from '../design-system/shadows';
+import { MODES, GameModeConfig, ModeId } from '../modeConfig';
 import { pmAssets } from '../design-system/uiAssets';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-interface GameModeItem {
-  id: string;
-  title: string;
-  desc: string;
-  badge: string;
-  color: string;
-}
-
-const MODES: GameModeItem[] = [
-  {
-    id: 'classic',
-    title: 'CLASSIC PATH',
-    desc: 'Watch the sacred glowing runes and retrace the path from start to goal.',
-    badge: 'CORE EXPEDITION',
-    color: pmColors.gold,
-  },
-  {
-    id: 'number_trail',
-    title: 'NUMBER TRAIL',
-    desc: 'Follow the ancient sequence numbers in ascending order 1 → 2 → 3.',
-    badge: 'SEQUENCE MEMORY',
-    color: pmColors.cyan,
-  },
-  {
-    id: 'mixed_path',
-    title: 'MIXED PATH',
-    desc: 'Dual challenge: combine rune color transformations with path recall.',
-    badge: 'ADVANCED MIND',
-    color: pmColors.relicPurple,
-  },
-  {
-    id: 'challenge_path',
-    title: 'CHALLENGE PATH',
-    desc: 'Rapid memory shift with decoys, moving obstacles, and tight timer.',
-    badge: 'HARDCORE RUN',
-    color: pmColors.dangerRed,
-  },
-  {
-    id: 'daily_path',
-    title: 'DAILY PATH',
-    desc: "Today's global ancient puzzle with special rewards and streak stars.",
-    badge: 'DAILY REWARD',
-    color: pmColors.successGreen,
-  },
-];
+import { pmShadows } from '../design-system/shadows';
 
 export const ModeSelectionScreen: React.FC = () => {
-  const { setScreen, selectedMode, hearts, coins } = usePathMindStore();
-  const [activeMode, setActiveMode] = useState<string>(selectedMode || 'CLASSIC PATH');
+  const { width } = useWindowDimensions();
+  const {
+    setScreen,
+    selectedMode,
+    hearts,
+    coins,
+    crystals,
+    hapticsEnabled,
+  } = usePathMindStore();
+
+  // Find matching initial mode from store or default to 'classic'
+  const initialMode = MODES.find((m) => m.title === selectedMode)?.id || 'classic';
+  const [selectedModeId, setSelectedModeId] = useState<ModeId>(initialMode);
+
   const scrollViewRef = useRef<ScrollView>(null);
 
-  const handleSelectMode = (mode: GameModeItem) => {
-    setActiveMode(mode.title);
+  // Staggered entrance animations for title and 4 mode cards
+  const titleAnim = useRef(new Animated.Value(0)).current;
+  const cardAnims = useRef(MODES.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    // 1. Fade & slide in Title Plaque
+    Animated.timing(titleAnim, {
+      toValue: 1,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+
+    // 2. Staggered entrance for the 4 mode cards
+    const cardStagger = cardAnims.map((anim, index) =>
+      Animated.timing(anim, {
+        toValue: 1,
+        duration: 220,
+        delay: index * 60,
+        useNativeDriver: true,
+      })
+    );
+
+    Animated.stagger(50, cardStagger).start();
+  }, [titleAnim, cardAnims]);
+
+  const handleSelectMode = (mode: GameModeConfig) => {
+    setSelectedModeId(mode.id);
     usePathMindStore.setState({ selectedMode: mode.title });
 
-    // Smooth auto-scroll down to the proceed action button
+    if (hapticsEnabled) {
+      Vibration.vibrate(20);
+    }
+
+    // Smooth auto-scroll down to make sure proceed CTA is comfortably visible
     setTimeout(() => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
-    }, 120);
+    }, 150);
   };
 
-  const handleProceed = () => {
-    usePathMindStore.setState({ selectedMode: activeMode });
-    if (activeMode === 'DAILY PATH') {
-      setScreen('daily');
-    } else {
-      setScreen('difficulty');
+  const handleProceed = (mode?: GameModeConfig) => {
+    const chosenMode = mode || MODES.find((m) => m.id === selectedModeId);
+    if (chosenMode) {
+      usePathMindStore.setState({ selectedMode: chosenMode.title });
     }
+
+    if (hapticsEnabled) {
+      Vibration.vibrate(35);
+    }
+
+    // Direct progression to Difficulty Selection Screen with chosen mode
+    setScreen('difficulty');
   };
 
   return (
-    <GameBackground variant="universal" overlayDarkness={0.25}>
-      <GameHeader
-        onBack={() => setScreen('home')}
-        onSettings={() => setScreen('settings')}
-        hearts={hearts}
-        coins={coins}
-      />
-
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <TitlePlaque
-          imageSource={pmAssets.plaques.gameplay}
-          style={styles.titlePlaque}
-        />
-
-        <View style={styles.cardContainer}>
-          {MODES.map((mode) => {
-            const isSelected = activeMode === mode.title;
-
-            return (
-              <Pressable
-                key={mode.id}
-                onPress={() => handleSelectMode(mode)}
-                style={({ pressed }) => [
-                  styles.modeCard,
-                  { borderColor: isSelected ? mode.color : pmColors.stoneBorder },
-                  isSelected && {
-                    backgroundColor: 'rgba(12, 28, 40, 0.96)',
-                    borderLeftWidth: 6,
-                    borderLeftColor: mode.color,
-                  },
-                  pressed && styles.pressed,
-                ]}
-              >
-                {/* Header row in card */}
-                <View style={styles.cardTopRow}>
-                  <View style={[styles.badgePill, { borderColor: mode.color }]}>
-                    <Text style={[styles.badgeText, { color: mode.color }]}>
-                      {mode.badge}
-                    </Text>
-                  </View>
-                  {isSelected && (
-                    <Text style={[styles.selectedStar, { color: mode.color }]}>★ SELECTED</Text>
-                  )}
-                </View>
-
-                {/* Title */}
-                <Text style={[styles.modeTitle, { color: mode.color }]}>
-                  {mode.title}
-                </Text>
-
-                {/* Description */}
-                <Text style={styles.modeDesc}>{mode.desc}</Text>
-
-                {/* Bottom Action Indicator */}
-                <View style={styles.cardActionRow}>
-                  <Text style={[styles.enterText, { color: mode.color }]}>
-                    {isSelected ? 'TAP PROCEED BELOW ↓' : 'SELECT MODE →'}
-                  </Text>
-                </View>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        {/* Custom Builder Promo Banner */}
-        <Pressable
-          style={styles.builderBanner}
-          onPress={() => setScreen('builder')}
-        >
-          <View style={styles.bannerInfo}>
-            <Text style={styles.bannerTitle}>🛠️ BUILD YOUR OWN PATH</Text>
-            <Text style={styles.bannerSub}>Create, edit and share custom puzzles</Text>
-          </View>
-          <Text style={styles.bannerArrow}>→</Text>
-        </Pressable>
-
-        {/* Next / Proceed Action Button */}
-        <View style={styles.ctaWrap}>
+    <GameScreen variant="universal" overlayDarkness={0.22}>
+      <View style={styles.container}>
+        {/* ============================================================ */}
+        {/* 1. TOP GLOBAL HUD: Back Button (Left) & Resource HUD (Right) */}
+        {/* ============================================================ */}
+        <View style={styles.topHudBar}>
           <GameButton
-            imageSource={pmAssets.buttons.letsPlayGreen}
-            label="LET'S PLAY"
-            size="large"
-            width={Math.min(SCREEN_WIDTH - 48, 250)}
-            height={66}
-            onPress={handleProceed}
-            accessibilityLabel="Proceed to Expedition"
+            imageSource={pmAssets.buttons.back}
+            label="BACK"
+            size="small"
+            width={78}
+            height={36}
+            onPress={() => setScreen('home')}
+            accessibilityLabel="Back to Home"
           />
 
-          <View style={styles.subRow}>
-            <GameButton
-              imageSource={pmAssets.buttons.howToPlayCyan}
-              label="HOW TO PLAY"
-              size="small"
-              width={145}
-              height={48}
-              onPress={() => setScreen('how_to_play')}
-              accessibilityLabel="How To Play"
-            />
-            <GameButton
-              imageSource={pmAssets.buttons.worldMapWood}
-              label="WORLD MAP"
-              size="small"
-              width={145}
-              height={48}
-              onPress={() => setScreen('world_map')}
-              accessibilityLabel="World Map"
-            />
-          </View>
+          <GameResourceHUD
+            hearts={hearts}
+            coins={coins}
+            crystals={crystals}
+            onCoinsPress={() => {}}
+            onHeartsPress={() => {}}
+            onCrystalsPress={() => {}}
+          />
         </View>
-      </ScrollView>
-    </GameBackground>
+
+        {/* ============================================================ */}
+        {/* 2. SCROLLABLE EXPEDITION DISCIPLINES                         */}
+        {/* ============================================================ */}
+        <ScrollView
+          ref={scrollViewRef}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Main Title Plaque */}
+          <Animated.View
+            style={{
+              opacity: titleAnim,
+              transform: [
+                {
+                  translateY: titleAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [-16, 0],
+                  }),
+                },
+              ],
+            }}
+          >
+            <GameTitlePlaque
+              title="CHOOSE YOUR MODE"
+              subtitle="SELECT EXPEDITION DISCIPLINE"
+              style={styles.titlePlaque}
+            />
+          </Animated.View>
+
+          {/* Four Mode Cards: Classic, Number Trail, Mixed, Challenge */}
+          <View style={styles.cardList}>
+            {MODES.map((mode, index) => {
+              const isSelected = selectedModeId === mode.id;
+              const anim = cardAnims[index];
+
+              return (
+                <Animated.View
+                  key={mode.id}
+                  style={{
+                    opacity: anim,
+                    transform: [
+                      {
+                        translateY: anim.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [18, 0],
+                        }),
+                      },
+                    ],
+                  }}
+                >
+                  <ModeCard
+                    mode={mode}
+                    isSelected={isSelected}
+                    onSelect={handleSelectMode}
+                    onProceed={handleProceed}
+                  />
+                </Animated.View>
+              );
+            })}
+          </View>
+
+          {/* ============================================================ */}
+          {/* 3. BOTTOM ACTION AREA: Proceed Button & Environmental Space */}
+          {/* ============================================================ */}
+          <View style={styles.bottomSection}>
+            {/* Primary Proceed CTA Button */}
+            <GameButton
+              imageSource={pmAssets.buttons.letsPlayGreen}
+              label="CONTINUE TO EXPEDITION"
+              size="large"
+              width={Math.min(width - 48, 255)}
+              height={66}
+              onPress={() => handleProceed()}
+              accessibilityLabel="Continue to Expedition"
+            />
+
+            {/* Quick Fantasy Shortcuts: How to Play & World Map */}
+            <View style={styles.subActionRow}>
+              <GameButton
+                imageSource={pmAssets.buttons.howToPlayCyan}
+                label="HOW TO PLAY"
+                size="small"
+                width={138}
+                height={46}
+                onPress={() => setScreen('how_to_play')}
+                accessibilityLabel="How To Play"
+              />
+              <GameButton
+                imageSource={pmAssets.buttons.worldMapWood}
+                label="WORLD MAP"
+                size="small"
+                width={138}
+                height={46}
+                onPress={() => setScreen('world_map')}
+                accessibilityLabel="World Map"
+              />
+            </View>
+
+            {/* Small Ambient Adventurer in Non-Obtrusive Environmental Space */}
+            <View style={styles.characterContainer} pointerEvents="none">
+              <ExplorerCharacter size={54} mood="idle" />
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+    </GameScreen>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollContent: {
+  container: {
+    flex: 1,
+  },
+  topHudBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingBottom: 36,
+    paddingVertical: 4,
+    zIndex: 20,
+  },
+  scrollContent: {
+    paddingHorizontal: 14,
+    paddingBottom: 40,
     alignItems: 'center',
   },
   titlePlaque: {
-    width: Math.min(SCREEN_WIDTH - 36, 320),
-    marginBottom: 16,
-    marginTop: 4,
-  },
-  cardContainer: {
-    width: '100%',
-    gap: 12,
-  },
-  modeCard: {
-    width: '100%',
-    backgroundColor: 'rgba(14, 22, 30, 0.92)',
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderRadius: pmRadii.lg,
-    padding: 16,
-    ...pmShadows.medium,
-  },
-  pressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
-  },
-  cardTopRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  badgePill: {
-    borderWidth: 1,
-    borderRadius: pmRadii.pill,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-  },
-  badgeText: {
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 0.5,
-  },
-  selectedStar: {
-    fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 0.5,
-  },
-  modeTitle: {
-    fontSize: 18,
-    fontWeight: '900',
-    letterSpacing: 1,
-    marginBottom: 4,
-    textTransform: 'uppercase',
-  },
-  modeDesc: {
-    ...pmTypography.bodyMedium,
-    color: pmColors.textSecondary,
-    marginBottom: 10,
-    lineHeight: 18,
-  },
-  cardActionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-  },
-  enterText: {
-    fontSize: 12,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-  },
-  builderBanner: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(74, 40, 16, 0.9)',
-    borderWidth: 2,
-    borderBottomWidth: 4,
-    borderColor: pmColors.woodHighlight,
-    borderRadius: pmRadii.lg,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginTop: 16,
-    ...pmShadows.medium,
-  },
-  bannerInfo: {
-    flex: 1,
-  },
-  bannerTitle: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: pmColors.goldBright,
-    letterSpacing: 0.8,
-  },
-  bannerSub: {
-    fontSize: 11,
-    color: pmColors.textWood,
     marginTop: 2,
+    marginBottom: 10,
   },
-  bannerArrow: {
-    fontSize: 20,
-    fontWeight: '900',
-    color: pmColors.goldBright,
-    marginLeft: 8,
-  },
-  ctaWrap: {
-    marginTop: 20,
-    alignItems: 'center',
+  cardList: {
     width: '100%',
+    alignItems: 'center',
+  },
+  bottomSection: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 18,
+    position: 'relative',
     gap: 12,
   },
-  subRow: {
+  subActionRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
     justifyContent: 'center',
     width: '100%',
+  },
+  characterContainer: {
+    position: 'absolute',
+    left: 4,
+    bottom: -8,
+    opacity: 0.85,
   },
 });

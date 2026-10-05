@@ -36,6 +36,7 @@ export interface PathMindState {
   hearts: number;
   maxHearts: number;
   coins: number;
+  crystals: number;
   stars: number;
   addCoins: (amount: number) => void;
   loseHeart: () => void;
@@ -89,6 +90,7 @@ export const usePathMindStore = create<PathMindState>((set, get) => ({
   hearts: 3,
   maxHearts: 3,
   coins: 850,
+  crystals: 12,
   stars: 42,
 
   addCoins: (amount) => set((s) => ({ coins: s.coins + amount })),
