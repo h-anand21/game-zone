@@ -15,6 +15,7 @@ import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
+import { pmAssets } from '../design-system/uiAssets';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -102,20 +103,19 @@ export const ResultScreen: React.FC = () => {
         {/* Primary Action Buttons */}
         <View style={styles.buttonStack}>
           <GameButton
+            imageSource={pmAssets.buttons.next}
             label="NEXT CHAMBER"
-            iconName="play"
-            variant="gold"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 48, 280)}
-            height={60}
+            width={Math.min(SCREEN_WIDTH - 48, 250)}
+            height={66}
             onPress={handleNextLevel}
             accessibilityLabel="Next Chamber"
           />
 
           <View style={styles.actionRow}>
             <GameButton
+              imageSource={pmAssets.buttons.restart}
               label="REPLAY"
-              variant="wood"
               size="small"
               width={130}
               height={46}
@@ -136,11 +136,11 @@ export const ResultScreen: React.FC = () => {
           </View>
 
           <GameButton
+            imageSource={pmAssets.buttons.home}
             label="RETURN HOME"
-            variant="wood"
             size="small"
-            width={140}
-            height={40}
+            width={130}
+            height={42}
             onPress={() => setScreen('home')}
             accessibilityLabel="Return Home"
           />
