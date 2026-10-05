@@ -251,10 +251,10 @@ export const GameplayScreen: React.FC = () => {
         {/* Bottom Utility Controls */}
         <View style={styles.controlRow}>
           <GameButton
-            label="RESET"
-            variant="wood"
+            imageSource={pmAssets.buttons.undoWood}
+            label="UNDO"
             size="small"
-            width={100}
+            width={98}
             height={44}
             onPress={() => setPlayerPath([])}
             accessibilityLabel="Reset Steps"
@@ -264,7 +264,7 @@ export const GameplayScreen: React.FC = () => {
             label="HINT (25 ◉)"
             variant="cyan"
             size="small"
-            width={130}
+            width={125}
             height={44}
             disabled={coins < 25}
             onPress={handleHint}
@@ -272,14 +272,13 @@ export const GameplayScreen: React.FC = () => {
           />
 
           <GameButton
-            label="MAP"
-            iconName="map"
-            variant="wood"
+            imageSource={pmAssets.buttons.worldMapGreen}
+            label="WORLD MAP"
             size="small"
-            width={90}
+            width={106}
             height={44}
             onPress={() => setScreen('world_map')}
-            accessibilityLabel="Map"
+            accessibilityLabel="World Map"
           />
         </View>
       </View>

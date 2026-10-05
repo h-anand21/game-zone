@@ -121,11 +121,10 @@ export const ResultScreen: React.FC = () => {
             />
 
             <GameButton
+              imageSource={pmAssets.buttons.worldMapGreen}
               label="WORLD MAP"
-              iconName="map"
-              variant="cyan"
               size="small"
-              width={130}
+              width={136}
               height={46}
               onPress={() => setScreen('world_map')}
               accessibilityLabel="World Map"

@@ -167,33 +167,31 @@ export const DifficultyScreen: React.FC = () => {
         {/* Primary CTA Buttons */}
         <View style={styles.ctaSection}>
           <GameButton
-            imageSource={pmAssets.buttons.startGame}
-            label="START EXPEDITION"
+            imageSource={pmAssets.buttons.letsPlayGold}
+            label="LET'S PLAY"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 48, 270)}
-            height={68}
+            width={Math.min(SCREEN_WIDTH - 48, 250)}
+            height={66}
             onPress={handleStartGame}
             accessibilityLabel="Start Expedition"
           />
 
           <View style={styles.subButtonRow}>
             <GameButton
+              imageSource={pmAssets.buttons.howToPlayWood}
               label="HOW TO PLAY"
-              iconName="compass"
-              variant="wood"
               size="small"
-              width={140}
-              height={44}
+              width={145}
+              height={48}
               onPress={() => setScreen('how_to_play')}
               accessibilityLabel="How To Play"
             />
             <GameButton
+              imageSource={pmAssets.buttons.worldMapGreen}
               label="WORLD MAP"
-              iconName="map"
-              variant="cyan"
               size="small"
-              width={140}
-              height={44}
+              width={145}
+              height={48}
               onPress={() => setScreen('world_map')}
               accessibilityLabel="World Map"
             />

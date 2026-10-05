@@ -110,14 +110,13 @@ export const HowToPlayScreen: React.FC = () => {
         {/* CTA Button */}
         <View style={styles.ctaWrap}>
           <GameButton
-            label="GOT IT! LET'S PLAY"
-            iconName="play"
-            variant="gold"
+            imageSource={pmAssets.buttons.letsPlayGold}
+            label="LET'S PLAY"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 48, 280)}
-            height={58}
+            width={Math.min(SCREEN_WIDTH - 48, 250)}
+            height={66}
             onPress={() => setScreen('difficulty')}
-            accessibilityLabel="Got it! Let's Play"
+            accessibilityLabel="Let's Play"
           />
         </View>
       </ScrollView>

@@ -118,10 +118,10 @@ export const BuildPathScreen: React.FC = () => {
         {/* Builder Action Toolbar */}
         <View style={styles.toolRow}>
           <GameButton
+            imageSource={pmAssets.buttons.undoWood}
             label="UNDO"
-            variant="wood"
             size="small"
-            width={90}
+            width={98}
             height={44}
             disabled={customPath.length === 0}
             onPress={handleUndo}
@@ -129,10 +129,10 @@ export const BuildPathScreen: React.FC = () => {
           />
 
           <GameButton
+            imageSource={pmAssets.buttons.clearRed}
             label="CLEAR"
-            variant="red"
             size="small"
-            width={90}
+            width={98}
             height={44}
             disabled={customPath.length === 0}
             onPress={handleClear}
@@ -140,25 +140,24 @@ export const BuildPathScreen: React.FC = () => {
           />
 
           <GameButton
-            label="MAP"
-            iconName="map"
-            variant="cyan"
+            imageSource={pmAssets.buttons.worldMapGreen}
+            label="WORLD MAP"
             size="small"
-            width={90}
+            width={106}
             height={44}
             onPress={() => setScreen('world_map')}
-            accessibilityLabel="Map"
+            accessibilityLabel="World Map"
           />
         </View>
 
         {/* Primary CTA Button */}
         <View style={styles.ctaWrap}>
           <GameButton
-            imageSource={pmAssets.buttons.startGame}
-            label="TEST & PLAY"
+            imageSource={pmAssets.buttons.letsPlayGold}
+            label="LET'S PLAY"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 48, 270)}
-            height={64}
+            width={Math.min(SCREEN_WIDTH - 48, 250)}
+            height={66}
             disabled={customPath.length < 3}
             onPress={handleTestAndPlay}
             accessibilityLabel="Test and Play"

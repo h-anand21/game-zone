@@ -173,14 +173,35 @@ export const ModeSelectionScreen: React.FC = () => {
         {/* Next / Proceed Action Button */}
         <View style={styles.ctaWrap}>
           <GameButton
-            imageSource={pmAssets.buttons.startGame}
-            label="PROCEED TO EXPEDITION"
+            imageSource={pmAssets.buttons.letsPlayGreen}
+            label="LET'S PLAY"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 48, 270)}
-            height={68}
+            width={Math.min(SCREEN_WIDTH - 48, 250)}
+            height={66}
             onPress={handleProceed}
             accessibilityLabel="Proceed to Expedition"
           />
+
+          <View style={styles.subRow}>
+            <GameButton
+              imageSource={pmAssets.buttons.howToPlayCyan}
+              label="HOW TO PLAY"
+              size="small"
+              width={145}
+              height={48}
+              onPress={() => setScreen('how_to_play')}
+              accessibilityLabel="How To Play"
+            />
+            <GameButton
+              imageSource={pmAssets.buttons.worldMapWood}
+              label="WORLD MAP"
+              size="small"
+              width={145}
+              height={48}
+              onPress={() => setScreen('world_map')}
+              accessibilityLabel="World Map"
+            />
+          </View>
         </View>
       </ScrollView>
     </GameBackground>
@@ -299,6 +320,13 @@ const styles = StyleSheet.create({
   ctaWrap: {
     marginTop: 20,
     alignItems: 'center',
+    width: '100%',
+    gap: 12,
+  },
+  subRow: {
+    flexDirection: 'row',
+    gap: 12,
+    justifyContent: 'center',
     width: '100%',
   },
 });

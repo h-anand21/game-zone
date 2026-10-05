@@ -49,6 +49,16 @@ export const pmAssets = {
     exit: require('../../../../../assets/game/path-mind/buttons/btn_exit.png') as ImageSourcePropType,
     next: require('../../../../../assets/game/path-mind/buttons/btn_next.png') as ImageSourcePropType,
     share: require('../../../../../assets/game/path-mind/buttons/btn_share.png') as ImageSourcePropType,
+
+    // Fantasy UI Button Collection
+    howToPlayWood: require('../../../../../assets/game/path-mind/buttons/btn_how_to_play_wood.png') as ImageSourcePropType,
+    howToPlayCyan: require('../../../../../assets/game/path-mind/buttons/btn_how_to_play_cyan.png') as ImageSourcePropType,
+    worldMapGreen: require('../../../../../assets/game/path-mind/buttons/btn_world_map_green.png') as ImageSourcePropType,
+    worldMapWood: require('../../../../../assets/game/path-mind/buttons/btn_world_map_wood.png') as ImageSourcePropType,
+    letsPlayGold: require('../../../../../assets/game/path-mind/buttons/btn_lets_play_gold.png') as ImageSourcePropType,
+    letsPlayGreen: require('../../../../../assets/game/path-mind/buttons/btn_lets_play_green.png') as ImageSourcePropType,
+    undoWood: require('../../../../../assets/game/path-mind/buttons/btn_undo_wood.png') as ImageSourcePropType,
+    clearRed: require('../../../../../assets/game/path-mind/buttons/btn_clear_red.png') as ImageSourcePropType,
   },
   icons: {
     heart: require('../../../../../assets/game/path-mind/icons/icon_18_165x146.png') as ImageSourcePropType,

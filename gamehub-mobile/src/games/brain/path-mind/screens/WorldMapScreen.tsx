@@ -138,12 +138,11 @@ export const WorldMapScreen: React.FC = () => {
         {/* Play Current Button CTA */}
         <View style={styles.ctaWrap}>
           <GameButton
-            label={`ENTER CHAMBER ${currentLevel}`}
-            iconName="play"
-            variant="gold"
+            imageSource={pmAssets.buttons.letsPlayGold}
+            label="LET'S PLAY"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 48, 280)}
-            height={58}
+            width={Math.min(SCREEN_WIDTH - 48, 250)}
+            height={66}
             onPress={() => setScreen('gameplay')}
             accessibilityLabel={`Enter Chamber ${currentLevel}`}
           />

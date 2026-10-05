@@ -108,18 +108,27 @@ export const HomeScreen: React.FC = () => {
             style={{ marginTop: 6 }}
           />
 
-          {/* BUILD YOUR PATH CTA */}
-          <GameButton
-            label="BUILD YOUR PATH"
-            iconName="map"
-            variant="wood"
-            size="medium"
-            width={Math.min(SCREEN_WIDTH - 84, 220)}
-            height={50}
-            onPress={() => setScreen('builder')}
-            accessibilityLabel="Build Your Path"
-            style={{ marginTop: 6 }}
-          />
+          {/* WORLD MAP & HOW TO PLAY FANTASY BUTTONS */}
+          <View style={styles.subActionRow}>
+            <GameButton
+              imageSource={pmAssets.buttons.worldMapWood}
+              label="WORLD MAP"
+              size="small"
+              width={138}
+              height={46}
+              onPress={() => setScreen('world_map')}
+              accessibilityLabel="World Map"
+            />
+            <GameButton
+              imageSource={pmAssets.buttons.howToPlayCyan}
+              label="HOW TO PLAY"
+              size="small"
+              width={138}
+              height={46}
+              onPress={() => setScreen('how_to_play')}
+              accessibilityLabel="How To Play"
+            />
+          </View>
         </View>
 
         {/* ============================================================ */}
@@ -228,6 +237,12 @@ const styles = StyleSheet.create({
   actionSection: {
     alignItems: 'center',
     marginBottom: 8,
+  },
+  subActionRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 6,
+    justifyContent: 'center',
   },
   bottomBar: {
     flexDirection: 'row',
