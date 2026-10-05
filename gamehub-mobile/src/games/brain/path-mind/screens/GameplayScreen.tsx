@@ -1,7 +1,8 @@
 // ============================================================
 // PATH MIND — Screen 16: GameplayScreen
-// Master Core Puzzle Engine: Memorize -> Retrace -> Conquer
-// Live SVG energy polyline, interactive stone tiles, combo multiplier, sound & haptics
+// Master Core Puzzle Engine: Memorize -> Retrace -> Auto Advance
+// Live SVG energy polyline, interactive stone tiles, combo multiplier,
+// prominent dynamic decreasing timer gauge & seamless level progression
 // ============================================================
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -25,6 +26,7 @@ export const GameplayScreen: React.FC = () => {
   const {
     setScreen,
     currentLevel,
+    nextLevel,
     hearts,
     loseHeart,
     coins,
@@ -46,16 +48,18 @@ export const GameplayScreen: React.FC = () => {
 
   const [path, setPath] = useState<GridPos[]>([]);
   const [playerPath, setPlayerPath] = useState<GridPos[]>([]);
+  const [wrongPos, setWrongPos] = useState<GridPos | null>(null);
   const [phase, setPhase] = useState<'memorize' | 'recall' | 'success' | 'failed'>('memorize');
-  const [countdown, setCountdown] = useState<number>(3);
+  const [totalMemoTime, setTotalMemoTime] = useState<number>(3.5);
+  const [timeLeft, setTimeLeft] = useState<number>(3.5);
   const [statusMessage, setStatusMessage] = useState<string>('OBSERVE SACRED RUNES');
   const [localScore, setLocalScore] = useState<number>(score);
   const [localCombo, setLocalCombo] = useState<number>(combo);
+  const [isAdvancing, setIsAdvancing] = useState<boolean>(false);
 
   // Initialize chamber path
   const initChamber = useCallback(() => {
     const newPath = generatePath(gridSize, targetLength);
-    // Fallback if path generation was short
     if (newPath.length < 3) {
       setPath([
         { row: 0, col: 0 },
@@ -68,38 +72,46 @@ export const GameplayScreen: React.FC = () => {
     }
 
     setPlayerPath([]);
+    setWrongPos(null);
+    setIsAdvancing(false);
     setPhase('memorize');
-    const memoSeconds = selectedDifficulty === 'HARD' ? 2 : selectedDifficulty === 'MEDIUM' ? 3 : 4;
-    setCountdown(memoSeconds);
+
+    const memoSeconds =
+      selectedDifficulty === 'HARD' ? 2.5 : selectedDifficulty === 'MEDIUM' ? 3.5 : 4.5;
+    setTotalMemoTime(memoSeconds);
+    setTimeLeft(memoSeconds);
     setStatusMessage('MEMORIZE THE PATH');
-  }, [gridSize, targetLength, selectedDifficulty]);
+  }, [gridSize, targetLength, selectedDifficulty, currentLevel]);
 
   useEffect(() => {
     initChamber();
   }, [initChamber]);
 
-  // Countdown timer for memorization
+  // High-frequency smooth decreasing timer for memorization (20 FPS update)
   useEffect(() => {
     if (phase !== 'memorize') return;
 
-    if (countdown > 0) {
-      const timer = setTimeout(() => {
-        setCountdown((c) => c - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else {
-      // Switch to player recall phase
-      setPhase('recall');
-      setStatusMessage('RETRACE THE PATH FROM START!');
-      if (hapticsEnabled) {
-        Vibration.vibrate(40);
-      }
-    }
-  }, [phase, countdown, hapticsEnabled]);
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 0.05) {
+          clearInterval(interval);
+          setPhase('recall');
+          setStatusMessage('RETRACE THE PATH FROM START!');
+          if (hapticsEnabled) {
+            Vibration.vibrate(50);
+          }
+          return 0;
+        }
+        return Math.max(0, parseFloat((prev - 0.05).toFixed(2)));
+      });
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, [phase, hapticsEnabled]);
 
   // Handle tile press or continuous finger drag
   const handleTilePress = (row: number, col: number) => {
-    if (phase !== 'recall') return;
+    if (phase !== 'recall' || isAdvancing) return;
     if (path.length === 0) return;
 
     // 1. Backtrack drag: user dragged back to previous step, smoothly undo last step
@@ -109,6 +121,7 @@ export const GameplayScreen: React.FC = () => {
       playerPath[playerPath.length - 2].col === col
     ) {
       setPlayerPath((prev) => prev.slice(0, -1));
+      setWrongPos(null);
       setLocalCombo((c) => Math.max(0, c - 1));
       if (hapticsEnabled) {
         Vibration.vibrate(20);
@@ -129,6 +142,7 @@ export const GameplayScreen: React.FC = () => {
     if (expected && expected.row === row && expected.col === col) {
       const nextPlayerPath = [...playerPath, { row, col }];
       setPlayerPath(nextPlayerPath);
+      setWrongPos(null);
 
       const newCombo = localCombo + 1;
       setLocalCombo(newCombo);
@@ -143,54 +157,66 @@ export const GameplayScreen: React.FC = () => {
         Vibration.vibrate(25);
       }
 
-      // Check if complete
+      // Check if chamber is completely traced
       if (nextPlayerPath.length === path.length) {
         setPhase('success');
-        setStatusMessage('CHAMBER CONQUERED! ★★★');
+        setIsAdvancing(true);
+        setStatusMessage(`CHAMBER ${currentLevel} CONQUERED! ★★★`);
         addCoins(25);
         if (hapticsEnabled) {
           Vibration.vibrate([0, 60, 40, 80]);
         }
+
+        // Automatic progression to next level without any Next button!
         setTimeout(() => {
-          setScreen('result');
-        }, 1200);
+          nextLevel(); // Automatically increments currentLevel in store, triggering initChamber
+        }, 1100);
       } else {
-        setStatusMessage(`STEP ${nextPlayerPath.length}/${path.length} • DRAGGING COMBO x${newCombo}`);
+        setStatusMessage(`STEP ${nextPlayerPath.length}/${path.length} • COMBO x${newCombo}`);
       }
     } else {
-      // Wrong tile touched/dragged
+      // Wrong tile touched/dragged!
+      setWrongPos({ row, col });
       loseHeart();
       setLocalCombo(0);
       usePathMindStore.setState({ combo: 0 });
-      setStatusMessage('PATH FRACTURE! -1 HEART');
+      setStatusMessage('❌ PATH FRACTURE! -1 HEART');
       if (hapticsEnabled) {
-        Vibration.vibrate(180);
+        Vibration.vibrate([0, 100, 50, 120]);
       }
 
-      // If out of hearts, reset or prompt
+      // If out of hearts, expedition failed
       if (hearts <= 1) {
+        setPhase('failed');
         setTimeout(() => {
-          setStatusMessage('EXPEDITION FAILED — RETRYING');
-          initChamber();
-        }, 1200);
+          setStatusMessage('💀 EXPEDITION FAILED!');
+          setScreen('result');
+        }, 1300);
       } else {
-        // Reset player steps to start
+        // Reset player steps after showing wrong red indicator
         setTimeout(() => {
+          setWrongPos(null);
           setPlayerPath([]);
-          setStatusMessage('DRAG FROM FIRST RUNE TO TRACE');
-        }, 600);
+          setStatusMessage('RETRACE FROM START TILE');
+        }, 650);
       }
     }
   };
 
-  // Give a hint (reveals entire path for 1.5s)
+  // Give a hint (reveals entire path for 2.0s)
   const handleHint = () => {
-    if (coins < 25) return;
+    if (coins < 25 || phase === 'success' || isAdvancing) return;
     addCoins(-25);
+    setWrongPos(null);
     setPhase('memorize');
-    setCountdown(2);
+    setTimeLeft(2.0);
+    setTotalMemoTime(2.0);
     setStatusMessage('HINT ACTIVE! 💡');
   };
+
+  // Calculate normalized time progress for gauge
+  const timeProgress = totalMemoTime > 0 ? Math.max(0, Math.min(1, timeLeft / totalMemoTime)) : 0;
+  const pathProgress = path.length > 0 ? Math.max(0, Math.min(1, playerPath.length / path.length)) : 0;
 
   return (
     <GameBackground variant="universal" overlayDarkness={0.25}>
@@ -218,24 +244,118 @@ export const GameplayScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Phase Status Banner */}
-        <View
-          style={[
-            styles.statusBanner,
-            phase === 'memorize' && styles.statusBannerMemo,
-            phase === 'success' && styles.statusBannerSuccess,
-          ]}
-        >
-          <Text
-            style={[
-              styles.statusText,
-              phase === 'memorize' && { color: pmColors.goldBright },
-              phase === 'success' && { color: pmColors.successGreen },
-            ]}
-          >
-            {phase === 'memorize' ? `⏱️ ${statusMessage} (${countdown}s)` : statusMessage}
-          </Text>
+        {/* ============================================================ */}
+        {/* PROMINENT DYNAMIC TIMER & PROGRESS GAUGE                     */}
+        {/* ============================================================ */}
+        <View style={styles.timerGaugeContainer}>
+          {/* Top Label & Countdown Number Row */}
+          <View style={styles.gaugeHeaderRow}>
+            <View style={styles.gaugeTitleGroup}>
+              <Text style={styles.gaugeIcon}>
+                {phase === 'memorize'
+                  ? '⏳'
+                  : phase === 'success'
+                  ? '🎉'
+                  : wrongPos
+                  ? '❌'
+                  : '⚡'}
+              </Text>
+              <Text
+                style={[
+                  styles.gaugeTitleText,
+                  phase === 'memorize' && { color: pmColors.goldBright },
+                  phase === 'success' && { color: pmColors.successGreen },
+                  wrongPos !== null && { color: pmColors.dangerRed },
+                ]}
+                numberOfLines={1}
+              >
+                {phase === 'memorize'
+                  ? 'MEMORIZE SACRED PATH'
+                  : phase === 'success'
+                  ? `CHAMBER ${currentLevel} CONQUERED!`
+                  : wrongPos
+                  ? 'PATH FRACTURE! -1 HEART'
+                  : `RETRACE RUNES (${playerPath.length}/${path.length})`}
+              </Text>
+            </View>
+
+            {/* Large High-Visibility Time / Step Badge */}
+            <View
+              style={[
+                styles.largeTimerBadge,
+                phase === 'memorize' && (
+                  timeProgress < 0.25
+                    ? styles.badgeDanger
+                    : timeProgress < 0.5
+                    ? styles.badgeWarning
+                    : styles.badgeNormal
+                ),
+                phase === 'success' && styles.badgeSuccess,
+                wrongPos !== null && styles.badgeDanger,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.largeTimerText,
+                  phase === 'memorize' && {
+                    color:
+                      timeProgress < 0.25
+                        ? pmColors.dangerRed
+                        : timeProgress < 0.5
+                        ? pmColors.goldBright
+                        : pmColors.cyanGlow,
+                  },
+                  phase === 'success' && { color: pmColors.successGreen },
+                  wrongPos !== null && { color: pmColors.dangerRed },
+                ]}
+              >
+                {phase === 'memorize'
+                  ? `⏱️ ${timeLeft.toFixed(1)}s`
+                  : phase === 'success'
+                  ? '★ ★ ★'
+                  : wrongPos
+                  ? 'FRACTURE'
+                  : `RUNES ${playerPath.length}/${path.length}`}
+              </Text>
+            </View>
+          </View>
+
+          {/* Thick Dynamic Laser Energy Drain Bar */}
+          <View style={styles.gaugeTrack}>
+            <View
+              style={[
+                styles.gaugeFill,
+                {
+                  width: `${(phase === 'memorize' ? timeProgress : pathProgress) * 100}%`,
+                  backgroundColor:
+                    phase === 'memorize'
+                      ? timeProgress < 0.25
+                        ? pmColors.dangerRed
+                        : timeProgress < 0.5
+                        ? pmColors.goldBright
+                        : pmColors.cyanGlow
+                      : phase === 'success'
+                      ? pmColors.successGreen
+                      : wrongPos
+                      ? pmColors.dangerRed
+                      : pmColors.cyanGlow,
+                },
+              ]}
+            >
+              {/* Highlight Glint Beam */}
+              <View style={styles.gaugeGlint} />
+            </View>
+          </View>
         </View>
+
+        {/* Floating Auto-Advance Banner when Chamber is Cleared */}
+        {isAdvancing && (
+          <View style={styles.advancingBanner}>
+            <Text style={styles.advancingText}>
+              ✨ CHAMBER {currentLevel} CLEARED! ADVANCING TO CHAMBER {currentLevel + 1}...
+            </Text>
+          </View>
+        )}
 
         {/* Master Game Board */}
         <View style={styles.boardStage}>
@@ -243,7 +363,8 @@ export const GameplayScreen: React.FC = () => {
             gridSize={gridSize}
             path={path}
             playerPath={playerPath}
-            phase={phase === 'memorize' ? 'memorize' : 'recall'}
+            wrongPos={wrongPos}
+            phase={phase}
             onTilePress={handleTilePress}
             maxWidth={Math.min(SCREEN_WIDTH - 32, 340)}
           />
@@ -257,6 +378,7 @@ export const GameplayScreen: React.FC = () => {
             size="small"
             width={98}
             height={44}
+            disabled={playerPath.length === 0 || phase !== 'recall' || isAdvancing}
             onPress={() => setPlayerPath([])}
             accessibilityLabel="Reset Steps"
           />
@@ -267,7 +389,7 @@ export const GameplayScreen: React.FC = () => {
             size="small"
             width={125}
             height={44}
-            disabled={coins < 25}
+            disabled={coins < 25 || phase === 'success' || isAdvancing}
             onPress={handleHint}
             accessibilityLabel="Hint"
           />
@@ -292,16 +414,16 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     justifyContent: 'space-between',
-    paddingBottom: 24,
+    paddingBottom: 20,
     alignItems: 'center',
   },
   metricRow: {
     flexDirection: 'row',
     gap: 12,
-    marginTop: 4,
+    marginTop: 2,
   },
   metricPill: {
-    backgroundColor: 'rgba(10, 18, 26, 0.92)',
+    backgroundColor: 'rgba(10, 18, 26, 0.94)',
     borderWidth: 1.5,
     borderColor: pmColors.stoneBorder,
     borderRadius: pmRadii.pill,
@@ -321,31 +443,126 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: pmColors.textPrimary,
   },
-  statusBanner: {
-    backgroundColor: 'rgba(14, 24, 34, 0.92)',
-    borderWidth: 1.5,
-    borderColor: pmColors.cyanGlow,
-    borderRadius: pmRadii.md,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginVertical: 10,
-    ...pmShadows.glowCyan,
+
+  // Prominent Timer & Progress Gauge
+  timerGaugeContainer: {
+    width: Math.min(SCREEN_WIDTH - 28, 345),
+    backgroundColor: 'rgba(10, 18, 26, 0.95)',
+    borderWidth: 2,
+    borderBottomWidth: 3,
+    borderColor: pmColors.stoneBorder,
+    borderRadius: pmRadii.lg,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginVertical: 4,
+    ...pmShadows.medium,
   },
-  statusBannerMemo: {
-    borderColor: pmColors.goldBright,
-    ...pmShadows.glowGold,
+  gaugeHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
-  statusBannerSuccess: {
-    borderColor: pmColors.successGreen,
-    ...pmShadows.glowGreen,
+  gaugeTitleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flex: 1,
+    marginRight: 8,
   },
-  statusText: {
+  gaugeIcon: {
+    fontSize: 16,
+  },
+  gaugeTitleText: {
     fontSize: 12,
     fontWeight: '900',
     color: pmColors.cyanGlow,
     letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  largeTimerBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: pmRadii.pill,
+    borderWidth: 1.5,
+    borderColor: pmColors.cyanGlow,
+    backgroundColor: 'rgba(0, 240, 255, 0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  largeTimerText: {
+    fontSize: 14,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+  },
+  badgeNormal: {
+    borderColor: pmColors.cyanGlow,
+    backgroundColor: 'rgba(0, 240, 255, 0.15)',
+    ...pmShadows.glowCyan,
+  },
+  badgeWarning: {
+    borderColor: pmColors.goldBright,
+    backgroundColor: 'rgba(255, 215, 0, 0.18)',
+    ...pmShadows.glowGold,
+  },
+  badgeDanger: {
+    borderColor: pmColors.dangerRed,
+    backgroundColor: 'rgba(255, 71, 87, 0.22)',
+    ...pmShadows.glowRed,
+  },
+  badgeSuccess: {
+    borderColor: pmColors.successGreen,
+    backgroundColor: 'rgba(46, 204, 113, 0.2)',
+    ...pmShadows.glowGreen,
+  },
+
+  // Gauge Track & Fill
+  gaugeTrack: {
+    width: '100%',
+    height: 14,
+    backgroundColor: '#070D12',
+    borderRadius: pmRadii.pill,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    overflow: 'hidden',
+    justifyContent: 'center',
+  },
+  gaugeFill: {
+    height: '100%',
+    borderRadius: pmRadii.pill,
+    position: 'relative',
+  },
+  gaugeGlint: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    width: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
+    borderRadius: pmRadii.pill,
+  },
+
+  // Auto Advancing Banner
+  advancingBanner: {
+    position: 'absolute',
+    top: 130,
+    zIndex: 99,
+    backgroundColor: 'rgba(46, 204, 113, 0.95)',
+    borderWidth: 2,
+    borderColor: '#73FFAC',
+    borderRadius: pmRadii.pill,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    ...pmShadows.glowGreen,
+  },
+  advancingText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#072412',
+    letterSpacing: 0.8,
     textAlign: 'center',
   },
+
   boardStage: {
     alignItems: 'center',
     justifyContent: 'center',

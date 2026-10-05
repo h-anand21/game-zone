@@ -43,6 +43,7 @@ export interface PathMindState {
 
   // Game Progress
   currentLevel: number;
+  nextLevel: () => void;
   score: number;
   combo: number;
   maxCombo: number;
@@ -95,6 +96,7 @@ export const usePathMindStore = create<PathMindState>((set, get) => ({
   refillHearts: () => set((s) => ({ hearts: s.maxHearts })),
 
   currentLevel: 1,
+  nextLevel: () => set((s) => ({ currentLevel: s.currentLevel + 1 })),
   score: 0,
   combo: 0,
   maxCombo: 0,

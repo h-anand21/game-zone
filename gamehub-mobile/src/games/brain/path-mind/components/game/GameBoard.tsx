@@ -19,7 +19,8 @@ interface GameBoardProps {
   gridSize?: number; // 4, 5, 6
   path?: GridPos[];
   playerPath?: GridPos[];
-  phase?: 'memorize' | 'hide' | 'recall' | 'build' | 'preview';
+  wrongPos?: GridPos | null;
+  phase?: 'memorize' | 'hide' | 'recall' | 'build' | 'preview' | 'success';
   numbersMap?: Record<string, number>;
   disabled?: boolean;
   onTilePress?: (row: number, col: number) => void;
@@ -30,6 +31,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   gridSize = 4,
   path = [],
   playerPath = [],
+  wrongPos = null,
   phase = 'recall',
   numbersMap = {},
   disabled = false,
@@ -97,10 +99,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   // Determine state of each cell
   const getCellState = (r: number, c: number): TileState => {
+    // If this tile was just fractured
+    if (wrongPos && wrongPos.row === r && wrongPos.col === c) {
+      return 'wrong';
+    }
+
     const isStart = path.length > 0 && path[0].row === r && path[0].col === c;
     const isGoal = path.length > 0 && path[path.length - 1].row === r && path[path.length - 1].col === c;
     const inTarget = path.some((p) => p.row === r && p.col === c);
     const inPlayer = playerPath.some((p) => p.row === r && p.col === c);
+
+    if (phase === 'success') {
+      if (inTarget) return 'correct';
+      return 'idle';
+    }
 
     if (phase === 'memorize' || phase === 'preview') {
       if (isStart) return 'start';
