@@ -20,7 +20,7 @@ interface GameBoardProps {
   path?: GridPos[];
   playerPath?: GridPos[];
   wrongPos?: GridPos | null;
-  phase?: 'memorize' | 'hide' | 'recall' | 'build' | 'preview' | 'success';
+  phase?: 'memorize' | 'hide' | 'recall' | 'build' | 'preview' | 'success' | 'failed';
   numbersMap?: Record<string, number>;
   disabled?: boolean;
   onTilePress?: (row: number, col: number) => void;
