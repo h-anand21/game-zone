@@ -12,6 +12,7 @@ import {
   Animated,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { StarIcon } from '../ui/GameSvgIcons';
 import { pmColors } from '../../design-system/colors';
 import { pmRadii } from '../../design-system/radii';
 import { pmShadows } from '../../design-system/shadows';
@@ -161,14 +162,12 @@ const GridTileComponent: React.FC<GridTileProps> = ({
 
         {/* Start / Goal Indicators */}
         {state === 'start' && (
-          <Text style={[styles.runeBadge, { color: pmColors.goldBright, fontSize: size * 0.38 }]}>
-            ★
-          </Text>
+          <StarIcon size={size * 0.42} color={pmColors.goldBright} />
         )}
         {state === 'goal' && (
-          <Text style={[styles.runeBadge, { color: pmColors.successGlow, fontSize: size * 0.38 }]}>
-            ◆
-          </Text>
+          <Svg width={size * 0.42} height={size * 0.42} viewBox="0 0 24 24">
+            <Path d="M12 2L2 12l10 10 10-10L12 2z" fill={pmColors.successGlow} />
+          </Svg>
         )}
 
         {/* Number Placement */}

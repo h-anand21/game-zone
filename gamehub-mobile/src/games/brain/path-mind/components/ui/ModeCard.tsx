@@ -17,6 +17,7 @@ import {
 import { ModeArtwork } from './ModeArtwork';
 import { ModeBadge } from './ModeBadge';
 import { GameButton } from './GameButton';
+import { StarIcon } from './GameSvgIcons';
 import { pmColors } from '../../design-system/colors';
 import { pmTypography } from '../../design-system/typography';
 import { pmRadii } from '../../design-system/radii';
@@ -108,9 +109,12 @@ export const ModeCard: React.FC<ModeCardProps> = ({
         {/* Top-Right Star Indicator for Selected State */}
         {isSelected && (
           <View style={[styles.selectedPill, { borderColor: mode.accentColor }]}>
-            <Text style={[styles.selectedPillText, { color: mode.accentColor }]}>
-              ★ SELECTED
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <StarIcon size={10} color={mode.accentColor} />
+              <Text style={[styles.selectedPillText, { color: mode.accentColor }]}>
+                SELECTED
+              </Text>
+            </View>
           </View>
         )}
 

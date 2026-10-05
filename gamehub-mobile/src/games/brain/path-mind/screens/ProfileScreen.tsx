@@ -4,7 +4,7 @@
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Dimensions, Image } from 'react-native';
 import { GameBackground } from '../components/ui/GameBackground';
 import { GameHeader } from '../components/ui/GameHeader';
 import { TitlePlaque } from '../components/ui/TitlePlaque';
@@ -12,6 +12,7 @@ import { GamePanel } from '../components/ui/GamePanel';
 import { GameButton } from '../components/ui/GameButton';
 import { StatCard } from '../components/ui/StatCard';
 import { ExplorerCharacter } from '../components/ui/ExplorerCharacter';
+import { StarIcon, CrownIcon } from '../components/ui/GameSvgIcons';
 import { usePathMindStore } from '../store/pathMindStore';
 import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
@@ -78,7 +79,7 @@ export const ProfileScreen: React.FC = () => {
           />
           <StatCard
             label="STARS GATHERED"
-            value={`${stars} ★`}
+            value={`${stars} STARS`}
             variant="gold"
             style={styles.statItem}
           />
@@ -101,15 +102,15 @@ export const ProfileScreen: React.FC = () => {
           <Text style={styles.panelTitle}>EARNED BADGES</Text>
           <View style={styles.badgeRow}>
             <View style={styles.badgePill}>
-              <Text style={styles.badgeIcon}>🧭</Text>
+              <Image source={pmAssets.icons.compass} style={styles.badgeImg} resizeMode="contain" />
               <Text style={styles.badgeLabel}>PATH PRODIGY</Text>
             </View>
             <View style={styles.badgePill}>
-              <Text style={styles.badgeIcon}>✨</Text>
+              <StarIcon size={12} color="#FFE27A" />
               <Text style={styles.badgeLabel}>RUNE SIGHT</Text>
             </View>
             <View style={styles.badgePill}>
-              <Text style={styles.badgeIcon}>👑</Text>
+              <CrownIcon size={12} color="#FFE27A" />
               <Text style={styles.badgeLabel}>CHAMBER KING</Text>
             </View>
           </View>
@@ -225,6 +226,10 @@ const styles = StyleSheet.create({
   badgePill: {
     alignItems: 'center',
     gap: 4,
+  },
+  badgeImg: {
+    width: 14,
+    height: 14,
   },
   badgeIcon: {
     fontSize: 22,

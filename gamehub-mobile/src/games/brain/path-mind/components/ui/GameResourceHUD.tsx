@@ -33,7 +33,7 @@ export const GameResourceHUD: React.FC<GameResourceHUDProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      {/* 1. HEARTS: ♥ 3/3 */}
+      {/* 1. HEARTS: 3/3 */}
       <Pressable
         onPress={onHeartsPress}
         style={({ pressed }) => [styles.pill, styles.pillHearts, pressed && styles.pressed]}

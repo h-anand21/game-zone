@@ -2,7 +2,8 @@
 // PATH MIND — Screen 16: GameplayScreen
 // Master Core Puzzle Engine: Memorize -> Retrace -> Auto Advance
 // Live SVG energy polyline, interactive stone tiles, combo multiplier,
-// prominent dynamic decreasing timer gauge & seamless level progression
+// prominent dynamic decreasing timer gauge, fantasy chamber plaque & restart control
+// ZERO EMOJIS — Pure Vector SVG Icons & Authentic Plaque Art
 // ============================================================
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -11,6 +12,14 @@ import { GameBackground } from '../components/ui/GameBackground';
 import { GameHeader } from '../components/ui/GameHeader';
 import { GameBoard } from '../components/game/GameBoard';
 import { GameButton } from '../components/ui/GameButton';
+import {
+  HourglassIcon,
+  CheckIcon,
+  CrossIcon,
+  LightningIcon,
+  TimerIcon,
+  CrownIcon,
+} from '../components/ui/GameSvgIcons';
 import { usePathMindStore } from '../store/pathMindStore';
 import { generatePath } from '../logic';
 import { pmColors } from '../design-system/colors';
@@ -96,7 +105,7 @@ export const GameplayScreen: React.FC = () => {
         if (prev <= 0.05) {
           clearInterval(interval);
           setPhase('recall');
-          setStatusMessage('RETRACE THE PATH FROM START!');
+          setStatusMessage('RETRACE THE PATH FROM START');
           if (hapticsEnabled) {
             Vibration.vibrate(50);
           }
@@ -134,6 +143,26 @@ export const GameplayScreen: React.FC = () => {
     setPhase('memorize');
     setStatusMessage('MEMORIZE THE PATH');
   }, [currentLevel, gridSize, nextLevel, selectedDifficulty]);
+
+  // Restart current chamber cleanly (generates fresh runes, resets steps & timer)
+  const handleRestartChamber = () => {
+    if (isAdvancing) return;
+    const freshPath = generatePath(gridSize, targetLength);
+    setPath(freshPath);
+    setPlayerPath([]);
+    setWrongPos(null);
+    setIsAdvancing(false);
+    setLocalCombo(0);
+    const memoSeconds =
+      selectedDifficulty === 'HARD' ? 2.5 : selectedDifficulty === 'MEDIUM' ? 3.5 : 4.5;
+    setTotalMemoTime(memoSeconds);
+    setTimeLeft(memoSeconds);
+    setPhase('memorize');
+    setStatusMessage('CHAMBER RESTARTED - MEMORIZE RUNES');
+    if (hapticsEnabled) {
+      Vibration.vibrate(35);
+    }
+  };
 
   // Handle tile press or continuous finger drag
   const handleTilePress = (row: number, col: number) => {
@@ -187,16 +216,16 @@ export const GameplayScreen: React.FC = () => {
       if (nextPlayerPath.length === path.length) {
         setPhase('success');
         setIsAdvancing(true);
-        setStatusMessage(`CHAMBER ${currentLevel} CONQUERED! ★★★`);
+        setStatusMessage(`CHAMBER ${currentLevel} CONQUERED`);
         addCoins(25);
         if (hapticsEnabled) {
           Vibration.vibrate([0, 50, 40, 70]);
         }
 
-        // Automatic progression to next level in 750ms!
+        // Smooth progression to next level in 1100ms
         setTimeout(() => {
           advanceToNextChamber();
-        }, 750);
+        }, 1100);
       } else {
         setStatusMessage(`STEP ${nextPlayerPath.length}/${path.length} • COMBO x${newCombo}`);
       }
@@ -206,7 +235,7 @@ export const GameplayScreen: React.FC = () => {
       loseHeart();
       setLocalCombo(0);
       usePathMindStore.setState({ combo: 0 });
-      setStatusMessage('❌ PATH FRACTURE! -1 HEART');
+      setStatusMessage('PATH FRACTURE! -1 HEART');
       if (hapticsEnabled) {
         Vibration.vibrate([0, 100, 50, 120]);
       }
@@ -215,7 +244,7 @@ export const GameplayScreen: React.FC = () => {
       if (hearts <= 1) {
         setPhase('failed');
         setTimeout(() => {
-          setStatusMessage('💀 EXPEDITION FAILED!');
+          setStatusMessage('EXPEDITION FAILED');
           setScreen('result');
         }, 1300);
       } else {
@@ -237,7 +266,7 @@ export const GameplayScreen: React.FC = () => {
     setPhase('memorize');
     setTimeLeft(2.0);
     setTotalMemoTime(2.0);
-    setStatusMessage('HINT ACTIVE! 💡');
+    setStatusMessage('HINT ACTIVE');
   };
 
   // Calculate normalized time progress for gauge
@@ -271,21 +300,21 @@ export const GameplayScreen: React.FC = () => {
         </View>
 
         {/* ============================================================ */}
-        {/* PROMINENT DYNAMIC TIMER & PROGRESS GAUGE                     */}
+        {/* PROMINENT DYNAMIC TIMER & PROGRESS GAUGE (ZERO EMOJIS)       */}
         {/* ============================================================ */}
         <View style={styles.timerGaugeContainer}>
           {/* Top Label & Countdown Number Row */}
           <View style={styles.gaugeHeaderRow}>
             <View style={styles.gaugeTitleGroup}>
-              <Text style={styles.gaugeIcon}>
-                {phase === 'memorize'
-                  ? '⏳'
-                  : phase === 'success'
-                  ? '🎉'
-                  : wrongPos
-                  ? '❌'
-                  : '⚡'}
-              </Text>
+              {phase === 'memorize' ? (
+                <HourglassIcon size={15} color={pmColors.goldBright} />
+              ) : phase === 'success' ? (
+                <CheckIcon size={15} color={pmColors.successGreen} />
+              ) : wrongPos ? (
+                <CrossIcon size={15} color={pmColors.dangerRed} />
+              ) : (
+                <LightningIcon size={15} color={pmColors.cyanGlow} />
+              )}
               <Text
                 style={[
                   styles.gaugeTitleText,
@@ -298,7 +327,7 @@ export const GameplayScreen: React.FC = () => {
                 {phase === 'memorize'
                   ? 'MEMORIZE SACRED PATH'
                   : phase === 'success'
-                  ? `CHAMBER ${currentLevel} CONQUERED!`
+                  ? `CHAMBER ${currentLevel} CONQUERED`
                   : wrongPos
                   ? 'PATH FRACTURE! -1 HEART'
                   : `RETRACE RUNES (${playerPath.length}/${path.length})`}
@@ -320,29 +349,43 @@ export const GameplayScreen: React.FC = () => {
                 wrongPos !== null && styles.badgeDanger,
               ]}
             >
-              <Text
-                style={[
-                  styles.largeTimerText,
-                  phase === 'memorize' && {
-                    color:
+              <View style={styles.badgeContentRow}>
+                {phase === 'memorize' && (
+                  <TimerIcon
+                    size={12}
+                    color={
                       timeProgress < 0.25
                         ? pmColors.dangerRed
                         : timeProgress < 0.5
                         ? pmColors.goldBright
-                        : pmColors.cyanGlow,
-                  },
-                  phase === 'success' && { color: pmColors.successGreen },
-                  wrongPos !== null && { color: pmColors.dangerRed },
-                ]}
-              >
-                {phase === 'memorize'
-                  ? `⏱️ ${timeLeft.toFixed(1)}s`
-                  : phase === 'success'
-                  ? '★ ★ ★'
-                  : wrongPos
-                  ? 'FRACTURE'
-                  : `RUNES ${playerPath.length}/${path.length}`}
-              </Text>
+                        : pmColors.cyanGlow
+                    }
+                  />
+                )}
+                <Text
+                  style={[
+                    styles.largeTimerText,
+                    phase === 'memorize' && {
+                      color:
+                        timeProgress < 0.25
+                          ? pmColors.dangerRed
+                          : timeProgress < 0.5
+                          ? pmColors.goldBright
+                          : pmColors.cyanGlow,
+                    },
+                    phase === 'success' && { color: pmColors.successGreen },
+                    wrongPos !== null && { color: pmColors.dangerRed },
+                  ]}
+                >
+                  {phase === 'memorize'
+                    ? `${timeLeft.toFixed(1)}s`
+                    : phase === 'success'
+                    ? 'COMPLETE'
+                    : wrongPos
+                    ? 'FRACTURE'
+                    : `${playerPath.length}/${path.length}`}
+                </Text>
+              </View>
             </View>
           </View>
 
@@ -374,15 +417,6 @@ export const GameplayScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Floating Auto-Advance Banner when Chamber is Cleared */}
-        {isAdvancing && (
-          <View style={styles.advancingBanner}>
-            <Text style={styles.advancingText}>
-              ✨ CHAMBER {currentLevel} CLEARED! ADVANCING TO CHAMBER {currentLevel + 1}...
-            </Text>
-          </View>
-        )}
-
         {/* Master Game Board */}
         <View style={styles.boardStage}>
           <GameBoard
@@ -396,40 +430,73 @@ export const GameplayScreen: React.FC = () => {
           />
         </View>
 
-        {/* Bottom Utility Controls */}
+        {/* Bottom Utility Controls: RESTART, HINT, WORLD MAP */}
         <View style={styles.controlRow}>
           <GameButton
-            imageSource={pmAssets.buttons.undoWood}
-            label="UNDO"
+            imageSource={pmAssets.buttons.restart}
             size="small"
-            width={98}
-            height={44}
-            disabled={playerPath.length === 0 || phase !== 'recall' || isAdvancing}
-            onPress={() => setPlayerPath([])}
-            accessibilityLabel="Reset Steps"
+            width={110}
+            height={46}
+            disabled={isAdvancing}
+            onPress={handleRestartChamber}
+            accessibilityLabel="Restart Chamber"
           />
 
           <GameButton
-            label="HINT (25 ◉)"
+            label="HINT (25)"
             variant="cyan"
             size="small"
-            width={125}
-            height={44}
+            width={120}
+            height={46}
             disabled={coins < 25 || phase === 'success' || isAdvancing}
             onPress={handleHint}
             accessibilityLabel="Hint"
           />
 
           <GameButton
-            imageSource={pmAssets.buttons.worldMapGreen}
-            label="WORLD MAP"
+            label="MAP"
+            iconName="map"
+            variant="wood"
             size="small"
-            width={106}
-            height={44}
+            width={85}
+            height={46}
             onPress={() => setScreen('world_map')}
             accessibilityLabel="World Map"
           />
         </View>
+
+        {/* Tactile Chamber Progression Plaque (Appears on level clear, NO EMOJIS) */}
+        {isAdvancing && (
+          <View style={styles.advancingOverlay} pointerEvents="none">
+            <View style={styles.advancingCard}>
+              {/* Corner metal rivets */}
+              <View style={[styles.cardRivet, { top: 6, left: 6 }]} />
+              <View style={[styles.cardRivet, { top: 6, right: 6 }]} />
+              <View style={[styles.cardRivet, { bottom: 6, left: 6 }]} />
+              <View style={[styles.cardRivet, { bottom: 6, right: 6 }]} />
+
+              <View style={styles.advancingInnerPlate}>
+                <View style={styles.advancingCrownBadge}>
+                  <CrownIcon size={24} color="#FFE066" />
+                </View>
+
+                <View style={styles.advancingTextCol}>
+                  <Text style={styles.advancingTitle}>
+                    CHAMBER {currentLevel} CLEARED!
+                  </Text>
+                  <Text style={styles.advancingReward}>
+                    +25 ANCIENT COINS • COMBO x{localCombo}
+                  </Text>
+                  <View style={styles.advancingNextBadge}>
+                    <Text style={styles.advancingSubtitle}>
+                      ENTERING CHAMBER {currentLevel + 1}...
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
       </View>
     </GameBackground>
   );
@@ -496,9 +563,6 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
   },
-  gaugeIcon: {
-    fontSize: 16,
-  },
   gaugeTitleText: {
     fontSize: 12,
     fontWeight: '900',
@@ -516,8 +580,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  badgeContentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   largeTimerText: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '900',
     letterSpacing: 0.6,
   },
@@ -568,23 +637,99 @@ const styles = StyleSheet.create({
     borderRadius: pmRadii.pill,
   },
 
-  // Auto Advancing Banner
-  advancingBanner: {
+  // Fantasy Chamber Progression Overlay & Plaque
+  advancingOverlay: {
     position: 'absolute',
-    top: 130,
-    zIndex: 99,
-    backgroundColor: 'rgba(46, 204, 113, 0.95)',
-    borderWidth: 2,
-    borderColor: '#73FFAC',
-    borderRadius: pmRadii.pill,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    ...pmShadows.glowGreen,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(5, 10, 16, 0.72)',
+    zIndex: 999,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  advancingText: {
-    fontSize: 12,
+  advancingCard: {
+    width: Math.min(SCREEN_WIDTH - 40, 320),
+    backgroundColor: '#1E2C38',
+    borderWidth: 2.5,
+    borderBottomWidth: 5,
+    borderColor: '#E5A638',
+    borderRadius: pmRadii.lg,
+    padding: 4,
+    ...pmShadows.glowGold,
+    position: 'relative',
+  },
+  cardRivet: {
+    position: 'absolute',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#FFE066',
+    zIndex: 2,
+    opacity: 0.8,
+  },
+  advancingInnerPlate: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#201208',
+    borderWidth: 1.5,
+    borderBottomWidth: 3,
+    borderColor: '#7A4D10',
+    borderRadius: pmRadii.md,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
+    gap: 8,
+  },
+  advancingCrownBadge: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: '#351C09',
+    borderWidth: 1.5,
+    borderColor: '#FFE066',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...pmShadows.glowGold,
+  },
+  advancingTextCol: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  advancingTitle: {
+    fontFamily: pmTypography.displaySection.fontFamily,
+    fontSize: 16,
     fontWeight: '900',
-    color: '#072412',
+    color: '#FFE27A',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    textShadowColor: '#4A2800',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  advancingReward: {
+    fontFamily: pmTypography.caption.fontFamily,
+    fontSize: 12,
+    fontWeight: '800',
+    color: pmColors.goldBright,
+    letterSpacing: 0.8,
+    textAlign: 'center',
+  },
+  advancingNextBadge: {
+    marginTop: 4,
+    backgroundColor: 'rgba(0, 168, 204, 0.15)',
+    borderWidth: 1,
+    borderColor: pmColors.cyanGlow,
+    borderRadius: pmRadii.sm,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  advancingSubtitle: {
+    fontFamily: pmTypography.caption.fontFamily,
+    fontSize: 11,
+    fontWeight: '800',
+    color: pmColors.cyanGlow,
     letterSpacing: 0.8,
     textAlign: 'center',
   },

@@ -4,12 +4,13 @@
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
 import { GameBackground } from '../components/ui/GameBackground';
 import { GameHeader } from '../components/ui/GameHeader';
 import { TitlePlaque } from '../components/ui/TitlePlaque';
 import { GamePanel } from '../components/ui/GamePanel';
 import { GameButton } from '../components/ui/GameButton';
+import { StarIcon } from '../components/ui/GameSvgIcons';
 import { usePathMindStore } from '../store/pathMindStore';
 import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
@@ -57,9 +58,11 @@ export const ResultScreen: React.FC = () => {
 
         {/* 3 Golden Stars Plaque */}
         <View style={styles.starRow}>
-          <Text style={styles.starLarge}>★</Text>
-          <Text style={[styles.starLarge, styles.starCenter]}>★</Text>
-          <Text style={styles.starLarge}>★</Text>
+          <StarIcon size={38} color="#FFD700" filled />
+          <View style={{ marginBottom: 12 }}>
+            <StarIcon size={52} color="#FFD700" filled />
+          </View>
+          <StarIcon size={38} color="#FFD700" filled />
         </View>
 
         {/* Rewards Panel */}
@@ -83,15 +86,22 @@ export const ResultScreen: React.FC = () => {
 
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>HEARTS SAVED</Text>
-              <Text style={[styles.statValue, { color: pmColors.dangerRed }]}>
-                {'♥ '.repeat(hearts || 3)}
-              </Text>
+              <View style={styles.heartRow}>
+                {Array.from({ length: hearts || 3 }).map((_, hIdx) => (
+                  <Image
+                    key={hIdx}
+                    source={pmAssets.icons.heart}
+                    style={{ width: 16, height: 16 }}
+                    resizeMode="contain"
+                  />
+                ))}
+              </View>
             </View>
 
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>COINS EARNED</Text>
               <Text style={[styles.statValue, { color: pmColors.goldBright }]}>
-                +35 ◉
+                +35 COINS
               </Text>
             </View>
           </View>
@@ -215,6 +225,12 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontWeight: '900',
+  },
+  heartRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
   },
   buttonStack: {
     alignItems: 'center',

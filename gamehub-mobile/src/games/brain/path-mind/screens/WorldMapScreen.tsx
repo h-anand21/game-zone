@@ -17,6 +17,7 @@ import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
 import { pmAssets } from '../design-system/uiAssets';
+import { LockIcon, StarIcon, CrownIcon } from '../components/ui/GameSvgIcons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -101,7 +102,7 @@ export const WorldMapScreen: React.FC = () => {
                       {node.level}
                     </Text>
                   ) : (
-                    <Text style={styles.lockIcon}>🔒</Text>
+                    <LockIcon size={18} color="#8A9BA8" />
                   )}
 
                   {/* Pulsing indicator on current */}
@@ -111,25 +112,34 @@ export const WorldMapScreen: React.FC = () => {
                 {/* Stars under chamber */}
                 <View style={styles.starRow}>
                   {node.isUnlocked ? (
-                    <Text style={styles.starText}>
-                      {'★'.repeat(node.stars)}
-                      {'☆'.repeat(3 - node.stars)}
-                    </Text>
+                    <View style={styles.starIconsGroup}>
+                      {[0, 1, 2].map((sIndex) => (
+                        <StarIcon
+                          key={sIndex}
+                          size={10}
+                          color="#FFD700"
+                          filled={sIndex < node.stars}
+                        />
+                      ))}
+                    </View>
                   ) : (
                     <Text style={styles.lockedText}>LOCKED</Text>
                   )}
                 </View>
 
                 {/* Chamber Name */}
-                <Text
-                  style={[
-                    styles.nodeName,
-                    isCurrent && { color: pmColors.cyanGlow, fontWeight: '900' },
-                  ]}
-                  numberOfLines={1}
-                >
-                  {node.isBoss ? '👑 SHRINE' : `CH. ${node.level}`}
-                </Text>
+                <View style={styles.chamberNameRow}>
+                  {node.isBoss && <CrownIcon size={11} color="#FFD700" />}
+                  <Text
+                    style={[
+                      styles.nodeName,
+                      isCurrent && { color: pmColors.cyanGlow, fontWeight: '900' },
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {node.isBoss ? 'SHRINE' : `CH. ${node.level}`}
+                  </Text>
+                </View>
               </View>
             );
           })}
@@ -240,10 +250,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  starText: {
-    fontSize: 11,
-    color: pmColors.goldBright,
-    fontWeight: '900',
+  starIconsGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  chamberNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginTop: 2,
   },
   lockedText: {
     fontSize: 8,

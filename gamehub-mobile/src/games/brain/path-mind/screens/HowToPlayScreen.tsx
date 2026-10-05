@@ -17,6 +17,7 @@ import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
 import { pmAssets } from '../design-system/uiAssets';
+import { LampIcon } from '../components/ui/GameSvgIcons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -101,7 +102,10 @@ export const HowToPlayScreen: React.FC = () => {
 
         {/* Pro Tip Box */}
         <View style={styles.proTipBox}>
-          <Text style={styles.tipHeader}>💡 CARTOGRAPHER'S TIP</Text>
+          <View style={styles.tipHeaderRow}>
+            <LampIcon size={14} color="#FFD700" />
+            <Text style={styles.tipHeader}>CARTOGRAPHER'S TIP</Text>
+          </View>
           <Text style={styles.tipBody}>
             Trace the line mentally with your eyes as it illuminates. Notice directional turns (e.g. 2 Right, 1 Down, 2 Right) instead of individual coordinates!
           </Text>
@@ -207,12 +211,17 @@ const styles = StyleSheet.create({
     marginTop: 16,
     ...pmShadows.soft,
   },
+  tipHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
   tipHeader: {
     fontSize: 12,
     fontWeight: '900',
     color: pmColors.goldBright,
     letterSpacing: 0.8,
-    marginBottom: 4,
   },
   tipBody: {
     ...pmTypography.caption,

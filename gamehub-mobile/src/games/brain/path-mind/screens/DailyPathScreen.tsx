@@ -16,6 +16,7 @@ import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
 import { pmAssets } from '../design-system/uiAssets';
+import { FlameIcon, CheckIcon, ChestIcon } from '../components/ui/GameSvgIcons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -54,7 +55,7 @@ export const DailyPathScreen: React.FC = () => {
 
         {/* Streak & Timer Banner */}
         <View style={styles.streakBanner}>
-          <Text style={styles.streakIcon}>🔥</Text>
+          <FlameIcon size={15} color="#FF8C00" />
           <Text style={styles.streakText}>{streak}-DAY EXPEDITION STREAK</Text>
         </View>
 
@@ -74,11 +75,11 @@ export const DailyPathScreen: React.FC = () => {
                 <Text style={styles.dayLabel}>{d.label}</Text>
                 <View style={styles.rewardIconWrap}>
                   {d.status === 'done' ? (
-                    <Text style={styles.checkIcon}>✓</Text>
+                    <CheckIcon size={14} color="#2ECC71" />
                   ) : d.status === 'chest' ? (
-                    <Text style={styles.chestIcon}>🎁</Text>
+                    <ChestIcon size={16} color="#FFD700" />
                   ) : (
-                    <Text style={styles.coinReward}>◉ {d.reward}</Text>
+                    <Text style={styles.coinReward}>+{d.reward}</Text>
                   )}
                 </View>
                 <Text
@@ -96,7 +97,10 @@ export const DailyPathScreen: React.FC = () => {
 
         {/* Grand Chest Teaser */}
         <GamePanel variant="wood" style={styles.chestPanel}>
-          <Text style={styles.chestHeader}>🏺 WEEKEND REWARD CHEST</Text>
+          <View style={styles.chestHeaderRow}>
+            <ChestIcon size={16} color="#FFD700" />
+            <Text style={styles.chestHeader}>WEEKEND REWARD CHEST</Text>
+          </View>
           <Text style={styles.chestSub}>
             Complete today to unlock the ancient Valley Cartographer Relic and +150 bonus coins!
           </Text>
@@ -221,12 +225,17 @@ const styles = StyleSheet.create({
     padding: 14,
     alignItems: 'center',
   },
+  chestHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
   chestHeader: {
     fontSize: 13,
     fontWeight: '900',
     color: pmColors.goldBright,
     letterSpacing: 0.8,
-    marginBottom: 4,
   },
   chestSub: {
     ...pmTypography.caption,

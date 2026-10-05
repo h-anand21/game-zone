@@ -4,12 +4,13 @@
 // ============================================================
 
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions, Image, ImageSourcePropType } from 'react-native';
 import { GameBackground } from '../components/ui/GameBackground';
 import { GameHeader } from '../components/ui/GameHeader';
 import { TitlePlaque } from '../components/ui/TitlePlaque';
 import { GamePanel } from '../components/ui/GamePanel';
 import { GameButton } from '../components/ui/GameButton';
+import { LockIcon } from '../components/ui/GameSvgIcons';
 import { usePathMindStore } from '../store/pathMindStore';
 import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
@@ -22,7 +23,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 interface RelicItem {
   id: string;
   name: string;
-  icon: string;
+  iconAsset: ImageSourcePropType;
   desc: string;
   unlocked: boolean;
   category: 'RELICS' | 'KEYS' | 'RUNES';
@@ -32,7 +33,7 @@ const ITEMS: RelicItem[] = [
   {
     id: 'compass',
     name: 'GOLDEN COMPASS',
-    icon: '🧭',
+    iconAsset: pmAssets.icons.compass,
     desc: 'Increases path score multiplier by +10%.',
     unlocked: true,
     category: 'RELICS',
@@ -40,7 +41,7 @@ const ITEMS: RelicItem[] = [
   {
     id: 'amulet',
     name: 'SUN AMULET',
-    icon: '☀️',
+    iconAsset: pmAssets.icons.star,
     desc: 'Grants 1 free hint per daily expedition.',
     unlocked: true,
     category: 'RELICS',
@@ -48,7 +49,7 @@ const ITEMS: RelicItem[] = [
   {
     id: 'chalice',
     name: 'TEMPLE CHALICE',
-    icon: '🏆',
+    iconAsset: pmAssets.icons.trophy,
     desc: 'Restores 1 heart every 3 flawless runs.',
     unlocked: true,
     category: 'RELICS',
@@ -56,7 +57,7 @@ const ITEMS: RelicItem[] = [
   {
     id: 'key_gold',
     name: 'SOLAR KEY',
-    icon: '🗝️',
+    iconAsset: pmAssets.icons.key,
     desc: 'Unlocks Chamber 10 secret boss vault.',
     unlocked: true,
     category: 'KEYS',
@@ -64,7 +65,7 @@ const ITEMS: RelicItem[] = [
   {
     id: 'key_cyan',
     name: 'ASTRAL KEY',
-    icon: '🔑',
+    iconAsset: pmAssets.icons.gem,
     desc: 'Unlocks Chamber 20 astral gateway.',
     unlocked: false,
     category: 'KEYS',
@@ -72,7 +73,7 @@ const ITEMS: RelicItem[] = [
   {
     id: 'rune_ignis',
     name: 'IGNIS RUNESTONE',
-    icon: '🔥',
+    iconAsset: pmAssets.icons.crown,
     desc: 'Ancient flame rune glowing with power.',
     unlocked: true,
     category: 'RUNES',
@@ -80,7 +81,7 @@ const ITEMS: RelicItem[] = [
   {
     id: 'rune_aqua',
     name: 'AQUA RUNESTONE',
-    icon: '💧',
+    iconAsset: pmAssets.icons.gem,
     desc: 'Glacial rune of ancient clarity.',
     unlocked: false,
     category: 'RUNES',
@@ -88,7 +89,7 @@ const ITEMS: RelicItem[] = [
   {
     id: 'rune_terra',
     name: 'TERRA RUNESTONE',
-    icon: '🌿',
+    iconAsset: pmAssets.icons.backpack,
     desc: 'Earth rune infused with forest vitality.',
     unlocked: false,
     category: 'RUNES',
@@ -159,7 +160,11 @@ export const CollectionScreen: React.FC = () => {
               ])}
             >
               <View style={styles.iconCircle}>
-                <Text style={styles.relicIcon}>{item.unlocked ? item.icon : '🔒'}</Text>
+                {item.unlocked ? (
+                  <Image source={item.iconAsset} style={{ width: 28, height: 28 }} resizeMode="contain" />
+                ) : (
+                  <LockIcon size={22} color="#7A8B9A" />
+                )}
               </View>
 
               <Text

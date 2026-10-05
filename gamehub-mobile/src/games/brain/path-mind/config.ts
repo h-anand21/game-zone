@@ -11,7 +11,7 @@ export const PATH_MIND_CONFIG: GameConfig = {
   offline: true,
   multiplayer: false,
   route: '/games/path-mind',
-  icon: '🛤️',
+  icon: 'map',
   status: 'available',
   gameVersion: '1.0.0',
   scoreVersion: 'v1',

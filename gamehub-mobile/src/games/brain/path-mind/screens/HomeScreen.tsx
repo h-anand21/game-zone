@@ -15,6 +15,7 @@ import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
 import { pmAssets } from '../design-system/uiAssets';
+import { FlameIcon } from '../components/ui/GameSvgIcons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -76,7 +77,8 @@ export const HomeScreen: React.FC = () => {
               CHAMBER {currentLevel} • ANCIENT VALLEY
             </Text>
             <View style={styles.streakPill}>
-              <Text style={styles.streakText}>🔥 {streak}</Text>
+              <FlameIcon size={12} color="#FF8C00" />
+              <Text style={styles.streakText}>{streak}</Text>
             </View>
           </View>
         </View>
