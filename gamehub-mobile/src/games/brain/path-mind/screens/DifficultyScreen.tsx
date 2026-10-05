@@ -109,10 +109,7 @@ export const DifficultyScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         <TitlePlaque
-          title="SELECT DIFFICULTY"
-          subtitle="CHAMBER COMPLEXITY & RULES"
-          variant="gold"
-          size="medium"
+          imageSource={pmAssets.plaques.customDifficulty}
           style={styles.titlePlaque}
         />
 

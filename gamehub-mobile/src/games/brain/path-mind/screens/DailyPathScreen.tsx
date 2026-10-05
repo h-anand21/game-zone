@@ -48,10 +48,7 @@ export const DailyPathScreen: React.FC = () => {
 
       <View style={styles.container}>
         <TitlePlaque
-          title="DAILY EXPEDITION"
-          subtitle="TODAY'S SACRED PUZZLE"
-          variant="gold"
-          size="medium"
+          imageSource={pmAssets.plaques.dailyPath}
           style={styles.titlePlaque}
         />
 

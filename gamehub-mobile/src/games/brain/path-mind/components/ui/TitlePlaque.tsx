@@ -1,30 +1,54 @@
 // ============================================================
 // PATH MIND — Component 02: TitlePlaque
-// Carved fantasy stone & wood title banner with gold bevels
+// Authentic Fantasy Menu Plaque Atlas & Carved Stone Banner
 // ============================================================
 
 import React from 'react';
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
+import { View, Text, StyleSheet, ViewStyle, Image, ImageSourcePropType, Dimensions } from 'react-native';
 import { pmColors } from '../../design-system/colors';
 import { pmTypography } from '../../design-system/typography';
 import { pmRadii } from '../../design-system/radii';
 import { pmShadows } from '../../design-system/shadows';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
 interface TitlePlaqueProps {
-  title: string;
+  title?: string;
   subtitle?: string;
+  imageSource?: ImageSourcePropType;
   variant?: 'gold' | 'cyan' | 'wood' | 'stone';
   size?: 'large' | 'medium' | 'small';
+  width?: number;
+  height?: number;
   style?: ViewStyle;
 }
 
 export const TitlePlaque: React.FC<TitlePlaqueProps> = ({
   title,
   subtitle,
+  imageSource,
   variant = 'gold',
   size = 'medium',
+  width,
+  height,
   style,
 }) => {
+  // If an authentic cropped plaque atlas image is provided, render it with exact aspect ratio
+  if (imageSource) {
+    const plaqueWidth = width || Math.min(SCREEN_WIDTH - 36, 320);
+    const plaqueHeight = height || Math.round(plaqueWidth * (170 / 400)); // Natural ~2.35:1 aspect ratio
+
+    return (
+      <View style={[styles.imageWrapper, style]}>
+        <Image
+          source={imageSource}
+          style={{ width: plaqueWidth, height: plaqueHeight }}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
+
   const getBorderColor = () => {
     switch (variant) {
       case 'cyan':
@@ -62,16 +86,18 @@ export const TitlePlaque: React.FC<TitlePlaqueProps> = ({
       <View style={[styles.cornerStud, styles.bottomRight, { backgroundColor: getBorderColor() }]} />
 
       <View style={[styles.innerContent, size === 'large' && styles.innerLarge]}>
-        <Text
-          style={[
-            size === 'large' ? pmTypography.displayHero : pmTypography.displayTitle,
-            { color: getTextColor() },
-            styles.titleText,
-          ]}
-          numberOfLines={1}
-        >
-          {title}
-        </Text>
+        {title && (
+          <Text
+            style={[
+              size === 'large' ? pmTypography.displayHero : pmTypography.displayTitle,
+              { color: getTextColor() },
+              styles.titleText,
+            ]}
+            numberOfLines={1}
+          >
+            {title}
+          </Text>
+        )}
         {subtitle && (
           <Text style={[pmTypography.displaySub, styles.subtitleText]}>
             {subtitle}
@@ -83,6 +109,11 @@ export const TitlePlaque: React.FC<TitlePlaqueProps> = ({
 };
 
 const styles = StyleSheet.create({
+  imageWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 4,
+  },
   outerFrame: {
     backgroundColor: 'rgba(12, 22, 30, 0.95)',
     borderWidth: 2.5,

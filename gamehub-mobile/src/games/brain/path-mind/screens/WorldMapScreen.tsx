@@ -16,6 +16,7 @@ import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
+import { pmAssets } from '../design-system/uiAssets';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -65,10 +66,7 @@ export const WorldMapScreen: React.FC = () => {
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <TitlePlaque
-          title="EXPEDITION MAP"
-          subtitle="ANCIENT VALLEY CHAMBERS"
-          variant="cyan"
-          size="medium"
+          imageSource={pmAssets.plaques.maps}
           style={styles.titlePlaque}
         />
 

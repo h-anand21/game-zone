@@ -92,10 +92,7 @@ export const BuildPathScreen: React.FC = () => {
 
       <View style={styles.container}>
         <TitlePlaque
-          title="BUILD YOUR PATH"
-          subtitle="SACRED PUZZLE WORKSHOP"
-          variant="gold"
-          size="medium"
+          imageSource={pmAssets.plaques.buildPath}
           style={styles.titlePlaque}
         />
 

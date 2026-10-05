@@ -51,10 +51,7 @@ export const ResultScreen: React.FC = () => {
 
       <View style={styles.container}>
         <TitlePlaque
-          title="CHAMBER CONQUERED!"
-          subtitle={`EXPEDITION ${currentLevel} COMPLETED`}
-          variant="gold"
-          size="medium"
+          imageSource={pmAssets.plaques.results}
           style={styles.titlePlaque}
         />
 

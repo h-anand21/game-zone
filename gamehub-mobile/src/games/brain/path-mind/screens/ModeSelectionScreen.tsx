@@ -104,10 +104,7 @@ export const ModeSelectionScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
       >
         <TitlePlaque
-          title="CHOOSE YOUR MODE"
-          subtitle="SELECT EXPEDITION DISCIPLINE"
-          variant="cyan"
-          size="medium"
+          imageSource={pmAssets.plaques.gameplay}
           style={styles.titlePlaque}
         />
 
