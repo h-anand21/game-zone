@@ -16,6 +16,7 @@ import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
+import { pmAssets } from '../design-system/uiAssets';
 import type { GridPos } from '../types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
