@@ -15,7 +15,6 @@ import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
 import { pmAssets } from '../design-system/uiAssets';
-import { FlameIcon } from '../components/ui/GameSvgIcons';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -69,31 +68,19 @@ export const HomeScreen: React.FC = () => {
         {/* 2. ARTWORK STAGE: Clean breathing space                     */}
         {/* Background showcases the majestic Path Mind logo & explorer */}
         {/* ============================================================ */}
-        <View style={styles.sceneryStage}>
-          {/* Subtle Chamber Region Tag */}
-          <View style={styles.expeditionBadge}>
-            <Image source={pmAssets.icons.compass} style={styles.badgeIcon} resizeMode="contain" />
-            <Text style={styles.expeditionText}>
-              CHAMBER {currentLevel} • ANCIENT VALLEY
-            </Text>
-            <View style={styles.streakPill}>
-              <FlameIcon size={12} color="#FF8C00" />
-              <Text style={styles.streakText}>{streak}</Text>
-            </View>
-          </View>
-        </View>
+        <View style={styles.sceneryStage} />
 
         {/* ============================================================ */}
         {/* 3. PRIMARY ACTIONS: Tactile Vector RPG Buttons               */}
         {/* ============================================================ */}
         <View style={styles.actionSection}>
-          {/* PLAY NOW CTA */}
+          {/* PLAY NOW CTA - Prominent Large Master Action */}
           <GameButton
             imageSource={pmAssets.buttons.playNow}
             label="PLAY NOW"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 64, 250)}
-            height={68}
+            width={Math.min(SCREEN_WIDTH - 40, 280)}
+            height={78}
             onPress={() => setScreen('modes')}
             accessibilityLabel="Play Now"
           />
@@ -103,11 +90,11 @@ export const HomeScreen: React.FC = () => {
             imageSource={pmAssets.buttons.playDaily}
             label="PLAY DAILY"
             size="medium"
-            width={Math.min(SCREEN_WIDTH - 80, 230)}
-            height={62}
+            width={Math.min(SCREEN_WIDTH - 56, 255)}
+            height={68}
             onPress={() => setScreen('daily')}
             accessibilityLabel="Play Daily"
-            style={{ marginTop: 6 }}
+            style={{ marginTop: 8 }}
           />
 
           {/* WORLD MAP & HOW TO PLAY FANTASY BUTTONS */}

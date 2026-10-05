@@ -188,13 +188,13 @@ export const ModeSelectionScreen: React.FC = () => {
           {/* 3. BOTTOM ACTION AREA: Proceed Button & Environmental Space */}
           {/* ============================================================ */}
           <View style={styles.bottomSection}>
-            {/* Primary Proceed CTA Button */}
+            {/* Primary Proceed CTA Button - Prominent Large Master Action */}
             <GameButton
               imageSource={pmAssets.buttons.letsPlayGreen}
               label="CONTINUE TO EXPEDITION"
               size="large"
-              width={Math.min(width - 48, 255)}
-              height={66}
+              width={Math.min(width - 40, 280)}
+              height={76}
               onPress={() => handleProceed()}
               accessibilityLabel="Continue to Expedition"
             />

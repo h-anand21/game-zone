@@ -65,7 +65,7 @@ export interface PathMindState {
 }
 
 export const usePathMindStore = create<PathMindState>((set, get) => ({
-  currentScreen: 'home',
+  currentScreen: 'splash',
   previousScreen: null,
   showExitModal: false,
 

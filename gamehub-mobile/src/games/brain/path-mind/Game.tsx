@@ -7,6 +7,7 @@ import React, { useEffect } from 'react';
 import { View, StyleSheet, BackHandler } from 'react-native';
 import type { GameEngine } from '../../engine/GameEngine';
 import { usePathMindStore } from './store/pathMindStore';
+import { SplashScreen } from './screens/SplashScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { ModeSelectionScreen } from './screens/ModeSelectionScreen';
 import { DifficultyScreen } from './screens/DifficultyScreen';
@@ -69,6 +70,8 @@ export const PathMindGame: React.FC<PathMindProps> = ({ onFinish }) => {
 
   const renderActiveScreen = () => {
     switch (currentScreen) {
+      case 'splash':
+        return <SplashScreen />;
       case 'modes':
         return <ModeSelectionScreen />;
       case 'difficulty':
