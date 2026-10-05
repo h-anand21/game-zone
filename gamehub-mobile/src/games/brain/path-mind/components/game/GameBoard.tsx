@@ -182,6 +182,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
                   state={state}
                   number={number}
                   disabled={disabled}
+                  onPress={(row, col) => onTilePress?.(row, col)}
                 />
               );
             })}

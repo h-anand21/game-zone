@@ -34,7 +34,7 @@ interface GridTileProps {
   number?: number;
   symbol?: string;
   disabled?: boolean;
-  onPress: (row: number, col: number) => void;
+  onPress?: (row: number, col: number) => void;
 }
 
 const GridTileComponent: React.FC<GridTileProps> = ({
