@@ -37,12 +37,12 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.topBar}>
           {/* Exit to GameHub */}
           <GameButton
+            imageSource={pmAssets.buttons.exit}
             label="EXIT"
-            iconName="arrow-left"
             variant="red"
             size="small"
-            width={84}
-            height={38}
+            width={76}
+            height={36}
             onPress={() => setShowExitModal(true)}
             accessibilityLabel="Exit to GameHub"
           />
@@ -87,27 +87,25 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.actionSection}>
           {/* PLAY NOW CTA */}
           <GameButton
+            imageSource={pmAssets.buttons.playNow}
             label="PLAY NOW"
-            iconName="play"
-            variant="gold"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 64, 260)}
-            height={64}
+            width={Math.min(SCREEN_WIDTH - 64, 250)}
+            height={68}
             onPress={() => setScreen('modes')}
             accessibilityLabel="Play Now"
           />
 
           {/* PLAY DAILY CTA */}
           <GameButton
+            imageSource={pmAssets.buttons.playDaily}
             label="PLAY DAILY"
-            iconName="star"
-            variant="cyan"
             size="medium"
-            width={Math.min(SCREEN_WIDTH - 84, 230)}
-            height={52}
+            width={Math.min(SCREEN_WIDTH - 80, 230)}
+            height={62}
             onPress={() => setScreen('daily')}
             accessibilityLabel="Play Daily"
-            style={{ marginTop: 8 }}
+            style={{ marginTop: 6 }}
           />
 
           {/* BUILD YOUR PATH CTA */}
@@ -116,11 +114,11 @@ export const HomeScreen: React.FC = () => {
             iconName="map"
             variant="wood"
             size="medium"
-            width={Math.min(SCREEN_WIDTH - 84, 230)}
-            height={52}
+            width={Math.min(SCREEN_WIDTH - 84, 220)}
+            height={50}
             onPress={() => setScreen('builder')}
             accessibilityLabel="Build Your Path"
-            style={{ marginTop: 8 }}
+            style={{ marginTop: 6 }}
           />
         </View>
 
@@ -129,23 +127,21 @@ export const HomeScreen: React.FC = () => {
         {/* ============================================================ */}
         <View style={styles.bottomBar}>
           <GameButton
+            imageSource={pmAssets.buttons.collection}
             label="COLLECTION"
-            iconName="chest"
-            variant="wood"
             size="small"
             width={140}
-            height={44}
+            height={48}
             onPress={() => setScreen('collection')}
             accessibilityLabel="Collection"
           />
 
           <GameButton
+            imageSource={pmAssets.buttons.profile}
             label="PROFILE"
-            iconName="user"
-            variant="cyan"
             size="small"
             width={140}
-            height={44}
+            height={48}
             onPress={() => setScreen('profile')}
             accessibilityLabel="Profile"
           />

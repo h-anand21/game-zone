@@ -1,11 +1,11 @@
 // ============================================================
 // PATH MIND — Screen 03: ModeSelectionScreen
 // Choose Your Mode: Classic, Number Trail, Mixed, Challenge, Daily
+// Auto-scroll on selection, authentic button assets, responsive layout
 // ============================================================
 
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
 import { GameBackground } from '../components/ui/GameBackground';
 import { GameHeader } from '../components/ui/GameHeader';
 import { TitlePlaque } from '../components/ui/TitlePlaque';
@@ -15,6 +15,7 @@ import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
+import { pmAssets } from '../design-system/uiAssets';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -24,7 +25,6 @@ interface GameModeItem {
   desc: string;
   badge: string;
   color: string;
-  icon: string;
 }
 
 const MODES: GameModeItem[] = [
@@ -34,7 +34,6 @@ const MODES: GameModeItem[] = [
     desc: 'Watch the sacred glowing runes and retrace the path from start to goal.',
     badge: 'CORE EXPEDITION',
     color: pmColors.gold,
-    icon: 'compass',
   },
   {
     id: 'number_trail',
@@ -42,7 +41,6 @@ const MODES: GameModeItem[] = [
     desc: 'Follow the ancient sequence numbers in ascending order 1 → 2 → 3.',
     badge: 'SEQUENCE MEMORY',
     color: pmColors.cyan,
-    icon: 'numbers',
   },
   {
     id: 'mixed_path',
@@ -50,7 +48,6 @@ const MODES: GameModeItem[] = [
     desc: 'Dual challenge: combine rune color transformations with path recall.',
     badge: 'ADVANCED MIND',
     color: pmColors.relicPurple,
-    icon: 'mixed',
   },
   {
     id: 'challenge_path',
@@ -58,7 +55,6 @@ const MODES: GameModeItem[] = [
     desc: 'Rapid memory shift with decoys, moving obstacles, and tight timer.',
     badge: 'HARDCORE RUN',
     color: pmColors.dangerRed,
-    icon: 'swords',
   },
   {
     id: 'daily_path',
@@ -66,16 +62,27 @@ const MODES: GameModeItem[] = [
     desc: "Today's global ancient puzzle with special rewards and streak stars.",
     badge: 'DAILY REWARD',
     color: pmColors.successGreen,
-    icon: 'star',
   },
 ];
 
 export const ModeSelectionScreen: React.FC = () => {
   const { setScreen, selectedMode, hearts, coins } = usePathMindStore();
+  const [activeMode, setActiveMode] = useState<string>(selectedMode || 'CLASSIC PATH');
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const handleSelectMode = (mode: GameModeItem) => {
+    setActiveMode(mode.title);
     usePathMindStore.setState({ selectedMode: mode.title });
-    if (mode.id === 'daily_path') {
+
+    // Smooth auto-scroll down to the proceed action button
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 120);
+  };
+
+  const handleProceed = () => {
+    usePathMindStore.setState({ selectedMode: activeMode });
+    if (activeMode === 'DAILY PATH') {
       setScreen('daily');
     } else {
       setScreen('difficulty');
@@ -92,6 +99,7 @@ export const ModeSelectionScreen: React.FC = () => {
       />
 
       <ScrollView
+        ref={scrollViewRef}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
@@ -105,7 +113,7 @@ export const ModeSelectionScreen: React.FC = () => {
 
         <View style={styles.cardContainer}>
           {MODES.map((mode) => {
-            const isSelected = selectedMode === mode.title;
+            const isSelected = activeMode === mode.title;
 
             return (
               <Pressable
@@ -114,7 +122,11 @@ export const ModeSelectionScreen: React.FC = () => {
                 style={({ pressed }) => [
                   styles.modeCard,
                   { borderColor: isSelected ? mode.color : pmColors.stoneBorder },
-                  isSelected && { backgroundColor: 'rgba(12, 28, 40, 0.96)' },
+                  isSelected && {
+                    backgroundColor: 'rgba(12, 28, 40, 0.96)',
+                    borderLeftWidth: 6,
+                    borderLeftColor: mode.color,
+                  },
                   pressed && styles.pressed,
                 ]}
               >
@@ -138,9 +150,11 @@ export const ModeSelectionScreen: React.FC = () => {
                 {/* Description */}
                 <Text style={styles.modeDesc}>{mode.desc}</Text>
 
-                {/* Bottom Action Arrow */}
+                {/* Bottom Action Indicator */}
                 <View style={styles.cardActionRow}>
-                  <Text style={[styles.enterText, { color: mode.color }]}>ENTER CHAMBER →</Text>
+                  <Text style={[styles.enterText, { color: mode.color }]}>
+                    {isSelected ? 'TAP PROCEED BELOW ↓' : 'SELECT MODE →'}
+                  </Text>
                 </View>
               </Pressable>
             );
@@ -158,6 +172,19 @@ export const ModeSelectionScreen: React.FC = () => {
           </View>
           <Text style={styles.bannerArrow}>→</Text>
         </Pressable>
+
+        {/* Next / Proceed Action Button */}
+        <View style={styles.ctaWrap}>
+          <GameButton
+            imageSource={pmAssets.buttons.startGame}
+            label="PROCEED TO EXPEDITION"
+            size="large"
+            width={Math.min(SCREEN_WIDTH - 48, 270)}
+            height={68}
+            onPress={handleProceed}
+            accessibilityLabel="Proceed to Expedition"
+          />
+        </View>
       </ScrollView>
     </GameBackground>
   );
@@ -166,7 +193,7 @@ export const ModeSelectionScreen: React.FC = () => {
 const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
-    paddingBottom: 32,
+    paddingBottom: 36,
     alignItems: 'center',
   },
   titlePlaque: {
@@ -271,5 +298,10 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: pmColors.goldBright,
     marginLeft: 8,
+  },
+  ctaWrap: {
+    marginTop: 20,
+    alignItems: 'center',
+    width: '100%',
   },
 });

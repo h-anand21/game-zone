@@ -15,6 +15,7 @@ import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
+import { pmAssets } from '../design-system/uiAssets';
 import type { GridPos } from '../types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -36,10 +37,19 @@ export const BuildPathScreen: React.FC = () => {
       return;
     }
 
-    const last = customPath[customPath.length - 1];
-    // Check if tapping existing last tile to undo
-    if (last.row === row && last.col === col) {
+    // 1. Backtrack drag: user dragged back to previous tile, smoothly undo
+    if (
+      customPath.length >= 2 &&
+      customPath[customPath.length - 2].row === row &&
+      customPath[customPath.length - 2].col === col
+    ) {
       setCustomPath(customPath.slice(0, -1));
+      return;
+    }
+
+    const last = customPath[customPath.length - 1];
+    // If hovering on current last tile, ignore
+    if (last.row === row && last.col === col) {
       return;
     }
 
@@ -147,12 +157,11 @@ export const BuildPathScreen: React.FC = () => {
         {/* Primary CTA Button */}
         <View style={styles.ctaWrap}>
           <GameButton
+            imageSource={pmAssets.buttons.startGame}
             label="TEST & PLAY"
-            iconName="play"
-            variant="gold"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 48, 280)}
-            height={58}
+            width={Math.min(SCREEN_WIDTH - 48, 270)}
+            height={64}
             disabled={customPath.length < 3}
             onPress={handleTestAndPlay}
             accessibilityLabel="Test and Play"

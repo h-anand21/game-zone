@@ -11,6 +11,8 @@ import {
   ViewStyle,
   Animated,
   View,
+  Image,
+  ImageSourcePropType,
 } from 'react-native';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { pmColors } from '../../design-system/colors';
@@ -31,6 +33,7 @@ export type GameButtonSize = 'large' | 'medium' | 'small' | 'icon';
 
 interface GameButtonProps {
   label?: string;
+  imageSource?: ImageSourcePropType;
   iconName?: 'play' | 'star' | 'compass' | 'map' | 'chest' | 'user' | 'settings' | 'arrow-left' | 'check' | 'cross' | 'pencil';
   variant?: GameButtonVariant;
   size?: GameButtonSize;
@@ -44,6 +47,7 @@ interface GameButtonProps {
 
 export const GameButton: React.FC<GameButtonProps> = ({
   label,
+  imageSource,
   iconName,
   variant = 'gold',
   size = 'medium',
@@ -224,46 +228,58 @@ export const GameButton: React.FC<GameButtonProps> = ({
           {
             width: dims.w,
             height: dims.h,
-            backgroundColor: theme.bg,
-            borderColor: theme.borderHighlight,
-            borderBottomColor: theme.border,
+            backgroundColor: imageSource ? 'transparent' : theme.bg,
+            borderColor: imageSource ? 'transparent' : theme.borderHighlight,
+            borderBottomColor: imageSource ? 'transparent' : theme.border,
+            borderWidth: imageSource ? 0 : 2,
+            borderBottomWidth: imageSource ? 0 : 5,
           },
-          theme.shadow,
+          !imageSource && theme.shadow,
         ]}
       >
-        {/* Inner Top Highlight Bevel */}
-        <View style={[styles.innerHighlight, { borderColor: theme.borderHighlight }]} />
+        {imageSource ? (
+          <Image
+            source={imageSource}
+            style={{ width: dims.w, height: dims.h }}
+            resizeMode="contain"
+          />
+        ) : (
+          <>
+            {/* Inner Top Highlight Bevel */}
+            <View style={[styles.innerHighlight, { borderColor: theme.borderHighlight }]} />
 
-        {/* Content Row */}
-        <View style={styles.contentRow}>
-          {renderIcon()}
-          {label && (
-            <Text
-              style={[
-                size === 'large'
-                  ? pmTypography.buttonLarge
-                  : size === 'small'
-                  ? pmTypography.buttonSmall
-                  : pmTypography.buttonMedium,
-                {
-                  color: theme.textColor,
-                  textShadowColor: theme.textShadow,
-                  textShadowOffset: { width: 0, height: 2 },
-                  textShadowRadius: 3,
-                },
-              ]}
-              numberOfLines={1}
-            >
-              {label}
-            </Text>
-          )}
-        </View>
+            {/* Content Row */}
+            <View style={styles.contentRow}>
+              {renderIcon()}
+              {label && (
+                <Text
+                  style={[
+                    size === 'large'
+                      ? pmTypography.buttonLarge
+                      : size === 'small'
+                      ? pmTypography.buttonSmall
+                      : pmTypography.buttonMedium,
+                    {
+                      color: theme.textColor,
+                      textShadowColor: theme.textShadow,
+                      textShadowOffset: { width: 0, height: 2 },
+                      textShadowRadius: 3,
+                    },
+                  ]}
+                  numberOfLines={1}
+                >
+                  {label}
+                </Text>
+              )}
+            </View>
 
-        {/* Corner Rivet Studs */}
-        <View style={[styles.cornerStud, styles.topLeft, { backgroundColor: theme.borderHighlight }]} />
-        <View style={[styles.cornerStud, styles.topRight, { backgroundColor: theme.borderHighlight }]} />
-        <View style={[styles.cornerStud, styles.bottomLeft, { backgroundColor: theme.border }]} />
-        <View style={[styles.cornerStud, styles.bottomRight, { backgroundColor: theme.border }]} />
+            {/* Corner Rivet Studs */}
+            <View style={[styles.cornerStud, styles.topLeft, { backgroundColor: theme.borderHighlight }]} />
+            <View style={[styles.cornerStud, styles.topRight, { backgroundColor: theme.borderHighlight }]} />
+            <View style={[styles.cornerStud, styles.bottomLeft, { backgroundColor: theme.border }]} />
+            <View style={[styles.cornerStud, styles.bottomRight, { backgroundColor: theme.border }]} />
+          </>
+        )}
       </Pressable>
     </Animated.View>
   );

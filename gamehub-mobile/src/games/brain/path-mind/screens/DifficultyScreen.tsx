@@ -4,7 +4,7 @@
 // Pure vector cards, responsive layout, seamless navigation
 // ============================================================
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-native';
 import { GameBackground } from '../components/ui/GameBackground';
 import { GameHeader } from '../components/ui/GameHeader';
@@ -15,6 +15,7 @@ import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
+import { pmAssets } from '../design-system/uiAssets';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -77,10 +78,15 @@ export const DifficultyScreen: React.FC = () => {
   const [currentDiff, setCurrentDiff] = useState<'EASY' | 'MEDIUM' | 'HARD' | 'CUSTOM'>(
     selectedDifficulty || 'EASY'
   );
+  const scrollViewRef = useRef<ScrollView>(null);
 
   const handleSelect = (diff: 'EASY' | 'MEDIUM' | 'HARD' | 'CUSTOM') => {
     setCurrentDiff(diff);
     usePathMindStore.setState({ selectedDifficulty: diff });
+    // Smooth auto-scroll to the start button on card selection
+    setTimeout(() => {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }, 120);
   };
 
   const handleStartGame = () => {
@@ -97,7 +103,11 @@ export const DifficultyScreen: React.FC = () => {
         coins={coins}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        ref={scrollViewRef}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <TitlePlaque
           title="SELECT DIFFICULTY"
           subtitle="CHAMBER COMPLEXITY & RULES"
@@ -160,12 +170,11 @@ export const DifficultyScreen: React.FC = () => {
         {/* Primary CTA Buttons */}
         <View style={styles.ctaSection}>
           <GameButton
+            imageSource={pmAssets.buttons.startGame}
             label="START EXPEDITION"
-            iconName="play"
-            variant="gold"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 48, 280)}
-            height={60}
+            width={Math.min(SCREEN_WIDTH - 48, 270)}
+            height={68}
             onPress={handleStartGame}
             accessibilityLabel="Start Expedition"
           />

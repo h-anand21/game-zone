@@ -96,15 +96,35 @@ export const GameplayScreen: React.FC = () => {
     }
   }, [phase, countdown, hapticsEnabled]);
 
-  // Handle tile press
+  // Handle tile press or continuous finger drag
   const handleTilePress = (row: number, col: number) => {
     if (phase !== 'recall') return;
     if (path.length === 0) return;
 
+    // 1. Backtrack drag: user dragged back to previous step, smoothly undo last step
+    if (
+      playerPath.length >= 2 &&
+      playerPath[playerPath.length - 2].row === row &&
+      playerPath[playerPath.length - 2].col === col
+    ) {
+      setPlayerPath((prev) => prev.slice(0, -1));
+      setLocalCombo((c) => Math.max(0, c - 1));
+      if (hapticsEnabled) {
+        Vibration.vibrate(20);
+      }
+      return;
+    }
+
+    // 2. Ignore if finger is still hovering inside current last step
+    const currentLast = playerPath[playerPath.length - 1];
+    if (currentLast && currentLast.row === row && currentLast.col === col) {
+      return;
+    }
+
     const nextIndex = playerPath.length;
     const expected = path[nextIndex];
 
-    // Check if this step is correct
+    // 3. Check if this step is correct
     if (expected && expected.row === row && expected.col === col) {
       const nextPlayerPath = [...playerPath, { row, col }];
       setPlayerPath(nextPlayerPath);
@@ -134,10 +154,10 @@ export const GameplayScreen: React.FC = () => {
           setScreen('result');
         }, 1200);
       } else {
-        setStatusMessage(`STEP ${nextPlayerPath.length}/${path.length} • COMBO x${newCombo}`);
+        setStatusMessage(`STEP ${nextPlayerPath.length}/${path.length} • DRAGGING COMBO x${newCombo}`);
       }
     } else {
-      // Wrong tile tapped!
+      // Wrong tile touched/dragged
       loseHeart();
       setLocalCombo(0);
       usePathMindStore.setState({ combo: 0 });
@@ -156,7 +176,7 @@ export const GameplayScreen: React.FC = () => {
         // Reset player steps to start
         setTimeout(() => {
           setPlayerPath([]);
-          setStatusMessage('RESTART FROM FIRST RUNE');
+          setStatusMessage('DRAG FROM FIRST RUNE TO TRACE');
         }, 600);
       }
     }
