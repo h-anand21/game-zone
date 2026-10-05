@@ -15,6 +15,7 @@ import { pmColors } from '../design-system/colors';
 import { pmTypography } from '../design-system/typography';
 import { pmRadii } from '../design-system/radii';
 import { pmShadows } from '../design-system/shadows';
+import { pmAssets } from '../design-system/uiAssets';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -107,12 +108,11 @@ export const DailyPathScreen: React.FC = () => {
         {/* CTA Button */}
         <View style={styles.ctaWrap}>
           <GameButton
+            imageSource={pmAssets.buttons.playDaily}
             label="PLAY TODAY'S PUZZLE"
-            iconName="play"
-            variant="gold"
             size="large"
-            width={Math.min(SCREEN_WIDTH - 48, 280)}
-            height={60}
+            width={Math.min(SCREEN_WIDTH - 48, 260)}
+            height={68}
             onPress={handlePlayDaily}
             accessibilityLabel="Play Today's Puzzle"
           />
