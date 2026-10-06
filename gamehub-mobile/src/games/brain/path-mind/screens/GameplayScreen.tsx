@@ -44,6 +44,7 @@ export const GameplayScreen: React.FC = () => {
     combo,
     selectedDifficulty,
     hapticsEnabled,
+    setShowExitModal,
   } = usePathMindStore();
 
   // Grid dimensions & path setup
@@ -276,7 +277,7 @@ export const GameplayScreen: React.FC = () => {
   return (
     <GameBackground variant="universal" overlayDarkness={0.25}>
       <GameHeader
-        onBack={() => setScreen('modes')}
+        onBack={() => setShowExitModal(true)}
         onSettings={() => setScreen('settings')}
         hearts={hearts}
         coins={coins}
@@ -430,36 +431,33 @@ export const GameplayScreen: React.FC = () => {
           />
         </View>
 
-        {/* Bottom Utility Controls: RESTART, HINT, WORLD MAP */}
+        {/* Bottom Utility Controls: RESTART, HINT, WORLD MAP (from image.png) */}
         <View style={styles.controlRow}>
           <GameButton
             imageSource={pmAssets.buttons.restart}
             size="small"
-            width={110}
-            height={46}
+            width={104}
+            height={48}
             disabled={isAdvancing}
             onPress={handleRestartChamber}
             accessibilityLabel="Restart Chamber"
           />
 
           <GameButton
-            label="HINT (25)"
-            variant="cyan"
+            imageSource={pmAssets.buttons.hint}
             size="small"
-            width={120}
-            height={46}
+            width={104}
+            height={48}
             disabled={coins < 25 || phase === 'success' || isAdvancing}
             onPress={handleHint}
-            accessibilityLabel="Hint"
+            accessibilityLabel="Hint (25 Coins)"
           />
 
           <GameButton
-            label="MAP"
-            iconName="map"
-            variant="wood"
+            imageSource={pmAssets.buttons.map}
             size="small"
-            width={85}
-            height={46}
+            width={104}
+            height={48}
             onPress={() => setScreen('world_map')}
             accessibilityLabel="World Map"
           />

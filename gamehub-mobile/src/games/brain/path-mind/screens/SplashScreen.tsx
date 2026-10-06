@@ -85,36 +85,28 @@ export const SplashScreen: React.FC = () => {
           style={styles.touchArea}
           onPress={() => progress > 50 && setScreen('home')}
         >
-          {/* Bottom Ancient Carved Stone Loading Stage */}
+          {/* Bottom Ancient Carved Stone Single-Line Loading Bar */}
           <View style={styles.loadingStage}>
-            {/* Outer Stone Panel with Gold Bevel & Rivets */}
-            <View style={styles.stonePanel}>
+            <View style={styles.singleLinePanel}>
               {/* Corner metal rivets */}
               <View style={[styles.rivet, styles.rivetTL]} />
               <View style={[styles.rivet, styles.rivetTR]} />
               <View style={[styles.rivet, styles.rivetBL]} />
               <View style={[styles.rivet, styles.rivetBR]} />
 
-              {/* Status & Percentage Header Row */}
-              <View style={styles.labelRow}>
-                <Text style={styles.hintText} numberOfLines={1}>
-                  {LOADING_HINTS[hintIndex]}
-                </Text>
+              <View style={styles.singleLineRow}>
+                <Text style={styles.singleLineLabel}>LOADING</Text>
+
+                {/* Carved Energy Channel Track */}
+                <View style={styles.gaugeTrack}>
+                  <View style={[styles.gaugeFill, { width: `${progress}%` }]}>
+                    {/* Glowing Energy Glint Beam */}
+                    <View style={styles.glintBeam} />
+                  </View>
+                </View>
+
                 <Text style={styles.percentText}>{progress}%</Text>
               </View>
-
-              {/* Carved Energy Channel Track */}
-              <View style={styles.gaugeTrack}>
-                <View style={[styles.gaugeFill, { width: `${progress}%` }]}>
-                  {/* Glowing Energy Glint Beam */}
-                  <View style={styles.glintBeam} />
-                </View>
-              </View>
-
-              {/* Version & Subtitle */}
-              <Text style={styles.versionSub}>
-                PATH MIND EXPEDITION • VERSION 1.0.0
-              </Text>
             </View>
           </View>
         </Pressable>
@@ -142,60 +134,50 @@ const styles = StyleSheet.create({
     width: Math.min(SCREEN_WIDTH - 36, 350),
     alignItems: 'center',
   },
-  stonePanel: {
-    width: '100%',
-    backgroundColor: 'rgba(14, 22, 30, 0.94)',
+  singleLinePanel: {
+    width: Math.min(SCREEN_WIDTH - 36, 350),
+    backgroundColor: 'rgba(12, 20, 28, 0.94)',
     borderWidth: 2,
-    borderBottomWidth: 4.5,
+    borderBottomWidth: 4,
     borderColor: '#7A5424',
     borderTopColor: '#C49448',
-    borderRadius: pmRadii.lg,
+    borderRadius: pmRadii.pill,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 10,
     position: 'relative',
     ...pmShadows.heavy,
   },
   rivet: {
     position: 'absolute',
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
     backgroundColor: '#FFE066',
     borderWidth: 1,
     borderColor: '#7A4D10',
     opacity: 0.85,
   },
-  rivetTL: { top: 5, left: 5 },
-  rivetTR: { top: 5, right: 5 },
-  rivetBL: { bottom: 5, left: 5 },
-  rivetBR: { bottom: 5, right: 5 },
+  rivetTL: { top: 4, left: 6 },
+  rivetTR: { top: 4, right: 6 },
+  rivetBL: { bottom: 4, left: 6 },
+  rivetBR: { bottom: 4, right: 6 },
 
-  labelRow: {
+  singleLineRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    gap: 10,
   },
-  hintText: {
-    fontFamily: pmTypography.caption.fontFamily,
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#FFE27A',
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    maxWidth: '80%',
-  },
-  percentText: {
+  singleLineLabel: {
     fontFamily: pmTypography.displaySection.fontFamily,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '900',
-    color: pmColors.cyanGlow,
+    color: '#FFE27A',
     letterSpacing: 1,
+    textTransform: 'uppercase',
   },
-
   gaugeTrack: {
-    width: '100%',
-    height: 14,
+    flex: 1,
+    height: 12,
     backgroundColor: '#070D12',
     borderRadius: pmRadii.pill,
     borderWidth: 1.5,
@@ -214,19 +196,18 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     bottom: 0,
-    width: 8,
+    width: 6,
     backgroundColor: '#FFFFFF',
     borderRadius: pmRadii.pill,
     opacity: 0.9,
   },
-
-  versionSub: {
-    fontFamily: pmTypography.caption.fontFamily,
-    fontSize: 9,
-    fontWeight: '700',
-    color: '#8A9BA8',
-    letterSpacing: 0.6,
-    textAlign: 'center',
-    marginTop: 8,
+  percentText: {
+    fontFamily: pmTypography.displaySection.fontFamily,
+    fontSize: 12,
+    fontWeight: '900',
+    color: pmColors.cyanGlow,
+    letterSpacing: 0.8,
+    minWidth: 36,
+    textAlign: 'right',
   },
 });
