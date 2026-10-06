@@ -79,25 +79,25 @@ export const ExitConfirmationModal: React.FC<ExitConfirmationModalProps> = ({
             <View style={styles.buttonCol}>
               {/* STAY & CONTINUE */}
               <GameButton
-                label="RESUME EXPEDITION"
-                iconName="play"
-                variant="green"
+                imageSource={pmAssets.buttons.resume}
+                label="RESUME"
                 size="large"
-                width={240}
-                height={54}
+                width={210}
+                height={60}
                 onPress={onCancel}
+                accessibilityLabel="Resume Expedition"
               />
 
               {/* QUIT EXPEDITION */}
               <GameButton
+                imageSource={pmAssets.buttons.exitHub}
                 label="EXIT TO HUB"
-                iconName="arrow-left"
-                variant="red"
-                size="medium"
-                width={240}
-                height={48}
+                size="large"
+                width={210}
+                height={60}
                 onPress={onConfirm}
-                style={{ marginTop: 8 }}
+                style={{ marginTop: 10 }}
+                accessibilityLabel="Exit to Hub"
               />
             </View>
           </View>
