@@ -1,154 +1,273 @@
 // ============================================================
-// GameHub — Aim Rush Component
+// AIM RUSH — TARGET CHAIN: Master Game Controller
+// Orchestrates full-screen arcade state machine, telemetry, & persistence
 // ============================================================
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
-import { createRandomTarget } from './logic';
-import type { Target } from './types';
-import type { GameEngine } from '../../engine/GameEngine';
+import { View, StyleSheet, BackHandler } from 'react-native';
+import { GameState, GameModeConfig, AimRushRunResult, AimRushUserProfile, AimRushSettings } from './types';
+import { GAME_MODES } from './config';
+import { AimRushStorage } from './storage/aimRushStorage';
+import { AimRushHaptics } from './haptics/hapticManager';
+import { AimRushAudio } from './audio/audioManager';
+
+// Screens
+import { SplashScreen } from './screens/SplashScreen';
+import { IntroScreen } from './screens/IntroScreen';
+import { HomeScreen } from './screens/HomeScreen';
+import { ModeSelectScreen } from './screens/ModeSelectScreen';
+import { HowToPlayScreen } from './screens/HowToPlayScreen';
+import { PracticeScreen } from './screens/PracticeScreen';
+import { CountdownScreen } from './screens/CountdownScreen';
+import { GameplayArena } from './screens/GameplayArena';
+import { ResultScreen } from './screens/ResultScreen';
+import { MissionsScreen } from './screens/MissionsScreen';
+import { StatsScreen } from './screens/StatsScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
+
+// Modals
+import { PauseModal } from './components/modals/PauseModal';
+import { ExitModal } from './components/modals/ExitModal';
 
 interface AimRushProps {
-  engine: GameEngine;
-  onFinish: (score: number, won: boolean, metadata?: Record<string, unknown>) => void;
-  isPaused: boolean;
+  engine?: any;
+  onFinish?: (score: number, won: boolean, metadata?: Record<string, unknown>) => void;
+  isPaused?: boolean;
 }
 
-export const AimRushGame: React.FC<AimRushProps> = ({ onFinish, isPaused }) => {
-  const [score, setScore] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(20);
-  const [target, setTarget] = useState<Target>(() => createRandomTarget(1));
+export const AimRushGame: React.FC<AimRushProps> = ({ onFinish }) => {
+  const [gameState, setGameState] = useState<GameState>('splash');
+  const [selectedMode, setSelectedMode] = useState<GameModeConfig>(GAME_MODES.classic);
+  const [profile, setProfile] = useState<AimRushUserProfile>({
+    personalBestScore: 0,
+    bestChain: 0,
+    totalRuns: 0,
+    totalTargetsHit: 0,
+    totalPerfects: 0,
+    totalMisses: 0,
+    totalPlayTimeSeconds: 0,
+    tutorialCompleted: false,
+  });
+  const [settings, setSettings] = useState<AimRushSettings>({
+    soundEnabled: true,
+    musicEnabled: true,
+    hapticsEnabled: true,
+    reducedFx: false,
+    graphicsQuality: 'high',
+  });
 
+  const [lastRunResult, setLastRunResult] = useState<AimRushRunResult | null>(null);
+  const [isPauseModalOpen, setIsPauseModalOpen] = useState(false);
+  const [isExitModalOpen, setIsExitModalOpen] = useState(false);
+
+  // Initialize storage & audio on load
   useEffect(() => {
-    if (isPaused) return;
+    AimRushAudio.init();
+    loadInitialData();
+  }, []);
 
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          clearInterval(timer);
-          onFinish(score, score >= 15, { totalHits: score });
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+  const loadInitialData = async () => {
+    const prof = await AimRushStorage.getProfile();
+    const sett = await AimRushStorage.getSettings();
+    setProfile(prof);
+    setSettings(sett);
+    AimRushHaptics.setEnabled(sett.hapticsEnabled);
+    AimRushAudio.setSoundEnabled(sett.soundEnabled);
+    AimRushAudio.setMusicEnabled(sett.musicEnabled);
+  };
 
-    return () => clearInterval(timer);
-  }, [isPaused, score, onFinish]);
+  // Hardware Android Back button handler
+  useEffect(() => {
+    const onBackPress = () => {
+      if (gameState === 'playing') {
+        setIsPauseModalOpen(true);
+        return true;
+      }
+      if (gameState === 'home') {
+        setIsExitModalOpen(true);
+        return true;
+      }
+      if (['mode_select', 'how_to_play', 'missions', 'stats', 'settings'].includes(gameState)) {
+        setGameState('home');
+        return true;
+      }
+      return false;
+    };
 
-  const handleTargetPress = () => {
-    if (isPaused || timeLeft <= 0) return;
-    const nextScore = score + 1;
-    setScore(nextScore);
-    setTarget(createRandomTarget(nextScore + 1));
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, [gameState]);
+
+  // Transition after splash
+  const handleSplashFinish = () => {
+    if (!profile.tutorialCompleted) {
+      setGameState('intro');
+    } else {
+      setGameState('home');
+    }
+  };
+
+  const handleCompleteIntro = async () => {
+    const updated = { ...profile, tutorialCompleted: true };
+    setProfile(updated);
+    await AimRushStorage.saveProfile(updated);
+    setGameState('home');
+  };
+
+  // Play Again: Direct fast loop (Countdown -> Gameplay)
+  const handlePlayAgain = () => {
+    setGameState('countdown');
+  };
+
+  // Handle run completion
+  const handleFinishRun = async (result: AimRushRunResult) => {
+    const { isNewBest, profile: updatedProfile } = await AimRushStorage.recordRun(result);
+    setProfile(updatedProfile);
+
+    const enrichedResult = { ...result, isNewPersonalBest: isNewBest };
+    setLastRunResult(enrichedResult);
+
+    if (isNewBest) {
+      AimRushHaptics.newBest();
+    }
+
+    setGameState('result');
+  };
+
+  const handleExitToGameHub = () => {
+    setIsExitModalOpen(false);
+    setIsPauseModalOpen(false);
+    if (onFinish) {
+      onFinish(0, false, { exit: true });
+    }
+  };
+
+  const handleResetData = async () => {
+    await AimRushStorage.resetAll();
+    await loadInitialData();
   };
 
   return (
-    <View style={styles.container}>
-      {/* Header Info */}
-      <View style={styles.headerRow}>
-        <View style={styles.statBox}>
-          <Text style={styles.statLabel}>TARGETS HIT</Text>
-          <Text style={styles.statValue}>{score}</Text>
-        </View>
+    <View style={styles.root}>
+      {/* 01. Splash Screen */}
+      {gameState === 'splash' && <SplashScreen onFinish={handleSplashFinish} />}
 
-        <View style={[styles.statBox, timeLeft <= 5 && styles.timeLow]}>
-          <Text style={styles.statLabel}>TIME</Text>
-          <Text style={[styles.statValue, timeLeft <= 5 && styles.timeLowText]}>
-            {timeLeft}s
-          </Text>
-        </View>
-      </View>
+      {/* 02. Intro Screen */}
+      {gameState === 'intro' && (
+        <IntroScreen onContinue={handleCompleteIntro} onSkip={handleCompleteIntro} />
+      )}
 
-      {/* Target Canvas Area */}
-      <View style={styles.arena}>
-        <Pressable
-          style={({ pressed }) => [
-            styles.target,
-            {
-              left: `${target.x}%`,
-              top: `${target.y}%`,
-              width: target.size,
-              height: target.size,
-              borderRadius: target.size / 2,
-            },
-            pressed && styles.pressed,
-          ]}
-          onPress={handleTargetPress}
-        >
-          <Text style={styles.targetIcon}>🎯</Text>
-        </Pressable>
-      </View>
+      {/* 03. Home Screen */}
+      {gameState === 'home' && (
+        <HomeScreen
+          profile={profile}
+          selectedMode={selectedMode}
+          onStartGame={() => setGameState('countdown')}
+          onOpenModes={() => setGameState('mode_select')}
+          onOpenHowToPlay={() => setGameState('how_to_play')}
+          onOpenMissions={() => setGameState('missions')}
+          onOpenStats={() => setGameState('stats')}
+          onOpenSettings={() => setGameState('settings')}
+          onExitToHub={() => setIsExitModalOpen(true)}
+        />
+      )}
+
+      {/* 04. Mode Select Screen */}
+      {gameState === 'mode_select' && (
+        <ModeSelectScreen
+          currentMode={selectedMode}
+          onSelectMode={(mode) => {
+            setSelectedMode(mode);
+            setGameState('home');
+          }}
+          onBack={() => setGameState('home')}
+        />
+      )}
+
+      {/* 05. How To Play Screen */}
+      {gameState === 'how_to_play' && (
+        <HowToPlayScreen
+          onStartPractice={() => setGameState('practice')}
+          onBack={() => setGameState('home')}
+        />
+      )}
+
+      {/* 06. Practice Arena */}
+      {gameState === 'practice' && (
+        <PracticeScreen onComplete={() => setGameState('countdown')} />
+      )}
+
+      {/* 07. Countdown Screen */}
+      {gameState === 'countdown' && (
+        <CountdownScreen onCountdownComplete={() => setGameState('playing')} />
+      )}
+
+      {/* 08. Active Gameplay Arena */}
+      {gameState === 'playing' && (
+        <GameplayArena
+          mode={selectedMode}
+          onFinishRun={handleFinishRun}
+          onPause={() => setIsPauseModalOpen(true)}
+          isPaused={isPauseModalOpen}
+        />
+      )}
+
+      {/* 09. Result Screen */}
+      {gameState === 'result' && lastRunResult && (
+        <ResultScreen
+          result={lastRunResult}
+          onPlayAgain={handlePlayAgain}
+          onHome={() => setGameState('home')}
+        />
+      )}
+
+      {/* 10. Missions Screen */}
+      {gameState === 'missions' && <MissionsScreen onBack={() => setGameState('home')} />}
+
+      {/* 11. Career Stats Screen */}
+      {gameState === 'stats' && <StatsScreen profile={profile} onBack={() => setGameState('home')} />}
+
+      {/* 12. Settings Screen */}
+      {gameState === 'settings' && (
+        <SettingsScreen
+          settings={settings}
+          onUpdateSettings={setSettings}
+          onResetProgress={handleResetData}
+          onBack={() => setGameState('home')}
+        />
+      )}
+
+      {/* Pause Modal Overlay */}
+      <PauseModal
+        visible={isPauseModalOpen}
+        onResume={() => setIsPauseModalOpen(false)}
+        onRestart={() => {
+          setIsPauseModalOpen(false);
+          setGameState('countdown');
+        }}
+        onSettings={() => {
+          setIsPauseModalOpen(false);
+          setGameState('settings');
+        }}
+        onExit={() => {
+          setIsPauseModalOpen(false);
+          setGameState('home');
+        }}
+      />
+
+      {/* Exit Confirmation Modal */}
+      <ExitModal
+        visible={isExitModalOpen}
+        onCancel={() => setIsExitModalOpen(false)}
+        onConfirm={handleExitToGameHub}
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  root: {
     flex: 1,
-    alignItems: 'center',
-    padding: Spacing.md,
-    justifyContent: 'space-between',
-  },
-  headerRow: {
-    flexDirection: 'row',
-    gap: Spacing.lg,
-    width: '100%',
-    justifyContent: 'center',
-  },
-  statBox: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.sm,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
-    minWidth: 120,
-  },
-  timeLow: {
-    borderColor: Colors.error,
-    backgroundColor: Colors.error + '15',
-  },
-  timeLowText: {
-    color: Colors.error,
-  },
-  statLabel: {
-    fontSize: Typography.caption,
-    color: Colors.textMuted,
-    fontWeight: Typography.semibold,
-  },
-  statValue: {
-    fontSize: Typography.h3,
-    color: Colors.textPrimary,
-    fontWeight: Typography.bold,
-  },
-  arena: {
-    width: '100%',
-    flex: 1,
-    maxHeight: 400,
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.xxl,
-    position: 'relative',
-    borderWidth: 1,
-    borderColor: Colors.border,
-    overflow: 'hidden',
-    ...Shadows.md,
-  },
-  target: {
-    position: 'absolute',
-    backgroundColor: Colors.accent + '30',
-    borderWidth: 2,
-    borderColor: Colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  targetIcon: {
-    fontSize: 24,
-  },
-  pressed: {
-    opacity: 0.6,
-    transform: [{ scale: 0.9 }],
+    backgroundColor: '#07090C',
   },
 });
