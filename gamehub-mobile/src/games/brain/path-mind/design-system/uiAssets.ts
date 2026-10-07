@@ -79,9 +79,6 @@ export const pmAssets = {
     backpack: require('../../../../../assets/game/path-mind/icons/icon_13_165x149.png') as ImageSourcePropType,
     scroll: require('../../../../../assets/game/path-mind/icons/icon_14_184x153.png') as ImageSourcePropType,
     crown: require('../../../../../assets/game/path-mind/icons/icon_20_179x156.png') as ImageSourcePropType,
-    exitScroll: require('../../../../../assets/game/path-mind/icons/icon_exit_scroll.png') as ImageSourcePropType,
-    exitChamber: require('../../../../../assets/game/path-mind/icons/icon_exit_chamber.png') as ImageSourcePropType,
-    exitTrophy: require('../../../../../assets/game/path-mind/icons/icon_exit_trophy.png') as ImageSourcePropType,
   },
   plaques: {
     profile: require('../../../../../assets/game/path-mind/plaques/plaque_profile.png') as ImageSourcePropType,
@@ -101,6 +98,5 @@ export const pmAssets = {
     gameplay: require('../../../../../assets/game/path-mind/plaques/plaque_gameplay.png') as ImageSourcePropType,
     results: require('../../../../../assets/game/path-mind/plaques/plaque_results.png') as ImageSourcePropType,
     leaveExpedition: require('../../../../../assets/game/path-mind/plaques/plaque_leave_expedition.png') as ImageSourcePropType,
-    pedestalBase: require('../../../../../assets/game/path-mind/plaques/pedestal_exit_base.png') as ImageSourcePropType,
   },
 };
