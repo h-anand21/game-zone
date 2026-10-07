@@ -1,14 +1,12 @@
 // ============================================================
 // PATTERN QUEST — Screen 02: HomeScreen
-// Environment-first jungle lake screen (bg_home),
-// Pattern Quest plaque, hero interaction, large PLAY NOW button,
-// and bottom navigation bar
+// Environment-first jungle lake screen (bg_home)
+// Clean top explorer HUD, centered CTAs, and elevated bottom navigation
 // ============================================================
 
 import React from 'react';
 import { View, StyleSheet, Pressable, Image, Text, Dimensions } from 'react-native';
 import { GameBackground } from '../components/background/GameBackground';
-import { ScreenPlaque } from '../components/common/ScreenPlaque';
 import { GameButton } from '../components/buttons/GameButton';
 import { BottomNavigation } from '../components/navigation/BottomNavigation';
 import { usePatternQuestStore } from '../store/patternQuestStore';
@@ -21,10 +19,11 @@ export const HomeScreen: React.FC = () => {
   const userName = getUserName();
 
   return (
-    <GameBackground screen="home" overlayDarkness={0.1}>
+    <GameBackground screen="home" overlayDarkness={0.12}>
       <View style={styles.container}>
-        {/* Top Header Row */}
+        {/* Top Header Row with Redesigned Explorer Profile & Resources */}
         <View style={styles.topRow}>
+          {/* Left Group: Exit Button + Explorer Profile Card */}
           <View style={styles.topLeftGroup}>
             {/* Exit to GameHub */}
             <Pressable
@@ -39,57 +38,76 @@ export const HomeScreen: React.FC = () => {
               />
             </Pressable>
 
-            {/* User Badge */}
-            <Pressable style={styles.profileBadge} onPress={() => setScreen('profile')}>
-              <Image source={pqAssets.hud.gem} style={styles.gemIcon} resizeMode="contain" />
-              <Text style={styles.userNameText}>{userName}</Text>
+            {/* Redesigned Premium Explorer Profile Badge */}
+            <Pressable
+              style={styles.profileBadge}
+              onPress={() => setScreen('profile')}
+              accessibilityLabel="View Profile"
+            >
+              {/* Explorer Avatar Ring */}
+              <View style={styles.avatarRing}>
+                <Image
+                  source={pqAssets.icons.chestBackpack}
+                  style={styles.avatarIcon}
+                  resizeMode="contain"
+                />
+              </View>
+
+              {/* Explorer Info */}
+              <View style={styles.profileInfo}>
+                <Text style={styles.userNameText} numberOfLines={1}>
+                  {userName}
+                </Text>
+                <Text style={styles.userRankText}>LVL 1 • EXPLORER</Text>
+              </View>
             </Pressable>
           </View>
 
-          {/* Action Icons: Mail & Settings */}
-          <View style={styles.topActions}>
-            <Pressable style={styles.iconCircle} onPress={() => setScreen('achievements')}>
-              <Image source={pqAssets.buttons.mail} style={styles.topIcon} resizeMode="contain" />
-            </Pressable>
-            <Pressable style={styles.iconCircle} onPress={() => setScreen('settings')}>
+          {/* Right Group: Resource Counter & Settings */}
+          <View style={styles.topRightGroup}>
+            {/* Gem / Coin Resource Capsule */}
+            <View style={styles.resourcePill}>
+              <Image source={pqAssets.hud.gem} style={styles.resourceIcon} resizeMode="contain" />
+              <Text style={styles.resourceValue}>450</Text>
+            </View>
+
+            {/* Settings Button */}
+            <Pressable
+              style={styles.iconCircle}
+              onPress={() => setScreen('settings')}
+              accessibilityLabel="Settings"
+            >
               <Image source={pqAssets.icons.settings} style={styles.topIcon} resizeMode="contain" />
             </Pressable>
           </View>
         </View>
 
-        {/* Center Plaque */}
-        <View style={styles.plaqueArea}>
-          <ScreenPlaque screen="home" width={Math.min(SCREEN_WIDTH - 40, 310)} height={165} />
-        </View>
-
-        {/* Floating Interactive Sacred Rune */}
-        <View style={styles.middleInteractiveArea}>
-          <View style={styles.sacredGlowCore}>
-            <View style={styles.runePillar}>
-              <Image source={pqAssets.hud.crystal} style={{ width: 64, height: 60, marginBottom: 4 }} resizeMode="contain" />
-              <Image source={pqAssets.buttons.badgeAdventure} style={{ width: 140, height: 42 }} resizeMode="contain" />
-            </View>
+        {/* Center Atmospheric Spacer (Home plaque & mode text removed as requested) */}
+        <View style={styles.centerSpace}>
+          <View style={styles.welcomeBanner}>
+            <Text style={styles.adventureTitle}>ANCIENT EXPEDITION</Text>
+            <Text style={styles.adventureSubtitle}>✦ UNCOVER THE SACRED GLYPHS ✦</Text>
           </View>
         </View>
 
-        {/* Primary Action Button: PLAY NOW & Quick How To Play */}
+        {/* Primary Action Buttons: HOW TO PLAY & PLAY NOW */}
         <View style={styles.playButtonArea}>
           <GameButton
             buttonAsset={pqAssets.buttons.howToPlay}
             onPress={() => setScreen('how_to_play')}
-            width={180}
-            height={48}
-            style={{ marginBottom: 6 }}
+            width={185}
+            height={50}
+            style={{ marginBottom: 12 }}
           />
           <GameButton
             buttonAsset={pqAssets.buttons.playNow}
             onPress={() => setScreen('ready')}
-            width={Math.min(SCREEN_WIDTH - 60, 270)}
-            height={74}
+            width={Math.min(SCREEN_WIDTH - 50, 280)}
+            height={76}
           />
         </View>
 
-        {/* Bottom Navigation */}
+        {/* Bottom Navigation Bar (Untouched tabs, elevated above safe area) */}
         <BottomNavigation currentScreen={currentScreen} onNavigate={setScreen} />
       </View>
     </GameBackground>
@@ -100,97 +118,155 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: pqSpacing.base,
-    paddingTop: pqSpacing.sm,
+    paddingTop: pqSpacing.xs,
   },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     zIndex: 10,
+    marginTop: 4,
   },
   topLeftGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: pqSpacing.sm,
+    gap: 8,
+    flex: 1,
   },
+  topRightGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  // Premium Explorer Profile Badge
   profileBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(15, 23, 30, 0.85)',
+    backgroundColor: 'rgba(12, 22, 32, 0.92)',
     borderWidth: 1.5,
-    borderColor: pqColors.gold,
+    borderBottomWidth: 3,
+    borderColor: '#C5832B',
     borderRadius: pqSpacing.radiusPill,
-    paddingHorizontal: pqSpacing.md,
+    paddingHorizontal: 8,
     paddingVertical: 4,
-    gap: 6,
+    gap: 7,
+    shadowColor: '#00F0FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  gemIcon: {
+  avatarRing: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(0, 240, 255, 0.15)',
+    borderWidth: 1.5,
+    borderColor: '#00F0FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarIcon: {
     width: 20,
     height: 20,
   },
-  userNameText: {
-    ...pqTypography.caption,
-    fontWeight: '800',
-    color: pqColors.textGold,
+  profileInfo: {
+    justifyContent: 'center',
+    paddingRight: 6,
   },
-  topActions: {
+  userNameText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#FFE27A',
+    letterSpacing: 0.5,
+  },
+  userRankText: {
+    fontSize: 8.5,
+    fontWeight: '800',
+    color: '#00F0FF',
+    letterSpacing: 0.8,
+  },
+
+  // Resources & Top Buttons
+  resourcePill: {
     flexDirection: 'row',
-    gap: pqSpacing.sm,
+    alignItems: 'center',
+    backgroundColor: 'rgba(12, 22, 32, 0.88)',
+    borderWidth: 1.5,
+    borderColor: '#C5832B',
+    borderRadius: pqSpacing.radiusPill,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    gap: 5,
+  },
+  resourceIcon: {
+    width: 18,
+    height: 18,
+  },
+  resourceValue: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#00F0FF',
   },
   iconCircle: {
-    backgroundColor: 'rgba(15, 23, 30, 0.85)',
+    backgroundColor: 'rgba(12, 22, 32, 0.88)',
     borderWidth: 1.5,
     borderColor: '#3A4B5E',
-    borderRadius: 22,
-    width: 44,
-    height: 44,
+    borderRadius: 20,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
   topIcon: {
-    width: 28,
-    height: 28,
+    width: 22,
+    height: 22,
   },
-  plaqueArea: {
-    alignItems: 'center',
-    marginTop: pqSpacing.xs,
-  },
-  middleInteractiveArea: {
+
+  // Center Atmospheric Section
+  centerSpace: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sacredGlowCore: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  runePillar: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(10, 20, 28, 0.65)',
+  welcomeBanner: {
+    backgroundColor: 'rgba(10, 20, 28, 0.85)',
     borderWidth: 1.5,
-    borderColor: 'rgba(0, 240, 255, 0.5)',
-    borderRadius: pqSpacing.radiusLg,
-    paddingHorizontal: pqSpacing.lg,
-    paddingVertical: pqSpacing.sm,
+    borderColor: '#C5832B',
+    borderRadius: 14,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    alignItems: 'center',
+    shadowColor: '#C5832B',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 6,
+    elevation: 6,
   },
-  runeGlyph: {
-    fontSize: 36,
-    color: pqColors.crystalCyan,
-    textShadowColor: pqColors.crystalCyan,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
-  },
-  runeSub: {
-    fontSize: 11,
+  adventureTitle: {
+    fontSize: 18,
     fontWeight: '900',
-    color: pqColors.textSecondary,
-    letterSpacing: 1.5,
-    marginTop: 2,
+    color: '#FFE27A',
+    letterSpacing: 2,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
+  adventureSubtitle: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#00F0FF',
+    letterSpacing: 1.5,
+    textAlign: 'center',
+    marginTop: 4,
+  },
+
+  // Action Buttons Section
   playButtonArea: {
     alignItems: 'center',
-    marginBottom: 88,
+    marginBottom: 96, // Ample breathing room above elevated BottomNavigation
     zIndex: 10,
   },
 });

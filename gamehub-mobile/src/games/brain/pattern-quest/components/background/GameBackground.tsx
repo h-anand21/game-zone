@@ -1,11 +1,11 @@
 // ============================================================
 // PATTERN QUEST — GameBackground Component
 // Supports Splash (bg_splash), Home (bg_home), Universal (bg_universal)
-// Layered atmospheric depth, vignette, and responsive scaling
+// Edge-to-edge full screen fitting on all devices & aspect ratios
 // ============================================================
 
 import React from 'react';
-import { View, StyleSheet, Image, Dimensions, StatusBar } from 'react-native';
+import { View, StyleSheet, Image, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { pqAssets, pqColors } from '../../theme';
 import { PQScreen } from '../../types';
@@ -14,14 +14,14 @@ interface GameBackgroundProps {
   screen: PQScreen;
   children: React.ReactNode;
   overlayDarkness?: number; // 0 to 1
+  edges?: ('top' | 'bottom' | 'left' | 'right')[];
 }
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export const GameBackground: React.FC<GameBackgroundProps> = ({
   screen,
   children,
   overlayDarkness = 0.15,
+  edges = ['top', 'left', 'right'],
 }) => {
   // Determine correct background according to screen-specific rules
   const getBackgroundImage = () => {
@@ -38,7 +38,7 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
     <View style={styles.container}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-      {/* Layer 1: Base Jungle / Temple Background */}
+      {/* Layer 1: Base Jungle / Temple Background (Full 100% cover on all devices) */}
       <Image
         source={getBackgroundImage()}
         style={styles.backgroundImage}
@@ -60,7 +60,7 @@ export const GameBackground: React.FC<GameBackgroundProps> = ({
       />
 
       {/* Layer 3: Safe Area Guided UI Content */}
-      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom', 'left', 'right']}>
+      <SafeAreaView style={styles.safeArea} edges={edges}>
         {children}
       </SafeAreaView>
     </View>
@@ -75,12 +75,12 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     position: 'absolute',
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   overlay: {
     position: 'absolute',
@@ -88,6 +88,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    width: '100%',
+    height: '100%',
   },
   safeArea: {
     flex: 1,

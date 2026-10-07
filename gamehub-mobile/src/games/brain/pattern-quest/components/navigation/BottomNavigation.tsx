@@ -21,6 +21,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   onNavigate,
 }) => {
   const insets = useSafeAreaInsets();
+  const bottomInset = Math.max(insets.bottom, 12);
 
   const tabs: { screen: PQScreen; asset: any; active: boolean }[] = [
     {
@@ -55,9 +56,10 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
       style={[
         styles.wrapper,
         {
-          paddingBottom: Math.max(insets.bottom, 12) + 4,
+          bottom: bottomInset + 6,
         },
       ]}
+      pointerEvents="box-none"
     >
       <View style={styles.container}>
         {tabs.map((tab, idx) => (
