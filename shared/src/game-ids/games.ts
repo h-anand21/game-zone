@@ -43,7 +43,6 @@ export const GAME_REVERSE_MIND = 'reverse-mind';
 export const GAME_MEMORY_RUSH = 'memory-rush';
 export const GAME_NUMBER_RUSH = 'number-rush';
 export const GAME_PATTERN_BREAK = 'pattern-break';
-export const GAME_CODE_BREAKER = 'code-breaker';
 export const GAME_PATH_MIND = 'path-mind';
 
 // ── Reflex / Skill Games ────────────────────────────────────
@@ -93,7 +92,7 @@ export const GAME_GUESS_THE_DRAWING = 'guess-the-drawing';
 export const ALL_GAME_IDS = [
   // Brain
   GAME_MIND_LOCK, GAME_FIND_ONE, GAME_REVERSE_MIND, GAME_MEMORY_RUSH,
-  GAME_NUMBER_RUSH, GAME_PATTERN_BREAK, GAME_CODE_BREAKER, GAME_PATH_MIND,
+  GAME_NUMBER_RUSH, GAME_PATTERN_BREAK, GAME_PATH_MIND,
   // Reflex
   GAME_AIM_RUSH, GAME_ONE_TAP, GAME_DONT_TAP_WRONG, GAME_REACTION_FIRE,
   GAME_STACK_MASTER, GAME_PERFECT_HIT,

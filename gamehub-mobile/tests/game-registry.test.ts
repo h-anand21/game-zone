@@ -8,14 +8,14 @@ export function runGameRegistryTests() {
   console.log('[Test] Running Game Registry Verification...');
 
   // 1. Total games count
-  if (GAME_REGISTRY.length !== 35) {
-    throw new Error(`Expected 35 games, found ${GAME_REGISTRY.length}`);
+  if (GAME_REGISTRY.length !== 34) {
+    throw new Error(`Expected 34 games, found ${GAME_REGISTRY.length}`);
   }
 
   // 2. Unique IDs check
   const ids = GAME_REGISTRY.map((g) => g.id);
   const uniqueIds = new Set(ids);
-  if (uniqueIds.size !== 35) {
+  if (uniqueIds.size !== 34) {
     throw new Error('Duplicate game IDs found in registry');
   }
 
@@ -31,11 +31,11 @@ export function runGameRegistryTests() {
   // 4. Non-FPS vs FPS count
   const nonFps = GAME_REGISTRY.filter((g) => g.category !== 'battle');
   const fps = GAME_REGISTRY.filter((g) => g.category === 'battle');
-  if (nonFps.length !== 30 || fps.length !== 5) {
-    throw new Error(`Expected 30 non-FPS & 5 FPS modes, got ${nonFps.length} & ${fps.length}`);
+  if (nonFps.length !== 29 || fps.length !== 5) {
+    throw new Error(`Expected 29 non-FPS & 5 FPS modes, got ${nonFps.length} & ${fps.length}`);
   }
 
-  console.log('✅ Game Registry Verification Passed: All 35 games valid (30 non-FPS + 5 FPS modes)');
+  console.log('✅ Game Registry Verification Passed: All 34 games valid (29 non-FPS + 5 FPS modes)');
   return true;
 }
 

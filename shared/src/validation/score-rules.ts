@@ -19,7 +19,6 @@ export const SCORE_VALIDATION_RULES: Record<string, ScoreValidationRules> = {
   'memory-rush':   { maxScore: 10000,  minDuration: 5,    maxDuration: 600 },
   'number-rush':   { maxScore: 50000,  minDuration: 5,    maxDuration: 120 },
   'pattern-break': { maxScore: 10000,  minDuration: 3,    maxDuration: 300 },
-  'code-breaker':  { maxScore: 10000,  minDuration: 10,   maxDuration: 600 },
   'path-mind':     { maxScore: 10000,  minDuration: 3,    maxDuration: 300 },
 
   // Reflex / Skill

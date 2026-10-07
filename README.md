@@ -37,11 +37,11 @@ GameHub/
                     Final Match Results
 ```
 
-## Games (35 Total)
+## Games (34 Total)
 
 | Category | Count | Games |
 |---|---|---|
-| Brain | 8 | Mind Lock, Find One, Reverse Mind, Memory Rush, Number Rush, Pattern Break, Code Breaker, Path Mind |
+| Brain | 7 | Mind Lock, Find One, Reverse Mind, Memory Rush, Number Rush, Pattern Break, Path Mind |
 | Reflex / Skill | 6 | Aim Rush, One Tap, Don't Tap Wrong, Reaction Fire, Stack Master, Perfect Hit |
 | Arcade | 5 | Snake, Pong, Sky Jump, Endless Runner, Block Puzzle |
 | Classic / Indian | 6 | Ludo, Bagh-Bakri, Carrom, Mini Chess, Connect 4, Memory Cards |
