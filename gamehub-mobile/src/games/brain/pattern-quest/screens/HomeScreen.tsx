@@ -82,43 +82,8 @@ export const HomeScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Center Atmospheric Branding & Title Insignia */}
-        <View style={styles.centerSpace}>
-          <View style={styles.titleInsigniaWrapper}>
-            {/* Top Mystic Glyphs Accent */}
-            <View style={styles.glyphAccentRow}>
-              <Text style={styles.glyphSymbol}>✦</Text>
-              <Text style={styles.glyphDot}>●</Text>
-              <Text style={styles.glyphDiamond}>◈</Text>
-              <Text style={styles.glyphDot}>●</Text>
-              <Text style={styles.glyphSymbol}>✦</Text>
-            </View>
-
-            {/* Master Game Title: PATTERN QUEST */}
-            <Text style={styles.masterGameTitle}>PATTERN QUEST</Text>
-
-            {/* Subtitle Badge Plaque */}
-            <View style={styles.subtitleBadge}>
-              <Text style={styles.adventureSubtitle}>✦ SACRED GLYPH EXPEDITION ✦</Text>
-            </View>
-
-            {/* Sacred Rune Preview Capsules */}
-            <View style={styles.runePreviewRow}>
-              <View style={[styles.runePill, { borderColor: '#2ECC71' }]}>
-                <Text style={[styles.runeIcon, { color: '#2ECC71' }]}>◯</Text>
-              </View>
-              <View style={[styles.runePill, { borderColor: '#00F0FF' }]}>
-                <Text style={[styles.runeIcon, { color: '#00F0FF' }]}>△</Text>
-              </View>
-              <View style={[styles.runePill, { borderColor: '#FFE27A' }]}>
-                <Text style={[styles.runeIcon, { color: '#FFE27A' }]}>◊</Text>
-              </View>
-              <View style={[styles.runePill, { borderColor: '#FF7675' }]}>
-                <Text style={[styles.runeIcon, { color: '#FF7675' }]}>★</Text>
-              </View>
-            </View>
-          </View>
-        </View>
+        {/* Center Atmospheric Section — Clean unobstructed view of background */}
+        <View style={styles.centerSpace} />
 
         {/* Primary Action Buttons: HOW TO PLAY & PLAY NOW */}
         <View style={styles.playButtonArea}>
@@ -264,91 +229,9 @@ const styles = StyleSheet.create({
     height: 42,
   },
 
-  // Center Atmospheric Section
+  // Center Atmospheric Section (Clean background view)
   centerSpace: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titleInsigniaWrapper: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  glyphAccentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 6,
-  },
-  glyphSymbol: {
-    color: '#00F0FF',
-    fontSize: 14,
-    fontWeight: '900',
-    textShadowColor: '#00F0FF',
-    textShadowRadius: 6,
-  },
-  glyphDot: {
-    color: '#FFE27A',
-    fontSize: 8,
-    opacity: 0.8,
-  },
-  glyphDiamond: {
-    color: '#FFE27A',
-    fontSize: 16,
-    fontWeight: '900',
-    textShadowColor: '#FFE27A',
-    textShadowRadius: 8,
-  },
-  masterGameTitle: {
-    fontSize: 34,
-    fontWeight: '900',
-    color: '#FFE27A',
-    letterSpacing: 3.5,
-    textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.95)',
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 8,
-  },
-  subtitleBadge: {
-    backgroundColor: 'rgba(12, 22, 32, 0.92)',
-    borderWidth: 1.5,
-    borderColor: '#C5832B',
-    borderRadius: pqSpacing.radiusPill,
-    paddingHorizontal: 16,
-    paddingVertical: 5,
-    marginTop: 8,
-    shadowColor: '#00F0FF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  adventureSubtitle: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#00F0FF',
-    letterSpacing: 2,
-    textAlign: 'center',
-  },
-  runePreviewRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 14,
-  },
-  runePill: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: 'rgba(12, 22, 32, 0.85)',
-    borderWidth: 1.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  runeIcon: {
-    fontSize: 14,
-    fontWeight: '900',
   },
 
   // Action Buttons Section
