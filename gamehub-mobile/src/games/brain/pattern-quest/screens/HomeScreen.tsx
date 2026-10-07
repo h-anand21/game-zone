@@ -25,15 +25,15 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.topRow}>
           {/* Left Group: Exit Button + Explorer Profile Card */}
           <View style={styles.topLeftGroup}>
-            {/* Exit to GameHub */}
+            {/* Authentic Red Stone EXIT Button */}
             <Pressable
-              style={styles.iconCircle}
+              style={styles.exitButton}
               onPress={() => setShowExitModal(true)}
               accessibilityLabel="Exit to GameHub"
             >
               <Image
-                source={pqAssets.icons.arrowLeft}
-                style={[styles.topIcon, { tintColor: pqColors.goldBright }]}
+                source={pqAssets.buttons.exit}
+                style={styles.exitButtonImg}
                 resizeMode="contain"
               />
             </Pressable>
@@ -82,11 +82,41 @@ export const HomeScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Center Atmospheric Spacer (Home plaque & mode text removed as requested) */}
+        {/* Center Atmospheric Branding & Title Insignia */}
         <View style={styles.centerSpace}>
-          <View style={styles.welcomeBanner}>
-            <Text style={styles.adventureTitle}>ANCIENT EXPEDITION</Text>
-            <Text style={styles.adventureSubtitle}>✦ UNCOVER THE SACRED GLYPHS ✦</Text>
+          <View style={styles.titleInsigniaWrapper}>
+            {/* Top Mystic Glyphs Accent */}
+            <View style={styles.glyphAccentRow}>
+              <Text style={styles.glyphSymbol}>✦</Text>
+              <Text style={styles.glyphDot}>●</Text>
+              <Text style={styles.glyphDiamond}>◈</Text>
+              <Text style={styles.glyphDot}>●</Text>
+              <Text style={styles.glyphSymbol}>✦</Text>
+            </View>
+
+            {/* Master Game Title: PATTERN QUEST */}
+            <Text style={styles.masterGameTitle}>PATTERN QUEST</Text>
+
+            {/* Subtitle Badge Plaque */}
+            <View style={styles.subtitleBadge}>
+              <Text style={styles.adventureSubtitle}>✦ SACRED GLYPH EXPEDITION ✦</Text>
+            </View>
+
+            {/* Sacred Rune Preview Capsules */}
+            <View style={styles.runePreviewRow}>
+              <View style={[styles.runePill, { borderColor: '#2ECC71' }]}>
+                <Text style={[styles.runeIcon, { color: '#2ECC71' }]}>◯</Text>
+              </View>
+              <View style={[styles.runePill, { borderColor: '#00F0FF' }]}>
+                <Text style={[styles.runeIcon, { color: '#00F0FF' }]}>△</Text>
+              </View>
+              <View style={[styles.runePill, { borderColor: '#FFE27A' }]}>
+                <Text style={[styles.runeIcon, { color: '#FFE27A' }]}>◊</Text>
+              </View>
+              <View style={[styles.runePill, { borderColor: '#FF7675' }]}>
+                <Text style={[styles.runeIcon, { color: '#FF7675' }]}>★</Text>
+              </View>
+            </View>
           </View>
         </View>
 
@@ -224,43 +254,101 @@ const styles = StyleSheet.create({
     height: 22,
   },
 
+  exitButton: {
+    height: 42,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  exitButtonImg: {
+    width: 76,
+    height: 42,
+  },
+
   // Center Atmospheric Section
   centerSpace: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  welcomeBanner: {
-    backgroundColor: 'rgba(10, 20, 28, 0.85)',
-    borderWidth: 1.5,
-    borderColor: '#C5832B',
-    borderRadius: 14,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+  titleInsigniaWrapper: {
     alignItems: 'center',
-    shadowColor: '#C5832B',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
-    elevation: 6,
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
   },
-  adventureTitle: {
-    fontSize: 18,
+  glyphAccentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
+  },
+  glyphSymbol: {
+    color: '#00F0FF',
+    fontSize: 14,
+    fontWeight: '900',
+    textShadowColor: '#00F0FF',
+    textShadowRadius: 6,
+  },
+  glyphDot: {
+    color: '#FFE27A',
+    fontSize: 8,
+    opacity: 0.8,
+  },
+  glyphDiamond: {
+    color: '#FFE27A',
+    fontSize: 16,
+    fontWeight: '900',
+    textShadowColor: '#FFE27A',
+    textShadowRadius: 8,
+  },
+  masterGameTitle: {
+    fontSize: 34,
     fontWeight: '900',
     color: '#FFE27A',
-    letterSpacing: 2,
+    letterSpacing: 3.5,
     textAlign: 'center',
-    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.95)',
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 8,
+  },
+  subtitleBadge: {
+    backgroundColor: 'rgba(12, 22, 32, 0.92)',
+    borderWidth: 1.5,
+    borderColor: '#C5832B',
+    borderRadius: pqSpacing.radiusPill,
+    paddingHorizontal: 16,
+    paddingVertical: 5,
+    marginTop: 8,
+    shadowColor: '#00F0FF',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    elevation: 4,
   },
   adventureSubtitle: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '800',
     color: '#00F0FF',
-    letterSpacing: 1.5,
+    letterSpacing: 2,
     textAlign: 'center',
-    marginTop: 4,
+  },
+  runePreviewRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 14,
+  },
+  runePill: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(12, 22, 32, 0.85)',
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  runeIcon: {
+    fontSize: 14,
+    fontWeight: '900',
   },
 
   // Action Buttons Section

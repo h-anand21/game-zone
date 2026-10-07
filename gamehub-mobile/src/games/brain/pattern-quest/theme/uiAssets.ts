@@ -48,6 +48,7 @@ export const pqAssets = {
     nextLevel: require('../../../../../assets/game/pattern-quest/buttons/btn_next_level.png') as ImageSourcePropType,
     tryAgain: require('../../../../../assets/game/pattern-quest/buttons/btn_try_again.png') as ImageSourcePropType,
     quit: require('../../../../../assets/game/pattern-quest/buttons/btn_quit.png') as ImageSourcePropType,
+    exit: require('../../../../../assets/game/path-mind/buttons/btn_exit.png') as ImageSourcePropType,
     howToPlay: require('../../../../../assets/game/pattern-quest/buttons/btn_how_to_play.png') as ImageSourcePropType,
     hint: require('../../../../../assets/game/pattern-quest/buttons/btn_hint.png') as ImageSourcePropType,
     skip: require('../../../../../assets/game/pattern-quest/buttons/btn_skip.png') as ImageSourcePropType,
