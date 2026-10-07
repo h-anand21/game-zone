@@ -28,8 +28,6 @@ import { PatternBreakGame } from './brain/pattern-break/Game';
 import { PATTERN_QUEST_CONFIG } from './brain/pattern-quest/config';
 import { PatternQuestGame } from './brain/pattern-quest/Game';
 
-import { CODE_BREAKER_CONFIG } from './brain/code-breaker/config';
-import { CodeBreakerGame } from './brain/code-breaker/Game';
 
 import { PATH_MIND_CONFIG } from './brain/path-mind/config';
 import { PathMindGame } from './brain/path-mind/Game';
@@ -138,7 +136,6 @@ export const GAME_COMPONENT_REGISTRY: Record<string, GameRegistryEntry> = {
   'memory-rush': { config: MEMORY_RUSH_CONFIG, component: MemoryRushGame },
   'pattern-break': { config: PATTERN_BREAK_CONFIG, component: PatternBreakGame },
   'pattern-quest': { config: PATTERN_QUEST_CONFIG, component: PatternQuestGame },
-  'code-breaker': { config: CODE_BREAKER_CONFIG, component: CodeBreakerGame },
   'path-mind': { config: PATH_MIND_CONFIG, component: PathMindGame },
 
   // Reflex

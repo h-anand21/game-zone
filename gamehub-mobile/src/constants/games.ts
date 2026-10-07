@@ -59,13 +59,6 @@ export const GAME_REGISTRY: GameConfig[] = [
     saveSupport: 'none', description: 'Find the pattern. Continue the adventure.',
   },
   {
-    id: 'code-breaker', name: 'Code Breaker', category: 'brain',
-    offline: true, multiplayer: false, route: '/games/code-breaker',
-    icon: '🔐', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
-    validation: { maxScore: 10000, minDuration: 10, maxDuration: 600 },
-    saveSupport: 'background', description: 'Crack the secret code',
-  },
-  {
     id: 'path-mind', name: 'Path Mind', category: 'brain',
     offline: true, multiplayer: false, route: '/games/path-mind',
     icon: '🛤️', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
