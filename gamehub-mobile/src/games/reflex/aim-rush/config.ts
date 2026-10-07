@@ -22,7 +22,7 @@ export const AIM_RUSH_CONFIG: GameConfig = {
     minDuration: 3,
     maxDuration: 180,
   },
-  saveSupport: 'local',
+  saveSupport: 'full',
   description: 'Aim Rush — Target Chain: Touch targets directly in a dark futuristic arena with concentric sweet-spot precision!',
 };
 

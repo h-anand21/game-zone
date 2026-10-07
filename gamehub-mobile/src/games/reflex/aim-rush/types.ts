@@ -53,6 +53,8 @@ export interface TargetItem {
   points: number;
 }
 
+export type Target = TargetItem;
+
 export interface TouchResult {
   hit: boolean;
   target?: TargetItem;
