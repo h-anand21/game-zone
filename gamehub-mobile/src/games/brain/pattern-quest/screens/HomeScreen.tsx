@@ -85,20 +85,20 @@ export const HomeScreen: React.FC = () => {
         {/* Center Atmospheric Section — Clean unobstructed view of background */}
         <View style={styles.centerSpace} />
 
-        {/* Primary Action Buttons: HOW TO PLAY & PLAY NOW */}
+        {/* Primary Action Buttons: HOW TO PLAY & PLAY NOW (Elevated for clear visibility) */}
         <View style={styles.playButtonArea}>
           <GameButton
             buttonAsset={pqAssets.buttons.howToPlay}
             onPress={() => setScreen('how_to_play')}
-            width={185}
-            height={50}
-            style={{ marginBottom: 12 }}
+            width={195}
+            height={52}
+            style={{ marginBottom: 14 }}
           />
           <GameButton
             buttonAsset={pqAssets.buttons.playNow}
             onPress={() => setScreen('ready')}
-            width={Math.min(SCREEN_WIDTH - 50, 280)}
-            height={76}
+            width={Math.min(SCREEN_WIDTH - 44, 285)}
+            height={78}
           />
         </View>
 
@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
   // Action Buttons Section
   playButtonArea: {
     alignItems: 'center',
-    marginBottom: 96, // Ample breathing room above elevated BottomNavigation
+    marginBottom: 140, // Elevated significantly so buttons are clearly visible above bottom navigation
     zIndex: 10,
   },
 });
