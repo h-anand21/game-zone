@@ -118,13 +118,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </View>
         </View>
 
-        {/* 2. CENTER BRANDING: AIM RUSH — TARGET CHAIN (MEDIUM PROPORTION) */}
+        {/* 2. CENTER BRANDING: AIM RUSH — TARGET CHAIN (ENLARGED & PERFECTLY CENTERED) */}
         <View style={styles.brandingSection}>
           <View style={styles.crosshairBehind}>
-            <Svg width={60} height={30} viewBox="0 0 60 30">
-              <Circle cx={30} cy={15} r={14} stroke={ARColors.cyan} strokeWidth={1.5} fill="none" opacity={0.6} />
-              <Circle cx={30} cy={15} r={6} stroke={ARColors.lime} strokeWidth={1.5} fill="none" opacity={0.8} />
-              <Line x1={5} y1={15} x2={55} y2={15} stroke={ARColors.cyan} strokeWidth={1.5} opacity={0.5} />
+            <Svg width={140} height={56} viewBox="0 0 140 56">
+              <Circle cx={70} cy={28} r={25} stroke={ARColors.cyan} strokeWidth={2} fill="none" opacity={0.65} />
+              <Circle cx={70} cy={28} r={12} stroke={ARColors.lime} strokeWidth={1.8} fill="none" opacity={0.85} />
+              <Circle cx={70} cy={28} r={3} fill={ARColors.cyan} opacity={0.9} />
+              <Line x1={15} y1={28} x2={125} y2={28} stroke={ARColors.cyan} strokeWidth={1.8} opacity={0.5} />
+              <Line x1={70} y1={3} x2={70} y2={12} stroke={ARColors.cyan} strokeWidth={1.8} opacity={0.6} />
+              <Line x1={70} y1={44} x2={70} y2={53} stroke={ARColors.cyan} strokeWidth={1.8} opacity={0.6} />
             </Svg>
           </View>
           <Text style={styles.masterTitle}>AIM RUSH</Text>
@@ -340,32 +343,35 @@ const styles = StyleSheet.create({
     backgroundColor: ARColors.red,
   },
 
-  // 2. Branding Section (Medium Scale)
+  // 2. Branding Section (Enlarged & Centered)
   brandingSection: {
     alignItems: 'center',
-    marginTop: 2,
+    justifyContent: 'center',
+    marginTop: 6,
     position: 'relative',
   },
   crosshairBehind: {
     position: 'absolute',
-    top: -4,
+    top: -2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   masterTitle: {
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 30,
+    fontWeight: '900',
     color: ARColors.white,
-    letterSpacing: 2,
+    letterSpacing: 3,
     fontStyle: 'italic',
     textShadowColor: ARColors.cyan,
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 6,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 10,
   },
   masterSubtitle: {
-    fontSize: 9.5,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '800',
     color: ARColors.lime,
-    letterSpacing: 1.5,
-    marginTop: 2,
+    letterSpacing: 2.5,
+    marginTop: 3,
   },
 
   // Center Atmospheric Spacer
