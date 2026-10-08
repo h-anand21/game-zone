@@ -5,37 +5,11 @@
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OneTapUserProfile, OneTapSettings, OneTapRunResult } from '../types';
+import { DEFAULT_SETTINGS, DEFAULT_USER_PROFILE } from '../config';
 
 const STORAGE_KEYS = {
   PROFILE: '@one_tap_user_profile_v1',
   SETTINGS: '@one_tap_settings_v1',
-};
-
-const DEFAULT_PROFILE: OneTapUserProfile = {
-  totalRuns: 0,
-  personalBestScore: 742,
-  previousBestScore: 0,
-  bestCombo: 18,
-  bestAccuracy: 88.5,
-  fastestReactionMs: 160,
-  averageReactionMs: 240,
-  totalPerfects: 45,
-  totalGreats: 72,
-  totalGoods: 98,
-  totalMisses: 12,
-  totalCoins: 250,
-  totalXp: 180,
-  unlockedModes: ['classic', 'endless', 'rush'],
-  tutorialCompleted: false,
-  dailyChallengeBest: 0,
-};
-
-const DEFAULT_SETTINGS: OneTapSettings = {
-  soundEnabled: true,
-  musicEnabled: true,
-  hapticsEnabled: true,
-  reducedMotion: false,
-  visualFxLevel: 'high',
 };
 
 export const OneTapStorage = {
@@ -43,54 +17,69 @@ export const OneTapStorage = {
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEYS.PROFILE);
       if (data) {
-        return { ...DEFAULT_PROFILE, ...JSON.parse(data) };
+        return { ...DEFAULT_USER_PROFILE, ...JSON.parse(data) };
       }
     } catch {
       // Fallback
     }
-    return DEFAULT_PROFILE;
+    return DEFAULT_USER_PROFILE;
   },
 
   async saveProfile(profile: OneTapUserProfile): Promise<void> {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(profile));
-    } catch {
-      // Ignore
+    } catch (err) {
+      console.warn('Failed to save OneTap profile:', err);
     }
   },
 
-  async recordRun(result: OneTapRunResult): Promise<{
-    isNewBest: boolean;
+  async recordRunResult(result: OneTapRunResult): Promise<{
     profile: OneTapUserProfile;
+    isNewPersonalBest: boolean;
   }> {
-    const profile = await this.getProfile();
-    const isNewBest = result.finalScore > profile.personalBestScore;
+    const current = await this.getProfile();
+    const isNewPersonalBest = result.finalScore > current.personalBestScore;
 
-    const previousBest = profile.personalBestScore;
-    const newBest = isNewBest ? result.finalScore : previousBest;
+    const nextTotalGames = current.totalGamesPlayed + 1;
+    const nextMaxCombo = Math.max(current.maxComboRecorded, result.maxCombo);
+    const nextBestScore = Math.max(current.personalBestScore, result.finalScore);
+    const nextFastest =
+      current.fastestReactionMs === 0
+        ? result.averageReactionTimeMs
+        : Math.min(current.fastestReactionMs, result.averageReactionTimeMs);
 
-    const updatedProfile: OneTapUserProfile = {
-      ...profile,
-      totalRuns: profile.totalRuns + 1,
-      previousBestScore: isNewBest ? previousBest : profile.previousBestScore,
-      personalBestScore: newBest,
-      bestCombo: Math.max(profile.bestCombo, result.maxCombo),
-      bestAccuracy: Math.max(profile.bestAccuracy, result.accuracyPercentage),
-      fastestReactionMs:
-        profile.fastestReactionMs === 0
-          ? result.averageReactionTimeMs
-          : Math.min(profile.fastestReactionMs, result.averageReactionTimeMs),
-      totalPerfects: profile.totalPerfects + result.perfectCount,
-      totalGreats: profile.totalGreats + result.greatCount,
-      totalGoods: profile.totalGoods + result.goodCount,
-      totalMisses: profile.totalMisses + result.missCount,
-      totalCoins: profile.totalCoins + result.earnedCoins,
-      totalXp: profile.totalXp + result.earnedXp,
+    const prevLifetime = current.lifetimeAccuracy * (nextTotalGames - 1);
+    const nextAccuracy =
+      Math.round(((prevLifetime + result.accuracyPercentage) / nextTotalGames) * 10) / 10;
+
+    const updated: OneTapUserProfile = {
+      ...current,
+      totalRuns: current.totalRuns + 1,
+      totalGamesPlayed: nextTotalGames,
+      previousBestScore: isNewPersonalBest ? current.personalBestScore : current.previousBestScore,
+      personalBestScore: nextBestScore,
+      bestCombo: nextMaxCombo,
+      maxComboRecorded: nextMaxCombo,
+      bestAccuracy: Math.max(current.bestAccuracy, result.accuracyPercentage),
+      lifetimeAccuracy: nextAccuracy,
+      fastestReactionMs: nextFastest,
+      averageReactionMs: Math.round(
+        (current.averageReactionMs + result.averageReactionTimeMs) / 2
+      ),
+      totalPerfects: current.totalPerfects + result.perfectCount,
+      totalPerfectHits: current.totalPerfectHits + result.perfectCount,
+      totalGreats: current.totalGreats + result.greatCount,
+      totalGoods: current.totalGoods + result.goodCount,
+      totalMisses: current.totalMisses + result.missCount,
+      totalCoins: current.totalCoins + result.earnedCoins,
+      coins: current.coins + result.earnedCoins,
+      totalXp: current.totalXp + result.earnedXp,
+      xp: current.xp + result.earnedXp,
       lastPlayedDate: new Date().toISOString(),
     };
 
-    await this.saveProfile(updatedProfile);
-    return { isNewBest, profile: updatedProfile };
+    await this.saveProfile(updated);
+    return { profile: updated, isNewPersonalBest };
   },
 
   async getSettings(): Promise<OneTapSettings> {
@@ -108,16 +97,16 @@ export const OneTapStorage = {
   async saveSettings(settings: OneTapSettings): Promise<void> {
     try {
       await AsyncStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-    } catch {
-      // Ignore
+    } catch (err) {
+      console.warn('Failed to save OneTap settings:', err);
     }
   },
 
-  async resetAll(): Promise<void> {
+  async resetAllData(): Promise<void> {
     try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.PROFILE);
-    } catch {
-      // Ignore
+      await AsyncStorage.multiRemove([STORAGE_KEYS.PROFILE, STORAGE_KEYS.SETTINGS]);
+    } catch (err) {
+      console.warn('Failed to reset OneTap data:', err);
     }
   },
 };
