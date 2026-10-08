@@ -28,8 +28,8 @@ export const BackgroundLayer: React.FC<BackgroundLayerProps> = ({
       ? ARBackgrounds.gameplay
       : ARBackgrounds.other;
 
-  // Automatically apply tactical blur for gameplay arena
-  const effectiveBlurRadius = blurRadius ?? (screen === 'gameplay' ? 14 : 0);
+  // Apply reduced subtle tactical blur for gameplay arena
+  const effectiveBlurRadius = blurRadius ?? (screen === 'gameplay' ? 3 : 0);
 
   return (
     <View style={styles.container}>

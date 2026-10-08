@@ -13,7 +13,6 @@ import { AimRushAudio } from './audio/audioManager';
 
 // Screens
 import { SplashScreen } from './screens/SplashScreen';
-import { IntroScreen } from './screens/IntroScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { ModeSelectScreen } from './screens/ModeSelectScreen';
 import { HowToPlayScreen } from './screens/HowToPlayScreen';
@@ -98,19 +97,8 @@ export const AimRushGame: React.FC<AimRushProps> = ({ onFinish }) => {
     return () => sub.remove();
   }, [gameState]);
 
-  // Transition after splash
+  // Transition directly after splash to Home (no intermediate intro screen)
   const handleSplashFinish = () => {
-    if (!profile.tutorialCompleted) {
-      setGameState('intro');
-    } else {
-      setGameState('home');
-    }
-  };
-
-  const handleCompleteIntro = async () => {
-    const updated = { ...profile, tutorialCompleted: true };
-    setProfile(updated);
-    await AimRushStorage.saveProfile(updated);
     setGameState('home');
   };
 
@@ -152,12 +140,7 @@ export const AimRushGame: React.FC<AimRushProps> = ({ onFinish }) => {
       {/* 01. Splash Screen */}
       {gameState === 'splash' && <SplashScreen onFinish={handleSplashFinish} />}
 
-      {/* 02. Intro Screen */}
-      {gameState === 'intro' && (
-        <IntroScreen onContinue={handleCompleteIntro} onSkip={handleCompleteIntro} />
-      )}
-
-      {/* 03. Home Screen */}
+      {/* 02. Home Screen */}
       {gameState === 'home' && (
         <HomeScreen
           profile={profile}
