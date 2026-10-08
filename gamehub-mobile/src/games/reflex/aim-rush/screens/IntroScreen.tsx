@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
@@ -15,9 +16,20 @@ interface IntroScreenProps {
 }
 
 export const IntroScreen: React.FC<IntroScreenProps> = ({ onContinue, onSkip }) => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <BackgroundLayer screen="other" overlayDarkness={0.4}>
-      <Pressable style={styles.container} onPress={onContinue}>
+    <BackgroundLayer screen="other" overlayDarkness={0.35}>
+      <Pressable
+        style={[
+          styles.container,
+          {
+            paddingTop: Math.max(12, insets.top + 6),
+            paddingBottom: Math.max(16, insets.bottom + 8),
+          },
+        ]}
+        onPress={onContinue}
+      >
         {/* Skip Button Top Right */}
         <View style={styles.topBar}>
           <Pressable style={styles.skipBtn} onPress={onSkip}>
@@ -43,16 +55,17 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onContinue, onSkip }) 
           <View style={styles.instructionCard}>
             <Text style={styles.ruleText}>✦ Touch targets directly with your fingers</Text>
             <Text style={styles.ruleText}>✦ Hit dead-center for PERFECT scores</Text>
-            <Text style={styles.ruleText}>✦ Build your chain without missing</Text>
-            <Text style={styles.ruleText}>✦ Avoid dangerous red targets</Text>
+            <Text style={styles.ruleText}>✦ Build combo chains to activate RUSH mode</Text>
+            <Text style={[styles.ruleText, { color: ARColors.red }]}>
+              ✦ Avoid RED danger targets
+            </Text>
           </View>
         </View>
 
-        {/* Footer Prompt */}
-        <View style={styles.footer}>
-          <View style={styles.touchPromptCapsule}>
-            <Text style={styles.promptText}>TOUCH ANYWHERE TO CONTINUE ▶</Text>
-          </View>
+        {/* Bottom Tap Anywhere Callout */}
+        <View style={styles.bottomTapSection}>
+          <Text style={styles.tapText}>TAP ANYWHERE TO ENTER ARENA</Text>
+          <Text style={styles.tapSubtext}>✦ SCREEN IS YOUR CONTROLLER ✦</Text>
         </View>
       </Pressable>
     </BackgroundLayer>
@@ -63,77 +76,74 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 48,
-    paddingBottom: 36,
     justifyContent: 'space-between',
   },
   topBar: {
     alignItems: 'flex-end',
   },
   skipBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
-    borderRadius: 8,
-    backgroundColor: ARColors.surfaceDark,
-    borderWidth: 1,
+    backgroundColor: 'rgba(10, 16, 26, 0.9)',
+    borderWidth: 1.5,
     borderColor: ARColors.border,
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
   skipText: {
     fontSize: 11,
-    fontWeight: '800',
+    fontWeight: '900',
     color: ARColors.textMuted,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   centerContent: {
     alignItems: 'center',
+    gap: 12,
   },
   headline: {
     fontSize: 28,
     fontWeight: '900',
-    color: ARColors.white,
+    color: ARColors.cyan,
     letterSpacing: 3,
-    marginTop: 18,
-    textAlign: 'center',
+    fontStyle: 'italic',
+    marginTop: 8,
   },
   subheadline: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '900',
     color: ARColors.lime,
     letterSpacing: 2,
-    marginTop: 6,
-    textAlign: 'center',
   },
   instructionCard: {
-    width: '100%',
-    backgroundColor: ARColors.surfaceCard,
+    backgroundColor: 'rgba(10, 16, 26, 0.92)',
     borderWidth: 1.5,
-    borderColor: ARColors.border,
+    borderColor: 'rgba(53, 231, 255, 0.35)',
     borderRadius: 16,
     padding: 18,
-    marginTop: 26,
-    gap: 12,
+    gap: 10,
+    marginTop: 12,
+    width: '100%',
   },
   ruleText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '700',
-    color: ARColors.textSecondary,
+    color: ARColors.white,
     lineHeight: 18,
   },
-  footer: {
+  bottomTapSection: {
     alignItems: 'center',
+    gap: 4,
+    paddingBottom: 8,
   },
-  touchPromptCapsule: {
-    backgroundColor: ARColors.cyanSoft,
-    borderWidth: 1.5,
-    borderColor: ARColors.cyan,
-    borderRadius: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-  },
-  promptText: {
-    fontSize: 12,
+  tapText: {
+    fontSize: 13,
     fontWeight: '900',
     color: ARColors.cyan,
     letterSpacing: 1.5,
+  },
+  tapSubtext: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: ARColors.textMuted,
+    letterSpacing: 1.2,
   },
 });
