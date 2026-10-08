@@ -1,10 +1,12 @@
 // ============================================================
 // AIM RUSH — Screen 11: StatsScreen
-// Lifetime player skill metrics and historical telemetry
+// Recreated from "AIM RUSH Neon Stats Dashboard.png" reference
+// Sci-Fi Telemetry dashboard with multi-metric grids & safe areas
 // ============================================================
 
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
@@ -16,6 +18,9 @@ interface StatsScreenProps {
 }
 
 export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => {
+  const insets = useSafeAreaInsets();
+  const [activeTab, setActiveTab] = useState<'overview' | 'modes' | 'records'>('overview');
+
   const totalAttempts = profile.totalTargetsHit + profile.totalMisses;
   const careerAccuracy =
     totalAttempts > 0
@@ -26,70 +31,156 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
   const playSeconds = profile.totalPlayTimeSeconds % 60;
 
   return (
-    <BackgroundLayer screen="other" overlayDarkness={0.4}>
-      <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.topBar}>
-          <Pressable style={styles.iconCircle} onPress={onBack}>
-            <Ionicons name="arrow-back" size={20} color={ARColors.white} />
+    <BackgroundLayer screen="other" overlayDarkness={0.35}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: Math.max(12, insets.top + 6),
+            paddingBottom: Math.max(16, insets.bottom + 8),
+          },
+        ]}
+      >
+        {/* 1. TOP HEADER & TITLE */}
+        <View style={styles.topHeader}>
+          <Pressable style={styles.backBtn} onPress={onBack}>
+            <Ionicons name="arrow-back" size={18} color={ARColors.white} />
           </Pressable>
-          <Text style={styles.headerTitle}>CAREER STATS</Text>
-          <View style={{ width: 42 }} />
-        </View>
 
-        <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
-          {/* Hero Best Score Card */}
-          <View style={styles.heroCard}>
-            <Text style={styles.heroLabel}>PERSONAL BEST RECORD</Text>
-            <Text style={styles.heroScore}>{profile.personalBestScore}</Text>
-            <Text style={styles.heroSub}>
-              MAX CHAIN STREAK: ×{profile.bestChain.toString().padStart(2, '0')}
-            </Text>
+          <View style={styles.brandTitleBox}>
+            <Text style={styles.headerTitle}>STATS</Text>
+            <Text style={styles.headerSub}>YOUR PERFORMANCE TELEMETRY</Text>
           </View>
 
-          {/* Metrics Grid */}
-          <View style={styles.grid}>
-            <View style={styles.gridCell}>
-              <Text style={styles.cellLabel}>TOTAL RUNS</Text>
-              <Text style={styles.cellValue}>{profile.totalRuns}</Text>
+          <View style={{ width: 40 }} />
+        </View>
+
+        {/* 2. TABS ROW */}
+        <View style={styles.tabsRow}>
+          <Pressable
+            style={[styles.tabBtn, activeTab === 'overview' && styles.tabBtnActive]}
+            onPress={() => setActiveTab('overview')}
+          >
+            <Ionicons name="bar-chart-outline" size={14} color={activeTab === 'overview' ? ARColors.gold : ARColors.textMuted} />
+            <Text style={[styles.tabText, activeTab === 'overview' && { color: ARColors.gold }]}>OVERVIEW</Text>
+          </Pressable>
+
+          <Pressable
+            style={[styles.tabBtn, activeTab === 'modes' && styles.tabBtnActive]}
+            onPress={() => setActiveTab('modes')}
+          >
+            <Ionicons name="game-controller-outline" size={14} color={activeTab === 'modes' ? ARColors.cyan : ARColors.textMuted} />
+            <Text style={[styles.tabText, activeTab === 'modes' && { color: ARColors.cyan }]}>MODES</Text>
+          </Pressable>
+
+          <Pressable
+            style={[styles.tabBtn, activeTab === 'records' && styles.tabBtnActive]}
+            onPress={() => setActiveTab('records')}
+          >
+            <Ionicons name="trophy-outline" size={14} color={activeTab === 'records' ? ARColors.lime : ARColors.textMuted} />
+            <Text style={[styles.tabText, activeTab === 'records' && { color: ARColors.lime }]}>RECORDS</Text>
+          </Pressable>
+        </View>
+
+        {/* 3. DASHBOARD METRICS */}
+        <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
+          {/* Top 4 Key Metric Capsules */}
+          <View style={styles.topFourRow}>
+            <View style={styles.miniCapsule}>
+              <Ionicons name="play-circle-outline" size={16} color={ARColors.cyan} />
+              <Text style={styles.miniLabel}>GAMES</Text>
+              <Text style={styles.miniValue}>{profile.totalRuns}</Text>
             </View>
 
-            <View style={styles.gridCell}>
-              <Text style={styles.cellLabel}>TARGETS HIT</Text>
-              <Text style={[styles.cellValue, { color: ARColors.cyan }]}>
+            <View style={styles.miniCapsule}>
+              <Ionicons name="trophy-outline" size={16} color={ARColors.gold} />
+              <Text style={styles.miniLabel}>BEST SCORE</Text>
+              <Text style={[styles.miniValue, { color: ARColors.gold }]}>
+                {profile.personalBestScore}
+              </Text>
+            </View>
+
+            <View style={styles.miniCapsule}>
+              <Ionicons name="link-outline" size={16} color={ARColors.lime} />
+              <Text style={styles.miniLabel}>MAX CHAIN</Text>
+              <Text style={[styles.miniValue, { color: ARColors.lime }]}>
+                x{profile.bestChain}
+              </Text>
+            </View>
+
+            <View style={styles.miniCapsule}>
+              <Ionicons name="disc-outline" size={16} color={ARColors.cyan} />
+              <Text style={styles.miniLabel}>PERFECTS</Text>
+              <Text style={styles.miniValue}>{profile.totalPerfects}</Text>
+            </View>
+          </View>
+
+          {/* Accuracy & Estimated Reaction Bars */}
+          <View style={styles.accuracyBarCard}>
+            <View style={styles.barHeader}>
+              <View style={styles.barLabelGroup}>
+                <Ionicons name="locate-outline" size={16} color={ARColors.cyan} />
+                <Text style={styles.barTitle}>OVERALL ACCURACY</Text>
+              </View>
+              <Text style={styles.barValue}>{careerAccuracy}%</Text>
+            </View>
+            <View style={styles.track}>
+              <View style={[styles.fill, { width: `${careerAccuracy}%`, backgroundColor: ARColors.cyan }]} />
+            </View>
+          </View>
+
+          {/* 4 Detailed Quad Cells */}
+          <View style={styles.quadGrid}>
+            <View style={[styles.quadCell, { borderColor: ARColors.lime }]}>
+              <Ionicons name="checkmark-done" size={20} color={ARColors.lime} />
+              <Text style={styles.quadLabel}>TOTAL HITS</Text>
+              <Text style={[styles.quadValue, { color: ARColors.lime }]}>
                 {profile.totalTargetsHit}
               </Text>
             </View>
 
-            <View style={styles.gridCell}>
-              <Text style={styles.cellLabel}>PERFECT HITS</Text>
-              <Text style={[styles.cellValue, { color: ARColors.lime }]}>
-                {profile.totalPerfects}
-              </Text>
-            </View>
-
-            <View style={styles.gridCell}>
-              <Text style={styles.cellLabel}>CAREER ACCURACY</Text>
-              <Text style={[styles.cellValue, { color: ARColors.gold }]}>
-                {careerAccuracy}%
-              </Text>
-            </View>
-
-            <View style={styles.gridCell}>
-              <Text style={styles.cellLabel}>TOTAL MISSES</Text>
-              <Text style={[styles.cellValue, { color: ARColors.red }]}>
+            <View style={[styles.quadCell, { borderColor: ARColors.red }]}>
+              <Ionicons name="close-circle-outline" size={20} color={ARColors.red} />
+              <Text style={styles.quadLabel}>TOTAL MISSES</Text>
+              <Text style={[styles.quadValue, { color: ARColors.red }]}>
                 {profile.totalMisses}
               </Text>
             </View>
 
-            <View style={styles.gridCell}>
-              <Text style={styles.cellLabel}>TOTAL PLAYTIME</Text>
-              <Text style={styles.cellValue}>
+            <View style={[styles.quadCell, { borderColor: ARColors.cyan }]}>
+              <Ionicons name="star" size={20} color={ARColors.cyan} />
+              <Text style={styles.quadLabel}>PERFECT SWEET-SPOTS</Text>
+              <Text style={[styles.quadValue, { color: ARColors.cyan }]}>
+                {profile.totalPerfects}
+              </Text>
+            </View>
+
+            <View style={[styles.quadCell, { borderColor: ARColors.gold }]}>
+              <Ionicons name="flame" size={20} color={ARColors.gold} />
+              <Text style={styles.quadLabel}>LONGEST CHAIN</Text>
+              <Text style={[styles.quadValue, { color: ARColors.gold }]}>
+                x{profile.bestChain}
+              </Text>
+            </View>
+          </View>
+
+          {/* Gameplay Time Card */}
+          <View style={styles.timeCard}>
+            <Ionicons name="time-outline" size={20} color={ARColors.white} />
+            <View style={styles.timeInfo}>
+              <Text style={styles.timeLabel}>TOTAL GAMEPLAY TIME</Text>
+              <Text style={styles.timeValue}>
                 {playMinutes}m {playSeconds}s
               </Text>
             </View>
           </View>
         </ScrollView>
+
+        {/* 4. BOTTOM ACTION (SAFELY POSITIONED ABOVE GESTURE NAV) */}
+        <Pressable style={styles.bottomBackBtn} onPress={onBack}>
+          <Ionicons name="arrow-back" size={16} color={ARColors.white} />
+          <Text style={styles.bottomBackText}>BACK TO HUB</Text>
+        </Pressable>
       </View>
     </BackgroundLayer>
   );
@@ -98,89 +189,201 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 48,
-    paddingBottom: 24,
+    paddingHorizontal: 16,
+    justifyContent: 'space-between',
   },
-  topBar: {
+  topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
   },
-  iconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: ARColors.surfaceCard,
+  backBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(10, 16, 26, 0.9)',
     borderWidth: 1.5,
-    borderColor: ARColors.border,
+    borderColor: ARColors.cyan,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  brandTitleBox: {
+    alignItems: 'center',
+  },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '900',
-    color: ARColors.white,
-    letterSpacing: 2,
+    color: ARColors.cyan,
+    letterSpacing: 2.5,
+    fontStyle: 'italic',
   },
-  scrollList: {
-    gap: 16,
-    paddingBottom: 20,
-  },
-  heroCard: {
-    backgroundColor: ARColors.surfaceCard,
-    borderWidth: 1.5,
-    borderColor: ARColors.cyan,
-    borderRadius: 18,
-    padding: 22,
-    alignItems: 'center',
-  },
-  heroLabel: {
-    fontSize: 9.5,
-    fontWeight: '800',
-    color: ARColors.textMuted,
-    letterSpacing: 1.5,
-  },
-  heroScore: {
-    fontSize: 48,
-    fontWeight: '900',
-    color: ARColors.white,
-    letterSpacing: 2,
-    marginTop: 4,
-  },
-  heroSub: {
-    fontSize: 12,
-    fontWeight: '900',
-    color: ARColors.lime,
-    letterSpacing: 1.2,
-    marginTop: 6,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-  },
-  gridCell: {
-    flex: 1,
-    minWidth: '45%',
-    backgroundColor: ARColors.surfaceCard,
-    borderWidth: 1.2,
-    borderColor: ARColors.border,
-    borderRadius: 14,
-    padding: 14,
-    alignItems: 'center',
-  },
-  cellLabel: {
+  headerSub: {
     fontSize: 8.5,
     fontWeight: '800',
     color: ARColors.textMuted,
+    letterSpacing: 1.2,
+    marginTop: 2,
+  },
+  tabsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginVertical: 12,
+  },
+  tabBtn: {
+    flex: 1,
+    height: 38,
+    backgroundColor: 'rgba(10, 16, 26, 0.85)',
+    borderWidth: 1.2,
+    borderColor: ARColors.border,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  tabBtnActive: {
+    borderColor: ARColors.cyan,
+    backgroundColor: 'rgba(12, 22, 36, 0.95)',
+  },
+  tabText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: ARColors.textMuted,
     letterSpacing: 1,
   },
-  cellValue: {
-    fontSize: 20,
+  scrollList: {
+    gap: 12,
+    paddingBottom: 16,
+  },
+  topFourRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  miniCapsule: {
+    flex: 1,
+    backgroundColor: 'rgba(10, 16, 26, 0.9)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(53, 231, 255, 0.35)',
+    borderRadius: 12,
+    paddingVertical: 8,
+    alignItems: 'center',
+    gap: 2,
+  },
+  miniLabel: {
+    fontSize: 7.5,
+    fontWeight: '800',
+    color: ARColors.textMuted,
+  },
+  miniValue: {
+    fontSize: 14,
     fontWeight: '900',
     color: ARColors.white,
-    marginTop: 4,
+  },
+  accuracyBarCard: {
+    backgroundColor: 'rgba(10, 16, 26, 0.92)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(53, 231, 255, 0.4)',
+    borderRadius: 14,
+    padding: 12,
+    gap: 8,
+  },
+  barHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  barLabelGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  barTitle: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: ARColors.white,
+    letterSpacing: 1,
+  },
+  barValue: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: ARColors.cyan,
+  },
+  track: {
+    width: '100%',
+    height: 8,
+    backgroundColor: ARColors.surfaceDark,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  fill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  quadGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  quadCell: {
+    flex: 1,
+    minWidth: '46%',
+    backgroundColor: 'rgba(10, 16, 26, 0.9)',
+    borderWidth: 1.5,
+    borderRadius: 14,
+    padding: 12,
+    alignItems: 'center',
+    gap: 4,
+  },
+  quadLabel: {
+    fontSize: 8.5,
+    fontWeight: '800',
+    color: ARColors.textMuted,
+    letterSpacing: 0.8,
+  },
+  quadValue: {
+    fontSize: 20,
+    fontWeight: '900',
+  },
+  timeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(10, 16, 26, 0.9)',
+    borderWidth: 1.2,
+    borderColor: ARColors.border,
+    borderRadius: 14,
+    padding: 12,
+    gap: 12,
+  },
+  timeInfo: {
+    gap: 2,
+  },
+  timeLabel: {
+    fontSize: 8.5,
+    fontWeight: '800',
+    color: ARColors.textMuted,
+  },
+  timeValue: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: ARColors.white,
+  },
+  bottomBackBtn: {
+    width: '100%',
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(10, 16, 26, 0.95)',
+    borderWidth: 1.5,
+    borderColor: ARColors.cyan,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    zIndex: 10,
+  },
+  bottomBackText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: ARColors.white,
+    letterSpacing: 1.5,
   },
 });

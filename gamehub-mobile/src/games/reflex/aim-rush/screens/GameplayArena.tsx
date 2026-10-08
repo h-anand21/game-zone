@@ -5,7 +5,8 @@
 // ============================================================
 
 import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { GameSurface } from '../components/GameSurface';
 import { GameHUD } from '../components/GameHUD';
@@ -22,6 +23,7 @@ interface GameplayArenaProps {
   mode: GameModeConfig;
   onFinishRun: (result: AimRushRunResult) => void;
   onPause: () => void;
+  onExit: () => void;
   isPaused: boolean;
 }
 
@@ -29,19 +31,23 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
   mode,
   onFinishRun,
   onPause,
+  onExit,
   isPaused,
 }) => {
   const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
-  // Arena safe limits
+  // Arena safe limits (dynamic with device insets)
   const bounds: ArenaBounds = {
     width,
     height,
-    safeTop: 110,     // Clear below GameHUD
-    safeBottom: 60,   // Clear above gesture navigation
-    safeLeft: 14,
-    safeRight: 14,
+    safeTop: insets.top + 105,        // Clear below dual-tier GameHUD
+    safeBottom: insets.bottom + 85,    // Clear above bottom progress & exit bar
+    safeLeft: Math.max(16, insets.left + 14),
+    safeRight: Math.max(16, insets.right + 14),
   };
+
+  const goalCount = mode.id === 'rush' ? 25 : mode.id === 'classic' ? 30 : 20;
 
   // Telemetry & Game State
   const [score, setScore] = useState(0);
@@ -50,6 +56,7 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
   const [lives, setLives] = useState(mode.initialLives);
   const [timeLeft, setTimeLeft] = useState(mode.durationSeconds);
   const [isRushActive, setIsRushActive] = useState(false);
+  const [hitsDisplay, setHitsDisplay] = useState(0);
 
   // Targets & Visual FX
   const [targets, setTargets] = useState<TargetItem[]>([]);
@@ -65,7 +72,7 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
   const startTimeRef = useRef(Date.now());
   const hasFinishedRef = useRef(false);
 
-  // Helper to spawn initial target
+  // Spawn initial target
   useEffect(() => {
     startTimeRef.current = Date.now();
     hasFinishedRef.current = false;
@@ -119,7 +126,6 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
         }
 
         if (expired) {
-          // Target expired before hit -> breaks chain & loses 1 life in precision
           handleTargetExpiration();
           const next = spawnTarget(bounds, mode, score, 0);
           return [next];
@@ -175,7 +181,7 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
       maxChain,
       accuracy,
       durationMs,
-      isNewPersonalBest: false, // Calculated by storage
+      isNewPersonalBest: false,
       dateIso: new Date().toISOString(),
     });
   };
@@ -190,7 +196,6 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
       const hitTarget = collision.target;
 
       if (hitTarget.type === 'danger') {
-        // Punish player for hitting danger target
         missesRef.current += 1;
         const penalty = collision.pointsAwarded || -20;
         setScore((prev) => Math.max(0, prev + penalty));
@@ -198,17 +203,14 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
         setIsRushActive(false);
         AimRushHaptics.missOrDanger();
 
-        // Spawn effect popup
         spawnEffectPopup(touchX, touchY, 'miss', penalty);
 
-        // Deduct life
         setLives((prev) => {
           const nextLives = prev - 1;
           if (nextLives <= 0) finishGame();
           return nextLives;
         });
 
-        // Respawn next target
         const next = spawnTarget(bounds, mode, score, 0);
         setTargets([next]);
         return;
@@ -216,6 +218,7 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
 
       // Valid hit on target!
       totalHitsRef.current += 1;
+      setHitsDisplay(totalHitsRef.current);
       const tier = collision.tier || 'good';
 
       if (tier === 'perfect') {
@@ -234,34 +237,34 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
       setChain(nextChain);
       if (nextChain > maxChain) setMaxChain(nextChain);
 
-      // Check Rush threshold
       if (nextChain >= AIM_RUSH_BALANCE.rushThresholdChain) {
         setIsRushActive(true);
       }
 
-      // Calculate score with combo multiplier
       const multiplier = Math.min(5, 1 + Math.floor(nextChain / 4));
       const basePoints = collision.pointsAwarded || 10;
       const totalPoints = basePoints * multiplier;
       setScore((prev) => prev + totalPoints);
 
-      // Check combo milestone vibration
       if (AIM_RUSH_BALANCE.comboMilestones.includes(nextChain)) {
         AimRushHaptics.comboMilestone();
       }
 
-      // Spawn visual feedbacks
       spawnEffectPopup(touchX, touchY, tier, totalPoints);
       setBursts((prev) => [
         ...prev,
         { id: `b_${Date.now()}_${Math.random()}`, x: touchX, y: touchY, tier },
       ]);
 
-      // Spawn next target immediately
+      // Check win condition if target goal reached
+      if (totalHitsRef.current >= goalCount) {
+        finishGame();
+        return;
+      }
+
       const next = spawnTarget(bounds, mode, score + totalPoints, nextChain, hitTarget);
       setTargets([next]);
     } else {
-      // Touched empty space = Miss
       missesRef.current += 1;
       setChain(0);
       setIsRushActive(false);
@@ -278,10 +281,21 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
     ]);
   };
 
+  const handleHint = () => {
+    if (targets.length > 0) {
+      const cur = targets[0];
+      setBursts((prev) => [
+        ...prev,
+        { id: `hint_${Date.now()}`, x: cur.x, y: cur.y, tier: 'great' },
+      ]);
+      AimRushHaptics.hitNormal();
+    }
+  };
+
   return (
-    <BackgroundLayer screen="gameplay" overlayDarkness={0.28}>
+    <BackgroundLayer screen="gameplay" overlayDarkness={0.25}>
       <GameSurface onTouch={handleTouch}>
-        {/* Futuristic Top HUD */}
+        {/* Authentic Dual-Tier & Bottom HUD */}
         <GameHUD
           score={score}
           chain={chain}
@@ -289,8 +303,12 @@ export const GameplayArena: React.FC<GameplayArenaProps> = ({
           lives={lives}
           maxLives={mode.initialLives}
           mode={mode}
+          hitsCount={hitsDisplay}
+          goalCount={goalCount}
           isRushActive={isRushActive}
           onPause={onPause}
+          onExit={onExit}
+          onHint={handleHint}
         />
 
         {/* Active Targets on Arena */}

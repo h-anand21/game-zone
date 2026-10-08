@@ -1,6 +1,7 @@
 // ============================================================
-// AIM RUSH — Pause Modal Component
-// Sci-Fi Instrument Panel with Resume, Restart, Settings, and Exit
+// AIM RUSH — Authentic Pause Modal Component
+// Recreated from "AIMRUSH Neon Pause Menu.png" reference
+// Chamfered hex-capsule buttons with cyan/red neon glow
 // ============================================================
 
 import React from 'react';
@@ -26,57 +27,39 @@ export const PauseModal: React.FC<PauseModalProps> = ({
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.backdrop}>
-        <View style={styles.card}>
-          {/* Header */}
-          <View style={styles.headerRow}>
-            <Ionicons name="pause-circle" size={26} color={ARColors.cyan} />
-            <Text style={styles.title}>SESSION PAUSED</Text>
+        <View style={styles.cardFrame}>
+          {/* Top Notch Ornament */}
+          <View style={styles.topNotch}>
+            <View style={styles.notchCircle} />
           </View>
+
+          {/* Master Title */}
+          <Text style={styles.title}>PAUSED</Text>
           <Text style={styles.subtitle}>TACTICAL HOLD • ENGINES IDLE</Text>
 
-          {/* Action Buttons */}
-          <View style={styles.buttonList}>
-            {/* Resume Button */}
-            <Pressable
-              style={[styles.btn, styles.resumeBtn]}
-              onPress={onResume}
-              accessibilityRole="button"
-              accessibilityLabel="Resume Game"
-            >
-              <Ionicons name="play" size={18} color="#07090C" />
+          {/* Action Buttons List */}
+          <View style={styles.buttonsList}>
+            {/* 1. Resume Button */}
+            <Pressable style={[styles.btn, styles.resumeBtn]} onPress={onResume}>
+              <Ionicons name="play" size={20} color="#07090C" />
               <Text style={styles.resumeBtnText}>RESUME</Text>
             </Pressable>
 
-            {/* Restart Button */}
-            <Pressable
-              style={styles.btn}
-              onPress={onRestart}
-              accessibilityRole="button"
-              accessibilityLabel="Restart Game"
-            >
-              <Ionicons name="refresh" size={18} color={ARColors.white} />
-              <Text style={styles.btnText}>RESTART RUN</Text>
+            {/* 2. Restart Button */}
+            <Pressable style={styles.btn} onPress={onRestart}>
+              <Ionicons name="refresh" size={20} color={ARColors.white} />
+              <Text style={styles.btnText}>RESTART</Text>
             </Pressable>
 
-            {/* Settings Button */}
-            <Pressable
-              style={styles.btn}
-              onPress={onSettings}
-              accessibilityRole="button"
-              accessibilityLabel="Game Settings"
-            >
-              <Ionicons name="settings-sharp" size={18} color={ARColors.white} />
+            {/* 3. Settings Button */}
+            <Pressable style={styles.btn} onPress={onSettings}>
+              <Ionicons name="settings-sharp" size={19} color={ARColors.white} />
               <Text style={styles.btnText}>SETTINGS</Text>
             </Pressable>
 
-            {/* Exit to Hub Button */}
-            <Pressable
-              style={[styles.btn, styles.exitBtn]}
-              onPress={onExit}
-              accessibilityRole="button"
-              accessibilityLabel="Exit to Hub"
-            >
-              <Ionicons name="exit-outline" size={18} color={ARColors.red} />
+            {/* 4. Exit to Hub Button */}
+            <Pressable style={[styles.btn, styles.exitBtn]} onPress={onExit}>
+              <Ionicons name="home" size={19} color={ARColors.red} />
               <Text style={[styles.btnText, { color: ARColors.red }]}>EXIT TO HUB</Text>
             </Pressable>
           </View>
@@ -89,79 +72,107 @@ export const PauseModal: React.FC<PauseModalProps> = ({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: ARColors.overlayBackdrop,
+    backgroundColor: 'rgba(5, 8, 12, 0.85)',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: 20,
   },
-  card: {
+  cardFrame: {
     width: '100%',
-    maxWidth: 340,
-    backgroundColor: ARColors.surfacePanel,
+    maxWidth: 320,
+    backgroundColor: 'rgba(10, 16, 26, 0.96)',
     borderWidth: 2,
     borderColor: ARColors.cyan,
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 24,
+    paddingHorizontal: 22,
+    paddingTop: 20,
+    paddingBottom: 24,
     alignItems: 'center',
     shadowColor: ARColors.cyan,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.5,
-    shadowRadius: 16,
+    shadowOpacity: 0.6,
+    shadowRadius: 18,
     elevation: 12,
+    position: 'relative',
   },
-  headerRow: {
-    flexDirection: 'row',
+  topNotch: {
+    width: 48,
+    height: 8,
+    borderBottomWidth: 1.5,
+    borderLeftWidth: 1.5,
+    borderRightWidth: 1.5,
+    borderColor: ARColors.cyan,
+    borderBottomLeftRadius: 6,
+    borderBottomRightRadius: 6,
     alignItems: 'center',
-    gap: 8,
+    position: 'absolute',
+    top: 0,
+  },
+  notchCircle: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: ARColors.cyan,
+    marginTop: 1,
   },
   title: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: '900',
-    color: ARColors.white,
-    letterSpacing: 2,
+    color: ARColors.cyan,
+    fontStyle: 'italic',
+    letterSpacing: 3,
+    marginTop: 6,
+    textShadowColor: ARColors.cyan,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 10,
   },
   subtitle: {
-    fontSize: 9.5,
+    fontSize: 8.5,
     fontWeight: '800',
-    color: ARColors.cyan,
+    color: ARColors.textMuted,
     letterSpacing: 1.5,
-    marginTop: 4,
+    marginTop: 2,
     marginBottom: 20,
   },
-  buttonList: {
+  buttonsList: {
     width: '100%',
-    gap: 10,
+    gap: 12,
   },
   btn: {
     width: '100%',
-    height: 48,
-    borderRadius: 12,
+    height: 50,
+    borderRadius: 14,
     backgroundColor: ARColors.surfaceDark,
     borderWidth: 1.5,
-    borderColor: ARColors.border,
+    borderColor: 'rgba(53, 231, 255, 0.45)',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
   },
   resumeBtn: {
     backgroundColor: ARColors.cyan,
     borderColor: ARColors.cyan,
+    shadowColor: ARColors.cyan,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
   },
   resumeBtnText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '900',
     color: '#07090C',
-    letterSpacing: 1.5,
+    letterSpacing: 2,
+    fontStyle: 'italic',
   },
   btnText: {
     fontSize: 13,
     fontWeight: '800',
     color: ARColors.white,
-    letterSpacing: 1,
+    letterSpacing: 1.5,
   },
   exitBtn: {
-    borderColor: 'rgba(255, 77, 97, 0.4)',
+    borderColor: 'rgba(255, 77, 97, 0.5)',
     backgroundColor: ARColors.redSoft,
   },
 });

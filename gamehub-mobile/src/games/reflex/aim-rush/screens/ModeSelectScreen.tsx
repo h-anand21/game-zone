@@ -1,15 +1,17 @@
 // ============================================================
 // AIM RUSH — Screen 04: ModeSelectScreen
-// Futuristic carousel for selecting Classic, Rush, Precision, or Daily
+// Recreated from "Neon Aim Rush Mode Selection.png" reference
+// Sci-Fi mode carousel, parameter specs, and safe area insets
 // ============================================================
 
 import React from 'react';
 import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
 import { GAME_MODES } from '../config';
-import { GameModeConfig, GameModeId } from '../types';
+import { GameModeConfig } from '../types';
 
 interface ModeSelectScreenProps {
   currentMode: GameModeConfig;
@@ -22,18 +24,30 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
   onSelectMode,
   onBack,
 }) => {
+  const insets = useSafeAreaInsets();
   const modesList = Object.values(GAME_MODES);
 
   return (
-    <BackgroundLayer screen="other" overlayDarkness={0.4}>
-      <View style={styles.container}>
+    <BackgroundLayer screen="other" overlayDarkness={0.35}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: Math.max(12, insets.top + 6),
+            paddingBottom: Math.max(16, insets.bottom + 8),
+          },
+        ]}
+      >
         {/* Top Header */}
         <View style={styles.topBar}>
           <Pressable style={styles.iconCircle} onPress={onBack}>
-            <Ionicons name="arrow-back" size={20} color={ARColors.white} />
+            <Ionicons name="arrow-back" size={18} color={ARColors.white} />
           </Pressable>
-          <Text style={styles.headerTitle}>ARENA MODES</Text>
-          <View style={{ width: 42 }} />
+          <View style={styles.titleGroup}>
+            <Text style={styles.headerTitle}>SELECT MODE</Text>
+            <Text style={styles.headerSub}>CHOOSE YOUR CHALLENGE</Text>
+          </View>
+          <View style={{ width: 40 }} />
         </View>
 
         {/* Scrollable Mode Cards */}
@@ -54,7 +68,7 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
                   <View style={[styles.badge, { backgroundColor: `${m.color}25`, borderColor: m.color }]}>
                     <Text style={[styles.badgeText, { color: m.color }]}>{m.badge}</Text>
                   </View>
-                  <Text style={[styles.durationTag, { color: m.color }]}>{m.durationSeconds}s</Text>
+                  <Text style={[styles.durationTag, { color: m.color }]}>{m.durationSeconds}s DURATION</Text>
                 </View>
 
                 <Text style={styles.cardTitle}>{m.title}</Text>
@@ -63,7 +77,7 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
 
                 {/* Telemetry specs row */}
                 <View style={styles.specRow}>
-                  <Text style={styles.specItem}>BASE RADIUS: {m.baseRadius}px</Text>
+                  <Text style={styles.specItem}>RADIUS: {m.baseRadius}px</Text>
                   <Text style={styles.specItem}>VELOCITY: ×{m.speedMultiplier}</Text>
                   <Text style={styles.specItem}>LIVES: {m.initialLives}</Text>
                 </View>
@@ -90,42 +104,51 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 48,
-    paddingBottom: 24,
+    paddingHorizontal: 16,
   },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 16,
   },
   iconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: ARColors.surfaceCard,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(10, 16, 26, 0.9)',
     borderWidth: 1.5,
-    borderColor: ARColors.border,
+    borderColor: ARColors.cyan,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  titleGroup: {
+    alignItems: 'center',
+  },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '900',
     color: ARColors.white,
     letterSpacing: 2,
+    fontStyle: 'italic',
+  },
+  headerSub: {
+    fontSize: 8.5,
+    fontWeight: '800',
+    color: ARColors.cyan,
+    letterSpacing: 1.2,
+    marginTop: 2,
   },
   scrollList: {
-    gap: 16,
+    gap: 14,
     paddingBottom: 24,
   },
   card: {
-    backgroundColor: ARColors.surfaceCard,
+    backgroundColor: 'rgba(10, 16, 26, 0.92)',
     borderWidth: 1.5,
     borderColor: ARColors.border,
     borderRadius: 18,
-    padding: 18,
+    padding: 16,
     gap: 8,
   },
   cardHeader: {
@@ -137,35 +160,36 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingVertical: 3,
   },
   badgeText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '900',
     letterSpacing: 1,
   },
   durationTag: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '900',
+    letterSpacing: 0.8,
   },
   cardTitle: {
     fontSize: 22,
     fontWeight: '900',
     color: ARColors.white,
     letterSpacing: 1.5,
-    marginTop: 4,
+    fontStyle: 'italic',
+    marginTop: 2,
   },
   cardSubtitle: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '800',
     color: ARColors.textMuted,
     letterSpacing: 1,
   },
   cardDesc: {
-    fontSize: 12,
+    fontSize: 11.5,
     color: ARColors.textSecondary,
-    lineHeight: 18,
-    marginTop: 2,
+    lineHeight: 16,
   },
   specRow: {
     flexDirection: 'row',
@@ -174,23 +198,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    marginTop: 6,
+    marginTop: 4,
   },
   specItem: {
-    fontSize: 9,
+    fontSize: 8.5,
     fontWeight: '800',
     color: ARColors.textMuted,
   },
   selectAction: {
     width: '100%',
-    height: 40,
-    borderRadius: 10,
+    height: 44,
+    borderRadius: 12,
     backgroundColor: ARColors.surfaceDark,
     borderWidth: 1.2,
     borderColor: ARColors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: 6,
   },
   selectActionText: {
     fontSize: 12,

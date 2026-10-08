@@ -1,10 +1,12 @@
 // ============================================================
-// AIM RUSH — Minimal Futuristic GameHUD Component
-// Compact digital telemetry display (Score, Chain, Timer, Lives)
+// AIM RUSH — Authentic Sci-Fi GameHUD Component
+// Recreated from "Neon Aim Rush_ Target Chain.png" reference
+// Dual-tier Top Telemetry + Safe Bottom Progress Rail with Hint & Exit
 // ============================================================
 
 import React from 'react';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { ARColors } from '../theme/colors';
 import { GameModeConfig } from '../types';
@@ -16,8 +18,12 @@ interface GameHUDProps {
   lives: number;
   maxLives: number;
   mode: GameModeConfig;
+  hitsCount: number;
+  goalCount: number;
   isRushActive: boolean;
   onPause: () => void;
+  onExit: () => void;
+  onHint?: () => void;
 }
 
 export const GameHUD: React.FC<GameHUDProps> = ({
@@ -27,204 +33,280 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   lives,
   maxLives,
   mode,
+  hitsCount,
+  goalCount,
   isRushActive,
   onPause,
+  onExit,
+  onHint,
 }) => {
-  // Format score to 3+ digits (e.g. 024)
-  const scoreDisplay = score.toString().padStart(3, '0');
-
-  // Format chain (e.g. ×07)
-  const chainDisplay = `×${chain.toString().padStart(2, '0')}`;
-
-  // Format time (e.g. 08.4s or 15s)
+  const insets = useSafeAreaInsets();
   const isTimeLow = timeLeftSeconds <= 5;
+  const timeFormatted = `00:${timeLeftSeconds.toString().padStart(2, '0')}`;
+
+  // Progress rail node count (6 segments)
+  const totalNodes = 6;
+  const progressRatio = Math.min(1, hitsCount / goalCount);
+  const activeNodes = Math.round(progressRatio * totalNodes);
 
   return (
-    <View style={styles.container} pointerEvents="box-none">
-      {/* Top HUD Telemetry Bar */}
-      <View style={styles.topRow}>
-        {/* Left: Pause Button + Mode Tag */}
-        <View style={styles.leftGroup}>
-          <Pressable
-            style={styles.pauseButton}
-            onPress={onPause}
-            accessibilityRole="button"
-            accessibilityLabel="Pause Game"
-          >
-            <Ionicons name="pause" size={18} color={ARColors.cyan} />
+    <View style={styles.hudOverlay} pointerEvents="box-none">
+      {/* 1. TOP TELEMETRY CLUSTER */}
+      <View
+        style={[
+          styles.topCluster,
+          { paddingTop: Math.max(10, insets.top + 6) },
+        ]}
+        pointerEvents="box-none"
+      >
+        {/* Tier 1 Row: Pause | Score | Title | Chain | Lives */}
+        <View style={styles.tier1Row}>
+          {/* Pause Button */}
+          <Pressable style={styles.hudBox} onPress={onPause}>
+            <Ionicons name="pause" size={16} color={ARColors.cyan} />
           </Pressable>
 
-          <View style={[styles.modeBadge, { borderColor: mode.color }]}>
-            <Text style={[styles.modeText, { color: mode.color }]}>{mode.title}</Text>
-          </View>
-        </View>
-
-        {/* Center: Score & Chain Multiplier */}
-        <View style={styles.centerGroup}>
-          <View style={styles.scoreCapsule}>
-            <Text style={styles.statLabel}>SCORE</Text>
-            <Text style={styles.scoreText}>{scoreDisplay}</Text>
+          {/* Score Box */}
+          <View style={[styles.hudBox, styles.scoreBox]}>
+            <Text style={styles.hudLabel}>SCORE</Text>
+            <Text style={styles.scoreNumber}>{score}</Text>
           </View>
 
-          <View style={[styles.chainCapsule, chain >= 5 && styles.chainActiveCapsule]}>
-            <Text style={[styles.statLabel, chain >= 5 && { color: ARColors.lime }]}>CHAIN</Text>
-            <Text style={[styles.chainText, chain >= 5 && { color: ARColors.lime }]}>
-              {chainDisplay}
-            </Text>
-          </View>
-        </View>
-
-        {/* Right: Timer & Lives */}
-        <View style={styles.rightGroup}>
-          <View style={[styles.timerCapsule, isTimeLow && styles.timerLowCapsule]}>
-            <Text style={[styles.timerText, isTimeLow && styles.timerLowText]}>
-              {timeLeftSeconds}s
-            </Text>
+          {/* Center Brand Tag */}
+          <View style={styles.brandTag}>
+            <Text style={styles.brandTitle}>AIM RUSH</Text>
+            <Text style={styles.brandSub}>TARGET CHAIN</Text>
           </View>
 
-          {/* Lives Indicator */}
-          {maxLives > 1 && (
+          {/* Chain Box */}
+          <View style={[styles.hudBox, styles.chainBox]}>
+            <Text style={[styles.hudLabel, { color: ARColors.gold }]}>CHAIN</Text>
+            <Text style={styles.chainNumber}>x{chain}</Text>
+          </View>
+
+          {/* Lives Box */}
+          <View style={styles.hudBox}>
             <View style={styles.livesRow}>
               {Array.from({ length: maxLives }).map((_, i) => (
                 <Text
                   key={i}
                   style={[
                     styles.heartIcon,
-                    { color: i < lives ? ARColors.red : ARColors.border },
+                    { color: i < lives ? ARColors.cyan : 'rgba(255,255,255,0.2)' },
                   ]}
                 >
                   ♥
                 </Text>
               ))}
             </View>
-          )}
+          </View>
         </View>
+
+        {/* Tier 2 Row: Mode | Time | Target Left */}
+        <View style={styles.tier2Row}>
+          {/* Mode Box */}
+          <View style={[styles.subBox, { borderColor: mode.color }]}>
+            <Text style={styles.subLabel}>MODE</Text>
+            <Text style={[styles.subValue, { color: mode.color }]}>{mode.title}</Text>
+          </View>
+
+          {/* Time Box */}
+          <View style={[styles.subBox, isTimeLow && styles.timeLowBox]}>
+            <Text style={[styles.subLabel, isTimeLow && { color: ARColors.red }]}>TIME</Text>
+            <Text style={[styles.subValue, isTimeLow && { color: ARColors.red }]}>
+              {timeFormatted}
+            </Text>
+          </View>
+
+          {/* Target Left Box */}
+          <View style={styles.subBox}>
+            <Text style={styles.subLabel}>TARGET LEFT</Text>
+            <Text style={styles.subValue}>
+              {hitsCount} / {goalCount}
+            </Text>
+          </View>
+        </View>
+
+        {/* Rush Mode Kinetic Banner */}
+        {isRushActive && (
+          <View style={styles.rushBanner} pointerEvents="none">
+            <Text style={styles.rushText}>⚡ RUSH ACTIVE • SPEED ×1.5 ⚡</Text>
+          </View>
+        )}
       </View>
 
-      {/* Rush State Notification Badge */}
-      {isRushActive && (
-        <View style={styles.rushBanner} pointerEvents="none">
-          <Text style={styles.rushText}>⚡ RUSH ACTIVE • SPEED ×1.5 ⚡</Text>
+      {/* 2. BOTTOM TELEMETRY CLUSTER (SAFELY POSITIONED ABOVE GESTURE BAR) */}
+      <View
+        style={[
+          styles.bottomCluster,
+          { paddingBottom: Math.max(12, insets.bottom + 8) },
+        ]}
+        pointerEvents="box-none"
+      >
+        <View style={styles.bottomBarRow}>
+          {/* Left: Hint Button with Counter Badge */}
+          <Pressable style={styles.bottomActionBtn} onPress={onHint}>
+            <View style={styles.hintBadge}>
+              <Text style={styles.hintBadgeText}>3</Text>
+            </View>
+            <Ionicons name="bulb-outline" size={18} color={ARColors.cyan} />
+            <Text style={styles.bottomActionLabel}>HINT</Text>
+          </Pressable>
+
+          {/* Center: Target Progress Waypoint Rail */}
+          <View style={styles.progressRailBox}>
+            <View style={styles.nodesTrack}>
+              {Array.from({ length: totalNodes }).map((_, i) => {
+                const isLit = i < activeNodes;
+                return (
+                  <React.Fragment key={i}>
+                    <View
+                      style={[
+                        styles.nodeCircle,
+                        isLit && styles.nodeCircleLit,
+                      ]}
+                    />
+                    {i < totalNodes - 1 && (
+                      <View
+                        style={[
+                          styles.nodeLink,
+                          isLit && styles.nodeLinkLit,
+                        ]}
+                      />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </View>
+            <Text style={styles.railText}>
+              {hitsCount} / {goalCount}
+            </Text>
+          </View>
+
+          {/* Right: Exit Button */}
+          <Pressable style={styles.bottomActionBtn} onPress={onExit}>
+            <Ionicons name="exit-outline" size={18} color={ARColors.cyan} />
+            <Text style={styles.bottomActionLabel}>EXIT</Text>
+          </Pressable>
         </View>
-      )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    paddingHorizontal: 16,
-    paddingTop: 8,
+  hudOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'space-between',
     zIndex: 50,
   },
-  topRow: {
+
+  // 1. Top Cluster
+  topCluster: {
+    paddingHorizontal: 14,
+    gap: 8,
+  },
+  tier1Row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: ARColors.surfaceCard,
+  },
+  hudBox: {
+    height: 44,
+    minWidth: 44,
+    backgroundColor: 'rgba(10, 16, 26, 0.9)',
     borderWidth: 1.5,
-    borderColor: ARColors.border,
-    borderRadius: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    shadowColor: ARColors.cyan,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  leftGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  pauseButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: ARColors.surfaceDark,
-    borderWidth: 1.2,
     borderColor: ARColors.cyan,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 8,
   },
-  modeBadge: {
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    backgroundColor: ARColors.surfaceDark,
+  scoreBox: {
+    minWidth: 68,
   },
-  modeText: {
-    fontSize: 9.5,
-    fontWeight: '900',
+  chainBox: {
+    minWidth: 60,
+    borderColor: ARColors.gold,
+  },
+  hudLabel: {
+    fontSize: 7.5,
+    fontWeight: '800',
+    color: ARColors.cyan,
     letterSpacing: 0.8,
   },
-  centerGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  scoreCapsule: {
-    alignItems: 'center',
-  },
-  chainCapsule: {
-    alignItems: 'center',
-  },
-  chainActiveCapsule: {
-    transform: [{ scale: 1.05 }],
-  },
-  statLabel: {
-    fontSize: 8,
-    fontWeight: '800',
-    color: ARColors.textMuted,
-    letterSpacing: 1,
-  },
-  scoreText: {
-    fontSize: 18,
+  scoreNumber: {
+    fontSize: 14,
     fontWeight: '900',
     color: ARColors.white,
+    letterSpacing: 0.8,
+  },
+  chainNumber: {
+    fontSize: 14,
+    fontWeight: '900',
+    color: ARColors.gold,
+    letterSpacing: 0.8,
+  },
+  brandTag: {
+    alignItems: 'center',
+  },
+  brandTitle: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: ARColors.white,
+    fontStyle: 'italic',
     letterSpacing: 1.5,
   },
-  chainText: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: ARColors.cyan,
+  brandSub: {
+    fontSize: 7,
+    fontWeight: '800',
+    color: ARColors.lime,
     letterSpacing: 1.2,
-  },
-  rightGroup: {
-    alignItems: 'flex-end',
-    gap: 2,
-  },
-  timerCapsule: {
-    backgroundColor: ARColors.surfaceDark,
-    borderWidth: 1.2,
-    borderColor: ARColors.border,
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  timerLowCapsule: {
-    borderColor: ARColors.red,
-    backgroundColor: ARColors.redSoft,
-  },
-  timerText: {
-    fontSize: 15,
-    fontWeight: '900',
-    color: ARColors.white,
-    letterSpacing: 0.8,
-  },
-  timerLowText: {
-    color: ARColors.red,
   },
   livesRow: {
     flexDirection: 'row',
     gap: 2,
   },
   heartIcon: {
-    fontSize: 12,
+    fontSize: 11,
   },
+
+  // Tier 2 Sub HUD Row
+  tier2Row: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  subBox: {
+    flex: 1,
+    height: 36,
+    backgroundColor: 'rgba(8, 14, 22, 0.85)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(53, 231, 255, 0.4)',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timeLowBox: {
+    borderColor: ARColors.red,
+    backgroundColor: ARColors.redSoft,
+  },
+  subLabel: {
+    fontSize: 7,
+    fontWeight: '800',
+    color: ARColors.textMuted,
+    letterSpacing: 0.6,
+  },
+  subValue: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: ARColors.white,
+    letterSpacing: 0.8,
+  },
+
   rushBanner: {
     alignSelf: 'center',
     backgroundColor: ARColors.limeSoft,
@@ -233,12 +315,105 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 3,
-    marginTop: 6,
+    marginTop: 2,
   },
   rushText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '900',
     color: ARColors.lime,
     letterSpacing: 1.2,
+  },
+
+  // 2. Bottom Cluster
+  bottomCluster: {
+    paddingHorizontal: 14,
+  },
+  bottomBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  bottomActionBtn: {
+    width: 52,
+    height: 50,
+    backgroundColor: 'rgba(10, 16, 26, 0.9)',
+    borderWidth: 1.5,
+    borderColor: ARColors.cyan,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    gap: 2,
+  },
+  bottomActionLabel: {
+    fontSize: 8,
+    fontWeight: '800',
+    color: ARColors.white,
+    letterSpacing: 0.8,
+  },
+  hintBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -4,
+    backgroundColor: ARColors.cyan,
+    borderRadius: 8,
+    width: 14,
+    height: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  hintBadgeText: {
+    fontSize: 8.5,
+    fontWeight: '900',
+    color: '#07090C',
+  },
+  progressRailBox: {
+    flex: 1,
+    height: 50,
+    backgroundColor: 'rgba(10, 16, 26, 0.9)',
+    borderWidth: 1.5,
+    borderColor: ARColors.cyan,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 12,
+  },
+  nodesTrack: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'center',
+    marginBottom: 3,
+  },
+  nodeCircle: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: ARColors.surfaceDark,
+    borderWidth: 1.5,
+    borderColor: 'rgba(53, 231, 255, 0.4)',
+  },
+  nodeCircleLit: {
+    backgroundColor: ARColors.cyan,
+    borderColor: '#FFFFFF',
+    shadowColor: ARColors.cyan,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+  },
+  nodeLink: {
+    width: 14,
+    height: 2,
+    backgroundColor: 'rgba(53, 231, 255, 0.3)',
+  },
+  nodeLinkLit: {
+    backgroundColor: ARColors.cyan,
+  },
+  railText: {
+    fontSize: 9.5,
+    fontWeight: '900',
+    color: ARColors.white,
+    letterSpacing: 1,
   },
 });
