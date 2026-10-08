@@ -1,16 +1,27 @@
 // ============================================================
 // AIM RUSH — Screen 11: StatsScreen
 // Recreated from "AIM RUSH Neon Stats Dashboard.png" reference
-// Sci-Fi Telemetry dashboard with multi-metric grids & safe areas
+// 100% SVG Vector Icons, Sci-Fi Telemetry dashboard & multi-metric grids
 // ============================================================
 
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
 import { AimRushUserProfile } from '../types';
+import {
+  SvgBackArrow,
+  SvgStatsBarChart,
+  SvgBullseyeTarget,
+  SvgTrophy,
+  SvgPlayTriangle,
+  SvgCrown,
+  SvgChainLink,
+  SvgStar,
+  SvgClose,
+  SvgClock,
+} from '../components/icons/AimRushIcons';
 
 interface StatsScreenProps {
   profile: AimRushUserProfile;
@@ -44,7 +55,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
         {/* 1. TOP HEADER & TITLE */}
         <View style={styles.topHeader}>
           <Pressable style={styles.backBtn} onPress={onBack}>
-            <Ionicons name="arrow-back" size={18} color={ARColors.white} />
+            <SvgBackArrow size={18} color={ARColors.white} />
           </Pressable>
 
           <View style={styles.brandTitleBox}>
@@ -55,13 +66,13 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
           <View style={{ width: 40 }} />
         </View>
 
-        {/* 2. TABS ROW */}
+        {/* 2. TABS ROW (SVG) */}
         <View style={styles.tabsRow}>
           <Pressable
             style={[styles.tabBtn, activeTab === 'overview' && styles.tabBtnActive]}
             onPress={() => setActiveTab('overview')}
           >
-            <Ionicons name="bar-chart-outline" size={14} color={activeTab === 'overview' ? ARColors.gold : ARColors.textMuted} />
+            <SvgStatsBarChart size={14} color={activeTab === 'overview' ? ARColors.gold : ARColors.textMuted} />
             <Text style={[styles.tabText, activeTab === 'overview' && { color: ARColors.gold }]}>OVERVIEW</Text>
           </Pressable>
 
@@ -69,7 +80,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
             style={[styles.tabBtn, activeTab === 'modes' && styles.tabBtnActive]}
             onPress={() => setActiveTab('modes')}
           >
-            <Ionicons name="game-controller-outline" size={14} color={activeTab === 'modes' ? ARColors.cyan : ARColors.textMuted} />
+            <SvgBullseyeTarget size={14} color={activeTab === 'modes' ? ARColors.cyan : ARColors.textMuted} />
             <Text style={[styles.tabText, activeTab === 'modes' && { color: ARColors.cyan }]}>MODES</Text>
           </Pressable>
 
@@ -77,7 +88,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
             style={[styles.tabBtn, activeTab === 'records' && styles.tabBtnActive]}
             onPress={() => setActiveTab('records')}
           >
-            <Ionicons name="trophy-outline" size={14} color={activeTab === 'records' ? ARColors.lime : ARColors.textMuted} />
+            <SvgTrophy size={14} color={activeTab === 'records' ? ARColors.lime : ARColors.textMuted} />
             <Text style={[styles.tabText, activeTab === 'records' && { color: ARColors.lime }]}>RECORDS</Text>
           </Pressable>
         </View>
@@ -87,13 +98,13 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
           {/* Top 4 Key Metric Capsules */}
           <View style={styles.topFourRow}>
             <View style={styles.miniCapsule}>
-              <Ionicons name="play-circle-outline" size={16} color={ARColors.cyan} />
+              <SvgPlayTriangle size={15} color={ARColors.cyan} />
               <Text style={styles.miniLabel}>GAMES</Text>
               <Text style={styles.miniValue}>{profile.totalRuns}</Text>
             </View>
 
             <View style={styles.miniCapsule}>
-              <Ionicons name="trophy-outline" size={16} color={ARColors.gold} />
+              <SvgCrown size={15} color={ARColors.gold} />
               <Text style={styles.miniLabel}>BEST SCORE</Text>
               <Text style={[styles.miniValue, { color: ARColors.gold }]}>
                 {profile.personalBestScore}
@@ -101,7 +112,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
             </View>
 
             <View style={styles.miniCapsule}>
-              <Ionicons name="link-outline" size={16} color={ARColors.lime} />
+              <SvgChainLink size={15} color={ARColors.lime} />
               <Text style={styles.miniLabel}>MAX CHAIN</Text>
               <Text style={[styles.miniValue, { color: ARColors.lime }]}>
                 x{profile.bestChain}
@@ -109,7 +120,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
             </View>
 
             <View style={styles.miniCapsule}>
-              <Ionicons name="disc-outline" size={16} color={ARColors.cyan} />
+              <SvgBullseyeTarget size={15} color={ARColors.cyan} />
               <Text style={styles.miniLabel}>PERFECTS</Text>
               <Text style={styles.miniValue}>{profile.totalPerfects}</Text>
             </View>
@@ -119,7 +130,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
           <View style={styles.accuracyBarCard}>
             <View style={styles.barHeader}>
               <View style={styles.barLabelGroup}>
-                <Ionicons name="locate-outline" size={16} color={ARColors.cyan} />
+                <SvgBullseyeTarget size={16} color={ARColors.cyan} />
                 <Text style={styles.barTitle}>OVERALL ACCURACY</Text>
               </View>
               <Text style={styles.barValue}>{careerAccuracy}%</Text>
@@ -132,7 +143,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
           {/* 4 Detailed Quad Cells */}
           <View style={styles.quadGrid}>
             <View style={[styles.quadCell, { borderColor: ARColors.lime }]}>
-              <Ionicons name="checkmark-done" size={20} color={ARColors.lime} />
+              <SvgBullseyeTarget size={20} color={ARColors.lime} />
               <Text style={styles.quadLabel}>TOTAL HITS</Text>
               <Text style={[styles.quadValue, { color: ARColors.lime }]}>
                 {profile.totalTargetsHit}
@@ -140,7 +151,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
             </View>
 
             <View style={[styles.quadCell, { borderColor: ARColors.red }]}>
-              <Ionicons name="close-circle-outline" size={20} color={ARColors.red} />
+              <SvgClose size={20} color={ARColors.red} />
               <Text style={styles.quadLabel}>TOTAL MISSES</Text>
               <Text style={[styles.quadValue, { color: ARColors.red }]}>
                 {profile.totalMisses}
@@ -148,7 +159,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
             </View>
 
             <View style={[styles.quadCell, { borderColor: ARColors.cyan }]}>
-              <Ionicons name="star" size={20} color={ARColors.cyan} />
+              <SvgStar size={20} color={ARColors.cyan} fill={ARColors.cyan} />
               <Text style={styles.quadLabel}>PERFECT SWEET-SPOTS</Text>
               <Text style={[styles.quadValue, { color: ARColors.cyan }]}>
                 {profile.totalPerfects}
@@ -156,7 +167,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
             </View>
 
             <View style={[styles.quadCell, { borderColor: ARColors.gold }]}>
-              <Ionicons name="flame" size={20} color={ARColors.gold} />
+              <SvgChainLink size={20} color={ARColors.gold} />
               <Text style={styles.quadLabel}>LONGEST CHAIN</Text>
               <Text style={[styles.quadValue, { color: ARColors.gold }]}>
                 x{profile.bestChain}
@@ -166,7 +177,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
 
           {/* Gameplay Time Card */}
           <View style={styles.timeCard}>
-            <Ionicons name="time-outline" size={20} color={ARColors.white} />
+            <SvgClock size={20} color={ARColors.white} />
             <View style={styles.timeInfo}>
               <Text style={styles.timeLabel}>TOTAL GAMEPLAY TIME</Text>
               <Text style={styles.timeValue}>
@@ -178,7 +189,7 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
 
         {/* 4. BOTTOM ACTION (SAFELY POSITIONED ABOVE GESTURE NAV) */}
         <Pressable style={styles.bottomBackBtn} onPress={onBack}>
-          <Ionicons name="arrow-back" size={16} color={ARColors.white} />
+          <SvgBackArrow size={16} color={ARColors.white} />
           <Text style={styles.bottomBackText}>BACK TO HUB</Text>
         </Pressable>
       </View>
@@ -267,7 +278,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 8,
     alignItems: 'center',
-    gap: 2,
+    gap: 3,
   },
   miniLabel: {
     fontSize: 7.5,

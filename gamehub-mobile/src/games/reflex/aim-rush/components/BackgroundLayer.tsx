@@ -1,6 +1,6 @@
 // ============================================================
 // AIM RUSH — Layered Sci-Fi Environment Background
-// Renders the designated neon arena image with dark ambient overlay
+// Renders the designated neon arena image with blur & dark ambient overlay
 // ============================================================
 
 import React from 'react';
@@ -11,12 +11,14 @@ import { ARColors } from '../theme/colors';
 interface BackgroundLayerProps {
   screen: 'home' | 'gameplay' | 'other';
   overlayDarkness?: number; // 0.0 to 1.0
+  blurRadius?: number;      // Background blur radius
   children?: React.ReactNode;
 }
 
 export const BackgroundLayer: React.FC<BackgroundLayerProps> = ({
   screen,
   overlayDarkness = 0.35,
+  blurRadius,
   children,
 }) => {
   const bgSource =
@@ -26,13 +28,17 @@ export const BackgroundLayer: React.FC<BackgroundLayerProps> = ({
       ? ARBackgrounds.gameplay
       : ARBackgrounds.other;
 
+  // Automatically apply tactical blur for gameplay arena
+  const effectiveBlurRadius = blurRadius ?? (screen === 'gameplay' ? 14 : 0);
+
   return (
     <View style={styles.container}>
-      {/* Background Image Layer */}
+      {/* Background Image Layer with optional Blur */}
       <Image
         source={bgSource}
         style={styles.imageBackground}
         resizeMode="cover"
+        blurRadius={effectiveBlurRadius}
       />
 
       {/* Futuristic Atmospheric Contrast Overlay */}

@@ -7,11 +7,11 @@
 import React from 'react';
 import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
 import { GAME_MODES } from '../config';
 import { GameModeConfig } from '../types';
+import { SvgBackArrow } from '../components/icons/AimRushIcons';
 
 interface ModeSelectScreenProps {
   currentMode: GameModeConfig;
@@ -41,7 +41,7 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
         {/* Top Header */}
         <View style={styles.topBar}>
           <Pressable style={styles.iconCircle} onPress={onBack}>
-            <Ionicons name="arrow-back" size={18} color={ARColors.white} />
+            <SvgBackArrow size={18} color={ARColors.white} />
           </Pressable>
           <View style={styles.titleGroup}>
             <Text style={styles.headerTitle}>SELECT MODE</Text>

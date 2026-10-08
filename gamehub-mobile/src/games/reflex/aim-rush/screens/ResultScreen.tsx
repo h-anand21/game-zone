@@ -1,16 +1,25 @@
 // ============================================================
 // AIM RUSH — Screen 09: ResultScreen
 // Recreated from "Neon Sci-Fi Level Complete HUD.png" reference
-// 3-Star celebration, chamfered telemetry grid, & safe bottom actions
+// 100% SVG Vector Icons, 3-Star celebration, & chamfered telemetry
 // ============================================================
 
 import React from 'react';
 import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
 import { AimRushRunResult } from '../types';
+import {
+  SvgHome,
+  SvgStar,
+  SvgTrophy,
+  SvgBullseyeTarget,
+  SvgClose,
+  SvgClock,
+  SvgRefresh,
+  SvgPlayTriangle,
+} from '../components/icons/AimRushIcons';
 
 interface ResultScreenProps {
   result: AimRushRunResult;
@@ -42,7 +51,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
           {/* 1. TOP HEADER ROW */}
           <View style={styles.topHeader}>
             <Pressable style={styles.headerBtn} onPress={onHome}>
-              <Ionicons name="home" size={16} color={ARColors.cyan} />
+              <SvgHome size={18} color={ARColors.cyan} />
             </Pressable>
 
             <View style={styles.brandTag}>
@@ -60,17 +69,19 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
             <Text style={styles.plaqueText}>LEVEL COMPLETE!</Text>
           </View>
 
-          {/* 3. THREE GOLDEN STARS CELEBRATION */}
+          {/* 3. THREE GOLDEN STARS CELEBRATION (SVG) */}
           <View style={styles.starsRow}>
-            <Ionicons name="star" size={38} color={ARColors.gold} style={styles.sideStar} />
-            <Ionicons name="star" size={48} color={ARColors.gold} style={styles.centerStar} />
-            <Ionicons name="star" size={38} color={ARColors.gold} style={styles.sideStar} />
+            <SvgStar size={36} color={ARColors.gold} fill={ARColors.gold} />
+            <View style={styles.centerStarWrap}>
+              <SvgStar size={46} color={ARColors.gold} fill={ARColors.gold} />
+            </View>
+            <SvgStar size={36} color={ARColors.gold} fill={ARColors.gold} />
           </View>
 
           {/* New Personal Record Pill */}
           {result.isNewPersonalBest && (
             <View style={styles.recordPill}>
-              <Ionicons name="trophy" size={16} color={ARColors.gold} />
+              <SvgTrophy size={16} color={ARColors.gold} />
               <Text style={styles.recordPillText}>✦ NEW PERSONAL RECORD! ✦</Text>
             </View>
           )}
@@ -90,32 +101,32 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
               </View>
             </View>
 
-            {/* Middle: 4 Chamfered Metric Squares */}
+            {/* Middle: 4 Chamfered Metric Squares (SVG Icons) */}
             <View style={styles.quadGrid}>
               {/* Hit */}
               <View style={[styles.quadCell, { borderColor: ARColors.cyan }]}>
-                <Ionicons name="disc-outline" size={18} color={ARColors.cyan} />
+                <SvgBullseyeTarget size={18} color={ARColors.cyan} />
                 <Text style={styles.quadLabel}>HIT</Text>
                 <Text style={[styles.quadValue, { color: ARColors.cyan }]}>{result.totalHits}</Text>
               </View>
 
               {/* Perfect */}
               <View style={[styles.quadCell, { borderColor: ARColors.lime }]}>
-                <Ionicons name="checkmark-circle-outline" size={18} color={ARColors.lime} />
+                <SvgBullseyeTarget size={18} color={ARColors.lime} />
                 <Text style={styles.quadLabel}>PERFECT</Text>
                 <Text style={[styles.quadValue, { color: ARColors.lime }]}>{result.perfectHits}</Text>
               </View>
 
               {/* Good */}
               <View style={[styles.quadCell, { borderColor: ARColors.gold }]}>
-                <Ionicons name="radio-button-on-outline" size={18} color={ARColors.gold} />
+                <SvgStar size={18} color={ARColors.gold} fill={ARColors.gold} />
                 <Text style={styles.quadLabel}>GOOD</Text>
                 <Text style={[styles.quadValue, { color: ARColors.gold }]}>{result.goodHits}</Text>
               </View>
 
               {/* Miss */}
               <View style={[styles.quadCell, { borderColor: ARColors.red }]}>
-                <Ionicons name="close-circle-outline" size={18} color={ARColors.red} />
+                <SvgClose size={18} color={ARColors.red} />
                 <Text style={styles.quadLabel}>MISS</Text>
                 <Text style={[styles.quadValue, { color: ARColors.red }]}>{result.misses}</Text>
               </View>
@@ -124,7 +135,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
             {/* Bottom: Time Taken & Accuracy */}
             <View style={styles.timeAccuracyRow}>
               <View style={styles.timeCell}>
-                <Ionicons name="time-outline" size={16} color={ARColors.cyan} />
+                <SvgClock size={16} color={ARColors.cyan} />
                 <View>
                   <Text style={styles.subMetricLabel}>TIME TAKEN</Text>
                   <Text style={styles.subMetricValue}>{timeFormatted}</Text>
@@ -132,7 +143,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
               </View>
 
               <View style={styles.accuracyCell}>
-                <Ionicons name="locate-outline" size={16} color={ARColors.cyan} />
+                <SvgBullseyeTarget size={16} color={ARColors.cyan} />
                 <View>
                   <Text style={styles.subMetricLabel}>ACCURACY</Text>
                   <Text style={styles.subMetricValue}>{result.accuracy}%</Text>
@@ -145,17 +156,17 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
         {/* 5. BOTTOM ACTIONS (SAFELY ELEVATED ABOVE GESTURE NAV) */}
         <View style={styles.bottomActionsRow}>
           <Pressable style={styles.replayBtn} onPress={onPlayAgain}>
-            <Ionicons name="refresh" size={18} color={ARColors.cyan} />
+            <SvgRefresh size={18} color={ARColors.cyan} />
             <Text style={styles.replayBtnText}>REPLAY</Text>
           </Pressable>
 
           <Pressable style={styles.playAgainBtn} onPress={onPlayAgain}>
-            <Ionicons name="play-forward" size={20} color="#07090C" />
+            <SvgPlayTriangle size={20} color="#07090C" />
             <Text style={styles.playAgainBtnText}>PLAY AGAIN</Text>
           </Pressable>
 
           <Pressable style={styles.exitBtn} onPress={onHome}>
-            <Ionicons name="home" size={18} color={ARColors.cyan} />
+            <SvgHome size={18} color={ARColors.cyan} />
             <Text style={styles.exitBtnText}>EXIT TO HUB</Text>
           </Pressable>
         </View>
@@ -258,10 +269,7 @@ const styles = StyleSheet.create({
     gap: 12,
     marginVertical: 8,
   },
-  sideStar: {
-    opacity: 0.9,
-  },
-  centerStar: {
+  centerStarWrap: {
     transform: [{ translateY: -4 }],
   },
   recordPill: {

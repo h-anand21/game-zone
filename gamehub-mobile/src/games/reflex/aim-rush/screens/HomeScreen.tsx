@@ -1,18 +1,34 @@
 // ============================================================
 // AIM RUSH — Screen 03: HomeScreen
 // Recreated from "Neon Aim Rush Game Hub.png" reference design
-// Pure programmatic UI with Safe Area insets & chamfered telemetry
+// 100% SVG Vector Icons, Medium Title, and Safe Area insets
 // ============================================================
 
 import React from 'react';
-import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
 import { GAME_MODES } from '../config';
 import { GameModeConfig, AimRushUserProfile } from '../types';
+import {
+  SvgBackArrow,
+  SvgUserAvatar,
+  SvgStatsBarChart,
+  SvgTrophy,
+  SvgSettingsGear,
+  SvgCrown,
+  SvgChainLink,
+  SvgBullseyeTarget,
+  SvgPlayTriangle,
+  SvgLightningFlash,
+  SvgStar,
+  SvgCalendar,
+  SvgBook,
+  SvgPodium,
+  SvgMedal,
+} from '../components/icons/AimRushIcons';
 
 interface HomeScreenProps {
   profile: AimRushUserProfile;
@@ -53,15 +69,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           },
         ]}
       >
-        {/* 1. TOP HEADER (PLAYER PROFILE + QUICK ICONS) */}
+        {/* 1. TOP HEADER (PLAYER PROFILE + QUICK SVG ICONS) */}
         <View style={styles.topHeader}>
           {/* Left: Player Profile Capsule */}
           <View style={styles.profileCapsule}>
             <Pressable style={styles.exitBackBtn} onPress={onExitToHub}>
-              <Ionicons name="arrow-back" size={16} color={ARColors.white} />
+              <SvgBackArrow size={16} color={ARColors.white} />
             </Pressable>
             <View style={styles.avatarCircle}>
-              <Ionicons name="person" size={16} color={ARColors.cyan} />
+              <SvgUserAvatar size={18} color={ARColors.cyan} />
             </View>
             <View style={styles.profileInfo}>
               <Text style={styles.playerName}>EXPLORER</Text>
@@ -83,26 +99,26 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           <View style={styles.headerIconsRow}>
             {/* Stats */}
             <Pressable style={styles.headerIconBtn} onPress={onOpenStats}>
-              <Ionicons name="bar-chart-outline" size={18} color={ARColors.white} />
+              <SvgStatsBarChart size={18} color={ARColors.white} />
               <Text style={styles.iconMiniLabel}>STATS</Text>
             </Pressable>
 
             {/* Missions */}
             <Pressable style={styles.headerIconBtn} onPress={onOpenMissions}>
-              <Ionicons name="trophy-outline" size={18} color={ARColors.white} />
+              <SvgTrophy size={18} color={ARColors.gold} />
               <View style={styles.notificationDot} />
               <Text style={styles.iconMiniLabel}>MISSIONS</Text>
             </Pressable>
 
             {/* Settings */}
             <Pressable style={styles.headerIconBtn} onPress={onOpenSettings}>
-              <Ionicons name="settings-sharp" size={18} color={ARColors.white} />
+              <SvgSettingsGear size={18} color={ARColors.white} />
               <Text style={styles.iconMiniLabel}>SETTINGS</Text>
             </Pressable>
           </View>
         </View>
 
-        {/* 2. CENTER BRANDING: AIM RUSH — TARGET CHAIN */}
+        {/* 2. CENTER BRANDING: AIM RUSH — TARGET CHAIN (MEDIUM PROPORTION) */}
         <View style={styles.brandingSection}>
           <View style={styles.crosshairBehind}>
             <Svg width={60} height={30} viewBox="0 0 60 30">
@@ -118,12 +134,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         {/* Center Atmospheric Spacer (Reveals Neon Target Podium Background) */}
         <View style={styles.centerSpace} />
 
-        {/* 3. TELEMETRY STATS ROW (3 CHAMFERED CARDS) */}
+        {/* 3. TELEMETRY STATS ROW (3 CHAMFERED CARDS WITH SVG ICONS) */}
         <View style={styles.telemetryRow}>
           {/* Card 1: Personal Best */}
           <View style={styles.telemetryCard}>
             <View style={styles.cardIconRow}>
-              <Ionicons name="trophy" size={14} color={ARColors.gold} />
+              <SvgCrown size={14} color={ARColors.gold} />
               <Text style={styles.cardHeaderLabel}>PERSONAL BEST</Text>
             </View>
             <Text style={[styles.cardMainValue, { color: ARColors.cyan }]}>
@@ -134,7 +150,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {/* Card 2: Best Chain */}
           <View style={styles.telemetryCard}>
             <View style={styles.cardIconRow}>
-              <Ionicons name="link" size={14} color={ARColors.lime} />
+              <SvgChainLink size={14} color={ARColors.lime} />
               <Text style={styles.cardHeaderLabel}>BEST CHAIN</Text>
             </View>
             <Text style={[styles.cardMainValue, { color: ARColors.lime }]}>
@@ -145,7 +161,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {/* Card 3: Perfect Hits */}
           <View style={styles.telemetryCard}>
             <View style={styles.cardIconRow}>
-              <Ionicons name="disc" size={14} color={ARColors.cyan} />
+              <SvgBullseyeTarget size={14} color={ARColors.cyan} />
               <Text style={styles.cardHeaderLabel}>PERFECT HITS</Text>
             </View>
             <Text style={[styles.cardMainValue, { color: ARColors.white }]}>
@@ -154,7 +170,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </View>
         </View>
 
-        {/* 4. MASTER PLAY BUTTON (GLOWING HEX-CHAMFER CTA) */}
+        {/* 4. MASTER PLAY BUTTON (GLOWING HEX-CHAMFER CTA WITH SVG TRIANGLE) */}
         <Pressable
           style={styles.masterPlayBtn}
           onPress={onStartGame}
@@ -162,24 +178,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           accessibilityLabel="Start Game"
         >
           <View style={styles.playContent}>
-            <Ionicons name="play" size={28} color="#07090C" style={styles.playIcon} />
+            <SvgPlayTriangle size={26} color="#07090C" />
             <Text style={styles.playBtnText}>PLAY</Text>
           </View>
           <Text style={styles.playSubtext}>TOUCH TO START</Text>
         </Pressable>
 
-        {/* 5. ARENA MODES ROW (4 ROUNDED CARDS) */}
+        {/* 5. ARENA MODES ROW (4 ROUNDED CARDS WITH SVG ICONS) */}
         <View style={styles.modesRow}>
           {modesList.map((m) => {
             const isEquipped = m.id === selectedMode.id;
-            const iconName =
-              m.id === 'classic'
-                ? 'disc-outline'
-                : m.id === 'rush'
-                ? 'flash'
-                : m.id === 'precision'
-                ? 'star'
-                : 'calendar-outline';
+            const iconColor = isEquipped ? m.color : ARColors.textMuted;
 
             return (
               <Pressable
@@ -193,11 +202,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 ]}
                 onPress={() => onSelectMode(m)}
               >
-                <Ionicons
-                  name={iconName as any}
-                  size={20}
-                  color={isEquipped ? m.color : ARColors.textMuted}
-                />
+                {m.id === 'classic' && <SvgBullseyeTarget size={20} color={iconColor} />}
+                {m.id === 'rush' && <SvgLightningFlash size={20} color={iconColor} />}
+                {m.id === 'precision' && <SvgStar size={20} color={iconColor} />}
+                {m.id === 'daily' && <SvgCalendar size={20} color={iconColor} />}
+
                 <Text style={[styles.modeCardTitle, isEquipped && { color: m.color }]}>
                   {m.title}
                 </Text>
@@ -207,20 +216,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           })}
         </View>
 
-        {/* 6. BOTTOM UTILITIES BAR (SAFELY ELEVATED ABOVE DEVICE NAV) */}
+        {/* 6. BOTTOM UTILITIES BAR (SAFELY ELEVATED ABOVE DEVICE NAV WITH SVG ICONS) */}
         <View style={styles.bottomUtilities}>
           <Pressable style={styles.utilityPill} onPress={onOpenHowToPlay}>
-            <Ionicons name="book-outline" size={15} color={ARColors.cyan} />
+            <SvgBook size={15} color={ARColors.cyan} />
             <Text style={styles.utilityText}>HOW TO PLAY</Text>
           </Pressable>
 
           <Pressable style={styles.utilityPill} onPress={onOpenStats}>
-            <Ionicons name="podium-outline" size={15} color={ARColors.lime} />
+            <SvgPodium size={15} color={ARColors.lime} />
             <Text style={styles.utilityText}>LEADERBOARD</Text>
           </Pressable>
 
           <Pressable style={styles.utilityPill} onPress={onOpenMissions}>
-            <Ionicons name="medal-outline" size={15} color={ARColors.gold} />
+            <SvgMedal size={15} color={ARColors.gold} />
             <Text style={styles.utilityText}>ACHIEVEMENTS</Text>
           </Pressable>
         </View>
@@ -331,7 +340,7 @@ const styles = StyleSheet.create({
     backgroundColor: ARColors.red,
   },
 
-  // 2. Branding Section
+  // 2. Branding Section (Medium Scale)
   brandingSection: {
     alignItems: 'center',
     marginTop: 2,
@@ -417,10 +426,7 @@ const styles = StyleSheet.create({
   playContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-  },
-  playIcon: {
-    marginTop: -2,
+    gap: 8,
   },
   playBtnText: {
     fontSize: 24,

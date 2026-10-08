@@ -1,19 +1,26 @@
 // ============================================================
 // AIM RUSH — Screen 12: SettingsScreen
 // Recreated from "Neon Cyberpunk Settings Interface.png" reference
-// Hardware audio toggles, haptics, FX controls, and safe areas
+// 100% SVG Vector Icons, Hardware audio toggles, haptics & FX controls
 // ============================================================
 
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable, Switch, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
 import { AimRushSettings } from '../types';
 import { AimRushStorage } from '../storage/aimRushStorage';
 import { AimRushHaptics } from '../haptics/hapticManager';
 import { AimRushAudio } from '../audio/audioManager';
+import {
+  SvgBackArrow,
+  SvgVolumeHigh,
+  SvgMusic,
+  SvgPhone,
+  SvgEye,
+  SvgTrash,
+} from '../components/icons/AimRushIcons';
 
 interface SettingsScreenProps {
   settings: AimRushSettings;
@@ -91,7 +98,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         {/* Header */}
         <View style={styles.topBar}>
           <Pressable style={styles.iconCircle} onPress={onBack}>
-            <Ionicons name="arrow-back" size={18} color={ARColors.white} />
+            <SvgBackArrow size={18} color={ARColors.white} />
           </Pressable>
           <View style={styles.titleBox}>
             <Text style={styles.headerTitle}>SETTINGS</Text>
@@ -104,7 +111,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         <View style={styles.groupCard}>
           <View style={styles.row}>
             <View style={styles.rowLeft}>
-              <Ionicons name="volume-high-outline" size={20} color={ARColors.cyan} />
+              <SvgVolumeHigh size={20} color={ARColors.cyan} />
               <Text style={styles.rowLabel}>SOUND EFFECTS</Text>
             </View>
             <Switch
@@ -119,7 +126,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
           <View style={styles.row}>
             <View style={styles.rowLeft}>
-              <Ionicons name="musical-notes-outline" size={20} color={ARColors.cyan} />
+              <SvgMusic size={20} color={ARColors.cyan} />
               <Text style={styles.rowLabel}>BACKGROUND MUSIC</Text>
             </View>
             <Switch
@@ -134,7 +141,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
           <View style={styles.row}>
             <View style={styles.rowLeft}>
-              <Ionicons name="phone-portrait-outline" size={20} color={ARColors.lime} />
+              <SvgPhone size={20} color={ARColors.lime} />
               <Text style={styles.rowLabel}>TACTILE HAPTICS</Text>
             </View>
             <Switch
@@ -149,7 +156,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
           <View style={styles.row}>
             <View style={styles.rowLeft}>
-              <Ionicons name="eye-outline" size={20} color={ARColors.textSecondary} />
+              <SvgEye size={20} color={ARColors.textSecondary} />
               <Text style={styles.rowLabel}>REDUCED VISUAL FX</Text>
             </View>
             <Switch
@@ -165,14 +172,14 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         <View style={styles.dangerCard}>
           <Text style={styles.dangerTitle}>DATA MANAGEMENT</Text>
           <Pressable style={styles.resetBtn} onPress={handleReset}>
-            <Ionicons name="trash-outline" size={16} color={ARColors.red} />
+            <SvgTrash size={16} color={ARColors.red} />
             <Text style={styles.resetBtnText}>RESET CAREER DATA</Text>
           </Pressable>
         </View>
 
         {/* Bottom Back Action */}
         <Pressable style={styles.bottomBackBtn} onPress={onBack}>
-          <Ionicons name="arrow-back" size={16} color={ARColors.white} />
+          <SvgBackArrow size={16} color={ARColors.white} />
           <Text style={styles.bottomBackText}>RETURN TO HUB</Text>
         </Pressable>
       </View>

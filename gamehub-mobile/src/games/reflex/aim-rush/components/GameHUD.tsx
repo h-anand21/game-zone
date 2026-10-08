@@ -1,15 +1,20 @@
 // ============================================================
 // AIM RUSH — Authentic Sci-Fi GameHUD Component
 // Recreated from "Neon Aim Rush_ Target Chain.png" reference
-// Dual-tier Top Telemetry + Safe Bottom Progress Rail with Hint & Exit
+// 100% SVG Vector Icons, Dual-tier Top Telemetry + Progress Rail
 // ============================================================
 
 import React from 'react';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { ARColors } from '../theme/colors';
 import { GameModeConfig } from '../types';
+import {
+  SvgPause,
+  SvgHeart,
+  SvgBulbHint,
+  SvgExitDoor,
+} from './icons/AimRushIcons';
 
 interface GameHUDProps {
   score: number;
@@ -61,9 +66,9 @@ export const GameHUD: React.FC<GameHUDProps> = ({
       >
         {/* Tier 1 Row: Pause | Score | Title | Chain | Lives */}
         <View style={styles.tier1Row}>
-          {/* Pause Button */}
+          {/* Pause Button (SVG) */}
           <Pressable style={styles.hudBox} onPress={onPause}>
-            <Ionicons name="pause" size={16} color={ARColors.cyan} />
+            <SvgPause size={16} color={ARColors.cyan} />
           </Pressable>
 
           {/* Score Box */}
@@ -84,19 +89,16 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             <Text style={styles.chainNumber}>x{chain}</Text>
           </View>
 
-          {/* Lives Box */}
+          {/* Lives Box (SVG Hearts) */}
           <View style={styles.hudBox}>
             <View style={styles.livesRow}>
               {Array.from({ length: maxLives }).map((_, i) => (
-                <Text
+                <SvgHeart
                   key={i}
-                  style={[
-                    styles.heartIcon,
-                    { color: i < lives ? ARColors.cyan : 'rgba(255,255,255,0.2)' },
-                  ]}
-                >
-                  ♥
-                </Text>
+                  size={14}
+                  color={i < lives ? ARColors.cyan : 'rgba(255,255,255,0.2)'}
+                  fill={i < lives ? ARColors.cyan : 'rgba(255,255,255,0.2)'}
+                />
               ))}
             </View>
           </View>
@@ -144,12 +146,12 @@ export const GameHUD: React.FC<GameHUDProps> = ({
         pointerEvents="box-none"
       >
         <View style={styles.bottomBarRow}>
-          {/* Left: Hint Button with Counter Badge */}
+          {/* Left: Hint Button with SVG Bulb */}
           <Pressable style={styles.bottomActionBtn} onPress={onHint}>
             <View style={styles.hintBadge}>
               <Text style={styles.hintBadgeText}>3</Text>
             </View>
-            <Ionicons name="bulb-outline" size={18} color={ARColors.cyan} />
+            <SvgBulbHint size={18} color={ARColors.cyan} />
             <Text style={styles.bottomActionLabel}>HINT</Text>
           </Pressable>
 
@@ -183,9 +185,9 @@ export const GameHUD: React.FC<GameHUDProps> = ({
             </Text>
           </View>
 
-          {/* Right: Exit Button */}
+          {/* Right: Exit Button with SVG Door */}
           <Pressable style={styles.bottomActionBtn} onPress={onExit}>
-            <Ionicons name="exit-outline" size={18} color={ARColors.cyan} />
+            <SvgExitDoor size={18} color={ARColors.cyan} />
             <Text style={styles.bottomActionLabel}>EXIT</Text>
           </Pressable>
         </View>
@@ -269,10 +271,8 @@ const styles = StyleSheet.create({
   },
   livesRow: {
     flexDirection: 'row',
-    gap: 2,
-  },
-  heartIcon: {
-    fontSize: 11,
+    gap: 3,
+    alignItems: 'center',
   },
 
   // Tier 2 Sub HUD Row

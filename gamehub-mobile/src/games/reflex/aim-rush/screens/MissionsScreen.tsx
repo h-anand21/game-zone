@@ -1,17 +1,26 @@
 // ============================================================
 // AIM RUSH — Screen 10: MissionsScreen
 // Recreated from "AIM RUSH Missions HUD.png" reference
-// Trophy header, progress bars, golden claim buttons, and safe areas
+// 100% SVG Vector Icons, progress rails, and golden claim buttons
 // ============================================================
 
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
 import { AimRushMission } from '../types';
 import { AimRushStorage } from '../storage/aimRushStorage';
+import {
+  SvgBackArrow,
+  SvgTrophy,
+  SvgCalendar,
+  SvgClock,
+  SvgMedal,
+  SvgBullseyeTarget,
+  SvgStar,
+  SvgGift,
+} from '../components/icons/AimRushIcons';
 
 interface MissionsScreenProps {
   onBack: () => void;
@@ -60,10 +69,10 @@ export const MissionsScreen: React.FC<MissionsScreenProps> = ({ onBack }) => {
         {/* 1. TOP HEADER & TITLE */}
         <View style={styles.topHeader}>
           <Pressable style={styles.backBtn} onPress={onBack}>
-            <Ionicons name="arrow-back" size={18} color={ARColors.white} />
+            <SvgBackArrow size={18} color={ARColors.white} />
           </Pressable>
           <View style={styles.brandTitleBox}>
-            <Ionicons name="trophy" size={24} color={ARColors.gold} />
+            <SvgTrophy size={24} color={ARColors.gold} />
             <Text style={styles.headerTitle}>MISSIONS</Text>
           </View>
           <View style={{ width: 40 }} />
@@ -71,13 +80,13 @@ export const MissionsScreen: React.FC<MissionsScreenProps> = ({ onBack }) => {
 
         <Text style={styles.headerSub}>COMPLETE MISSIONS • EARN REWARDS • LEVEL UP</Text>
 
-        {/* 2. TAB SELECTOR */}
+        {/* 2. TAB SELECTOR (SVG) */}
         <View style={styles.tabsRow}>
           <Pressable
             style={[styles.tabBtn, activeTab === 'daily' && styles.tabBtnActive]}
             onPress={() => setActiveTab('daily')}
           >
-            <Ionicons name="calendar-outline" size={14} color={activeTab === 'daily' ? ARColors.gold : ARColors.textMuted} />
+            <SvgCalendar size={14} color={activeTab === 'daily' ? ARColors.gold : ARColors.textMuted} />
             <Text style={[styles.tabText, activeTab === 'daily' && { color: ARColors.gold }]}>DAILY</Text>
           </Pressable>
 
@@ -85,7 +94,7 @@ export const MissionsScreen: React.FC<MissionsScreenProps> = ({ onBack }) => {
             style={[styles.tabBtn, activeTab === 'weekly' && styles.tabBtnActive]}
             onPress={() => setActiveTab('weekly')}
           >
-            <Ionicons name="time-outline" size={14} color={activeTab === 'weekly' ? ARColors.cyan : ARColors.textMuted} />
+            <SvgClock size={14} color={activeTab === 'weekly' ? ARColors.cyan : ARColors.textMuted} />
             <Text style={[styles.tabText, activeTab === 'weekly' && { color: ARColors.cyan }]}>WEEKLY</Text>
           </Pressable>
 
@@ -93,7 +102,7 @@ export const MissionsScreen: React.FC<MissionsScreenProps> = ({ onBack }) => {
             style={[styles.tabBtn, activeTab === 'achievements' && styles.tabBtnActive]}
             onPress={() => setActiveTab('achievements')}
           >
-            <Ionicons name="medal-outline" size={14} color={activeTab === 'achievements' ? ARColors.lime : ARColors.textMuted} />
+            <SvgMedal size={14} color={activeTab === 'achievements' ? ARColors.lime : ARColors.textMuted} />
             <Text style={[styles.tabText, activeTab === 'achievements' && { color: ARColors.lime }]}>ACHIEVEMENTS</Text>
           </Pressable>
         </View>
@@ -108,7 +117,7 @@ export const MissionsScreen: React.FC<MissionsScreenProps> = ({ onBack }) => {
               <View key={m.id} style={styles.missionCard}>
                 <View style={styles.cardTopRow}>
                   <View style={styles.missionIconBox}>
-                    <Ionicons name="disc" size={20} color={ARColors.cyan} />
+                    <SvgBullseyeTarget size={20} color={ARColors.cyan} />
                   </View>
 
                   <View style={styles.missionTitleBox}>
@@ -117,7 +126,7 @@ export const MissionsScreen: React.FC<MissionsScreenProps> = ({ onBack }) => {
                   </View>
 
                   <View style={styles.coinRewardBox}>
-                    <Ionicons name="sparkles" size={14} color={ARColors.gold} />
+                    <SvgStar size={14} color={ARColors.gold} fill={ARColors.gold} />
                     <Text style={styles.coinRewardText}>+{m.rewardCoins}</Text>
                   </View>
                 </View>
@@ -154,12 +163,12 @@ export const MissionsScreen: React.FC<MissionsScreenProps> = ({ onBack }) => {
         {/* 4. BOTTOM ACTION BAR (SAFELY POSITIONED ABOVE GESTURE NAV) */}
         <View style={styles.bottomBar}>
           <Pressable style={styles.bottomBackBtn} onPress={onBack}>
-            <Ionicons name="arrow-back" size={16} color={ARColors.white} />
+            <SvgBackArrow size={16} color={ARColors.white} />
             <Text style={styles.bottomBackText}>BACK</Text>
           </Pressable>
 
           <Pressable style={styles.claimAllBtn} onPress={handleClaimAll}>
-            <Ionicons name="gift-outline" size={18} color="#07090C" />
+            <SvgGift size={18} color="#07090C" />
             <Text style={styles.claimAllText}>CLAIM ALL</Text>
           </Pressable>
         </View>

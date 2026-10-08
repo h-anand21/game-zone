@@ -1,13 +1,17 @@
 // ============================================================
 // AIM RUSH — Authentic Exit Confirmation Modal
 // Recreated from "Neon Cyberpunk Exit Confirmation.png" reference
-// Warning emblem, dual-color title, and chamfered action pills
+// 100% SVG Vector Icons, Warning Emblem, and Chamfered Action Pills
 // ============================================================
 
 import React from 'react';
 import { StyleSheet, View, Text, Pressable, Modal } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { ARColors } from '../../theme/colors';
+import {
+  SvgWarningTriangle,
+  SvgClose,
+  SvgExitDoor,
+} from '../icons/AimRushIcons';
 
 interface ExitModalProps {
   visible: boolean;
@@ -29,9 +33,9 @@ export const ExitModal: React.FC<ExitModalProps> = ({
             <View style={styles.notchCircle} />
           </View>
 
-          {/* Glowing Red Warning Triangle */}
+          {/* Glowing Red Warning Triangle (SVG) */}
           <View style={styles.warningBox}>
-            <Ionicons name="warning" size={44} color={ARColors.red} />
+            <SvgWarningTriangle size={46} color={ARColors.red} />
           </View>
 
           {/* Dual-Color Title: EXIT in cyan, GAME? in red */}
@@ -46,15 +50,15 @@ export const ExitModal: React.FC<ExitModalProps> = ({
 
           {/* Action Buttons Row */}
           <View style={styles.actionsRow}>
-            {/* Cancel Button */}
+            {/* Cancel Button (SVG Close) */}
             <Pressable style={[styles.btn, styles.cancelBtn]} onPress={onCancel}>
-              <Ionicons name="close" size={18} color={ARColors.cyan} />
+              <SvgClose size={18} color={ARColors.cyan} />
               <Text style={styles.cancelText}>CANCEL</Text>
             </Pressable>
 
-            {/* Exit Button */}
+            {/* Exit Button (SVG Door) */}
             <Pressable style={[styles.btn, styles.exitBtn]} onPress={onConfirm}>
-              <Ionicons name="exit-outline" size={18} color={ARColors.red} />
+              <SvgExitDoor size={18} color={ARColors.red} />
               <Text style={styles.exitText}>EXIT</Text>
             </Pressable>
           </View>

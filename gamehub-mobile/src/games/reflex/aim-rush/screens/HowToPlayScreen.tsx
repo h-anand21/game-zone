@@ -6,10 +6,10 @@
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
+import { SvgBackArrow } from '../components/icons/AimRushIcons';
 
 interface HowToPlayScreenProps {
   onStartPractice: () => void;
@@ -37,7 +37,7 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({
         {/* Top Header */}
         <View style={styles.topBar}>
           <Pressable style={styles.iconCircle} onPress={onBack}>
-            <Ionicons name="arrow-back" size={18} color={ARColors.white} />
+            <SvgBackArrow size={18} color={ARColors.white} />
           </Pressable>
           <Text style={styles.headerTitle}>HOW TO PLAY</Text>
           <Text style={styles.stepIndicator}>STEP {step}/3</Text>

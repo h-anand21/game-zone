@@ -1,13 +1,18 @@
 // ============================================================
 // AIM RUSH — Authentic Pause Modal Component
 // Recreated from "AIMRUSH Neon Pause Menu.png" reference
-// Chamfered hex-capsule buttons with cyan/red neon glow
+// 100% SVG Vector Icons & Chamfered Hex-Capsule Action Buttons
 // ============================================================
 
 import React from 'react';
 import { StyleSheet, View, Text, Pressable, Modal } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { ARColors } from '../../theme/colors';
+import {
+  SvgPlayTriangle,
+  SvgRefresh,
+  SvgSettingsGear,
+  SvgHome,
+} from '../icons/AimRushIcons';
 
 interface PauseModalProps {
   visible: boolean;
@@ -39,27 +44,27 @@ export const PauseModal: React.FC<PauseModalProps> = ({
 
           {/* Action Buttons List */}
           <View style={styles.buttonsList}>
-            {/* 1. Resume Button */}
+            {/* 1. Resume Button (SVG Play) */}
             <Pressable style={[styles.btn, styles.resumeBtn]} onPress={onResume}>
-              <Ionicons name="play" size={20} color="#07090C" />
+              <SvgPlayTriangle size={18} color="#07090C" />
               <Text style={styles.resumeBtnText}>RESUME</Text>
             </Pressable>
 
-            {/* 2. Restart Button */}
+            {/* 2. Restart Button (SVG Refresh) */}
             <Pressable style={styles.btn} onPress={onRestart}>
-              <Ionicons name="refresh" size={20} color={ARColors.white} />
+              <SvgRefresh size={18} color={ARColors.white} />
               <Text style={styles.btnText}>RESTART</Text>
             </Pressable>
 
-            {/* 3. Settings Button */}
+            {/* 3. Settings Button (SVG Gear) */}
             <Pressable style={styles.btn} onPress={onSettings}>
-              <Ionicons name="settings-sharp" size={19} color={ARColors.white} />
+              <SvgSettingsGear size={18} color={ARColors.white} />
               <Text style={styles.btnText}>SETTINGS</Text>
             </Pressable>
 
-            {/* 4. Exit to Hub Button */}
+            {/* 4. Exit to Hub Button (SVG Home) */}
             <Pressable style={[styles.btn, styles.exitBtn]} onPress={onExit}>
-              <Ionicons name="home" size={19} color={ARColors.red} />
+              <SvgHome size={18} color={ARColors.red} />
               <Text style={[styles.btnText, { color: ARColors.red }]}>EXIT TO HUB</Text>
             </Pressable>
           </View>
