@@ -162,6 +162,7 @@ export const AimRushGame: React.FC<AimRushProps> = ({ onFinish }) => {
         <HomeScreen
           profile={profile}
           selectedMode={selectedMode}
+          onSelectMode={(mode) => setSelectedMode(mode)}
           onStartGame={() => setGameState('countdown')}
           onOpenModes={() => setGameState('mode_select')}
           onOpenHowToPlay={() => setGameState('how_to_play')}
@@ -208,6 +209,7 @@ export const AimRushGame: React.FC<AimRushProps> = ({ onFinish }) => {
           mode={selectedMode}
           onFinishRun={handleFinishRun}
           onPause={() => setIsPauseModalOpen(true)}
+          onExit={() => setIsExitModalOpen(true)}
           isPaused={isPauseModalOpen}
         />
       )}

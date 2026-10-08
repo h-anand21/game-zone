@@ -1,10 +1,12 @@
 // ============================================================
 // AIM RUSH — Screen 12: SettingsScreen
-// Audio, Haptics, FX controls, and data management
+// Recreated from "Neon Cyberpunk Settings Interface.png" reference
+// Hardware audio toggles, haptics, FX controls, and safe areas
 // ============================================================
 
 import React, { useState } from 'react';
 import { StyleSheet, View, Text, Pressable, Switch, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
@@ -26,6 +28,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onResetProgress,
   onBack,
 }) => {
+  const insets = useSafeAreaInsets();
   const [localSettings, setLocalSettings] = useState<AimRushSettings>(settings);
 
   const toggleSound = (val: boolean) => {
@@ -75,18 +78,29 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   };
 
   return (
-    <BackgroundLayer screen="other" overlayDarkness={0.4}>
-      <View style={styles.container}>
+    <BackgroundLayer screen="other" overlayDarkness={0.35}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: Math.max(12, insets.top + 6),
+            paddingBottom: Math.max(16, insets.bottom + 8),
+          },
+        ]}
+      >
         {/* Header */}
         <View style={styles.topBar}>
           <Pressable style={styles.iconCircle} onPress={onBack}>
-            <Ionicons name="arrow-back" size={20} color={ARColors.white} />
+            <Ionicons name="arrow-back" size={18} color={ARColors.white} />
           </Pressable>
-          <Text style={styles.headerTitle}>SETTINGS</Text>
-          <View style={{ width: 42 }} />
+          <View style={styles.titleBox}>
+            <Text style={styles.headerTitle}>SETTINGS</Text>
+            <Text style={styles.headerSub}>SYSTEM CALIBRATION</Text>
+          </View>
+          <View style={{ width: 40 }} />
         </View>
 
-        {/* Settings Options Group */}
+        {/* Settings Group Card */}
         <View style={styles.groupCard}>
           <View style={styles.row}>
             <View style={styles.rowLeft}>
@@ -155,6 +169,12 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
             <Text style={styles.resetBtnText}>RESET CAREER DATA</Text>
           </Pressable>
         </View>
+
+        {/* Bottom Back Action */}
+        <Pressable style={styles.bottomBackBtn} onPress={onBack}>
+          <Ionicons name="arrow-back" size={16} color={ARColors.white} />
+          <Text style={styles.bottomBackText}>RETURN TO HUB</Text>
+        </Pressable>
       </View>
     </BackgroundLayer>
   );
@@ -163,10 +183,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 48,
-    paddingBottom: 24,
-    gap: 20,
+    paddingHorizontal: 16,
+    justifyContent: 'space-between',
   },
   topBar: {
     flexDirection: 'row',
@@ -174,25 +192,36 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   iconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: ARColors.surfaceCard,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: 'rgba(10, 16, 26, 0.9)',
     borderWidth: 1.5,
-    borderColor: ARColors.border,
+    borderColor: ARColors.cyan,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  titleBox: {
+    alignItems: 'center',
+  },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '900',
     color: ARColors.white,
     letterSpacing: 2,
+    fontStyle: 'italic',
+  },
+  headerSub: {
+    fontSize: 8.5,
+    fontWeight: '800',
+    color: ARColors.cyan,
+    letterSpacing: 1.2,
+    marginTop: 2,
   },
   groupCard: {
-    backgroundColor: ARColors.surfaceCard,
+    backgroundColor: 'rgba(10, 16, 26, 0.92)',
     borderWidth: 1.5,
-    borderColor: ARColors.border,
+    borderColor: 'rgba(53, 231, 255, 0.35)',
     borderRadius: 18,
     padding: 16,
     gap: 6,
@@ -216,19 +245,19 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: ARColors.border,
+    backgroundColor: 'rgba(53, 231, 255, 0.15)',
     marginVertical: 4,
   },
   dangerCard: {
-    backgroundColor: ARColors.surfaceCard,
+    backgroundColor: 'rgba(10, 16, 26, 0.92)',
     borderWidth: 1.5,
     borderColor: 'rgba(255, 77, 97, 0.3)',
     borderRadius: 18,
-    padding: 18,
-    gap: 12,
+    padding: 16,
+    gap: 10,
   },
   dangerTitle: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '900',
     color: ARColors.red,
     letterSpacing: 1.2,
@@ -245,9 +274,28 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   resetBtnText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '900',
     color: ARColors.red,
     letterSpacing: 1,
+  },
+  bottomBackBtn: {
+    width: '100%',
+    height: 48,
+    borderRadius: 14,
+    backgroundColor: 'rgba(10, 16, 26, 0.95)',
+    borderWidth: 1.5,
+    borderColor: ARColors.cyan,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    zIndex: 10,
+  },
+  bottomBackText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: ARColors.white,
+    letterSpacing: 1.5,
   },
 });
