@@ -105,10 +105,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         {/* 2. CENTER BRANDING: AIM RUSH — TARGET CHAIN */}
         <View style={styles.brandingSection}>
           <View style={styles.crosshairBehind}>
-            <Svg width={80} height={40} viewBox="0 0 80 40">
-              <Circle cx={40} cy={20} r={18} stroke={ARColors.cyan} strokeWidth={1.5} fill="none" opacity={0.6} />
-              <Circle cx={40} cy={20} r={8} stroke={ARColors.lime} strokeWidth={1.5} fill="none" opacity={0.8} />
-              <Line x1={10} y1={20} x2={70} y2={20} stroke={ARColors.cyan} strokeWidth={1.5} opacity={0.5} />
+            <Svg width={60} height={30} viewBox="0 0 60 30">
+              <Circle cx={30} cy={15} r={14} stroke={ARColors.cyan} strokeWidth={1.5} fill="none" opacity={0.6} />
+              <Circle cx={30} cy={15} r={6} stroke={ARColors.lime} strokeWidth={1.5} fill="none" opacity={0.8} />
+              <Line x1={5} y1={15} x2={55} y2={15} stroke={ARColors.cyan} strokeWidth={1.5} opacity={0.5} />
             </Svg>
           </View>
           <Text style={styles.masterTitle}>AIM RUSH</Text>
@@ -342,20 +342,20 @@ const styles = StyleSheet.create({
     top: -4,
   },
   masterTitle: {
-    fontSize: 34,
-    fontWeight: '900',
+    fontSize: 22,
+    fontWeight: '700',
     color: ARColors.white,
-    letterSpacing: 3.5,
+    letterSpacing: 2,
     fontStyle: 'italic',
     textShadowColor: ARColors.cyan,
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 8,
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 6,
   },
   masterSubtitle: {
-    fontSize: 11,
-    fontWeight: '900',
+    fontSize: 9.5,
+    fontWeight: '700',
     color: ARColors.lime,
-    letterSpacing: 2,
+    letterSpacing: 1.5,
     marginTop: 2,
   },
 
