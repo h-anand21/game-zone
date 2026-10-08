@@ -11,7 +11,7 @@ const BG_PORTAL: ImageSourcePropType = require('../../../../../assets/game/backg
 const BG_NEBULA: ImageSourcePropType = require('../../../../../assets/game/backgrounds/Golden Nebula Sci-Fi Arena.png');
 
 interface BackgroundLayerProps {
-  screen?: 'splash' | 'home' | 'gameplay' | 'other';
+  screen?: 'splash' | 'home' | 'gameplay' | 'result' | 'other';
   blurRadius?: number;
   overlayDarkness?: number; // 0.0 to 1.0
   children?: React.ReactNode;
@@ -73,7 +73,11 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   content: {
     flex: 1,

@@ -1,42 +1,35 @@
 // ============================================================
 // ONE TAP: PRECISION GAME — Config
-// Gameplay tuning, modes, tolerances, scoring and ranks
+// Master Game Configuration, Modes, Tolerances, Scoring & Profiles
 // ============================================================
 
-import { GameModeConfig, GameModeId } from './types';
+import { GameConfig } from '@/constants/types';
+import {
+  GameModeConfig,
+  GameModeId,
+  OneTapSettings,
+  OneTapUserProfile,
+} from './types';
 
-export const ONE_TAP_CONFIG = {
-  // Classic mode round target
+// Internal Gameplay Engine Tuning
+export const ONE_TAP_GAMEPLAY_CONFIG = {
   classicRounds: 10,
-
-  // Base Scoring Points
   goodScore: 10,
   greatScore: 25,
   perfectScore: 50,
   missScore: 0,
-
-  // Timing Tolerances (Normalized to track width [0.0 - 1.0])
-  // Distance from center of target zone:
-  perfectTolerance: 0.035, // within ~3.5% of center
-  greatTolerance: 0.08,    // within ~8% of center
-  goodTolerance: 0.14,     // within ~14% of center
-
-  // Target Zone Geometry
-  minTargetWidth: 0.12,   // minimum width of target box
-  maxTargetWidth: 0.28,   // maximum width on early rounds
-  trackSafeMargin: 0.08,  // padding from track edges (8% to 92%)
-
-  // Speed & Movement
-  baseTravelDurationMs: 1400, // Time to travel one way across track
-  rushTravelDurationMs: 900,  // Faster in Rush mode
-  speedProgressionFactor: 0.03, // Speed up per round
-
-  // Perfect Chain & Fever Mode
-  perfectChainRequired: 5,    // 5 consecutive perfects triggers Fever
-  feverDurationMs: 5000,      // 5 seconds of Fever
-  feverScoreMultiplier: 2.0,   // x2 all points during Fever
-
-  // Combo multipliers
+  perfectTolerance: 0.035,
+  greatTolerance: 0.08,
+  goodTolerance: 0.14,
+  minTargetWidth: 0.12,
+  maxTargetWidth: 0.28,
+  trackSafeMargin: 0.08,
+  baseTravelDurationMs: 1400,
+  rushTravelDurationMs: 900,
+  speedProgressionFactor: 0.03,
+  perfectChainRequired: 5,
+  feverDurationMs: 5000,
+  feverScoreMultiplier: 2.0,
   comboMultipliers: [
     { minCombo: 1, multiplier: 1.0 },
     { minCombo: 3, multiplier: 1.2 },
@@ -44,8 +37,6 @@ export const ONE_TAP_CONFIG = {
     { minCombo: 8, multiplier: 1.8 },
     { minCombo: 12, multiplier: 2.0 },
   ],
-
-  // Ranks threshold by Accuracy %
   ranks: {
     S: 90,
     A: 80,
@@ -53,6 +44,29 @@ export const ONE_TAP_CONFIG = {
     C: 50,
     D: 0,
   },
+};
+
+// GameHub Central Registry Configuration
+export const ONE_TAP_CONFIG: GameConfig & typeof ONE_TAP_GAMEPLAY_CONFIG = {
+  id: 'one-tap',
+  name: 'One Tap',
+  category: 'reflex',
+  offline: true,
+  multiplayer: false,
+  route: '/games/one-tap',
+  icon: '⏱️',
+  status: 'available',
+  gameVersion: '2.0.0',
+  scoreVersion: 'v2',
+  validation: {
+    maxScore: 5000,
+    minDuration: 3,
+    maxDuration: 180,
+  },
+  saveSupport: 'full',
+  description:
+    'One Tap: Precision Game — Tap anywhere with split-second timing as the oscillating needle sweeps across glowing target zones!',
+  ...ONE_TAP_GAMEPLAY_CONFIG,
 };
 
 export const GAME_MODES: Record<GameModeId, GameModeConfig> = {
@@ -142,4 +156,37 @@ export const GAME_MODES: Record<GameModeId, GameModeConfig> = {
     targetWidthMultiplier: 0.8,
     color: '#A0AEC0',
   },
+};
+
+export const DEFAULT_SETTINGS: OneTapSettings = {
+  soundEnabled: true,
+  musicEnabled: true,
+  hapticsEnabled: true,
+  reducedMotion: false,
+  visualFxLevel: 'high',
+};
+
+export const DEFAULT_USER_PROFILE: OneTapUserProfile = {
+  totalRuns: 0,
+  totalGamesPlayed: 0,
+  personalBestScore: 0,
+  previousBestScore: 0,
+  bestCombo: 0,
+  maxComboRecorded: 0,
+  bestAccuracy: 0,
+  lifetimeAccuracy: 0,
+  fastestReactionMs: 0,
+  averageReactionMs: 0,
+  totalPerfects: 0,
+  totalPerfectHits: 0,
+  totalGreats: 0,
+  totalGoods: 0,
+  totalMisses: 0,
+  totalCoins: 100,
+  coins: 100,
+  totalXp: 0,
+  xp: 0,
+  unlockedModes: ['classic', 'endless', 'rush', 'daily'],
+  tutorialCompleted: false,
+  dailyChallengeBest: 0,
 };

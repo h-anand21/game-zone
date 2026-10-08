@@ -10,6 +10,7 @@ export type OneTapGameState =
   | 'how_to_play'
   | 'touch_demo'
   | 'countdown'
+  | 'gameplay'
   | 'playing'
   | 'paused'
   | 'result'
@@ -17,6 +18,8 @@ export type OneTapGameState =
   | 'daily'
   | 'stats'
   | 'settings';
+
+export type OneTapScreen = OneTapGameState;
 
 export type GameModeId =
   | 'classic'
@@ -67,18 +70,24 @@ export interface HitEvaluation {
 
 export interface OneTapUserProfile {
   totalRuns: number;
+  totalGamesPlayed: number;
   personalBestScore: number;
   previousBestScore: number;
   bestCombo: number;
+  maxComboRecorded: number;
   bestAccuracy: number;
+  lifetimeAccuracy: number;
   fastestReactionMs: number;
   averageReactionMs: number;
   totalPerfects: number;
+  totalPerfectHits: number;
   totalGreats: number;
   totalGoods: number;
   totalMisses: number;
   totalCoins: number;
+  coins: number;
   totalXp: number;
+  xp: number;
   unlockedModes: GameModeId[];
   tutorialCompleted: boolean;
   dailyChallengeBest: number;
@@ -96,9 +105,9 @@ export interface OneTapSettings {
 export interface OneTapRunResult {
   mode: GameModeId;
   finalScore: number;
-  isNewPersonalBest: boolean;
-  previousBest: number;
-  scoreDifference: number;
+  isNewPersonalBest?: boolean;
+  previousBest?: number;
+  scoreDifference?: number;
   rank: 'S' | 'A' | 'B' | 'C' | 'D';
   accuracyPercentage: number;
   perfectCount: number;
@@ -107,7 +116,8 @@ export interface OneTapRunResult {
   missCount: number;
   maxCombo: number;
   totalRoundsPlayed: number;
-  totalDurationSeconds: number;
+  totalDurationSeconds?: number;
+  timeElapsedSeconds: number;
   averageReactionTimeMs: number;
   earnedCoins: number;
   earnedXp: number;
