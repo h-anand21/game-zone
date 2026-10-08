@@ -1,19 +1,23 @@
 // ============================================================
 // AIM RUSH — Screen 03: HomeScreen
-// Hero target, personal telemetry, mode selector, and instant launch
+// Recreated from "Neon Aim Rush Game Hub.png" reference design
+// Pure programmatic UI with Safe Area insets & chamfered telemetry
 // ============================================================
 
 import React from 'react';
-import { StyleSheet, View, Text, Pressable } from 'react-native';
+import { StyleSheet, View, Text, Pressable, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import Svg, { Circle, Line, Defs, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Circle, Line } from 'react-native-svg';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
+import { GAME_MODES } from '../config';
 import { GameModeConfig, AimRushUserProfile } from '../types';
 
 interface HomeScreenProps {
   profile: AimRushUserProfile;
   selectedMode: GameModeConfig;
+  onSelectMode: (mode: GameModeConfig) => void;
   onStartGame: () => void;
   onOpenModes: () => void;
   onOpenHowToPlay: () => void;
@@ -26,6 +30,7 @@ interface HomeScreenProps {
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   profile,
   selectedMode,
+  onSelectMode,
   onStartGame,
   onOpenModes,
   onOpenHowToPlay,
@@ -34,117 +39,190 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onOpenSettings,
   onExitToHub,
 }) => {
-  return (
-    <BackgroundLayer screen="home" overlayDarkness={0.32}>
-      <View style={styles.container}>
-        {/* Top Header Bar */}
-        <View style={styles.topBar}>
-          <Pressable
-            style={styles.iconCircle}
-            onPress={onExitToHub}
-            accessibilityRole="button"
-            accessibilityLabel="Exit to GameHub"
-          >
-            <Ionicons name="arrow-back" size={20} color={ARColors.white} />
-          </Pressable>
+  const insets = useSafeAreaInsets();
+  const modesList = Object.values(GAME_MODES);
 
-          <View style={styles.topRightGroup}>
-            <Pressable
-              style={styles.iconCircle}
-              onPress={onOpenSettings}
-              accessibilityRole="button"
-              accessibilityLabel="Settings"
-            >
-              <Ionicons name="settings-sharp" size={20} color={ARColors.white} />
+  return (
+    <BackgroundLayer screen="home" overlayDarkness={0.25}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: Math.max(12, insets.top + 6),
+            paddingBottom: Math.max(16, insets.bottom + 8),
+          },
+        ]}
+      >
+        {/* 1. TOP HEADER (PLAYER PROFILE + QUICK ICONS) */}
+        <View style={styles.topHeader}>
+          {/* Left: Player Profile Capsule */}
+          <View style={styles.profileCapsule}>
+            <Pressable style={styles.exitBackBtn} onPress={onExitToHub}>
+              <Ionicons name="arrow-back" size={16} color={ARColors.white} />
+            </Pressable>
+            <View style={styles.avatarCircle}>
+              <Ionicons name="person" size={16} color={ARColors.cyan} />
+            </View>
+            <View style={styles.profileInfo}>
+              <Text style={styles.playerName}>EXPLORER</Text>
+              <View style={styles.levelRow}>
+                <Text style={styles.levelText}>Lv. {Math.max(1, Math.floor(profile.totalTargetsHit / 50) + 1)}</Text>
+                <View style={styles.xpTrack}>
+                  <View
+                    style={[
+                      styles.xpFill,
+                      { width: `${(profile.totalTargetsHit % 50) * 2}%` },
+                    ]}
+                  />
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Right: Quick Action Hub Icons */}
+          <View style={styles.headerIconsRow}>
+            {/* Stats */}
+            <Pressable style={styles.headerIconBtn} onPress={onOpenStats}>
+              <Ionicons name="bar-chart-outline" size={18} color={ARColors.white} />
+              <Text style={styles.iconMiniLabel}>STATS</Text>
+            </Pressable>
+
+            {/* Missions */}
+            <Pressable style={styles.headerIconBtn} onPress={onOpenMissions}>
+              <Ionicons name="trophy-outline" size={18} color={ARColors.white} />
+              <View style={styles.notificationDot} />
+              <Text style={styles.iconMiniLabel}>MISSIONS</Text>
+            </Pressable>
+
+            {/* Settings */}
+            <Pressable style={styles.headerIconBtn} onPress={onOpenSettings}>
+              <Ionicons name="settings-sharp" size={18} color={ARColors.white} />
+              <Text style={styles.iconMiniLabel}>SETTINGS</Text>
             </Pressable>
           </View>
         </View>
 
-        {/* Center Hero Identity */}
-        <View style={styles.heroSection}>
-          {/* Hero Target Emblem */}
-          <View style={styles.targetEmblem}>
-            <Svg width={130} height={130} viewBox="0 0 130 130">
-              <Defs>
-                <RadialGradient id="heroGlow" cx="50%" cy="50%" r="50%">
-                  <Stop offset="0%" stopColor={ARColors.cyan} stopOpacity="0.4" />
-                  <Stop offset="100%" stopColor={ARColors.cyan} stopOpacity="0" />
-                </RadialGradient>
-              </Defs>
-              <Circle cx={65} cy={65} r={60} fill="url(#heroGlow)" />
-              <Circle cx={65} cy={65} r={56} stroke={ARColors.cyan} strokeWidth={2.5} fill="none" strokeDasharray="8, 6" />
-              <Circle cx={65} cy={65} r={36} stroke={ARColors.lime} strokeWidth={2} fill="none" />
-              <Circle cx={65} cy={65} r={16} stroke={ARColors.white} strokeWidth={1.5} fill="none" />
-              <Circle cx={65} cy={65} r={5} fill={ARColors.cyan} />
-              <Line x1={5} y1={65} x2={22} y2={65} stroke={ARColors.cyan} strokeWidth={2} />
-              <Line x1={108} y1={65} x2={125} y2={65} stroke={ARColors.cyan} strokeWidth={2} />
-              <Line x1={65} y1={5} x2={65} y2={22} stroke={ARColors.cyan} strokeWidth={2} />
-              <Line x1={65} y1={108} x2={65} y2={125} stroke={ARColors.cyan} strokeWidth={2} />
+        {/* 2. CENTER BRANDING: AIM RUSH — TARGET CHAIN */}
+        <View style={styles.brandingSection}>
+          <View style={styles.crosshairBehind}>
+            <Svg width={80} height={40} viewBox="0 0 80 40">
+              <Circle cx={40} cy={20} r={18} stroke={ARColors.cyan} strokeWidth={1.5} fill="none" opacity={0.6} />
+              <Circle cx={40} cy={20} r={8} stroke={ARColors.lime} strokeWidth={1.5} fill="none" opacity={0.8} />
+              <Line x1={10} y1={20} x2={70} y2={20} stroke={ARColors.cyan} strokeWidth={1.5} opacity={0.5} />
             </Svg>
           </View>
-
-          <Text style={styles.titleText}>AIM RUSH</Text>
-          <Text style={styles.subtitleText}>✦ TARGET CHAIN ✦</Text>
-
-          {/* Telemetry Record Capsule */}
-          <View style={styles.recordCapsule}>
-            <View style={styles.recordItem}>
-              <Text style={styles.recordLabel}>PERSONAL BEST</Text>
-              <Text style={styles.recordValue}>{profile.personalBestScore}</Text>
-            </View>
-            <View style={styles.recordDivider} />
-            <View style={styles.recordItem}>
-              <Text style={styles.recordLabel}>MAX CHAIN</Text>
-              <Text style={[styles.recordValue, { color: ARColors.lime }]}>
-                ×{profile.bestChain.toString().padStart(2, '0')}
-              </Text>
-            </View>
-          </View>
-
-          {/* Current Selected Mode Preview */}
-          <Pressable style={styles.modePill} onPress={onOpenModes}>
-            <Text style={styles.modePillPrefix}>ACTIVE MODE:</Text>
-            <Text style={[styles.modePillTitle, { color: selectedMode.color }]}>
-              {selectedMode.title}
-            </Text>
-            <Ionicons name="chevron-forward" size={14} color={ARColors.cyan} />
-          </Pressable>
+          <Text style={styles.masterTitle}>AIM RUSH</Text>
+          <Text style={styles.masterSubtitle}>— TARGET CHAIN —</Text>
         </View>
 
-        {/* Bottom Interactive Area */}
-        <View style={styles.bottomSection}>
-          {/* Main Hero Launch CTA */}
-          <Pressable
-            style={styles.launchButton}
-            onPress={onStartGame}
-            accessibilityRole="button"
-            accessibilityLabel="Enter Arena"
-          >
-            <Text style={styles.launchButtonText}>ENTER ARENA ▶</Text>
+        {/* Center Atmospheric Spacer (Reveals Neon Target Podium Background) */}
+        <View style={styles.centerSpace} />
+
+        {/* 3. TELEMETRY STATS ROW (3 CHAMFERED CARDS) */}
+        <View style={styles.telemetryRow}>
+          {/* Card 1: Personal Best */}
+          <View style={styles.telemetryCard}>
+            <View style={styles.cardIconRow}>
+              <Ionicons name="trophy" size={14} color={ARColors.gold} />
+              <Text style={styles.cardHeaderLabel}>PERSONAL BEST</Text>
+            </View>
+            <Text style={[styles.cardMainValue, { color: ARColors.cyan }]}>
+              {profile.personalBestScore}
+            </Text>
+          </View>
+
+          {/* Card 2: Best Chain */}
+          <View style={styles.telemetryCard}>
+            <View style={styles.cardIconRow}>
+              <Ionicons name="link" size={14} color={ARColors.lime} />
+              <Text style={styles.cardHeaderLabel}>BEST CHAIN</Text>
+            </View>
+            <Text style={[styles.cardMainValue, { color: ARColors.lime }]}>
+              ×{profile.bestChain.toString().padStart(2, '0')}
+            </Text>
+          </View>
+
+          {/* Card 3: Perfect Hits */}
+          <View style={styles.telemetryCard}>
+            <View style={styles.cardIconRow}>
+              <Ionicons name="disc" size={14} color={ARColors.cyan} />
+              <Text style={styles.cardHeaderLabel}>PERFECT HITS</Text>
+            </View>
+            <Text style={[styles.cardMainValue, { color: ARColors.white }]}>
+              {profile.totalPerfects}
+            </Text>
+          </View>
+        </View>
+
+        {/* 4. MASTER PLAY BUTTON (GLOWING HEX-CHAMFER CTA) */}
+        <Pressable
+          style={styles.masterPlayBtn}
+          onPress={onStartGame}
+          accessibilityRole="button"
+          accessibilityLabel="Start Game"
+        >
+          <View style={styles.playContent}>
+            <Ionicons name="play" size={28} color="#07090C" style={styles.playIcon} />
+            <Text style={styles.playBtnText}>PLAY</Text>
+          </View>
+          <Text style={styles.playSubtext}>TOUCH TO START</Text>
+        </Pressable>
+
+        {/* 5. ARENA MODES ROW (4 ROUNDED CARDS) */}
+        <View style={styles.modesRow}>
+          {modesList.map((m) => {
+            const isEquipped = m.id === selectedMode.id;
+            const iconName =
+              m.id === 'classic'
+                ? 'disc-outline'
+                : m.id === 'rush'
+                ? 'flash'
+                : m.id === 'precision'
+                ? 'star'
+                : 'calendar-outline';
+
+            return (
+              <Pressable
+                key={m.id}
+                style={[
+                  styles.modeCard,
+                  isEquipped && [
+                    styles.modeCardActive,
+                    { borderColor: m.color, shadowColor: m.color },
+                  ],
+                ]}
+                onPress={() => onSelectMode(m)}
+              >
+                <Ionicons
+                  name={iconName as any}
+                  size={20}
+                  color={isEquipped ? m.color : ARColors.textMuted}
+                />
+                <Text style={[styles.modeCardTitle, isEquipped && { color: m.color }]}>
+                  {m.title}
+                </Text>
+                <Text style={styles.modeCardSub}>{m.badge}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        {/* 6. BOTTOM UTILITIES BAR (SAFELY ELEVATED ABOVE DEVICE NAV) */}
+        <View style={styles.bottomUtilities}>
+          <Pressable style={styles.utilityPill} onPress={onOpenHowToPlay}>
+            <Ionicons name="book-outline" size={15} color={ARColors.cyan} />
+            <Text style={styles.utilityText}>HOW TO PLAY</Text>
           </Pressable>
 
-          {/* Secondary Action Grid */}
-          <View style={styles.navRow}>
-            <Pressable style={styles.navBtn} onPress={onOpenModes}>
-              <Ionicons name="game-controller-outline" size={16} color={ARColors.cyan} />
-              <Text style={styles.navBtnText}>MODES</Text>
-            </Pressable>
+          <Pressable style={styles.utilityPill} onPress={onOpenStats}>
+            <Ionicons name="podium-outline" size={15} color={ARColors.lime} />
+            <Text style={styles.utilityText}>LEADERBOARD</Text>
+          </Pressable>
 
-            <Pressable style={styles.navBtn} onPress={onOpenHowToPlay}>
-              <Ionicons name="help-circle-outline" size={16} color={ARColors.cyan} />
-              <Text style={styles.navBtnText}>HOW TO PLAY</Text>
-            </Pressable>
-
-            <Pressable style={styles.navBtn} onPress={onOpenMissions}>
-              <Ionicons name="trophy-outline" size={16} color={ARColors.gold} />
-              <Text style={styles.navBtnText}>MISSIONS</Text>
-            </Pressable>
-
-            <Pressable style={styles.navBtn} onPress={onOpenStats}>
-              <Ionicons name="bar-chart-outline" size={16} color={ARColors.lime} />
-              <Text style={styles.navBtnText}>STATS</Text>
-            </Pressable>
-          </View>
+          <Pressable style={styles.utilityPill} onPress={onOpenMissions}>
+            <Ionicons name="medal-outline" size={15} color={ARColors.gold} />
+            <Text style={styles.utilityText}>ACHIEVEMENTS</Text>
+          </Pressable>
         </View>
       </View>
     </BackgroundLayer>
@@ -154,152 +232,271 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 48,
-    paddingBottom: 28,
+    paddingHorizontal: 16,
     justifyContent: 'space-between',
   },
-  topBar: {
+
+  // 1. Top Header
+  topHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    zIndex: 10,
   },
-  iconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: ARColors.surfaceCard,
-    borderWidth: 1.5,
+  profileCapsule: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  exitBackBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: ARColors.surfaceDark,
+    borderWidth: 1.2,
     borderColor: ARColors.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  topRightGroup: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  heroSection: {
-    alignItems: 'center',
-  },
-  targetEmblem: {
-    marginBottom: 12,
-  },
-  titleText: {
-    fontSize: 36,
-    fontWeight: '900',
-    color: ARColors.white,
-    letterSpacing: 4,
-    textAlign: 'center',
-    textShadowColor: ARColors.cyan,
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 10,
-  },
-  subtitleText: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: ARColors.cyan,
-    letterSpacing: 2,
-    marginTop: 4,
-  },
-  recordCapsule: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: ARColors.surfaceCard,
+  avatarCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(53, 231, 255, 0.15)',
     borderWidth: 1.5,
-    borderColor: ARColors.border,
-    borderRadius: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    marginTop: 22,
-    gap: 18,
-  },
-  recordItem: {
+    borderColor: ARColors.cyan,
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  recordDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: ARColors.border,
+  profileInfo: {
+    justifyContent: 'center',
   },
-  recordLabel: {
-    fontSize: 8.5,
-    fontWeight: '800',
-    color: ARColors.textMuted,
-    letterSpacing: 1.2,
-  },
-  recordValue: {
-    fontSize: 18,
+  playerName: {
+    fontSize: 11,
     fontWeight: '900',
     color: ARColors.white,
     letterSpacing: 1,
-    marginTop: 2,
   },
-  modePill: {
+  levelRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
+  },
+  levelText: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: ARColors.cyan,
+  },
+  xpTrack: {
+    width: 52,
+    height: 4,
     backgroundColor: ARColors.surfaceDark,
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  xpFill: {
+    height: '100%',
+    backgroundColor: ARColors.cyan,
+  },
+  headerIconsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerIconBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: ARColors.surfaceCard,
     borderWidth: 1.2,
     borderColor: ARColors.border,
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    marginTop: 16,
-    gap: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
   },
-  modePillPrefix: {
-    fontSize: 10,
+  iconMiniLabel: {
+    fontSize: 7,
+    fontWeight: '800',
+    color: ARColors.textMuted,
+    marginTop: 1,
+  },
+  notificationDot: {
+    position: 'absolute',
+    top: 5,
+    right: 7,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: ARColors.red,
+  },
+
+  // 2. Branding Section
+  brandingSection: {
+    alignItems: 'center',
+    marginTop: 2,
+    position: 'relative',
+  },
+  crosshairBehind: {
+    position: 'absolute',
+    top: -4,
+  },
+  masterTitle: {
+    fontSize: 34,
+    fontWeight: '900',
+    color: ARColors.white,
+    letterSpacing: 3.5,
+    fontStyle: 'italic',
+    textShadowColor: ARColors.cyan,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
+  masterSubtitle: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: ARColors.lime,
+    letterSpacing: 2,
+    marginTop: 2,
+  },
+
+  // Center Atmospheric Spacer
+  centerSpace: {
+    flex: 1,
+    minHeight: 40,
+  },
+
+  // 3. Telemetry Row
+  telemetryRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 10,
+  },
+  telemetryCard: {
+    flex: 1,
+    backgroundColor: 'rgba(11, 18, 28, 0.88)',
+    borderWidth: 1.2,
+    borderColor: 'rgba(53, 231, 255, 0.35)',
+    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+  },
+  cardIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: 2,
+  },
+  cardHeaderLabel: {
+    fontSize: 7.5,
     fontWeight: '800',
     color: ARColors.textMuted,
     letterSpacing: 0.8,
   },
-  modePillTitle: {
-    fontSize: 11,
+  cardMainValue: {
+    fontSize: 18,
     fontWeight: '900',
     letterSpacing: 1,
   },
-  bottomSection: {
+
+  // 4. Master Play CTA Button
+  masterPlayBtn: {
     width: '100%',
-    alignItems: 'center',
-    gap: 14,
-  },
-  launchButton: {
-    width: '100%',
-    height: 58,
+    height: 62,
     backgroundColor: ARColors.cyan,
-    borderRadius: 16,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: ARColors.cyan,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.55,
-    shadowRadius: 12,
+    shadowOpacity: 0.6,
+    shadowRadius: 14,
     elevation: 8,
+    marginBottom: 12,
   },
-  launchButtonText: {
-    fontSize: 17,
+  playContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  playIcon: {
+    marginTop: -2,
+  },
+  playBtnText: {
+    fontSize: 24,
+    fontWeight: '900',
+    color: '#07090C',
+    letterSpacing: 3,
+    fontStyle: 'italic',
+  },
+  playSubtext: {
+    fontSize: 9.5,
     fontWeight: '900',
     color: '#07090C',
     letterSpacing: 2,
+    opacity: 0.85,
+    marginTop: -2,
   },
-  navRow: {
+
+  // 5. Modes Row
+  modesRow: {
     flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between',
-    gap: 6,
+    gap: 8,
+    marginBottom: 12,
   },
-  navBtn: {
+  modeCard: {
     flex: 1,
-    height: 48,
     backgroundColor: ARColors.surfaceCard,
     borderWidth: 1.2,
     borderColor: ARColors.border,
     borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 4,
     alignItems: 'center',
-    justifyContent: 'center',
     gap: 3,
   },
-  navBtnText: {
-    fontSize: 8.5,
+  modeCardActive: {
+    borderWidth: 1.8,
+    backgroundColor: 'rgba(15, 25, 38, 0.95)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  modeCardTitle: {
+    fontSize: 9.5,
+    fontWeight: '900',
+    color: ARColors.white,
+    letterSpacing: 0.5,
+    marginTop: 2,
+  },
+  modeCardSub: {
+    fontSize: 7.5,
+    fontWeight: '700',
+    color: ARColors.textMuted,
+    textAlign: 'center',
+  },
+
+  // 6. Bottom Utilities Bar
+  bottomUtilities: {
+    flexDirection: 'row',
+    gap: 8,
+    zIndex: 10,
+  },
+  utilityPill: {
+    flex: 1,
+    height: 40,
+    backgroundColor: ARColors.surfaceCard,
+    borderWidth: 1.2,
+    borderColor: ARColors.border,
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+  },
+  utilityText: {
+    fontSize: 9,
     fontWeight: '800',
     color: ARColors.white,
     letterSpacing: 0.5,
