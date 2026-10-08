@@ -7,7 +7,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Svg, { Circle, Line } from 'react-native-svg';
+import Svg, { Circle, Line, Path } from 'react-native-svg';
 import { BackgroundLayer } from '../components/BackgroundLayer';
 import { ARColors } from '../theme/colors';
 import { GAME_MODES } from '../config';
@@ -118,24 +118,58 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </View>
         </View>
 
-        {/* 2. CENTER BRANDING: AIM RUSH — TARGET CHAIN (ENLARGED & PERFECTLY CENTERED) */}
-        <View style={styles.brandingSection}>
-          <View style={styles.crosshairBehind}>
-            <Svg width={140} height={56} viewBox="0 0 140 56">
-              <Circle cx={70} cy={28} r={25} stroke={ARColors.cyan} strokeWidth={2} fill="none" opacity={0.65} />
-              <Circle cx={70} cy={28} r={12} stroke={ARColors.lime} strokeWidth={1.8} fill="none" opacity={0.85} />
-              <Circle cx={70} cy={28} r={3} fill={ARColors.cyan} opacity={0.9} />
-              <Line x1={15} y1={28} x2={125} y2={28} stroke={ARColors.cyan} strokeWidth={1.8} opacity={0.5} />
-              <Line x1={70} y1={3} x2={70} y2={12} stroke={ARColors.cyan} strokeWidth={1.8} opacity={0.6} />
-              <Line x1={70} y1={44} x2={70} y2={53} stroke={ARColors.cyan} strokeWidth={1.8} opacity={0.6} />
-            </Svg>
-          </View>
-          <Text style={styles.masterTitle}>AIM RUSH</Text>
-          <Text style={styles.masterSubtitle}>— TARGET CHAIN —</Text>
-        </View>
+        {/* 2. CENTER BRANDING & RETICLE HERO (PERFECTLY CENTERED IN MOBILE MIDDLE & ENLARGED) */}
+        <View style={styles.centerHeroSection}>
+          <View style={styles.reticleWrapper}>
+            {/* High-Tech Cyber Reticle Targeting Vector */}
+            <Svg width={250} height={210} viewBox="0 0 250 210" style={styles.reticleSvg}>
+              {/* Outer HUD Corner Brackets */}
+              <Path d="M 32 46 L 32 26 L 52 26" stroke={ARColors.cyan} strokeWidth={2.4} fill="none" opacity={0.75} />
+              <Path d="M 218 46 L 218 26 L 198 26" stroke={ARColors.cyan} strokeWidth={2.4} fill="none" opacity={0.75} />
+              <Path d="M 32 164 L 32 184 L 52 184" stroke={ARColors.cyan} strokeWidth={2.4} fill="none" opacity={0.75} />
+              <Path d="M 218 164 L 218 184 L 198 184" stroke={ARColors.cyan} strokeWidth={2.4} fill="none" opacity={0.75} />
 
-        {/* Center Atmospheric Spacer (Reveals Neon Target Podium Background) */}
-        <View style={styles.centerSpace} />
+              {/* Outer Calibrated Reticle Ring */}
+              <Circle cx={125} cy={105} r={92} stroke={ARColors.cyan} strokeWidth={1.4} strokeDasharray="6 4" fill="none" opacity={0.4} />
+
+              {/* Main Concentric Aim Ring */}
+              <Circle cx={125} cy={105} r={70} stroke={ARColors.cyan} strokeWidth={2.2} fill="none" opacity={0.85} />
+
+              {/* Inner Sweet-Spot Ring (Lime) */}
+              <Circle cx={125} cy={105} r={44} stroke={ARColors.lime} strokeWidth={1.8} strokeDasharray="5 3" fill="none" opacity={0.8} />
+
+              {/* Bullseye Core */}
+              <Circle cx={125} cy={105} r={6} fill={ARColors.cyan} opacity={0.9} />
+              <Circle cx={125} cy={105} r={2.5} fill="#FFFFFF" />
+
+              {/* Primary Crosshairs with Gap */}
+              <Line x1={15} y1={105} x2={52} y2={105} stroke={ARColors.cyan} strokeWidth={2} opacity={0.8} />
+              <Line x1={198} y1={105} x2={235} y2={105} stroke={ARColors.cyan} strokeWidth={2} opacity={0.8} />
+              <Line x1={125} y1={12} x2={125} y2={45} stroke={ARColors.cyan} strokeWidth={2} opacity={0.8} />
+              <Line x1={125} y1={165} x2={125} y2={198} stroke={ARColors.cyan} strokeWidth={2} opacity={0.8} />
+
+              {/* 45-degree Precision Notch Ticks */}
+              <Line x1={60} y1={50} x2={69} y2={59} stroke={ARColors.lime} strokeWidth={1.6} opacity={0.65} />
+              <Line x1={190} y1={50} x2={181} y2={59} stroke={ARColors.lime} strokeWidth={1.6} opacity={0.65} />
+              <Line x1={60} y1={160} x2={69} y2={151} stroke={ARColors.lime} strokeWidth={1.6} opacity={0.65} />
+              <Line x1={190} y1={160} x2={181} y2={151} stroke={ARColors.lime} strokeWidth={1.6} opacity={0.65} />
+            </Svg>
+
+            {/* Centered Brand Typography */}
+            <View style={styles.brandingContent}>
+              <View style={styles.systemBadge}>
+                <View style={styles.systemDot} />
+                <Text style={styles.systemBadgeText}>PRECISION REFLEX ARENA</Text>
+              </View>
+
+              <Text style={styles.masterTitle}>AIM RUSH</Text>
+
+              <View style={styles.subtitleCapsule}>
+                <Text style={styles.masterSubtitle}>— TARGET CHAIN —</Text>
+              </View>
+            </View>
+          </View>
+        </View>
 
         {/* 3. TELEMETRY STATS ROW (3 CHAMFERED CARDS WITH SVG ICONS) */}
         <View style={styles.telemetryRow}>
@@ -343,41 +377,79 @@ const styles = StyleSheet.create({
     backgroundColor: ARColors.red,
   },
 
-  // 2. Branding Section (Enlarged & Centered)
-  brandingSection: {
-    alignItems: 'center',
+  // 2. Center Hero Section (True Optical Middle of Mobile Screen)
+  centerHeroSection: {
+    flex: 1,
     justifyContent: 'center',
-    marginTop: 6,
-    position: 'relative',
+    alignItems: 'center',
+    width: '100%',
+    marginVertical: 4,
   },
-  crosshairBehind: {
-    position: 'absolute',
-    top: -2,
+  reticleWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+    width: '100%',
+  },
+  reticleSvg: {
+    position: 'absolute',
+    alignSelf: 'center',
+  },
+  brandingContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+    paddingHorizontal: 12,
+  },
+  systemBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(53, 231, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(53, 231, 255, 0.25)',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 10,
+    marginBottom: 6,
+  },
+  systemDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: ARColors.lime,
+  },
+  systemBadgeText: {
+    fontSize: 8.5,
+    fontWeight: '800',
+    color: ARColors.cyan,
+    letterSpacing: 1.6,
   },
   masterTitle: {
-    fontSize: 30,
+    fontSize: 38,
     fontWeight: '900',
     color: ARColors.white,
-    letterSpacing: 3,
+    letterSpacing: 4,
     fontStyle: 'italic',
     textShadowColor: ARColors.cyan,
     textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 10,
+    textShadowRadius: 16,
+    textAlign: 'center',
+  },
+  subtitleCapsule: {
+    backgroundColor: 'rgba(7, 12, 18, 0.75)',
+    borderWidth: 1,
+    borderColor: 'rgba(200, 255, 77, 0.4)',
+    paddingHorizontal: 12,
+    paddingVertical: 3,
+    borderRadius: 8,
+    marginTop: 4,
   },
   masterSubtitle: {
-    fontSize: 12,
+    fontSize: 12.5,
     fontWeight: '800',
     color: ARColors.lime,
-    letterSpacing: 2.5,
-    marginTop: 3,
-  },
-
-  // Center Atmospheric Spacer
-  centerSpace: {
-    flex: 1,
-    minHeight: 40,
+    letterSpacing: 2.8,
   },
 
   // 3. Telemetry Row
