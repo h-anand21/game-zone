@@ -126,10 +126,10 @@ export const ArcadeButton: React.FC<ArcadeButtonProps> = ({
           style={[
             styles.baseText,
             config.text,
-            size === 'large' && styles.textLarge,
-            size === 'compact' && styles.textCompact,
+            size === 'large' ? styles.textLarge : undefined,
+            size === 'compact' ? styles.textCompact : undefined,
             textStyle,
-          ]}
+          ] as any}
         >
           {title}
         </Text>
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   baseText: {
-    fontWeight: '950',
+    fontWeight: '900',
     fontSize: 14,
     letterSpacing: 1.5,
     textTransform: 'uppercase',

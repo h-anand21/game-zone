@@ -6,6 +6,7 @@
 export const RfColors = {
   // Main backgrounds
   bgMain: '#050914',
+  background: '#050914',
   bgElevated: '#091426',
   panel: '#0A1729',
   panelBorder: '#183957',

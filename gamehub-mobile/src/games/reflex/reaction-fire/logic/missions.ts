@@ -2,7 +2,7 @@
 // REACTION FIRE — Missions & Achievements Logic
 // ============================================================
 
-import type { MissionItem, AchievementItem, ReactionStats } from '../types';
+import type { MissionItem, AchievementItem, ReactionStats, RunResult } from '../types';
 
 export const INITIAL_MISSIONS: MissionItem[] = [
   {

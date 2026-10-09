@@ -7,13 +7,19 @@ export type ScreenState =
   | 'intro'
   | 'home'
   | 'mode_select'
+  | 'mode-select'
   | 'how_to_play'
+  | 'how-to-play'
   | 'practice'
+  | 'practice-arena'
   | 'gameplay'
   | 'result'
+  | 'results'
   | 'daily'
+  | 'daily-challenge'
   | 'missions'
   | 'stats'
+  | 'statistics'
   | 'settings';
 
 export type GameModeId = 'classic' | 'five-round' | 'endurance' | 'fakeout' | 'practice';
