@@ -1,12 +1,13 @@
 // ============================================================
 // DON'T TAP WRONG — In-game Heads Up Display (HUD)
+// Real-time score, deadline timer bar, streak indicators
 // ============================================================
 
 import React from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
 import { DtwColors } from '../../theme/colors';
 import { NeonBadge } from '../common/NeonBadge';
-import type { GameMode } from '../../types';
+import type { GameModeId } from '../../types';
 
 interface GameHudProps {
   score: number;
@@ -14,7 +15,7 @@ interface GameHudProps {
   timeLeftSeconds: number;
   totalTimeSeconds: number;
   targetScore: number;
-  mode: GameMode;
+  mode: GameModeId;
   onPause: () => void;
   onExit: () => void;
 }
@@ -29,12 +30,14 @@ export const GameHud: React.FC<GameHudProps> = ({
   onPause,
   onExit,
 }) => {
-  const timeProgress = Math.max(0, Math.min(1, timeLeftSeconds / totalTimeSeconds));
-  const isTimeCritical = timeLeftSeconds <= 5;
+  const isTimed = totalTimeSeconds > 0;
+  const timeProgress = isTimed ? Math.max(0, Math.min(1, timeLeftSeconds / totalTimeSeconds)) : 1;
+  const isTimeCritical = isTimed && timeLeftSeconds <= 5;
+  const isTimeWarning = isTimed && timeLeftSeconds <= 10;
 
   const timerColor = isTimeCritical
     ? DtwColors.dangerRed
-    : timeLeftSeconds <= 10
+    : isTimeWarning
     ? DtwColors.streakGold
     : DtwColors.safeGreen;
 
@@ -48,13 +51,15 @@ export const GameHud: React.FC<GameHudProps> = ({
 
         <View style={styles.badgeRow}>
           <NeonBadge
-            label={mode}
+            label={mode.toUpperCase()}
             color={DtwColors.cyanAccent}
+            size="compact"
             style={styles.modeBadge}
           />
           <NeonBadge
             label={`TARGET ${targetScore}`}
             color={DtwColors.streakGold}
+            size="compact"
           />
         </View>
 
@@ -63,19 +68,25 @@ export const GameHud: React.FC<GameHudProps> = ({
         </Pressable>
       </View>
 
-      {/* Timer Bar */}
-      <View style={styles.timerTrack}>
-        <View
-          style={[
-            styles.timerFill,
-            {
-              width: `${Math.round(timeProgress * 100)}%`,
-              backgroundColor: timerColor,
-              shadowColor: timerColor,
-            },
-          ]}
-        />
-      </View>
+      {/* Timer Bar (for timed modes) */}
+      {isTimed ? (
+        <View style={styles.timerTrack}>
+          <View
+            style={[
+              styles.timerFill,
+              {
+                width: `${Math.round(timeProgress * 100)}%`,
+                backgroundColor: timerColor,
+                shadowColor: timerColor,
+              },
+            ]}
+          />
+        </View>
+      ) : (
+        <View style={styles.survivalBar}>
+          <Text style={styles.survivalLabel}>ENDLESS SURVIVAL • 1 LIFE</Text>
+        </View>
+      )}
 
       {/* Main Stats Row */}
       <View style={styles.statsRow}>
@@ -103,9 +114,9 @@ export const GameHud: React.FC<GameHudProps> = ({
 
         {/* Time Left */}
         <View style={styles.statCol}>
-          <Text style={styles.statLabel}>TIME LEFT</Text>
-          <Text style={[styles.statValue, { color: timerColor }]}>
-            {timeLeftSeconds.toFixed(1)}s
+          <Text style={styles.statLabel}>{isTimed ? 'TIME LEFT' : 'MODE'}</Text>
+          <Text style={[styles.statValue, isTimed && { color: timerColor }]}>
+            {isTimed ? `${timeLeftSeconds.toFixed(1)}s` : 'UNTYPED'}
           </Text>
         </View>
       </View>
@@ -129,12 +140,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 6,
+    width: '100%',
   },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   iconButton: {
     width: 38,
@@ -163,7 +175,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 3,
     overflow: 'hidden',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   timerFill: {
     height: '100%',
@@ -172,6 +184,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 6,
     elevation: 3,
+  },
+  survivalBar: {
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  survivalLabel: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: DtwColors.dangerRed,
+    letterSpacing: 2,
   },
   statsRow: {
     flexDirection: 'row',
@@ -212,17 +234,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scoreNumber: {
-    fontSize: 38,
+    fontSize: 36,
     fontWeight: '900',
     color: DtwColors.safeGreen,
     letterSpacing: 1,
-    lineHeight: 42,
+    lineHeight: 40,
     textShadowColor: DtwColors.safeGreen,
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 10,
   },
   scoreSubLabel: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '800',
     color: DtwColors.textSecondary,
     letterSpacing: 2,
@@ -232,7 +254,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
-    marginTop: 10,
+    marginTop: 8,
     paddingHorizontal: 14,
     paddingVertical: 4,
     borderRadius: 16,
@@ -266,3 +288,5 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
+
+export default GameHud;
