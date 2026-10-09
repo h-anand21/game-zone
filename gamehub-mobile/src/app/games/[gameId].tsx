@@ -37,8 +37,8 @@ export default function GameScreen() {
 
   const categoryColor = CATEGORY_COLORS[gameConfig.category] || Colors.primary;
 
-  // Dedicated Full-Screen Experience for Mind Lock, Find One, Number Rush, Reverse Mind, Memory Rush, Pattern Break, Pattern Quest, Path Mind, Aim Rush & One Tap
-  if ((cleanGameId === 'mind-lock' || cleanGameId === 'find-one' || cleanGameId === 'number-rush' || cleanGameId === 'reverse-mind' || cleanGameId === 'memory-rush' || cleanGameId === 'pattern-break' || cleanGameId === 'pattern-quest' || cleanGameId === 'path-mind' || cleanGameId === 'aim-rush' || cleanGameId === 'one-tap') && registeredGame) {
+  // Dedicated Full-Screen Experience for Mind Lock, Find One, Number Rush, Reverse Mind, Memory Rush, Pattern Break, Pattern Quest, Path Mind, Aim Rush, One Tap & Don't Tap Wrong
+  if ((cleanGameId === 'mind-lock' || cleanGameId === 'find-one' || cleanGameId === 'number-rush' || cleanGameId === 'reverse-mind' || cleanGameId === 'memory-rush' || cleanGameId === 'pattern-break' || cleanGameId === 'pattern-quest' || cleanGameId === 'path-mind' || cleanGameId === 'aim-rush' || cleanGameId === 'one-tap' || cleanGameId === 'dont-tap-wrong') && registeredGame) {
     const GameComponent = registeredGame.component;
     return (
       <>
