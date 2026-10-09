@@ -1,6 +1,6 @@
 // ============================================================
 // DON'T TAP WRONG — Full-Screen Cosmic Background Layer
-// Strictly uses authentic cosmic arena platforms without cropping
+// Responsive sci-fi atmosphere with legibility overlay
 // ============================================================
 
 import React from 'react';
@@ -9,7 +9,7 @@ import { dtwAssets } from '../../theme/uiAssets';
 import { DtwColors } from '../../theme/colors';
 
 interface BackgroundLayerProps {
-  variant?: 'splash' | 'main';
+  variant?: 'splash' | 'main' | 'game' | 'lobby';
   dimOverlay?: boolean;
   children?: React.ReactNode;
 }
@@ -41,12 +41,12 @@ const styles = StyleSheet.create({
     backgroundColor: DtwColors.bgMain,
   },
   backgroundImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
   },
   dimOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(8, 11, 16, 0.42)',
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(8, 11, 16, 0.48)',
   },
 });
