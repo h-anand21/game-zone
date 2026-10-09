@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     borderColor: DtwColors.tileBorder,
   },
   contentWrapper: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   safeGlowRim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 14,
     borderWidth: 1.5,
     borderColor: DtwColors.safeGreenHighlight,
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   dangerGlowRim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 14,
     borderWidth: 1.5,
     borderColor: DtwColors.dangerRedHighlight,

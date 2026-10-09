@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   dangerScreenFlash: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(255, 82, 93, 0.45)',
     zIndex: 99,
   },
