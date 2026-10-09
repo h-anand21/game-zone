@@ -95,3 +95,59 @@ export function calculateLevel(xp: number): { level: number; currentXp: number; 
   const currentXp = xp % xpPerLevel;
   return { level, currentXp, nextLevelXp: xpPerLevel };
 }
+
+/**
+ * Evaluates and advances missions & achievements based on player statistics & recent results
+ */
+export function evaluateMissionsAndAchievements(
+  missions: MissionItem[],
+  achievements: AchievementItem[],
+  stats: ReactionStats,
+  lastResult?: RunResult,
+  dailyCompleted = false
+): { updatedMissions: MissionItem[]; updatedAchievements: AchievementItem[] } {
+  const modesPlayed = new Set(stats.recentAttempts.map((a) => a.mode));
+
+  const updatedMissions = missions.map((m) => {
+    let progress = m.progress;
+    let completed = m.completed;
+
+    if (m.id === 'm-play-3') {
+      progress = Math.min(m.target, stats.completedGames);
+      if (progress >= m.target) completed = true;
+    } else if (m.id === 'm-fast-250') {
+      if (stats.bestTimeMs !== null && stats.bestTimeMs <= 250) {
+        progress = 1;
+        completed = true;
+      }
+    } else if (m.id === 'm-try-modes') {
+      progress = Math.min(m.target, modesPlayed.size);
+      if (progress >= m.target) completed = true;
+    } else if (m.id === 'm-five-rounds') {
+      if (lastResult?.mode === 'five-round' && lastResult.totalRoundsCompleted === 5) {
+        progress = 1;
+        completed = true;
+      }
+    }
+
+    return { ...m, progress, completed };
+  });
+
+  const updatedAchievements = achievements.map((ach) => {
+    let unlocked = ach.unlocked;
+
+    if (ach.id === 'ach-sub-200') {
+      if (stats.bestTimeMs !== null && stats.bestTimeMs < 200) unlocked = true;
+    } else if (ach.id === 'ach-sub-250') {
+      if (stats.bestTimeMs !== null && stats.bestTimeMs < 250) unlocked = true;
+    } else if (ach.id === 'ach-50-games') {
+      if (stats.completedGames >= 50) unlocked = true;
+    } else if (ach.id === 'ach-daily-master') {
+      if (dailyCompleted) unlocked = true;
+    }
+
+    return { ...ach, unlocked };
+  });
+
+  return { updatedMissions, updatedAchievements };
+}
