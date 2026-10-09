@@ -9,6 +9,8 @@ export const DtwColors = {
   bgSecondary: '#0E131A',
   bgOverlay: 'rgba(8, 11, 16, 0.85)',
   bgOverlayLight: 'rgba(8, 11, 16, 0.65)',
+  bgCard: '#151C25',
+  bgCardBorder: 'rgba(255, 255, 255, 0.1)',
 
   // Tile surfaces
   tileSurface: '#151C25',

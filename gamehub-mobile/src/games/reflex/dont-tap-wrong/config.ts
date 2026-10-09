@@ -22,7 +22,7 @@ export const DONT_TAP_WRONG_CONFIG: GameConfig = {
     minDuration: 3,
     maxDuration: 180,
   },
-  saveSupport: 'local',
+  saveSupport: 'full',
   description: 'Pure reflex survival! Tap glowing GREEN tiles, avoid lethal RED targets. 20s blitz!',
 };
 

@@ -16,6 +16,7 @@ export type ScreenState =
   | 'daily_challenge';
 
 export type GameModeId = 'classic' | 'rush' | 'survival' | 'daily';
+export type GameMode = GameModeId; // Convenience alias
 
 export interface GameModeConfig {
   id: GameModeId;
@@ -72,12 +73,31 @@ export interface UserProfile {
   lastDailyDate: string;
 }
 
+// Alias for legacy components
+export type PlayerRecord = UserProfile;
+
 export interface GameSettings {
   soundEnabled: boolean;
   musicEnabled: boolean;
   hapticsEnabled: boolean;
   reducedMotion: boolean;
   graphicsQuality: 'high' | 'low';
+}
+
+// Session state during live play
+export interface GameSessionState {
+  mode: GameModeId;
+  score: number;
+  streak: number;
+  bestStreak: number;
+  safeTaps: number;
+  dangerTaps: number;
+  timeRemaining: number;
+  totalDuration: number;
+  tiles: TileItem[];
+  boardRevision: number;
+  isPaused: boolean;
+  isGameOver: boolean;
 }
 
 // Compatibility with GameHub registry & engine
