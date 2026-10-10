@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBar } from '../components/HeaderBar';
 import { ArcadeButton } from '../components/ArcadeButton';
 import { NeonBadge } from '../components/NeonBadge';
@@ -24,6 +25,7 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
   onBack,
   onStartDaily,
 }) => {
+  const insets = useSafeAreaInsets();
   const todayFormatted = new Date().toLocaleDateString(undefined, {
     weekday: 'long',
     month: 'short',
@@ -40,7 +42,13 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
         onBack={onBack}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: Math.max(insets.bottom + 24, 36) },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Date Badge */}
         <View style={styles.dateBadge}>
           <NeonBadge label={todayFormatted.toUpperCase()} color={RfColors.rewardGold} />
@@ -124,7 +132,7 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
   scrollContent: {
     padding: 20,
