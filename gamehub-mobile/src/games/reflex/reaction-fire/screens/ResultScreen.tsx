@@ -5,6 +5,7 @@
 
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArcadeButton } from '../components/ArcadeButton';
 import { NeonBadge } from '../components/NeonBadge';
 import { formatMs } from '../logic/timing';
@@ -30,6 +31,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
   onModeSelect,
   onBackToHome,
 }) => {
+  const insets = useSafeAreaInsets();
   const modeConfig = RF_MODES[result.mode];
   const isEndurance = result.mode === 'endurance';
   const isFiveRound = result.mode === 'five-round';
@@ -46,7 +48,16 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          {
+            paddingTop: Math.max(insets.top + 10, 20),
+            paddingBottom: Math.max(insets.bottom + 24, 36),
+          },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header Mode Badge */}
         <View style={styles.header}>
           <NeonBadge
@@ -202,7 +213,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
   scrollContent: {
     padding: 20,
