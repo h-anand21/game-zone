@@ -125,24 +125,24 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
 
-  // State Backgrounds
+  // State Backgrounds with high-tech translucency over arena backdrop
   arenaWaiting: {
-    backgroundColor: '#07162C',
+    backgroundColor: 'rgba(7, 22, 44, 0.72)',
   },
   arenaGo: {
-    backgroundColor: '#1E3E04',
+    backgroundColor: 'rgba(30, 62, 4, 0.78)',
   },
   arenaTooEarly: {
-    backgroundColor: '#350C12',
+    backgroundColor: 'rgba(53, 12, 18, 0.78)',
   },
   arenaDecoy: {
-    backgroundColor: '#382A02',
+    backgroundColor: 'rgba(56, 42, 2, 0.78)',
   },
   arenaSuccess: {
-    backgroundColor: '#091A26',
+    backgroundColor: 'rgba(9, 26, 38, 0.75)',
   },
 
   centerRadarFrame: {

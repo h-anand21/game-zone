@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { StyleSheet, View, AppState, AppStateStatus } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GameHUD } from '../components/GameHUD';
 import { ReactionArena } from '../components/ReactionArena';
 import { CountdownOverlay } from '../components/CountdownOverlay';
@@ -287,8 +288,10 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     onExitToHome();
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 10) }]}>
       {/* Top Game HUD */}
       <GameHUD
         mode={mode}
@@ -328,7 +331,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
   arenaContainer: {
     flex: 1,
