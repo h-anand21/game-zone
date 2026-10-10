@@ -239,7 +239,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
   header: {
     flexDirection: 'row',
