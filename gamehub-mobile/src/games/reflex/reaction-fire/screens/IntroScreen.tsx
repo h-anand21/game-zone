@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Pressable, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArcadeButton } from '../components/ArcadeButton';
 import { RfColors } from '../theme';
 
@@ -13,6 +14,7 @@ interface IntroScreenProps {
 }
 
 export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [slideIndex, setSlideIndex] = useState(0);
 

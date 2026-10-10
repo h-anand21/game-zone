@@ -5,6 +5,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, Text, View, Animated, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Line, Path } from 'react-native-svg';
 import { RfColors } from '../theme';
 
@@ -13,6 +14,7 @@ interface SplashScreenProps {
 }
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [progress, setProgress] = useState(0);
   const pulseAnim = useRef(new Animated.Value(0.95)).current;
@@ -70,7 +72,15 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
   });
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: Math.max(insets.top + 16, 40),
+          paddingBottom: Math.max(insets.bottom + 20, 40),
+        },
+      ]}
+    >
       <View style={styles.topSpacer} />
 
       {/* Center Insignia */}
@@ -130,10 +140,9 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 48,
     paddingHorizontal: 24,
   },
   topSpacer: {
