@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBar } from '../components/HeaderBar';
 import { ReactionArena } from '../components/ReactionArena';
 import { ArcadeButton } from '../components/ArcadeButton';
