@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBar } from '../components/HeaderBar';
 import { MissionCard } from '../components/MissionCard';
 import { calculateLevel } from '../logic/missions';
@@ -26,6 +27,7 @@ export const MissionsRewardsScreen: React.FC<MissionsRewardsScreenProps> = ({
   onClaimReward,
   onBack,
 }) => {
+  const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<'missions' | 'achievements'>('missions');
   const { level, currentXp, nextLevelXp } = calculateLevel(stats.xp);
   const xpPercent = Math.min(100, Math.round((currentXp / nextLevelXp) * 100));
@@ -38,7 +40,13 @@ export const MissionsRewardsScreen: React.FC<MissionsRewardsScreenProps> = ({
         onBack={onBack}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: Math.max(insets.bottom + 20, 32) },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Level Progression Banner */}
         <View style={styles.levelCard}>
           <View style={styles.levelHeader}>
@@ -120,7 +128,7 @@ export const MissionsRewardsScreen: React.FC<MissionsRewardsScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
   scrollContent: {
     padding: 16,
