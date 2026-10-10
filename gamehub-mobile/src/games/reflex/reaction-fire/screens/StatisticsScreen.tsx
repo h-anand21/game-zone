@@ -142,7 +142,7 @@ export const StatisticsScreen: React.FC<StatisticsScreenProps> = ({ stats, onBac
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
   scrollContent: {
     padding: 16,
