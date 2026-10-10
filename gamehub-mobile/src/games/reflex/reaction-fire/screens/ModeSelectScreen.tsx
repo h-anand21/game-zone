@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBar } from '../components/HeaderBar';
 import { ModeCard } from '../components/ModeCard';
 import { ArcadeButton } from '../components/ArcadeButton';
@@ -23,6 +24,7 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
   onSelectMode,
   onOpenPractice,
 }) => {
+  const insets = useSafeAreaInsets();
   const modes: GameModeId[] = ['classic', 'five-round', 'endurance', 'fakeout'];
 
   return (
@@ -33,7 +35,13 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
         onBack={onBack}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollList,
+          { paddingBottom: Math.max(insets.bottom + 20, 32) },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {modes.map((modeId) => (
           <ModeCard
             key={modeId}
@@ -61,7 +69,7 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
   scrollList: {
     padding: 16,

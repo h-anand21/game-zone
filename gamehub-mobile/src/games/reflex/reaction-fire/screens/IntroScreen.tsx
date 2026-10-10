@@ -78,7 +78,15 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: Math.max(insets.top + 16, 36),
+          paddingBottom: Math.max(insets.bottom + 16, 32),
+        },
+      ]}
+    >
       {/* Top Skip Control */}
       <View style={styles.topBar}>
         <Text style={styles.stepCounter}>{`0${slideIndex + 1} / 03`}</Text>
@@ -134,9 +142,8 @@ export const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
     justifyContent: 'space-between',
-    paddingVertical: 40,
     paddingHorizontal: 24,
   },
   topBar: {
