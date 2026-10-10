@@ -26,6 +26,8 @@ import { createInitialDailyState, DEFAULT_DAILY_CHALLENGE } from './logic/dailyC
 import { INITIAL_MISSIONS, INITIAL_ACHIEVEMENTS, evaluateMissionsAndAchievements } from './logic/missions';
 import { RfAudio } from './audio/audioManager';
 import { RfHaptics } from './haptics/hapticManager';
+import { BackgroundLayer } from './components/BackgroundLayer';
+import type { RfBgVariant } from './theme/backgrounds';
 
 // Screens
 import { SplashScreen } from './screens/SplashScreen';
@@ -273,131 +275,149 @@ export const ReactionFireMasterGame: React.FC<ReactionFireMasterGameProps> = ({ 
   };
 
   // Screen View Switcher
+  const getBgVariant = (): RfBgVariant => {
+    switch (currentScreen) {
+      case 'home':
+        return 'home';
+      case 'gameplay':
+        return 'gameplay';
+      case 'practice-arena':
+        return 'practice';
+      default:
+        return 'other';
+    }
+  };
+
   return (
-    <View style={styles.root}>
-      {/* 01: SPLASH SCREEN */}
-      {currentScreen === 'splash' && (
-        <SplashScreen onComplete={handleSplashComplete} />
-      )}
+    <BackgroundLayer
+      variant={getBgVariant()}
+      overlayDarkness={currentScreen === 'gameplay' ? 0.35 : 0.45}
+    >
+      <View style={styles.root}>
+        {/* 01: SPLASH SCREEN */}
+        {currentScreen === 'splash' && (
+          <SplashScreen onComplete={handleSplashComplete} />
+        )}
 
-      {/* 02: FIRST LAUNCH / INTRO */}
-      {currentScreen === 'intro' && (
-        <IntroScreen onComplete={handleIntroComplete} />
-      )}
+        {/* 02: FIRST LAUNCH / INTRO */}
+        {currentScreen === 'intro' && (
+          <IntroScreen onComplete={handleIntroComplete} />
+        )}
 
-      {/* 03: HOME */}
-      {currentScreen === 'home' && (
-        <HomeScreen
-          stats={stats}
-          soundEnabled={settings.soundEnabled}
-          onToggleSound={handleToggleSound}
-          onPlayMode={handlePlayMode}
-          onOpenModeSelect={() => setCurrentScreen('mode-select')}
-          onOpenDaily={() => setCurrentScreen('daily-challenge')}
-          onOpenHowToPlay={() => setCurrentScreen('how-to-play')}
-          onOpenPractice={() => setCurrentScreen('practice-arena')}
-          onOpenMissions={() => setCurrentScreen('missions')}
-          onOpenStats={() => setCurrentScreen('statistics')}
-          onOpenSettings={() => setCurrentScreen('settings')}
-          onExitToHub={onExit}
-        />
-      )}
+        {/* 03: HOME */}
+        {currentScreen === 'home' && (
+          <HomeScreen
+            stats={stats}
+            soundEnabled={settings.soundEnabled}
+            onToggleSound={handleToggleSound}
+            onPlayMode={handlePlayMode}
+            onOpenModeSelect={() => setCurrentScreen('mode-select')}
+            onOpenDaily={() => setCurrentScreen('daily-challenge')}
+            onOpenHowToPlay={() => setCurrentScreen('how-to-play')}
+            onOpenPractice={() => setCurrentScreen('practice-arena')}
+            onOpenMissions={() => setCurrentScreen('missions')}
+            onOpenStats={() => setCurrentScreen('statistics')}
+            onOpenSettings={() => setCurrentScreen('settings')}
+            onExitToHub={onExit}
+          />
+        )}
 
-      {/* 04: MODE SELECT */}
-      {currentScreen === 'mode-select' && (
-        <ModeSelectScreen
-          onBack={() => setCurrentScreen('home')}
-          onSelectMode={handlePlayMode}
-          onOpenPractice={() => setCurrentScreen('practice-arena')}
-        />
-      )}
+        {/* 04: MODE SELECT */}
+        {currentScreen === 'mode-select' && (
+          <ModeSelectScreen
+            onBack={() => setCurrentScreen('home')}
+            onSelectMode={handlePlayMode}
+            onOpenPractice={() => setCurrentScreen('practice-arena')}
+          />
+        )}
 
-      {/* 05: HOW TO PLAY */}
-      {currentScreen === 'how-to-play' && (
-        <HowToPlayScreen
-          onBack={() => setCurrentScreen('home')}
-          onOpenPractice={() => setCurrentScreen('practice-arena')}
-          onStartClassic={() => handlePlayMode('classic')}
-        />
-      )}
+        {/* 05: HOW TO PLAY */}
+        {currentScreen === 'how-to-play' && (
+          <HowToPlayScreen
+            onBack={() => setCurrentScreen('home')}
+            onOpenPractice={() => setCurrentScreen('practice-arena')}
+            onStartClassic={() => handlePlayMode('classic')}
+          />
+        )}
 
-      {/* 06: PRACTICE ARENA */}
-      {currentScreen === 'practice-arena' && (
-        <PracticeArenaScreen
-          onBack={() => setCurrentScreen('home')}
-          onLaunchClassic={() => handlePlayMode('classic')}
-        />
-      )}
+        {/* 06: PRACTICE ARENA */}
+        {currentScreen === 'practice-arena' && (
+          <PracticeArenaScreen
+            onBack={() => setCurrentScreen('home')}
+            onLaunchClassic={() => handlePlayMode('classic')}
+          />
+        )}
 
-      {/* 07: GAMEPLAY ARENA */}
-      {currentScreen === 'gameplay' && (
-        <GameplayScreen
-          mode={activeMode}
-          previousBestMs={getActiveModePreviousBest()}
-          onGameOver={handleGameOver}
-          onExitToHome={() => setCurrentScreen('home')}
-        />
-      )}
+        {/* 07: GAMEPLAY ARENA */}
+        {currentScreen === 'gameplay' && (
+          <GameplayScreen
+            mode={activeMode}
+            previousBestMs={getActiveModePreviousBest()}
+            onGameOver={handleGameOver}
+            onExitToHome={() => setCurrentScreen('home')}
+          />
+        )}
 
-      {/* 08: RESULTS SCREEN */}
-      {currentScreen === 'results' && lastResult && (
-        <ResultScreen
-          result={lastResult}
-          previousBestMs={getActiveModePreviousBest()}
-          onPlayAgain={() => setCurrentScreen('gameplay')}
-          onModeSelect={() => setCurrentScreen('mode-select')}
-          onBackToHome={() => setCurrentScreen('home')}
-        />
-      )}
+        {/* 08: RESULTS SCREEN */}
+        {currentScreen === 'results' && lastResult && (
+          <ResultScreen
+            result={lastResult}
+            previousBestMs={getActiveModePreviousBest()}
+            onPlayAgain={() => setCurrentScreen('gameplay')}
+            onModeSelect={() => setCurrentScreen('mode-select')}
+            onBackToHome={() => setCurrentScreen('home')}
+          />
+        )}
 
-      {/* 09: DAILY CHALLENGE */}
-      {currentScreen === 'daily-challenge' && (
-        <DailyChallengeScreen
-          dailyState={dailyState}
-          onBack={() => setCurrentScreen('home')}
-          onStartDaily={handleStartDaily}
-        />
-      )}
+        {/* 09: DAILY CHALLENGE */}
+        {currentScreen === 'daily-challenge' && (
+          <DailyChallengeScreen
+            dailyState={dailyState}
+            onBack={() => setCurrentScreen('home')}
+            onStartDaily={handleStartDaily}
+          />
+        )}
 
-      {/* 10: MISSIONS & REWARDS */}
-      {currentScreen === 'missions' && (
-        <MissionsRewardsScreen
-          stats={stats}
-          missions={missions}
-          achievements={achievements}
-          onClaimReward={handleClaimMissionReward}
-          onBack={() => setCurrentScreen('home')}
-        />
-      )}
+        {/* 10: MISSIONS & REWARDS */}
+        {currentScreen === 'missions' && (
+          <MissionsRewardsScreen
+            stats={stats}
+            missions={missions}
+            achievements={achievements}
+            onClaimReward={handleClaimMissionReward}
+            onBack={() => setCurrentScreen('home')}
+          />
+        )}
 
-      {/* 11: STATISTICS & PROGRESS */}
-      {currentScreen === 'statistics' && (
-        <StatisticsScreen
-          stats={stats}
-          onBack={() => setCurrentScreen('home')}
-        />
-      )}
+        {/* 11: STATISTICS & PROGRESS */}
+        {currentScreen === 'statistics' && (
+          <StatisticsScreen
+            stats={stats}
+            onBack={() => setCurrentScreen('home')}
+          />
+        )}
 
-      {/* 12: SETTINGS */}
-      {currentScreen === 'settings' && (
-        <SettingsScreen
-          settings={settings}
-          onUpdateSettings={handleUpdateSettings}
-          onReplayIntro={() => {
-            setIsReplayingIntro(true);
-            setCurrentScreen('intro');
-          }}
-          onResetData={handleResetData}
-          onBack={() => setCurrentScreen('home')}
-        />
-      )}
-    </View>
+        {/* 12: SETTINGS */}
+        {currentScreen === 'settings' && (
+          <SettingsScreen
+            settings={settings}
+            onUpdateSettings={handleUpdateSettings}
+            onReplayIntro={() => {
+              setIsReplayingIntro(true);
+              setCurrentScreen('intro');
+            }}
+            onResetData={handleResetData}
+            onBack={() => setCurrentScreen('home')}
+          />
+        )}
+      </View>
+    </BackgroundLayer>
   );
 };
 
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: RfColors.background,
+    backgroundColor: 'transparent',
   },
 });
