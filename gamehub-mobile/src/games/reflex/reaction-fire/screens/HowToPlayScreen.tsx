@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { HeaderBar } from '../components/HeaderBar';
 import { ArcadeButton } from '../components/ArcadeButton';
@@ -21,6 +22,7 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({
   onOpenPractice,
   onStartClassic,
 }) => {
+  const insets = useSafeAreaInsets();
   const sections = [
     {
       num: '01',
@@ -78,7 +80,13 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({
         onBack={onBack}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollList,
+          { paddingBottom: Math.max(insets.bottom + 20, 32) },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {sections.map((sec) => (
           <View key={sec.num} style={[styles.card, { borderColor: sec.color }]}>
             <View style={styles.cardHeader}>
@@ -147,7 +155,7 @@ export const HowToPlayScreen: React.FC<HowToPlayScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
   scrollList: {
     padding: 16,
