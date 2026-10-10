@@ -5,6 +5,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { StyleSheet, Text, View, Pressable, ScrollView, Animated } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { ArcadeButton } from '../components/ArcadeButton';
 import { RfColors } from '../theme';
@@ -40,6 +41,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onOpenSettings,
   onExitToHub,
 }) => {
+  const insets = useSafeAreaInsets();
   const radarSpin = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   return (
     <View style={styles.container}>
       {/* Top Header Bar */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, 12) }]}>
         <Pressable onPress={onOpenSettings} style={styles.headerBtn}>
           <Text style={styles.headerBtnIcon}>⚙️</Text>
         </Pressable>
@@ -74,7 +76,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: Math.max(insets.bottom + 20, 32) },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Title Block */}
         <View style={styles.titleArea}>
           <Text style={styles.titlePrefix}>REFLEX ARENA</Text>
