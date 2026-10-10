@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NeonBadge } from './NeonBadge';
 import { RfColors } from '../theme';
 import type { GameModeId } from '../types';
@@ -27,11 +28,12 @@ export const GameHUD: React.FC<GameHUDProps> = ({
   personalBestMs,
   onPause,
 }) => {
+  const insets = useSafeAreaInsets();
   const modeConfig = RF_MODES[mode];
   const isEndurance = mode === 'endurance';
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 12) }]}>
       <View style={styles.topRow}>
         {/* Left: Mode Badge */}
         <NeonBadge
