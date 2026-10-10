@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { HeaderBar } from '../components/HeaderBar';
 import { TrendChart } from '../components/TrendChart';
 import { DistributionChart } from '../components/DistributionChart';
@@ -19,6 +20,7 @@ interface StatisticsScreenProps {
 }
 
 export const StatisticsScreen: React.FC<StatisticsScreenProps> = ({ stats, onBack }) => {
+  const insets = useSafeAreaInsets();
   const validTimes = stats.recentAttempts
     .filter((a) => a.reactionTimeMs !== null && a.status === 'success')
     .map((a) => a.reactionTimeMs!);
@@ -34,7 +36,13 @@ export const StatisticsScreen: React.FC<StatisticsScreenProps> = ({ stats, onBac
         onBack={onBack}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: Math.max(insets.bottom + 20, 32) },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Core Overview Card */}
         <View style={styles.overviewCard}>
           <Text style={styles.sectionTitle}>🏆 OVERVIEW BENCHMARKS</Text>
