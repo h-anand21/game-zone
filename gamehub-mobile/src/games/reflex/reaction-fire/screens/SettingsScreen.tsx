@@ -26,6 +26,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onResetData,
   onBack,
 }) => {
+  const insets = useSafeAreaInsets();
   const [local, setLocal] = useState<ReactionSettings>(settings);
 
   const update = <K extends keyof ReactionSettings>(key: K, val: ReactionSettings[K]) => {
@@ -60,7 +61,13 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         onBack={onBack}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollList,
+          { paddingBottom: Math.max(insets.bottom + 24, 36) },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Audio Toggles */}
         <View style={styles.sectionCard}>
           <Text style={styles.sectionTitle}>🔊 AUDIO & SOUND</Text>
@@ -159,7 +166,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
   scrollList: {
     padding: 16,
