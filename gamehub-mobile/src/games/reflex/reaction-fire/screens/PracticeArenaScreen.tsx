@@ -27,6 +27,7 @@ export const PracticeArenaScreen: React.FC<PracticeArenaScreenProps> = ({
   onBack,
   onLaunchClassic,
 }) => {
+  const insets = useSafeAreaInsets();
   const [attempt, setAttempt] = useState(1);
   const [state, setState] = useState<GameplayState>('countdown');
   const [lastMs, setLastMs] = useState<number | null>(null);
@@ -130,7 +131,7 @@ export const PracticeArenaScreen: React.FC<PracticeArenaScreenProps> = ({
             lastClassification={lastClass}
           />
         ) : (
-          <View style={styles.completedCard}>
+          <View style={[styles.completedCard, { paddingBottom: Math.max(insets.bottom + 16, 24) }]}>
             <Text style={styles.trophyIcon}>🏆</Text>
             <Text style={styles.completedTitle}>PRACTICE COMPLETE!</Text>
             <Text style={styles.completedSub}>
@@ -168,7 +169,7 @@ export const PracticeArenaScreen: React.FC<PracticeArenaScreenProps> = ({
 
       {/* Bottom Guidance */}
       {!completed && (
-        <View style={styles.footerGuidance}>
+        <View style={[styles.footerGuidance, { paddingBottom: Math.max(insets.bottom + 12, 20) }]}>
           <Text style={styles.guidanceText}>
             💡 Practice reactions are unranked. Focus on pure visual reaction!
           </Text>
@@ -181,7 +182,7 @@ export const PracticeArenaScreen: React.FC<PracticeArenaScreenProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: RfColors.bgMain,
+    backgroundColor: 'transparent',
   },
   statusStrip: {
     flexDirection: 'row',
