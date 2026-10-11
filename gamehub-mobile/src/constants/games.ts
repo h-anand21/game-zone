@@ -65,6 +65,13 @@ export const GAME_REGISTRY: GameConfig[] = [
     validation: { maxScore: 10000, minDuration: 3, maxDuration: 300 },
     saveSupport: 'none', description: 'Memorize and trace the path',
   },
+  {
+    id: 'arrow-kingdom', name: 'Arrow Kingdom: Slide Escape', category: 'brain',
+    offline: true, multiplayer: false, route: '/games/arrow-kingdom',
+    icon: '🏹', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
+    validation: { maxScore: 50000, minDuration: 2, maxDuration: 1200 },
+    saveSupport: 'background', description: 'Slide neon bent arrows off the kingdom board without hitting blockers',
+  },
 
   // ── Reflex / Skill Games (6) ────────────────────────────────
   {

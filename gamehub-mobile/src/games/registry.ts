@@ -32,6 +32,9 @@ import { PatternQuestGame } from './brain/pattern-quest/Game';
 import { PATH_MIND_CONFIG } from './brain/path-mind/config';
 import { PathMindGame } from './brain/path-mind/Game';
 
+import { ARROW_KINGDOM_CONFIG } from './brain/arrow-kingdom/config';
+import { ArrowKingdomGame } from './brain/arrow-kingdom/Game';
+
 // ── 2. Reflex / Skill Games (6) ─────────────────────────────
 import { AIM_RUSH_CONFIG } from './reflex/aim-rush/config';
 import { AimRushGame } from './reflex/aim-rush/Game';
@@ -137,6 +140,7 @@ export const GAME_COMPONENT_REGISTRY: Record<string, GameRegistryEntry> = {
   'pattern-break': { config: PATTERN_BREAK_CONFIG, component: PatternBreakGame },
   'pattern-quest': { config: PATTERN_QUEST_CONFIG, component: PatternQuestGame },
   'path-mind': { config: PATH_MIND_CONFIG, component: PathMindGame },
+  'arrow-kingdom': { config: ARROW_KINGDOM_CONFIG, component: ArrowKingdomGame },
 
   // Reflex
   'aim-rush': { config: AIM_RUSH_CONFIG, component: AimRushGame },

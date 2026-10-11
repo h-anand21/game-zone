@@ -11,7 +11,7 @@ import { COLORS } from '../constants/colors';
 import { FantasyBackground } from '../components/ui/FantasyBackground';
 import { WoodHeader } from '../components/ui/WoodHeader';
 import { CurrencyBar } from '../components/ui/CurrencyBar';
-import { StarsDisplay } from '../ui/StarsDisplay';
+import { StarsDisplay } from '../components/ui/StarsDisplay';
 import { useGameStore } from '../store/gameStore';
 import { LEVELS } from '../data/levels';
 import { ArrowHaptics } from '../utils/haptics';

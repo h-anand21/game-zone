@@ -1,12 +1,12 @@
 // ============================================================
 // ARROW KINGDOM: SLIDE ESCAPE — Neon Arrow Component
 // Quadruple-pass SVG stroke rendering with glowing arrowhead,
-// interactive touch scaling, blocked shake, and slide-out escape
+// PanResponder physical drag response, blocked shake, and slide-out escape
 // ============================================================
 
 import React, { useRef, useEffect } from 'react';
-import { StyleSheet, Animated, Pressable } from 'react-native';
-import Svg, { Path, Polygon, Circle } from 'react-native-svg';
+import { StyleSheet, Animated, PanResponder, View } from 'react-native';
+import Svg, { Path, Polygon } from 'react-native-svg';
 import type { ArrowPieceData, Cell, Direction } from '../../game/types';
 import { ArrowHaptics } from '../../utils/haptics';
 
@@ -117,6 +117,68 @@ export const ArrowPiece: React.FC<Props> = ({
     }
   }, [isHinted, scaleAnim]);
 
+  // Touch & Swipe PanResponder
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => !disabled && !piece.removed && !isEscaping,
+      onMoveShouldSetPanResponder: () => !disabled && !piece.removed && !isEscaping,
+      onPanResponderGrant: () => {
+        ArrowHaptics.touch();
+        Animated.spring(scaleAnim, {
+          toValue: 1.05,
+          useNativeDriver: true,
+          speed: 60,
+          bounciness: 0,
+        }).start();
+      },
+      onPanResponderMove: (_, gestureState) => {
+        // Follow finger slightly along valid arrow axis (max 15px)
+        const maxNudge = 15;
+        if (piece.direction === 'right') {
+          translateX.setValue(Math.max(0, Math.min(maxNudge, gestureState.dx)));
+        } else if (piece.direction === 'left') {
+          translateX.setValue(Math.min(0, Math.max(-maxNudge, gestureState.dx)));
+        } else if (piece.direction === 'down') {
+          translateY.setValue(Math.max(0, Math.min(maxNudge, gestureState.dy)));
+        } else if (piece.direction === 'up') {
+          translateY.setValue(Math.min(0, Math.max(-maxNudge, gestureState.dy)));
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          useNativeDriver: true,
+          speed: 40,
+          bounciness: 8,
+        }).start();
+
+        const threshold = 8;
+        const isTap = Math.abs(gestureState.dx) < 6 && Math.abs(gestureState.dy) < 6;
+        const isSwipeRight = piece.direction === 'right' && gestureState.dx >= threshold;
+        const isSwipeLeft = piece.direction === 'left' && gestureState.dx <= -threshold;
+        const isSwipeDown = piece.direction === 'down' && gestureState.dy >= threshold;
+        const isSwipeUp = piece.direction === 'up' && gestureState.dy <= -threshold;
+
+        if (isTap || isSwipeRight || isSwipeLeft || isSwipeDown || isSwipeUp) {
+          onPress(piece);
+        } else {
+          // Snap back
+          Animated.parallel([
+            Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
+            Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
+          ]).start();
+        }
+      },
+      onPanResponderTerminate: () => {
+        Animated.parallel([
+          Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }),
+          Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
+          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
+        ]).start();
+      },
+    })
+  ).current;
+
   if (piece.removed && !isEscaping) {
     return null;
   }
@@ -127,30 +189,9 @@ export const ArrowPiece: React.FC<Props> = ({
 
   const displayColor = isBlocked ? '#FF4655' : piece.color;
 
-  const handlePressIn = () => {
-    if (disabled) return;
-    ArrowHaptics.touch();
-    Animated.spring(scaleAnim, {
-      toValue: 1.05,
-      useNativeDriver: true,
-      speed: 60,
-      bounciness: 0,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    if (disabled) return;
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 40,
-      bounciness: 8,
-    }).start();
-  };
-
   return (
     <Animated.View
-      pointerEvents={disabled ? 'none' : 'box-none'}
+      {...panResponder.panHandlers}
       style={[
         StyleSheet.absoluteFill,
         {
@@ -163,59 +204,51 @@ export const ArrowPiece: React.FC<Props> = ({
         },
       ]}
     >
-      <Pressable
-        onPress={() => onPress(piece)}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        disabled={disabled || piece.removed}
-        style={StyleSheet.absoluteFill}
-      >
-        <Svg style={StyleSheet.absoluteFill} pointerEvents="none">
-          {/* Layer 1: Dark Outer Drop Shadow */}
-          <Path
-            d={path}
-            stroke="rgba(0, 0, 0, 0.75)"
-            strokeWidth={18}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-          <Polygon points={headPoints} fill="rgba(0, 0, 0, 0.75)" stroke="rgba(0, 0, 0, 0.75)" strokeWidth={6} />
+      <Svg style={StyleSheet.absoluteFill} pointerEvents="none">
+        {/* Layer 1: Dark Outer Drop Shadow */}
+        <Path
+          d={path}
+          stroke="rgba(0, 0, 0, 0.75)"
+          strokeWidth={18}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <Polygon points={headPoints} fill="rgba(0, 0, 0, 0.75)" stroke="rgba(0, 0, 0, 0.75)" strokeWidth={6} />
 
-          {/* Layer 2: Wide Soft Neon Glow */}
-          <Path
-            d={path}
-            stroke={displayColor}
-            strokeOpacity={0.35}
-            strokeWidth={22}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-          <Polygon points={headPoints} fill={displayColor} opacity={0.35} stroke={displayColor} strokeWidth={8} />
+        {/* Layer 2: Wide Soft Neon Glow */}
+        <Path
+          d={path}
+          stroke={displayColor}
+          strokeOpacity={0.35}
+          strokeWidth={22}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <Polygon points={headPoints} fill={displayColor} opacity={0.35} stroke={displayColor} strokeWidth={8} />
 
-          {/* Layer 3: Solid Saturated Neon Body */}
-          <Path
-            d={path}
-            stroke={displayColor}
-            strokeWidth={12}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-          <Polygon points={headPoints} fill={displayColor} stroke={displayColor} strokeWidth={2} strokeLinejoin="round" />
+        {/* Layer 3: Solid Saturated Neon Body */}
+        <Path
+          d={path}
+          stroke={displayColor}
+          strokeWidth={12}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <Polygon points={headPoints} fill={displayColor} stroke={displayColor} strokeWidth={2} strokeLinejoin="round" />
 
-          {/* Layer 4: Thin Bright White Core Highlight */}
-          <Path
-            d={path}
-            stroke="rgba(255, 255, 255, 0.55)"
-            strokeWidth={3.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-        </Svg>
-      </Pressable>
+        {/* Layer 4: Thin Bright White Core Highlight */}
+        <Path
+          d={path}
+          stroke="rgba(255, 255, 255, 0.55)"
+          strokeWidth={3.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </Svg>
     </Animated.View>
   );
 };
