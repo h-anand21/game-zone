@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, Pressable, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/common/BackgroundLayer';
 import { HeaderBar } from '../components/common/HeaderBar';
 import { NeonBadge } from '../components/common/NeonBadge';
@@ -21,6 +22,7 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
   onBack,
   onSelectMode,
 }) => {
+  const insets = useSafeAreaInsets();
   const modes = Object.values(DTW_MODES);
 
   return (
@@ -32,7 +34,13 @@ export const ModeSelectScreen: React.FC<ModeSelectScreenProps> = ({
           onBack={onBack}
         />
 
-        <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollList,
+            { paddingBottom: Math.max(insets.bottom + 20, 32) },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
           {modes.map((mode) => {
             const isClassic = mode.id === 'classic';
 

@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Alert } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/common/BackgroundLayer';
 import { HeaderBar } from '../components/common/HeaderBar';
 import { TileGrid } from '../components/game/TileGrid';
@@ -25,6 +26,7 @@ export const PracticeScreen: React.FC<PracticeScreenProps> = ({
   onBack,
   onStartRealGame,
 }) => {
+  const insets = useSafeAreaInsets();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [boardTiles, setBoardTiles] = useState<TileItem[]>(() => generatePracticeBoard(1));
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -70,7 +72,7 @@ export const PracticeScreen: React.FC<PracticeScreenProps> = ({
 
   return (
     <BackgroundLayer variant="game">
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: Math.max(insets.bottom + 16, 24) }]}>
         <HeaderBar
           title="PRACTICE DEMO"
           subtitle={`STEP ${step} OF 3`}

@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { StyleSheet, Text, View, Animated, AppState, AppStateStatus } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/common/BackgroundLayer';
 import { GameHud } from '../components/game/GameHud';
 import { TileGrid } from '../components/game/TileGrid';
@@ -274,6 +275,8 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     onExitToHome();
   };
 
+  const insets = useSafeAreaInsets();
+
   return (
     <BackgroundLayer variant="game">
       {/* Danger Screen Flash Overlay */}
@@ -287,7 +290,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
         ]}
       />
 
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 16) }]}>
         {/* Heads Up Display */}
         <GameHud
           score={score}

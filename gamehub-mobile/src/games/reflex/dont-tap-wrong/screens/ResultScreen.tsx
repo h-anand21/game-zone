@@ -5,6 +5,7 @@
 
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/common/BackgroundLayer';
 import { ArcadeButton } from '../components/common/ArcadeButton';
 import { NeonBadge } from '../components/common/NeonBadge';
@@ -29,6 +30,7 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
   onPlayAgain,
   onBackToHome,
 }) => {
+  const insets = useSafeAreaInsets();
   const modeConfig = DTW_MODES[telemetry.mode];
   const gradeInfo = getGradeForScore(telemetry.score, telemetry.mode);
 
@@ -51,7 +53,16 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
   return (
     <BackgroundLayer variant="game">
       <View style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            {
+              paddingTop: Math.max(insets.top + 16, 28),
+              paddingBottom: Math.max(insets.bottom + 24, 36),
+            },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Header Mode & Status */}
           <View style={styles.header}>
             <NeonBadge

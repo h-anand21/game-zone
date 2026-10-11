@@ -4,8 +4,10 @@
 // ============================================================
 
 import React, { useEffect, useState, useRef } from 'react';
-import { StyleSheet, Text, View, Animated, useWindowDimensions } from 'react-native';
+import { StyleSheet, Text, View, Animated, useWindowDimensions, Image } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/common/BackgroundLayer';
+import { dtwAssets } from '../theme/uiAssets';
 import { DtwColors } from '../theme/colors';
 
 interface SplashScreenProps {
@@ -13,6 +15,7 @@ interface SplashScreenProps {
 }
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [progress, setProgress] = useState(0);
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -72,36 +75,28 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onComplete }) => {
 
   return (
     <BackgroundLayer variant="splash">
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: Math.max(insets.top + 16, 40),
+            paddingBottom: Math.max(insets.bottom + 20, 40),
+          },
+        ]}
+      >
         {/* Top spacer */}
         <View style={styles.topSpacer} />
 
         {/* Center Hero Insignia */}
         <Animated.View style={[styles.heroWrapper, { transform: [{ scale: pulseAnim }] }]}>
-          {/* Mini 3x3 Tile Logo Symbol */}
-          <View style={styles.miniGrid}>
-            {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
-              const isSafe = i === 4; // Center tile is green
-              const isDanger = i === 1 || i === 7;
-              return (
-                <View
-                  key={i}
-                  style={[
-                    styles.miniTile,
-                    isSafe && styles.miniSafeTile,
-                    isDanger && styles.miniDangerTile,
-                  ]}
-                >
-                  {isSafe && <Text style={styles.miniTileSymbol}>✓</Text>}
-                  {isDanger && <Text style={styles.miniTileDangerSymbol}>✕</Text>}
-                </View>
-              );
-            })}
-          </View>
+          {/* Neon Arcade Emblem */}
+          <Image
+            source={dtwAssets.logos.splashEmblem}
+            style={[styles.splashEmblemImage, { width: Math.min(width - 48, 280) }]}
+            resizeMode="contain"
+          />
 
           <Text style={styles.categoryBadge}>REFLEX • RECOGNITION • SURVIVAL</Text>
-          <Text style={styles.mainTitle}>DON'T TAP</Text>
-          <Text style={styles.subTitle}>WRONG</Text>
           <View style={styles.dividerLine} />
           <Text style={styles.tagline}>20s BLITZ • SPEED CHALLENGE</Text>
         </Animated.View>
@@ -123,14 +118,17 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 48,
     paddingHorizontal: 24,
   },
   topSpacer: {
-    height: 30,
+    height: 10,
   },
   heroWrapper: {
     alignItems: 'center',
+  },
+  splashEmblemImage: {
+    height: 180,
+    marginBottom: 12,
   },
   miniGrid: {
     width: 108,

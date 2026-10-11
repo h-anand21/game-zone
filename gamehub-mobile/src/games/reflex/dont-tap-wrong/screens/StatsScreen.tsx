@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/common/BackgroundLayer';
 import { HeaderBar } from '../components/common/HeaderBar';
 import { DtwColors } from '../theme/colors';
@@ -17,6 +18,7 @@ interface StatsScreenProps {
 }
 
 export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => {
+  const insets = useSafeAreaInsets();
   const lifetimeAccuracy = calculateAccuracy(profile.totalSafeTaps, profile.totalDangerTaps);
   const minutesPlayed = Math.round(profile.totalTimePlayedSeconds / 60);
 
@@ -29,7 +31,13 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ profile, onBack }) => 
           onBack={onBack}
         />
 
-        <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollList,
+            { paddingBottom: Math.max(insets.bottom + 20, 32) },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
           {/* High Scores Arena Card */}
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>🏆 HIGH SCORE RECORDS</Text>

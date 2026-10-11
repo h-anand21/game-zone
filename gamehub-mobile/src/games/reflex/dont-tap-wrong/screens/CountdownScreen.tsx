@@ -5,6 +5,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { StyleSheet, Text, View, Animated } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/common/BackgroundLayer';
 import { DtwColors } from '../theme/colors';
 import { DtwHaptics } from '../haptics/hapticManager';
@@ -21,6 +22,7 @@ export const CountdownScreen: React.FC<CountdownScreenProps> = ({
   modeId,
   onCountdownComplete,
 }) => {
+  const insets = useSafeAreaInsets();
   const [stage, setStage] = useState<'READY' | '3' | '2' | '1' | 'GO!'>('READY');
   const scaleAnim = useRef(new Animated.Value(0.4)).current;
   const ringScale = useRef(new Animated.Value(0.8)).current;
@@ -100,7 +102,15 @@ export const CountdownScreen: React.FC<CountdownScreenProps> = ({
 
   return (
     <BackgroundLayer variant="game">
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          {
+            paddingTop: Math.max(insets.top + 20, 48),
+            paddingBottom: Math.max(insets.bottom + 16, 36),
+          },
+        ]}
+      >
         {/* Top Mode Label */}
         <View style={styles.topHeader}>
           <Text style={styles.modePrefix}>DEPLOYING TO</Text>
@@ -155,7 +165,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 50,
+    paddingHorizontal: 20,
   },
   topHeader: {
     alignItems: 'center',

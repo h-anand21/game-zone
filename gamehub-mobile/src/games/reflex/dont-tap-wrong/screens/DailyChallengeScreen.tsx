@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/common/BackgroundLayer';
 import { HeaderBar } from '../components/common/HeaderBar';
 import { ArcadeButton } from '../components/common/ArcadeButton';
@@ -24,6 +25,7 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
   onBack,
   onStartDaily,
 }) => {
+  const insets = useSafeAreaInsets();
   const todayStr = new Date().toLocaleDateString(undefined, {
     weekday: 'long',
     month: 'short',
@@ -39,7 +41,13 @@ export const DailyChallengeScreen: React.FC<DailyChallengeScreenProps> = ({
           onBack={onBack}
         />
 
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: Math.max(insets.bottom + 24, 36) },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Calendar Badge */}
           <View style={styles.dateBadge}>
             <NeonBadge label={todayStr.toUpperCase()} color={DtwColors.streakGold} />

@@ -4,11 +4,13 @@
 // ============================================================
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Pressable, ScrollView, useWindowDimensions } from 'react-native';
+import { StyleSheet, Text, View, Pressable, ScrollView, useWindowDimensions, Image } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/common/BackgroundLayer';
 import { ArcadeButton } from '../components/common/ArcadeButton';
 import { DtwColors } from '../theme/colors';
 import { DtwAudio } from '../audio/audioManager';
+import { dtwAssets } from '../theme/uiAssets';
 import type { UserProfile, GameModeId } from '../types';
 
 interface HomeScreenProps {
@@ -38,6 +40,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onOpenSettings,
   onExitToHub,
 }) => {
+  const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
 
   // Idle animation for the 3x3 hero preview (cycles the safe green position)
@@ -54,7 +57,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     <BackgroundLayer variant="lobby">
       <View style={styles.container}>
         {/* Top Header Bar */}
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: Math.max(insets.top, 12) }]}>
           <Pressable onPress={onOpenSettings} style={styles.headerBtn}>
             <Text style={styles.headerBtnIcon}>⚙️</Text>
           </Pressable>
@@ -69,14 +72,20 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </View>
 
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            { paddingBottom: Math.max(insets.bottom + 20, 36) },
+          ]}
           showsVerticalScrollIndicator={false}
         >
           {/* Title Area */}
           <View style={styles.titleArea}>
+            <Image
+              source={dtwAssets.logos.homeLogo}
+              style={[styles.homeLogoImage, { width: Math.min(width - 40, 290) }]}
+              resizeMode="contain"
+            />
             <Text style={styles.subtitlePrefix}>REFLEX • RECOGNITION • SURVIVAL</Text>
-            <Text style={styles.mainTitle}>DON'T TAP</Text>
-            <Text style={styles.dangerTitle}>WRONG</Text>
           </View>
 
           {/* Quick Stats Strip */}
@@ -256,6 +265,10 @@ const styles = StyleSheet.create({
   titleArea: {
     alignItems: 'center',
     marginVertical: 10,
+  },
+  homeLogoImage: {
+    height: 72,
+    marginBottom: 6,
   },
   subtitlePrefix: {
     fontSize: 10,
