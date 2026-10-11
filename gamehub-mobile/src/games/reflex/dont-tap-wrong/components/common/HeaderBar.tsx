@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DtwColors } from '../../theme/colors';
 
 interface HeaderBarProps {
@@ -20,8 +21,10 @@ export const HeaderBar: React.FC<HeaderBarProps> = ({
   onBack,
   rightAction,
 }) => {
+  const insets = useSafeAreaInsets();
+
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: Math.max(insets.top, 12) }]}>
       <Pressable onPress={onBack} style={styles.backButton}>
         <Text style={styles.backArrow}>←</Text>
         <Text style={styles.backLabel}>BACK</Text>
@@ -47,7 +50,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingBottom: 12,
+    backgroundColor: 'rgba(8, 11, 16, 0.65)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },

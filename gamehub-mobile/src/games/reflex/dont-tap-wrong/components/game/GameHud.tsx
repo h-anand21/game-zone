@@ -5,6 +5,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, View, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { DtwColors } from '../../theme/colors';
 import { NeonBadge } from '../common/NeonBadge';
 import type { GameModeId } from '../../types';
@@ -30,6 +31,7 @@ export const GameHud: React.FC<GameHudProps> = ({
   onPause,
   onExit,
 }) => {
+  const insets = useSafeAreaInsets();
   const isTimed = totalTimeSeconds > 0;
   const timeProgress = isTimed ? Math.max(0, Math.min(1, timeLeftSeconds / totalTimeSeconds)) : 1;
   const isTimeCritical = isTimed && timeLeftSeconds <= 5;
@@ -42,7 +44,7 @@ export const GameHud: React.FC<GameHudProps> = ({
     : DtwColors.safeGreen;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: Math.max(insets.top, 12) }]}>
       {/* Top action row */}
       <View style={styles.topRow}>
         <Pressable onPress={onExit} style={styles.iconButton}>
