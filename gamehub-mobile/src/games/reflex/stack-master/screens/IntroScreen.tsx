@@ -8,7 +8,7 @@ import { StyleSheet, View, Text, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenBackground } from '../components/ui/ScreenBackground';
-import { PrimaryButton } from '../ui/PrimaryButton';
+import { PrimaryButton } from '../components/ui/PrimaryButton';
 import { COLORS } from '../theme/colors';
 import { StackHaptics } from '../utils/haptics';
 

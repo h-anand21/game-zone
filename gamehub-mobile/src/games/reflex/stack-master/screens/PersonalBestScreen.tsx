@@ -15,10 +15,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenBackground } from '../components/ui/ScreenBackground';
-import { PrimaryButton } from '../ui/PrimaryButton';
-import { SecondaryButton } from '../ui/SecondaryButton';
+import { PrimaryButton } from '../components/ui/PrimaryButton';
+import { SecondaryButton } from '../components/ui/SecondaryButton';
 import { COLORS } from '../theme/colors';
-import { StackHaptics } from '../../utils/haptics';
+import { StackHaptics } from '../utils/haptics';
 import type { RunRecord } from '../types';
 
 interface PersonalBestScreenProps {

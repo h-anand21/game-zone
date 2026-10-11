@@ -9,8 +9,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenBackground } from '../components/ui/ScreenBackground';
 import { GameHeader } from '../components/ui/GameHeader';
-import { PrimaryButton } from '../ui/PrimaryButton';
-import { SecondaryButton } from '../ui/SecondaryButton';
+import { PrimaryButton } from '../components/ui/PrimaryButton';
+import { SecondaryButton } from '../components/ui/SecondaryButton';
 import { COLORS } from '../theme/colors';
 import type { RunRecord } from '../types';
 
