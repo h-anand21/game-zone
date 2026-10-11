@@ -10,6 +10,7 @@ import { useGameStore } from './store/gameStore';
 import { SplashScreen } from './screens/SplashScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { WorldMapScreen } from './screens/WorldMapScreen';
+import { LevelSelectScreen } from './screens/LevelSelectScreen';
 import { GameplayScreen } from './screens/GameplayScreen';
 import { DailyPuzzleScreen } from './screens/DailyPuzzleScreen';
 import { ThemesScreen } from './screens/ThemesScreen';
