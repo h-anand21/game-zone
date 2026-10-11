@@ -1,115 +1,193 @@
 // ============================================================
-// GameHub — Stack Master Component
+// STACK MASTER — Master Game Coordinator & Screen Navigator
+// Implements full 16-screen flow, persistence & GameHub lifecycle
 // ============================================================
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
-import { getBlockColor } from './logic';
-import type { StackBlock } from './types';
+import { StyleSheet, View } from 'react-native';
+import { useStackStore } from './store/stackStore';
+import { SplashScreen } from './screens/SplashScreen';
+import { IntroScreen } from './screens/IntroScreen';
+import { HomeScreen } from './screens/HomeScreen';
+import { ModeSelectScreen } from './screens/ModeSelectScreen';
+import { TutorialScreen } from './screens/TutorialScreen';
+import { TowerThemesScreen } from './screens/TowerThemesScreen';
+import { GameplayScreen } from './screens/GameplayScreen';
+import { ResultsScreen } from './screens/ResultsScreen';
+import { PersonalBestScreen } from './screens/PersonalBestScreen';
+import { StatsScreen } from './screens/StatsScreen';
+import { DailyChallengeScreen } from './screens/DailyChallengeScreen';
+import { CollectionScreen } from './screens/CollectionScreen';
+import { ProfileScreen } from './screens/ProfileScreen';
+import { SettingsScreen } from './screens/SettingsScreen';
+import { RunBreakdownScreen } from './screens/RunBreakdownScreen';
+import type { ScreenId, GameMode, RunRecord } from './types';
 import type { GameEngine } from '../../engine/GameEngine';
 
-interface StackMasterProps {
-  engine: GameEngine;
-  onFinish: (score: number, won: boolean, metadata?: Record<string, unknown>) => void;
-  isPaused: boolean;
+interface StackMasterGameProps {
+  engine?: GameEngine;
+  onFinish?: (score: number, won: boolean, metadata?: Record<string, unknown>) => void;
+  isPaused?: boolean;
 }
 
-export const StackMasterGame: React.FC<StackMasterProps> = ({ onFinish, isPaused }) => {
-  const [blocks, setBlocks] = useState<StackBlock[]>([
-    { id: 1, x: 25, width: 50, color: getBlockColor(0) },
-  ]);
-  const [currX, setCurrX] = useState(0);
-  const [direction, setDirection] = useState<1 | -1>(1);
-  const [currWidth, setCurrWidth] = useState(50);
+export const StackMasterGame: React.FC<StackMasterGameProps> = ({ onFinish }) => {
+  const [currentScreen, setCurrentScreen] = useState<ScreenId>('splash');
+  const [selectedMode, setSelectedMode] = useState<GameMode>('classic');
+  const [activeRunRecord, setActiveRunRecord] = useState<RunRecord | null>(null);
 
+  const loadState = useStackStore((state) => state.loadState);
+  const introCompleted = useStackStore((state) => state.introCompleted);
+  const completeIntro = useStackStore((state) => state.completeIntro);
+
+  // Load persistent progress on mount
   useEffect(() => {
-    if (isPaused) return;
+    loadState();
+  }, [loadState]);
 
-    const speed = 1.5 + Math.min(4, blocks.length * 0.2);
-    const timer = setInterval(() => {
-      setCurrX((prev) => {
-        let next = prev + direction * speed;
-        if (next + currWidth >= 100) {
-          next = 100 - currWidth;
-          setDirection(-1);
-        } else if (next <= 0) {
-          next = 0;
-          setDirection(1);
-        }
-        return next;
-      });
-    }, 16);
+  const navigateTo = (screen: ScreenId) => {
+    setCurrentScreen(screen);
+  };
 
-    return () => clearInterval(timer);
-  }, [isPaused, direction, currWidth, blocks.length]);
-
-  const handlePlaceBlock = () => {
-    if (isPaused) return;
-
-    const topBlock = blocks[blocks.length - 1];
-    const leftOverlap = Math.max(currX, topBlock.x);
-    const rightOverlap = Math.min(currX + currWidth, topBlock.x + topBlock.width);
-    const newWidth = rightOverlap - leftOverlap;
-
-    if (newWidth <= 0) {
-      // Complete miss! Game Over
-      const finalScore = blocks.length - 1;
-      onFinish(finalScore, finalScore >= 10, { towerHeight: finalScore });
-      return;
+  const handleSplashFinish = () => {
+    if (!introCompleted) {
+      setCurrentScreen('intro');
+    } else {
+      setCurrentScreen('home');
     }
+  };
 
-    const newBlock: StackBlock = {
-      id: blocks.length + 1,
-      x: leftOverlap,
-      width: newWidth,
-      color: getBlockColor(blocks.length),
-    };
+  const handleIntroComplete = () => {
+    completeIntro();
+    setCurrentScreen('home');
+  };
 
-    setBlocks([...blocks, newBlock]);
-    setCurrWidth(newWidth);
-    setCurrX(0);
-    setDirection(1);
+  const handleStartMode = (mode: GameMode) => {
+    setSelectedMode(mode);
+    setCurrentScreen('gameplay');
+  };
+
+  const handleFinishRun = (run: RunRecord, isNewBest: boolean) => {
+    setActiveRunRecord(run);
+    if (isNewBest) {
+      setCurrentScreen('personal-best');
+    } else {
+      setCurrentScreen('results');
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Header Info */}
-      <View style={styles.infoCard}>
-        <Text style={styles.scoreText}>Blocks Stacked: {blocks.length - 1}</Text>
-      </View>
+      {/* 01: Splash Screen */}
+      {currentScreen === 'splash' && (
+        <SplashScreen onFinish={handleSplashFinish} />
+      )}
 
-      {/* Tower Viewport */}
-      <Pressable style={styles.viewport} onPress={handlePlaceBlock}>
-        {/* Moving active block on top */}
-        <View
-          style={[
-            styles.block,
-            {
-              bottom: blocks.length * 28 + 10,
-              left: `${currX}%`,
-              width: `${currWidth}%`,
-              backgroundColor: getBlockColor(blocks.length),
-            },
-          ]}
+      {/* 02: First Launch Intro */}
+      {currentScreen === 'intro' && (
+        <IntroScreen onComplete={handleIntroComplete} />
+      )}
+
+      {/* 03: Game Home */}
+      {currentScreen === 'home' && (
+        <HomeScreen
+          onNavigate={navigateTo}
+          onPlayClassic={() => handleStartMode('classic')}
+          onExitGame={() => {
+            if (onFinish) {
+              onFinish(0, false);
+            }
+          }}
         />
+      )}
 
-        {/* Placed blocks in tower */}
-        {blocks.map((blk, idx) => (
-          <View
-            key={blk.id}
-            style={[
-              styles.block,
-              {
-                bottom: idx * 28 + 10,
-                left: `${blk.x}%`,
-                width: `${blk.width}%`,
-                backgroundColor: blk.color,
-              },
-            ]}
-          />
-        ))}
-      </Pressable>
+      {/* 04: Mode Select */}
+      {currentScreen === 'mode-select' && (
+        <ModeSelectScreen
+          onBack={() => navigateTo('home')}
+          onSelectMode={handleStartMode}
+        />
+      )}
+
+      {/* 05: Tutorial */}
+      {currentScreen === 'tutorial' && (
+        <TutorialScreen
+          onBack={() => navigateTo('home')}
+          onStartPlaying={() => handleStartMode('classic')}
+        />
+      )}
+
+      {/* 06: Tower Themes */}
+      {currentScreen === 'tower-themes' && (
+        <TowerThemesScreen onBack={() => navigateTo('home')} />
+      )}
+
+      {/* 07: Active Gameplay Arena (includes 08: Pause Modal) */}
+      {currentScreen === 'gameplay' && (
+        <GameplayScreen
+          mode={selectedMode}
+          onFinishRun={handleFinishRun}
+          onExitHome={() => navigateTo('home')}
+          onOpenSettings={() => navigateTo('settings')}
+        />
+      )}
+
+      {/* 09: Results Screen */}
+      {currentScreen === 'results' && activeRunRecord && (
+        <ResultsScreen
+          run={activeRunRecord}
+          onPlayAgain={() => handleStartMode(selectedMode)}
+          onViewBreakdown={() => navigateTo('run-breakdown')}
+          onHome={() => navigateTo('home')}
+        />
+      )}
+
+      {/* 10: New Personal Best Screen */}
+      {currentScreen === 'personal-best' && activeRunRecord && (
+        <PersonalBestScreen
+          run={activeRunRecord}
+          onPlayAgain={() => handleStartMode(selectedMode)}
+          onViewBreakdown={() => navigateTo('run-breakdown')}
+          onHome={() => navigateTo('home')}
+        />
+      )}
+
+      {/* 11: Stats & Performance */}
+      {currentScreen === 'stats' && (
+        <StatsScreen onBack={() => navigateTo('home')} />
+      )}
+
+      {/* 12: Daily Challenge & Missions */}
+      {currentScreen === 'daily-challenge' && (
+        <DailyChallengeScreen
+          onBack={() => navigateTo('home')}
+          onPlayDaily={() => handleStartMode('daily')}
+        />
+      )}
+
+      {/* 13: Block Collection */}
+      {currentScreen === 'collection' && (
+        <CollectionScreen onBack={() => navigateTo('home')} />
+      )}
+
+      {/* 14: Player Profile & Achievements */}
+      {currentScreen === 'profile' && (
+        <ProfileScreen onBack={() => navigateTo('home')} />
+      )}
+
+      {/* 15: Settings */}
+      {currentScreen === 'settings' && (
+        <SettingsScreen onBack={() => navigateTo('home')} />
+      )}
+
+      {/* 16: Run Breakdown */}
+      {currentScreen === 'run-breakdown' && activeRunRecord && (
+        <RunBreakdownScreen
+          run={activeRunRecord}
+          onPlayAgain={() => handleStartMode(selectedMode)}
+          onBackToResults={() => navigateTo('results')}
+          onHome={() => navigateTo('home')}
+        />
+      )}
     </View>
   );
 };
@@ -117,41 +195,8 @@ export const StackMasterGame: React.FC<StackMasterProps> = ({ onFinish, isPaused
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    padding: Spacing.md,
-    justifyContent: 'space-between',
-  },
-  infoCard: {
-    width: '100%',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  scoreText: {
-    fontSize: Typography.h3,
-    color: Colors.primary,
-    fontWeight: Typography.bold,
-  },
-  viewport: {
-    width: '100%',
-    flex: 1,
-    maxHeight: 450,
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.xxl,
-    position: 'relative',
-    borderWidth: 1,
-    borderColor: Colors.border,
-    overflow: 'hidden',
-    ...Shadows.md,
-  },
-  block: {
-    position: 'absolute',
-    height: 24,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: '#071329',
   },
 });
+
+export default StackMasterGame;

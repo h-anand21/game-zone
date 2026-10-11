@@ -75,7 +75,7 @@ export interface TowerTheme {
   accentColor: string;
   unlocked: boolean;
   unlockRequirement: string;
-  bgKey: 'gameplayBg' | 'homeBg' | 'sunriseBg';
+  bgKey: 'gameplay' | 'home' | 'sunrise';
 }
 
 export interface BlockCosmetic {

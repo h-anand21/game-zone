@@ -15,7 +15,7 @@ export const TOWER_THEMES: TowerTheme[] = [
     accentColor: '#FF48C8',
     unlocked: true,
     unlockRequirement: 'Default theme',
-    bgKey: 'gameplayBg',
+    bgKey: 'gameplay',
   },
   {
     id: 'nature-wood',
@@ -26,7 +26,7 @@ export const TOWER_THEMES: TowerTheme[] = [
     accentColor: '#10B981',
     unlocked: true,
     unlockRequirement: 'Reach Height 10',
-    bgKey: 'sunriseBg',
+    bgKey: 'sunrise',
   },
   {
     id: 'ice-world',
@@ -37,7 +37,7 @@ export const TOWER_THEMES: TowerTheme[] = [
     accentColor: '#0284C7',
     unlocked: false,
     unlockRequirement: 'Reach Height 25',
-    bgKey: 'homeBg',
+    bgKey: 'home',
   },
   {
     id: 'sunset',
@@ -48,7 +48,7 @@ export const TOWER_THEMES: TowerTheme[] = [
     accentColor: '#F43F5E',
     unlocked: false,
     unlockRequirement: 'Reach Height 40',
-    bgKey: 'sunriseBg',
+    bgKey: 'sunrise',
   },
   {
     id: 'galaxy',
@@ -59,7 +59,7 @@ export const TOWER_THEMES: TowerTheme[] = [
     accentColor: '#818CF8',
     unlocked: false,
     unlockRequirement: 'Earn 1000 Total Score',
-    bgKey: 'gameplayBg',
+    bgKey: 'gameplay',
   },
   {
     id: 'stone-temple',
@@ -70,7 +70,7 @@ export const TOWER_THEMES: TowerTheme[] = [
     accentColor: '#64748B',
     unlocked: false,
     unlockRequirement: 'Complete 10 Runs',
-    bgKey: 'homeBg',
+    bgKey: 'home',
   },
   {
     id: 'golden-royal',
@@ -81,7 +81,7 @@ export const TOWER_THEMES: TowerTheme[] = [
     accentColor: '#F59E0B',
     unlocked: false,
     unlockRequirement: 'Achieve 10 Combo Streak',
-    bgKey: 'gameplayBg',
+    bgKey: 'gameplay',
   },
   {
     id: 'mystic',
@@ -92,6 +92,6 @@ export const TOWER_THEMES: TowerTheme[] = [
     accentColor: '#9165FF',
     unlocked: false,
     unlockRequirement: 'Reach Level 5',
-    bgKey: 'homeBg',
+    bgKey: 'home',
   },
 ];
