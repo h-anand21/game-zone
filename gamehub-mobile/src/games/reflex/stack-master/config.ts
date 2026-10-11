@@ -20,6 +20,6 @@ export const STACK_MASTER_CONFIG: GameConfig = {
     minDuration: 3,
     maxDuration: 1800,
   },
-  saveSupport: 'local',
+  saveSupport: 'full',
   description: 'Precision 3D fantasy stacking arcade. Time your drops, slice the overhangs, and climb the skylands spires!',
 };

@@ -43,7 +43,7 @@ export const ScreenBackground: React.FC<ScreenBackgroundProps> = ({
             `rgba(7, 19, 41, ${dimAmount})`,
             `rgba(7, 19, 41, ${Math.min(dimAmount + 0.35, 0.9)})`,
           ]}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
 
         {children}
