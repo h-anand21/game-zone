@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Switch, Alert, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BackgroundLayer } from '../components/common/BackgroundLayer';
 import { HeaderBar } from '../components/common/HeaderBar';
 import { ArcadeButton } from '../components/common/ArcadeButton';
@@ -24,6 +25,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   onResetData,
   onBack,
 }) => {
+  const insets = useSafeAreaInsets();
   const [localSettings, setLocalSettings] = useState<GameSettings>(settings);
 
   const updateField = <K extends keyof GameSettings>(field: K, value: GameSettings[K]) => {
@@ -59,7 +61,13 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           onBack={onBack}
         />
 
-        <ScrollView contentContainerStyle={styles.scrollList} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.scrollList,
+            { paddingBottom: Math.max(insets.bottom + 24, 36) },
+          ]}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Audio Section */}
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>🔊 AUDIO & SOUND</Text>

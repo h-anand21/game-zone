@@ -27,6 +27,11 @@ export const GameTile: React.FC<GameTileProps> = React.memo(({
   const isDanger = tile.type === 'danger';
   const isEmpty = tile.type === 'empty';
 
+  const badgeSize = Math.max(26, Math.min(38, Math.floor(size * 0.4)));
+  const symbolSize = Math.max(16, Math.min(24, Math.floor(badgeSize * 0.58)));
+  const labelSize = Math.max(9, Math.min(11, Math.floor(size * 0.11)));
+  const tileRadius = Math.max(12, Math.min(18, Math.floor(size * 0.18)));
+
   const handlePressIn = () => {
     if (disabled || isEmpty) return;
     Animated.spring(scaleAnim, {
@@ -58,6 +63,7 @@ export const GameTile: React.FC<GameTileProps> = React.memo(({
         {
           width: size,
           height: size,
+          borderRadius: tileRadius,
           transform: [{ scale: scaleAnim }],
         },
       ]}
@@ -69,6 +75,7 @@ export const GameTile: React.FC<GameTileProps> = React.memo(({
         disabled={disabled || isEmpty}
         style={[
           styles.pressableSurface,
+          { borderRadius: tileRadius },
           isSafe && styles.safeTileSurface,
           isDanger && styles.dangerTileSurface,
           isEmpty && styles.emptyTileSurface,
@@ -77,29 +84,78 @@ export const GameTile: React.FC<GameTileProps> = React.memo(({
         {/* Safe Green Tile Content */}
         {isSafe && (
           <View style={styles.contentWrapper}>
-            <View style={styles.safeGlowRim} />
-            <View style={styles.safeBadge}>
-              <Text style={styles.safeSymbol}>✓</Text>
+            <View style={[styles.safeGlowRim, { borderRadius: tileRadius - 2 }]} />
+            <View
+              style={[
+                styles.safeBadge,
+                {
+                  width: badgeSize,
+                  height: badgeSize,
+                  borderRadius: badgeSize / 2,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.safeSymbol,
+                  {
+                    fontSize: symbolSize,
+                    lineHeight: symbolSize + 3,
+                  },
+                ]}
+              >
+                ✓
+              </Text>
             </View>
-            <Text style={styles.safeLabel}>TAP</Text>
+            <Text style={[styles.safeLabel, { fontSize: labelSize }]}>TAP</Text>
           </View>
         )}
 
         {/* Danger Red Tile Content */}
         {isDanger && (
           <View style={styles.contentWrapper}>
-            <View style={styles.dangerGlowRim} />
-            <View style={styles.dangerBadge}>
-              <Text style={styles.dangerSymbol}>✕</Text>
+            <View style={[styles.dangerGlowRim, { borderRadius: tileRadius - 2 }]} />
+            <View
+              style={[
+                styles.dangerBadge,
+                {
+                  width: badgeSize,
+                  height: badgeSize,
+                  borderRadius: badgeSize / 2,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.dangerSymbol,
+                  {
+                    fontSize: symbolSize,
+                    lineHeight: symbolSize + 3,
+                  },
+                ]}
+              >
+                ✕
+              </Text>
             </View>
-            <Text style={styles.dangerLabel}>AVOID</Text>
+            <Text style={[styles.dangerLabel, { fontSize: labelSize }]}>AVOID</Text>
           </View>
         )}
 
         {/* Empty Tile Content */}
         {isEmpty && (
           <View style={styles.contentWrapper}>
-            <View style={styles.emptyCenterDot} />
+            <View
+              style={[
+                styles.emptyReticle,
+                {
+                  width: Math.floor(size * 0.28),
+                  height: Math.floor(size * 0.28),
+                  borderRadius: Math.floor(size * 0.14),
+                },
+              ]}
+            >
+              <View style={styles.emptyCenterDot} />
+            </View>
           </View>
         )}
       </Pressable>
@@ -111,14 +167,12 @@ GameTile.displayName = 'GameTile';
 
 const styles = StyleSheet.create({
   tileContainer: {
-    margin: 4,
-    borderRadius: 16,
+    margin: 0,
     overflow: 'hidden',
   },
   pressableSurface: {
     width: '100%',
     height: '100%',
-    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
@@ -142,15 +196,11 @@ const styles = StyleSheet.create({
   },
   safeGlowRim: {
     ...StyleSheet.absoluteFill,
-    borderRadius: 14,
     borderWidth: 1.5,
     borderColor: DtwColors.safeGreenHighlight,
     opacity: 0.7,
   },
   safeBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
     backgroundColor: DtwColors.safeGreen,
     justifyContent: 'center',
     alignItems: 'center',
@@ -161,17 +211,14 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   safeSymbol: {
-    fontSize: 22,
     fontWeight: '900',
     color: '#0A1702',
-    lineHeight: 24,
   },
   safeLabel: {
-    fontSize: 10,
     fontWeight: '900',
     color: DtwColors.safeGreen,
     letterSpacing: 1.5,
-    marginTop: 4,
+    marginTop: 3,
   },
 
   // Danger Red State
@@ -186,15 +233,11 @@ const styles = StyleSheet.create({
   },
   dangerGlowRim: {
     ...StyleSheet.absoluteFill,
-    borderRadius: 14,
     borderWidth: 1.5,
     borderColor: DtwColors.dangerRedHighlight,
     opacity: 0.7,
   },
   dangerBadge: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
     backgroundColor: DtwColors.dangerRed,
     justifyContent: 'center',
     alignItems: 'center',
@@ -205,29 +248,33 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   dangerSymbol: {
-    fontSize: 20,
     fontWeight: '900',
     color: '#FFFFFF',
-    lineHeight: 22,
   },
   dangerLabel: {
-    fontSize: 10,
     fontWeight: '900',
     color: DtwColors.dangerRedHighlight,
     letterSpacing: 1.5,
-    marginTop: 4,
+    marginTop: 3,
   },
 
   // Empty Idle State
   emptyTileSurface: {
-    backgroundColor: 'rgba(21, 28, 37, 0.75)',
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: 'rgba(21, 28, 37, 0.78)',
+    borderColor: 'rgba(66, 217, 255, 0.18)',
+  },
+  emptyReticle: {
+    borderWidth: 1,
+    borderColor: 'rgba(66, 217, 255, 0.25)',
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   emptyCenterDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(66, 217, 255, 0.5)',
   },
 });
 

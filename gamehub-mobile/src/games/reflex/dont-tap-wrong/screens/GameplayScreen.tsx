@@ -303,42 +303,44 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
           onExit={handleExitRequest}
         />
 
-        {/* Floating Streak Banner Popup */}
-        {streakBanner && (
-          <Animated.View
-            style={[
-              styles.streakBannerContainer,
-              {
-                transform: [{ scale: streakAnim }],
-                opacity: streakAnim,
-              },
-            ]}
-          >
-            <Text style={styles.streakBannerText}>{streakBanner}</Text>
-          </Animated.View>
-        )}
-
-        {/* Floating +1 Score Popup */}
-        {scorePopup && (
-          <Animated.View
-            style={[
-              styles.scorePopupContainer,
-              {
-                opacity: popupAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
-                transform: [
-                  {
-                    translateY: popupAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -36] }),
-                  },
-                ],
-              },
-            ]}
-          >
-            <Text style={styles.scorePopupText}>{scorePopup}</Text>
-          </Animated.View>
-        )}
-
         {/* Dominant 3x3 Tile Grid */}
         <View style={styles.gridContainer}>
+          {/* Floating Streak Banner Popup */}
+          {streakBanner && (
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.streakBannerContainer,
+                {
+                  transform: [{ scale: streakAnim }],
+                  opacity: streakAnim,
+                },
+              ]}
+            >
+              <Text style={styles.streakBannerText}>{streakBanner}</Text>
+            </Animated.View>
+          )}
+
+          {/* Floating +1 Score Popup */}
+          {scorePopup && (
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.scorePopupContainer,
+                {
+                  opacity: popupAnim.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
+                  transform: [
+                    {
+                      translateY: popupAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -36] }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              <Text style={styles.scorePopupText}>{scorePopup}</Text>
+            </Animated.View>
+          )}
+
           <TileGrid
             tiles={board.tiles}
             onTilePress={handleTilePress}
@@ -392,7 +394,7 @@ const styles = StyleSheet.create({
   },
   scorePopupContainer: {
     position: 'absolute',
-    top: 130,
+    top: 4,
     alignSelf: 'center',
     zIndex: 20,
   },
@@ -406,9 +408,9 @@ const styles = StyleSheet.create({
   },
   streakBannerContainer: {
     position: 'absolute',
-    top: 120,
+    top: -16,
     alignSelf: 'center',
-    backgroundColor: 'rgba(255, 214, 90, 0.2)',
+    backgroundColor: 'rgba(255, 214, 90, 0.25)',
     borderWidth: 1.5,
     borderColor: DtwColors.streakGold,
     paddingHorizontal: 20,

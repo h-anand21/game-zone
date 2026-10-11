@@ -47,8 +47,8 @@ export const GameHud: React.FC<GameHudProps> = ({
     <View style={[styles.container, { paddingTop: Math.max(insets.top, 12) }]}>
       {/* Top action row */}
       <View style={styles.topRow}>
-        <Pressable onPress={onExit} style={styles.iconButton}>
-          <Text style={styles.iconButtonText}>✕</Text>
+        <Pressable onPress={onExit} style={styles.iconButton} accessibilityLabel="Exit Game">
+          <Text style={styles.iconButtonText}>←</Text>
         </Pressable>
 
         <View style={styles.badgeRow}>
