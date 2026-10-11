@@ -17,6 +17,7 @@ import { BottomControls } from '../components/game/BottomControls';
 import { PauseModal } from '../components/ui/PauseModal';
 import { LevelCompleteModal } from '../components/ui/LevelCompleteModal';
 import { RewardChestModal } from '../components/ui/RewardChestModal';
+import { OutOfHeartsModal } from '../components/ui/OutOfHeartsModal';
 import { useGameStore } from '../store/gameStore';
 import { ArrowHaptics } from '../utils/haptics';
 import { ArrowAudio } from '../utils/sound';
@@ -63,6 +64,8 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
   const [showPause, setShowPause] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
   const [showChest, setShowChest] = useState(false);
+  const [showOutOfHearts, setShowOutOfHearts] = useState(false);
+  const [levelHearts, setLevelHearts] = useState(3);
   const [finalStars, setFinalStars] = useState(3);
 
   // Re-initialize when level changes
@@ -71,10 +74,12 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     const target = LEVELS.find((l) => l.id === levelId) || LEVELS[0];
     setPieces(JSON.parse(JSON.stringify(target.pieces)));
     setMoves(0);
+    setLevelHearts(3);
     setHistory([]);
     setShowPause(false);
     setShowComplete(false);
     setShowChest(false);
+    setShowOutOfHearts(false);
     setBlockedPieceId(null);
     setEscapingPieceId(null);
     setHintedPieceId(null);
@@ -84,10 +89,12 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
   const handleRestart = useCallback(() => {
     setPieces(JSON.parse(JSON.stringify(levelData.pieces)));
     setMoves(0);
+    setLevelHearts(3);
     setHistory([]);
     setShowPause(false);
     setShowComplete(false);
     setShowChest(false);
+    setShowOutOfHearts(false);
     setBlockedPieceId(null);
     setEscapingPieceId(null);
     setHintedPieceId(null);
@@ -96,17 +103,26 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
   // Arrow Tap / Drag Handler
   const handlePiecePress = useCallback(
     (pressedPiece: ArrowPieceData) => {
-      if (escapingPieceId || showComplete || showPause) return;
+      if (escapingPieceId || showComplete || showPause || showOutOfHearts) return;
 
       const result = attemptMove(pressedPiece, pieces, levelData.rows, levelData.cols);
 
       if (result.type === 'blocked') {
         // Trigger blocked shake & error flash
+        const nextHearts = Math.max(0, levelHearts - 1);
+        setLevelHearts(nextHearts);
         setBlockedPieceId(pressedPiece.id);
         ArrowAudio.playBlocked();
+        ArrowHaptics.blocked();
         setTimeout(() => {
           setBlockedPieceId(null);
         }, 320);
+
+        if (nextHearts === 0) {
+          setTimeout(() => {
+            setShowOutOfHearts(true);
+          }, 400);
+        }
         return;
       }
 
@@ -200,7 +216,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
           levelName={levelData.name}
           moves={moves}
           targetMoves={levelData.threeStarMoves}
-          hearts={hearts}
+          hearts={levelHearts}
           remainingPieces={getRemainingCount(pieces)}
           onPause={() => setShowPause(true)}
           onRestart={handleRestart}
@@ -225,7 +241,8 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
             hintedPieceId={hintedPieceId}
             theme={activeTheme}
             showTutorialHand={levelData.id === 1 && moves === 0}
-            disabled={showPause || showComplete || showChest}
+            disabled={showPause || showComplete || showChest || showOutOfHearts}
+            hiddenSymbol={levelData.hiddenSymbol}
           />
         </View>
 
@@ -277,6 +294,13 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
             setShowChest(false);
             setShowComplete(true);
           }}
+        />
+
+        {/* Out of Hearts Modal */}
+        <OutOfHeartsModal
+          visible={showOutOfHearts}
+          onRestart={handleRestart}
+          onExitHome={onExitHome}
         />
       </View>
     </FantasyBackground>

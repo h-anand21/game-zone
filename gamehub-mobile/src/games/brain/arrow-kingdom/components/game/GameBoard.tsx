@@ -21,6 +21,7 @@ interface GameBoardProps {
   theme: ThemeConfig;
   showTutorialHand?: boolean;
   disabled?: boolean;
+  hiddenSymbol?: string;
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({
@@ -34,6 +35,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   theme,
   showTutorialHand = false,
   disabled = false,
+  hiddenSymbol,
 }) => {
   const { width, height } = useWindowDimensions();
 
@@ -108,6 +110,15 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           />
         </Svg>
 
+        {/* Hidden Kingdom Rune / Symbol underneath arrows */}
+        {hiddenSymbol && (
+          <View style={styles.hiddenSymbolBox} pointerEvents="none">
+            <Text style={[styles.hiddenSymbolEmoji, { fontSize: boardSize * 0.44 }]}>
+              {hiddenSymbol}
+            </Text>
+          </View>
+        )}
+
         {/* All Arrow Pieces */}
         {pieces.map((piece) => (
           <ArrowPiece
@@ -177,6 +188,19 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '900',
     letterSpacing: 1,
+  },
+  hiddenSymbolBox: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0.28,
+  },
+  hiddenSymbolEmoji: {
+    textAlign: 'center',
   },
 });
 

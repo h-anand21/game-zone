@@ -32,6 +32,7 @@ export interface GameLevel {
     gems?: number;
   };
   tutorialText?: string;
+  hiddenSymbol?: string;
 }
 
 export type ThemeId = 'neon' | 'forest' | 'ocean' | 'galaxy' | 'candy' | 'lava';

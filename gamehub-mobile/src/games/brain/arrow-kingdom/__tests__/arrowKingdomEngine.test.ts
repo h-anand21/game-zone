@@ -3,7 +3,7 @@
 // Verifies collision detection, ray-casting escape, star scoring & hint solver
 // ============================================================
 
-import { attemptMove, isLevelComplete, calculateStars, getHint, getRemainingCount } from '../game/engine';
+import { attemptMove, isLevelComplete, calculateStars, getHint, getRemainingCount, canExitBoard } from '../game/engine';
 import { getOccupiedCells, vectors } from '../game/collision';
 import { LEVELS } from '../data/levels';
 import type { ArrowPieceData } from '../game/types';
@@ -63,11 +63,9 @@ describe('Arrow Kingdom: Slide Escape — Game Engine & Logic', () => {
 
   test('calculateStars: awards 3, 2, or 1 star based on move thresholds', () => {
     const level1 = LEVELS[0];
-    expect(calculateStars(2, level1)).toBe(3);
-    expect(calculateStars(3, level1)).toBe(2);
-    expect(calculateStars(4, level1)).toBe(2);
-    expect(calculateStars(5, level1)).toBe(1);
-    expect(calculateStars(10, level1)).toBe(1);
+    expect(calculateStars(level1.threeStarMoves, level1)).toBe(3);
+    expect(calculateStars(level1.twoStarMoves, level1)).toBe(2);
+    expect(calculateStars(level1.twoStarMoves + 2, level1)).toBe(1);
   });
 
   test('getHint: finds a piece that is currently free to escape', () => {
@@ -92,8 +90,20 @@ describe('Arrow Kingdom: Slide Escape — Game Engine & Logic', () => {
       expect(lvl.id).toBeGreaterThan(0);
       expect(lvl.rows).toBeGreaterThanOrEqual(6);
       expect(lvl.cols).toBeGreaterThanOrEqual(6);
-      expect(lvl.pieces.length).toBeGreaterThanOrEqual(2);
+      expect(lvl.pieces.length).toBeGreaterThanOrEqual(6);
       expect(lvl.reward.coins).toBeGreaterThan(0);
+      expect(lvl.hiddenSymbol).toBeDefined();
+
+      // Verify level is 100% solvable without deadlocks
+      let pieces = lvl.pieces.map((p) => ({ ...p, removed: false }));
+      while (pieces.some((p) => !p.removed)) {
+        const free = pieces.find(
+          (p) => !p.removed && canExitBoard(p, pieces, lvl.rows, lvl.cols).canExit
+        );
+        expect(free).toBeDefined();
+        if (free) free.removed = true;
+      }
+      expect(isLevelComplete(pieces)).toBe(true);
     });
   });
 });
