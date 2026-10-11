@@ -42,6 +42,13 @@ export function isCellInside(row: number, col: number, rows: number, cols: numbe
 }
 
 /**
+ * Returns true if the coordinate is outside grid bounds.
+ */
+export function isOutside(cell: Cell, rows: number, cols: number): boolean {
+  return cell.row < 0 || cell.row >= rows || cell.col < 0 || cell.col >= cols;
+}
+
+/**
  * Returns the arrowhead cell (typically the last cell in the array).
  */
 export function getArrowHead(piece: ArrowPieceData): Cell {

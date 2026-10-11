@@ -3,7 +3,13 @@
 // ============================================================
 
 import type { ArrowPieceData, Cell, Direction, GameLevel } from './types';
-import { vectors, getOccupiedCells, isCellInside, getArrowHead } from './collision';
+import { vectors, getOccupiedCells, isOutside } from './collision';
+
+export interface CanExitResult {
+  canExit: boolean;
+  distance: number;
+  blockedCell?: Cell;
+}
 
 export interface MoveResult {
   type: 'escaped' | 'blocked';
@@ -12,9 +18,57 @@ export interface MoveResult {
 }
 
 /**
- * Checks if an arrow can escape the board in its arrowhead direction.
- * The arrow moves strictly along its direction vector until completely outside the grid.
- * If any cell along its forward path hits another active piece, the move is blocked.
+ * Checks if the entire winding arrow object can travel in its arrowhead direction
+ * and completely exit the board without colliding with any other active pieces.
+ * At each simulation step, the whole arrow is translated by its direction vector.
+ * If any cell of the translated arrow intersects with an occupied cell, the move is blocked.
+ */
+export function canExitBoard(
+  piece: ArrowPieceData,
+  pieces: ArrowPieceData[],
+  rows: number,
+  cols: number
+): CanExitResult {
+  if (piece.removed) {
+    return { canExit: false, distance: 0 };
+  }
+
+  const vector = vectors[piece.direction];
+  const occupied = getOccupiedCells(pieces, piece.id);
+
+  let translated = piece.cells.map((cell) => ({ ...cell }));
+  let distance = 0;
+  const maxIterations = Math.max(rows, cols) + 6;
+
+  while (!translated.every((cell) => isOutside(cell, rows, cols)) && distance < maxIterations) {
+    distance++;
+    translated = translated.map((cell) => ({
+      row: cell.row + vector.row,
+      col: cell.col + vector.col,
+    }));
+
+    for (const cell of translated) {
+      if (isOutside(cell, rows, cols)) {
+        continue;
+      }
+      if (occupied.has(`${cell.row}:${cell.col}`)) {
+        return {
+          canExit: false,
+          distance: 0,
+          blockedCell: { row: cell.row, col: cell.col },
+        };
+      }
+    }
+  }
+
+  return {
+    canExit: true,
+    distance,
+  };
+}
+
+/**
+ * Performs attemptMove using whole-arrow exit simulation.
  */
 export function attemptMove(
   selected: ArrowPieceData,
@@ -22,55 +76,16 @@ export function attemptMove(
   rows: number,
   cols: number
 ): MoveResult {
-  if (selected.removed) {
-    return { type: 'blocked' };
+  const result = canExitBoard(selected, pieces, rows, cols);
+  if (!result.canExit) {
+    return {
+      type: 'blocked',
+      blockedCell: result.blockedCell,
+    };
   }
-
-  const vector = vectors[selected.direction];
-  const occupied = getOccupiedCells(pieces, selected.id);
-  const head = getArrowHead(selected);
-
-  // Cast ray forward from arrowhead until outside the grid
-  let currRow = head.row + vector.row;
-  let currCol = head.col + vector.col;
-  let steps = 0;
-
-  while (isCellInside(currRow, currCol, rows, cols)) {
-    steps++;
-    const key = `${currRow}:${currCol}`;
-    if (occupied.has(key)) {
-      return {
-        type: 'blocked',
-        blockedCell: { row: currRow, col: currCol },
-      };
-    }
-    currRow += vector.row;
-    currCol += vector.col;
-  }
-
-  // Also check if any other body cell moving forward encounters a blocker
-  // (e.g. for wide or L-shaped arrows with trailing segments)
-  const maxDimension = Math.max(rows, cols) + 2;
-  for (let step = 1; step <= maxDimension; step++) {
-    for (const cell of selected.cells) {
-      const nextR = cell.row + vector.row * step;
-      const nextC = cell.col + vector.col * step;
-
-      // Only check cells that are still inside the grid
-      if (isCellInside(nextR, nextC, rows, cols)) {
-        if (occupied.has(`${nextR}:${nextC}`)) {
-          return {
-            type: 'blocked',
-            blockedCell: { row: nextR, col: nextC },
-          };
-        }
-      }
-    }
-  }
-
   return {
     type: 'escaped',
-    distanceToExit: steps + 1,
+    distanceToExit: result.distance,
   };
 }
 
