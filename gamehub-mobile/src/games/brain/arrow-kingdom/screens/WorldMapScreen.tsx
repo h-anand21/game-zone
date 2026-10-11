@@ -20,12 +20,14 @@ interface WorldMapScreenProps {
   onBack: () => void;
   onSelectLevel: (levelId: number) => void;
   onOpenShop: () => void;
+  onOpenLevelSelect?: () => void;
 }
 
 export const WorldMapScreen: React.FC<WorldMapScreenProps> = ({
   onBack,
   onSelectLevel,
   onOpenShop,
+  onOpenLevelSelect,
 }) => {
   const insets = useSafeAreaInsets();
   const unlockedLevels = useGameStore((state) => state.unlockedLevels);
@@ -44,6 +46,20 @@ export const WorldMapScreen: React.FC<WorldMapScreenProps> = ({
           onBack={onBack}
           rightAction={<CurrencyBar onOpenShop={onOpenShop} />}
         />
+
+        {onOpenLevelSelect && (
+          <View style={styles.toggleRow}>
+            <Pressable
+              onPress={() => {
+                ArrowHaptics.buttonPress();
+                onOpenLevelSelect();
+              }}
+              style={styles.togglePill}
+            >
+              <Text style={styles.toggleText}>🔢 GRID VIEW</Text>
+            </Pressable>
+          </View>
+        )}
 
         <ScrollView
           contentContainerStyle={[
@@ -306,6 +322,29 @@ const styles = StyleSheet.create({
   dividerIcon: {
     fontSize: 22,
     letterSpacing: 4,
+  },
+  toggleRow: {
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  togglePill: {
+    backgroundColor: '#0F3152',
+    borderWidth: 2,
+    borderColor: '#20BFFF',
+    borderRadius: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    shadowColor: '#20BFFF',
+    shadowOpacity: 0.35,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  toggleText: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: 0.8,
   },
 });
 

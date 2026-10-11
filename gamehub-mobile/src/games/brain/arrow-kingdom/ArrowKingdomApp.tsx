@@ -67,6 +67,16 @@ export const ArrowKingdomApp: React.FC<ArrowKingdomAppProps> = ({ onExitGame }) 
           onBack={() => navigateTo('home')}
           onSelectLevel={handlePlayLevel}
           onOpenShop={() => navigateTo('shop')}
+          onOpenLevelSelect={() => navigateTo('level-select')}
+        />
+      )}
+
+      {currentScreen === 'level-select' && (
+        <LevelSelectScreen
+          onBack={() => navigateTo('home')}
+          onSelectLevel={handlePlayLevel}
+          onOpenWorldMap={() => navigateTo('world-map')}
+          onOpenShop={() => navigateTo('shop')}
         />
       )}
 
