@@ -38,7 +38,7 @@ export default function GameScreen() {
   const categoryColor = CATEGORY_COLORS[gameConfig.category] || Colors.primary;
 
   // Dedicated Full-Screen Experience for Standalone Games
-  if ((cleanGameId === 'mind-lock' || cleanGameId === 'find-one' || cleanGameId === 'number-rush' || cleanGameId === 'reverse-mind' || cleanGameId === 'memory-rush' || cleanGameId === 'pattern-break' || cleanGameId === 'pattern-quest' || cleanGameId === 'path-mind' || cleanGameId === 'arrow-kingdom' || cleanGameId === 'aim-rush' || cleanGameId === 'one-tap' || cleanGameId === 'dont-tap-wrong' || cleanGameId === 'reaction-fire') && registeredGame) {
+  if ((cleanGameId === 'mind-lock' || cleanGameId === 'find-one' || cleanGameId === 'number-rush' || cleanGameId === 'reverse-mind' || cleanGameId === 'memory-rush' || cleanGameId === 'pattern-break' || cleanGameId === 'pattern-quest' || cleanGameId === 'path-mind' || cleanGameId === 'arrow-kingdom' || cleanGameId === 'aim-rush' || cleanGameId === 'one-tap' || cleanGameId === 'dont-tap-wrong' || cleanGameId === 'reaction-fire' || cleanGameId === 'stack-master') && registeredGame) {
     const GameComponent = registeredGame.component;
     return (
       <>
