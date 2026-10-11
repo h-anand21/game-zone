@@ -47,52 +47,29 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onLoaded }) => {
       <View style={styles.container}>
         {/* Center Emblem & Title */}
         <Animated.View style={[styles.emblemContainer, { transform: [{ scale: pulseAnim }] }]}>
-          {/* Neon Arrow Emblem Graphic */}
-          <Svg width={120} height={120} viewBox="0 0 120 120">
-            {/* Blue Arrow pointing right */}
-            <Path
-              d="M 20 40 L 60 40 L 60 70 L 90 70"
-              stroke={COLORS.blue}
-              strokeWidth={10}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-            />
-            <Polygon points="104,70 88,58 88,82" fill={COLORS.blue} />
+          <Text style={styles.flag}>🚩</Text>
+          <Text style={styles.logoTop}>ARROW</Text>
+          <Text style={styles.logoBottom}>KINGDOM</Text>
 
-            {/* Pink Arrow pointing up */}
-            <Path
-              d="M 80 100 L 80 85 L 45 85 L 45 30"
-              stroke={COLORS.pink}
-              strokeWidth={8}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-            />
-            <Polygon points="45,16 35,32 55,32" fill={COLORS.pink} />
+          <Text style={styles.castleTrees}>🏰 🌲 🌲</Text>
 
-            {/* Green Arrow pointing down */}
-            <Path
-              d="M 25 15 L 25 95"
-              stroke={COLORS.green}
-              strokeWidth={8}
-              strokeLinecap="round"
-              fill="none"
-            />
-            <Polygon points="25,108 15,92 35,92" fill={COLORS.green} />
-          </Svg>
+          {/* Neon Arrow Demo Glyphs */}
+          <View style={styles.arrowsBox}>
+            <Text style={[styles.arrowGlyph, { color: '#FF45B5' }]}>┗━━━━━━→</Text>
+            <Text style={[styles.arrowGlyph, { color: '#20BFFF' }]}>←━━━━━━┓</Text>
+            <Text style={[styles.arrowGlyph, { color: '#49E67A' }]}>↑━━━━━━┛</Text>
+          </View>
 
-          <Text style={styles.gameTitle}>ARROW KINGDOM</Text>
-          <Text style={styles.gameSubtitle}>SLIDE ESCAPE</Text>
+          <Text style={styles.tagline}>TAP • CLEAR • CONQUER</Text>
         </Animated.View>
 
         {/* Bottom Loading Indicator */}
         <View style={styles.loadingSection}>
-          <Text style={styles.loadingStatusText}>AWAKENING RUNIC PUZZLES...</Text>
+          <Text style={styles.loadingStatusText}>Loading kingdom…</Text>
           <View style={styles.trackBar}>
             <Animated.View style={[styles.fillBar, { width: barWidth }]}>
               <LinearGradient
-                colors={['#78F329', '#22C51D']}
+                colors={['#83F23A', '#35D521', '#159919']}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
@@ -110,7 +87,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 60,
+    paddingVertical: 50,
     paddingHorizontal: 24,
   },
   emblemContainer: {
@@ -118,24 +95,57 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  gameTitle: {
-    fontSize: 32,
+  flag: {
+    fontSize: 42,
+    marginBottom: 4,
+  },
+  logoTop: {
+    fontSize: 52,
+    fontWeight: '900',
+    color: '#FFD33D',
+    letterSpacing: 4,
+    textTransform: 'uppercase',
+    textShadowColor: '#7A3200',
+    textShadowOffset: { width: 0, height: 3 },
+    textShadowRadius: 6,
+  },
+  logoBottom: {
+    fontSize: 38,
+    fontWeight: '900',
+    color: '#20BFFF',
+    letterSpacing: 4,
+    marginTop: -10,
+    textTransform: 'uppercase',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
+  },
+  castleTrees: {
+    fontSize: 56,
+    marginVertical: 12,
+  },
+  arrowsBox: {
+    alignItems: 'center',
+    gap: 4,
+    marginVertical: 14,
+  },
+  arrowGlyph: {
+    fontSize: 30,
+    fontWeight: '900',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
+  tagline: {
+    fontSize: 13,
     fontWeight: '900',
     color: '#FFF8E7',
-    letterSpacing: 3,
+    letterSpacing: 2.5,
+    marginTop: 8,
     textTransform: 'uppercase',
-    marginTop: 20,
-    textShadowColor: COLORS.blue,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 18,
-  },
-  gameSubtitle: {
-    fontSize: 14,
-    fontWeight: '900',
-    color: COLORS.gold,
-    letterSpacing: 4,
-    marginTop: 6,
-    textTransform: 'uppercase',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   loadingSection: {
     width: '100%',
@@ -143,20 +153,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingStatusText: {
-    fontSize: 10,
+    fontSize: 12,
     fontWeight: '800',
-    color: COLORS.muted,
-    letterSpacing: 1.5,
+    color: '#9AB4CA',
+    letterSpacing: 1,
     marginBottom: 10,
-    textTransform: 'uppercase',
   },
   trackBar: {
     width: '100%',
-    height: 10,
-    backgroundColor: 'rgba(8, 27, 47, 0.8)',
-    borderRadius: 5,
-    borderWidth: 1.5,
-    borderColor: '#3D1C08',
+    height: 12,
+    backgroundColor: '#061426',
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#5B2E12',
     overflow: 'hidden',
   },
   fillBar: {

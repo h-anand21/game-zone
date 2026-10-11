@@ -7,7 +7,6 @@ import React from 'react';
 import { StyleSheet, Text, View, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import Svg, { Path, Polygon } from 'react-native-svg';
 import { COLORS } from '../constants/colors';
 import { FantasyBackground } from '../components/ui/FantasyBackground';
 import { CurrencyBar } from '../components/ui/CurrencyBar';
@@ -59,42 +58,17 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         >
           {/* Grand Kingdom Hero Logo */}
           <View style={styles.heroSection}>
-            <View style={styles.emblemBadge}>
-              <Svg width={90} height={90} viewBox="0 0 120 120">
-                <Path
-                  d="M 20 40 L 60 40 L 60 70 L 90 70"
-                  stroke={COLORS.blue}
-                  strokeWidth={11}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-                <Polygon points="104,70 88,58 88,82" fill={COLORS.blue} />
-
-                <Path
-                  d="M 80 100 L 80 85 L 45 85 L 45 30"
-                  stroke={COLORS.pink}
-                  strokeWidth={9}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-                <Polygon points="45,16 35,32 55,32" fill={COLORS.pink} />
-              </Svg>
-            </View>
-
-            <Text style={styles.titleMain}>ARROW KINGDOM</Text>
-            <Text style={styles.subtitleMain}>SLIDE ESCAPE</Text>
-
-            <View style={styles.realmPill}>
-              <Text style={styles.realmText}>🏰 REALM OF RUNIC ARROWS</Text>
-            </View>
+            <Text style={styles.flagEmoji}>🚩</Text>
+            <Text style={styles.titleArrow}>ARROW</Text>
+            <Text style={styles.titleKingdom}>KINGDOM</Text>
+            <Text style={styles.tagline}>TAP • CLEAR • CONQUER</Text>
+            <Text style={styles.castleTrees}>🏰 🌲 🌲</Text>
           </View>
 
           {/* Primary Big Green CTA: PLAY */}
           <View style={styles.primaryActionSection}>
             <GameButton
-              title={`▶ PLAY LEVEL ${unlockedLevels}`}
+              title={`▶  PLAY`}
               variant="green"
               size="large"
               onPress={onPlayCurrentLevel}
@@ -103,20 +77,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </View>
 
           {/* Secondary Mode Cards (Levels Map & Daily Puzzle) */}
-          <View style={styles.modesRow}>
-            {/* World Map Card */}
+          <View style={styles.bigRow}>
+            {/* World Map / Levels Card */}
             <Pressable
               onPress={() => {
                 ArrowHaptics.buttonPress();
                 onNavigate('world-map');
               }}
-              style={({ pressed }) => [styles.modeCard, pressed && styles.cardPressed]}
+              style={({ pressed }) => [styles.bigTile, pressed && styles.cardPressed]}
             >
-              <LinearGradient colors={['#10395C', '#071F36']} style={styles.modeCardGrad}>
-                <Text style={styles.modeCardIcon}>🗺️</Text>
-                <Text style={styles.modeCardTitle}>WORLD MAP</Text>
-                <Text style={styles.modeCardSub}>{unlockedLevels}/15 UNLOCKED</Text>
-              </LinearGradient>
+              <Text style={styles.bigTileEmoji}>👑</Text>
+              <Text style={styles.bigTileTitle}>Levels</Text>
+              <Text style={styles.bigTileSub}>{unlockedLevels}/10 Cleared</Text>
             </Pressable>
 
             {/* Daily Puzzle Card */}
@@ -125,29 +97,25 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 ArrowHaptics.buttonPress();
                 onNavigate('daily-puzzle');
               }}
-              style={({ pressed }) => [styles.modeCard, pressed && styles.cardPressed]}
+              style={({ pressed }) => [styles.bigTile, pressed && styles.cardPressed]}
             >
-              <LinearGradient colors={['#2E1022', '#14050F']} style={[styles.modeCardGrad, styles.dailyCardGrad]}>
-                <Text style={styles.modeCardIcon}>📅</Text>
-                <Text style={[styles.modeCardTitle, { color: COLORS.pink }]}>DAILY PUZZLE</Text>
-                <Text style={styles.modeCardSub}>BONUS CHEST</Text>
-              </LinearGradient>
+              <Text style={styles.bigTileEmoji}>📅</Text>
+              <Text style={styles.bigTileTitle}>Daily</Text>
+              <Text style={styles.bigTileSub}>Bonus Gems</Text>
             </Pressable>
           </View>
 
-          {/* Bottom Feature Tabs Row: Themes, Achievements, Shop, Tutorial */}
+          {/* Bottom Feature Tabs Row: Themes, Achievements, Shop */}
           <View style={styles.featuresRow}>
             <Pressable
               onPress={() => {
                 ArrowHaptics.buttonPress();
                 onNavigate('themes');
               }}
-              style={({ pressed }) => [styles.featBtn, pressed && styles.cardPressed]}
+              style={({ pressed }) => [styles.featTile, pressed && styles.cardPressed]}
             >
-              <LinearGradient colors={['#10395C', '#0A253E']} style={styles.featBtnGrad}>
-                <Text style={styles.featIcon}>🎨</Text>
-                <Text style={styles.featLabel}>THEMES</Text>
-              </LinearGradient>
+              <Text style={styles.featEmoji}>🎨</Text>
+              <Text style={styles.featTitle}>Themes</Text>
             </Pressable>
 
             <Pressable
@@ -155,12 +123,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 ArrowHaptics.buttonPress();
                 onNavigate('achievements');
               }}
-              style={({ pressed }) => [styles.featBtn, pressed && styles.cardPressed]}
+              style={({ pressed }) => [styles.featTile, pressed && styles.cardPressed]}
             >
-              <LinearGradient colors={['#10395C', '#0A253E']} style={styles.featBtnGrad}>
-                <Text style={styles.featIcon}>🏆</Text>
-                <Text style={styles.featLabel}>BADGES</Text>
-              </LinearGradient>
+              <Text style={styles.featEmoji}>🏆</Text>
+              <Text style={styles.featTitle}>Awards</Text>
             </Pressable>
 
             <Pressable
@@ -168,27 +134,23 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 ArrowHaptics.buttonPress();
                 onNavigate('shop');
               }}
-              style={({ pressed }) => [styles.featBtn, pressed && styles.cardPressed]}
+              style={({ pressed }) => [styles.featTile, pressed && styles.cardPressed]}
             >
-              <LinearGradient colors={['#10395C', '#0A253E']} style={styles.featBtnGrad}>
-                <Text style={styles.featIcon}>🎁</Text>
-                <Text style={styles.featLabel}>SHOP</Text>
-              </LinearGradient>
-            </Pressable>
-
-            <Pressable
-              onPress={() => {
-                ArrowHaptics.buttonPress();
-                onNavigate('how-to-play');
-              }}
-              style={({ pressed }) => [styles.featBtn, pressed && styles.cardPressed]}
-            >
-              <LinearGradient colors={['#10395C', '#0A253E']} style={styles.featBtnGrad}>
-                <Text style={styles.featIcon}>❓</Text>
-                <Text style={styles.featLabel}>GUIDE</Text>
-              </LinearGradient>
+              <Text style={styles.featEmoji}>🎁</Text>
+              <Text style={styles.featTitle}>Shop</Text>
             </Pressable>
           </View>
+
+          {/* How to play helper link */}
+          <Pressable
+            onPress={() => {
+              ArrowHaptics.buttonPress();
+              onNavigate('how-to-play');
+            }}
+            style={styles.helpLink}
+          >
+            <Text style={styles.helpText}>❓ How to play?</Text>
+          </Pressable>
         </ScrollView>
       </View>
     </FantasyBackground>
@@ -231,144 +193,140 @@ const styles = StyleSheet.create({
   },
   heroSection: {
     alignItems: 'center',
-    marginTop: 18,
-    marginBottom: 26,
+    marginTop: 10,
+    marginBottom: 16,
   },
-  emblemBadge: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: 'rgba(8, 27, 47, 0.75)',
-    borderWidth: 2,
-    borderColor: 'rgba(32, 191, 255, 0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: COLORS.blue,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 18,
-    marginBottom: 10,
+  flagEmoji: {
+    fontSize: 40,
+    marginBottom: 4,
   },
-  titleMain: {
-    fontSize: 30,
+  titleArrow: {
+    fontSize: 50,
     fontWeight: '900',
-    color: '#FFF8E7',
-    letterSpacing: 3,
+    color: '#FFD33D',
+    letterSpacing: 4,
     textTransform: 'uppercase',
-    textShadowColor: 'rgba(0, 0, 0, 0.9)',
-    textShadowOffset: { width: 0, height: 2 },
+    textShadowColor: '#7A3200',
+    textShadowOffset: { width: 0, height: 3 },
     textShadowRadius: 6,
   },
-  subtitleMain: {
-    fontSize: 13,
+  titleKingdom: {
+    fontSize: 38,
     fontWeight: '900',
-    color: COLORS.gold,
+    color: '#20BFFF',
     letterSpacing: 4,
-    marginTop: 4,
+    marginTop: -10,
     textTransform: 'uppercase',
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
-  realmPill: {
-    backgroundColor: 'rgba(7, 24, 43, 0.85)',
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
-    marginTop: 12,
+  tagline: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 2,
+    marginTop: 6,
+    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
-  realmText: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: COLORS.muted,
-    letterSpacing: 1.5,
+  castleTrees: {
+    fontSize: 54,
+    marginTop: 10,
   },
   primaryActionSection: {
     width: '100%',
     maxWidth: 340,
-    marginBottom: 20,
+    marginBottom: 16,
   },
   playBtn: {
     width: '100%',
   },
-  modesRow: {
+  bigRow: {
     flexDirection: 'row',
     width: '100%',
     maxWidth: 340,
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 12,
   },
-  modeCard: {
+  bigTile: {
     flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    backgroundColor: '#0B2944',
+    borderWidth: 2.5,
+    borderColor: '#2A5D84',
     borderRadius: 18,
-    borderWidth: 3,
-    borderColor: '#3D1C08',
-    backgroundColor: '#351503',
-    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.45,
     shadowRadius: 5,
+    elevation: 4,
   },
   cardPressed: {
-    transform: [{ scale: 0.96 }],
+    transform: [{ scale: 0.95 }],
   },
-  modeCardGrad: {
-    padding: 14,
-    alignItems: 'center',
-    borderRadius: 15,
-    borderWidth: 1.5,
-    borderColor: 'rgba(32, 191, 255, 0.3)',
-  },
-  dailyCardGrad: {
-    borderColor: 'rgba(255, 69, 181, 0.3)',
-  },
-  modeCardIcon: {
+  bigTileEmoji: {
     fontSize: 28,
-    marginBottom: 6,
   },
-  modeCardTitle: {
-    fontSize: 13,
+  bigTileTitle: {
+    color: '#FFFFFF',
     fontWeight: '900',
-    color: COLORS.gold,
-    letterSpacing: 1,
-  },
-  modeCardSub: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: COLORS.muted,
-    marginTop: 2,
+    fontSize: 14,
+    marginTop: 4,
     letterSpacing: 0.5,
+  },
+  bigTileSub: {
+    color: '#9AB4CA',
+    fontWeight: '800',
+    fontSize: 10,
+    marginTop: 2,
   },
   featuresRow: {
     flexDirection: 'row',
     width: '100%',
     maxWidth: 340,
-    gap: 8,
+    gap: 10,
+    marginBottom: 14,
   },
-  featBtn: {
+  featTile: {
     flex: 1,
-    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    backgroundColor: '#0B2944',
     borderWidth: 2,
-    borderColor: '#3D1C08',
-    backgroundColor: '#351503',
-    overflow: 'hidden',
-  },
-  featBtnGrad: {
-    paddingVertical: 10,
+    borderColor: '#2A5D84',
+    borderRadius: 16,
     alignItems: 'center',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  featIcon: {
-    fontSize: 20,
-    marginBottom: 2,
+  featEmoji: {
+    fontSize: 22,
   },
-  featLabel: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#E2EEF9',
-    letterSpacing: 0.8,
+  featTitle: {
+    color: '#FFFFFF',
+    fontWeight: '800',
+    fontSize: 11,
+    marginTop: 4,
+  },
+  helpLink: {
+    marginTop: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  helpText: {
+    color: '#9AB4CA',
+    fontSize: 14,
+    fontWeight: '800',
+    textDecorationLine: 'underline',
   },
 });
 

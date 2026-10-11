@@ -71,19 +71,20 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   return (
     <View style={styles.outerContainer}>
-      {/* Board Bezel & Frame */}
-      <View
-        style={[
-          styles.boardFrame,
-          {
-            width: boardSize,
-            height: boardSize,
-            backgroundColor: theme.boardBg,
-            borderColor: theme.boardBorder,
-            shadowColor: theme.glowColor,
-          },
-        ]}
-      >
+      {/* Outer Wooden Border Frame */}
+      <View style={styles.woodFrame}>
+        <View
+          style={[
+            styles.boardFrame,
+            {
+              width: boardSize,
+              height: boardSize,
+              backgroundColor: theme.boardBg,
+              borderColor: theme.boardBorder,
+              shadowColor: theme.glowColor,
+            },
+          ]}
+        >
         {/* Subtle Neon Grid Texture */}
         <Svg style={StyleSheet.absoluteFill} pointerEvents="none">
           {gridLines.map((l, idx) => (
@@ -142,6 +143,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             </View>
           </View>
         )}
+        </View>
       </View>
     </View>
   );
@@ -153,13 +155,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginVertical: 10,
   },
-  boardFrame: {
-    borderRadius: 22,
-    borderWidth: 3,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.45,
-    shadowRadius: 16,
+  woodFrame: {
+    padding: 8,
+    borderRadius: 28,
+    backgroundColor: '#5B2E12',
+    borderWidth: 3.5,
+    borderColor: '#D48835',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.55,
+    shadowRadius: 10,
     elevation: 8,
+  },
+  boardFrame: {
+    borderRadius: 20,
+    borderWidth: 2,
     position: 'relative',
     overflow: 'visible', // allows escaping arrows to visually slide off board before removal
   },
