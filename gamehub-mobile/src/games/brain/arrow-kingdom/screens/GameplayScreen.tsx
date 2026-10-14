@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { ArrowPieceData, GameLevel } from '../game/types';
-import { LEVELS } from '../data/levels';
+import { getLevel } from '../data/levels';
 import { THEMES } from '../data/themes';
 import { attemptMove, isLevelComplete, calculateStars, getHint, getRemainingCount } from '../game/engine';
 import { FantasyBackground } from '../components/ui/FantasyBackground';
@@ -47,7 +47,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
 
   // Active level state
   const [currentLevelId, setCurrentLevelId] = useState(levelId);
-  const levelData = LEVELS.find((l) => l.id === currentLevelId) || LEVELS[0];
+  const levelData = getLevel(currentLevelId);
 
   const [pieces, setPieces] = useState<ArrowPieceData[]>(() =>
     JSON.parse(JSON.stringify(levelData.pieces))
@@ -71,7 +71,7 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
   // Re-initialize when level changes
   useEffect(() => {
     setCurrentLevelId(levelId);
-    const target = LEVELS.find((l) => l.id === levelId) || LEVELS[0];
+    const target = getLevel(levelId);
     setPieces(JSON.parse(JSON.stringify(target.pieces)));
     setMoves(0);
     setLevelHearts(3);
@@ -190,22 +190,22 @@ export const GameplayScreen: React.FC<GameplayScreenProps> = ({
     }
   }, [hintsRemaining, pieces, levelData, useHintFromStore]);
 
-  // Next level navigation
+  // Next level navigation (infinite procedural progression)
   const handleNextLevel = useCallback(() => {
     setShowComplete(false);
     setShowChest(false);
     const nextId = currentLevelId + 1;
-    if (nextId <= LEVELS.length) {
-      setCurrentLevelId(nextId);
-      setCurrentLevelInStore(nextId);
-      const nextLevel = LEVELS.find((l) => l.id === nextId) || LEVELS[0];
-      setPieces(JSON.parse(JSON.stringify(nextLevel.pieces)));
-      setMoves(0);
-      setHistory([]);
-    } else {
-      onOpenWorldMap();
-    }
-  }, [currentLevelId, setCurrentLevelInStore, onOpenWorldMap]);
+    setCurrentLevelId(nextId);
+    setCurrentLevelInStore(nextId);
+    const nextLevel = getLevel(nextId);
+    setPieces(JSON.parse(JSON.stringify(nextLevel.pieces)));
+    setMoves(0);
+    setLevelHearts(3);
+    setHistory([]);
+    setBlockedPieceId(null);
+    setEscapingPieceId(null);
+    setHintedPieceId(null);
+  }, [currentLevelId, setCurrentLevelInStore]);
 
   return (
     <FantasyBackground>

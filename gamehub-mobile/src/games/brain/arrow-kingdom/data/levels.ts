@@ -2875,6 +2875,20 @@ export const LEVELS: GameLevel[] = [
   }
 ];
 
+import { generateProceduralLevel } from './levelGenerator';
+
 export const getLevel = (id: number): GameLevel => {
-  return LEVELS.find((l) => l.id === id) ?? LEVELS[0];
+  const handcrafted = LEVELS.find((l) => l.id === id);
+  if (handcrafted) return handcrafted;
+  return generateProceduralLevel(id);
 };
+
+export const getAllAvailableLevels = (maxLevel: number): GameLevel[] => {
+  const count = Math.max(maxLevel, 10);
+  const result: GameLevel[] = [];
+  for (let i = 1; i <= count; i++) {
+    result.push(getLevel(i));
+  }
+  return result;
+};
+
