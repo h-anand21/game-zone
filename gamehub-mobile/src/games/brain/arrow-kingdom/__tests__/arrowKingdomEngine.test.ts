@@ -106,4 +106,38 @@ describe('Arrow Kingdom: Slide Escape — Game Engine & Logic', () => {
       expect(isLevelComplete(pieces)).toBe(true);
     });
   });
+
+  describe('Procedural Endless Generation & Worlds', () => {
+    it('generates solvable levels beyond level 10 instantaneously', () => {
+      const { getLevel, getAllAvailableLevels } = require('../data/levels');
+      const testLevelIds = [11, 15, 20, 25, 30];
+
+      testLevelIds.forEach((id) => {
+        const start = Date.now();
+        const lvl = getLevel(id);
+        const elapsed = Date.now() - start;
+
+        expect(elapsed).toBeLessThan(50); // Instant generation (<50ms)
+        expect(lvl.id).toBe(id);
+        expect(lvl.pieces.length).toBeGreaterThanOrEqual(6);
+
+        // Verify full solvability
+        let pieces = lvl.pieces.map((p: any) => ({ ...p, removed: false }));
+        let iterations = 0;
+        while (pieces.some((p: any) => !p.removed) && iterations < 50) {
+          iterations++;
+          const free = pieces.find(
+            (p: any) => !p.removed && canExitBoard(p, pieces, lvl.rows, lvl.cols).canExit
+          );
+          expect(free).toBeDefined();
+          if (free) free.removed = true;
+        }
+        expect(isLevelComplete(pieces)).toBe(true);
+      });
+
+      const list = getAllAvailableLevels(25);
+      expect(list.length).toBe(25);
+    });
+  });
 });
+

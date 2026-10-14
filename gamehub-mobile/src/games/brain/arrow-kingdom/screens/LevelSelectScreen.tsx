@@ -13,7 +13,7 @@ import { WoodHeader } from '../components/ui/WoodHeader';
 import { CurrencyBar } from '../components/ui/CurrencyBar';
 import { StarsDisplay } from '../components/ui/StarsDisplay';
 import { useGameStore } from '../store/gameStore';
-import { LEVELS } from '../data/levels';
+import { getAllAvailableLevels } from '../data/levels';
 import { ArrowHaptics } from '../utils/haptics';
 
 interface LevelSelectScreenProps {
@@ -32,6 +32,7 @@ export const LevelSelectScreen: React.FC<LevelSelectScreenProps> = ({
   const insets = useSafeAreaInsets();
   const unlockedLevels = useGameStore((state) => state.unlockedLevels);
   const completedLevels = useGameStore((state) => state.completedLevels);
+  const availableLevels = getAllAvailableLevels(Math.max(unlockedLevels + 8, 12));
 
   return (
     <FantasyBackground>
@@ -64,7 +65,7 @@ export const LevelSelectScreen: React.FC<LevelSelectScreenProps> = ({
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.gridContainer}>
-            {LEVELS.map((lvl) => {
+            {availableLevels.map((lvl) => {
               const isUnlocked = lvl.id <= unlockedLevels;
               const isCurrent = lvl.id === unlockedLevels;
               const record = completedLevels[lvl.id];

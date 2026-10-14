@@ -1,9 +1,4 @@
-// ============================================================
-// ARROW KINGDOM: SLIDE ESCAPE — Screen 03: World Map
-// Scrollable fantasy progression map with branching paths & level nodes
-// ============================================================
-
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View, Pressable, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -13,7 +8,8 @@ import { WoodHeader } from '../components/ui/WoodHeader';
 import { CurrencyBar } from '../components/ui/CurrencyBar';
 import { StarsDisplay } from '../components/ui/StarsDisplay';
 import { useGameStore } from '../store/gameStore';
-import { LEVELS } from '../data/levels';
+import { getAllAvailableLevels } from '../data/levels';
+import { getWorldInfoForLevel } from '../data/levelGenerator';
 import { ArrowHaptics } from '../utils/haptics';
 
 interface WorldMapScreenProps {
@@ -33,9 +29,29 @@ export const WorldMapScreen: React.FC<WorldMapScreenProps> = ({
   const unlockedLevels = useGameStore((state) => state.unlockedLevels);
   const completedLevels = useGameStore((state) => state.completedLevels);
 
-  // Group levels by world
-  const world1Levels = LEVELS.filter((l) => l.worldId === 1);
-  const world2Levels = LEVELS.filter((l) => l.worldId === 2);
+  // Dynamically calculate how many worlds to display:
+  // Shows all worlds up to the next upcoming world (at least 2 worlds)
+  const currentWorldId = Math.floor((unlockedLevels - 1) / 10) + 1;
+  const maxWorldToShow = Math.max(2, currentWorldId + 1);
+  const maxLevelsToShow = maxWorldToShow * 10;
+
+  const allLevels = useMemo(() => {
+    return getAllAvailableLevels(maxLevelsToShow);
+  }, [maxLevelsToShow]);
+
+  // Group by worlds, from highest (top of map) down to World 1 (start)
+  const worldsList = useMemo(() => {
+    const list = [];
+    for (let w = maxWorldToShow; w >= 1; w--) {
+      const worldLevels = allLevels.filter((l) => l.worldId === w);
+      const info = getWorldInfoForLevel((w - 1) * 10 + 1);
+      list.push({
+        ...info,
+        levels: worldLevels,
+      });
+    }
+    return list;
+  }, [allLevels, maxWorldToShow]);
 
   return (
     <FantasyBackground>
@@ -68,141 +84,92 @@ export const WorldMapScreen: React.FC<WorldMapScreenProps> = ({
           ]}
           showsVerticalScrollIndicator={false}
         >
-          {/* ── WORLD 2: CRYSTAL COAST (Top Area) ── */}
-          <View style={styles.worldSection}>
-            <View style={styles.worldBanner}>
-              <Text style={styles.worldIcon}>🌊</Text>
-              <Text style={styles.worldTitle}>WORLD 2: CRYSTAL COAST</Text>
-            </View>
-
-            <View style={styles.nodesContainer}>
-              {world2Levels.map((lvl, idx) => {
-                const isUnlocked = lvl.id <= unlockedLevels;
-                const isCurrent = lvl.id === unlockedLevels;
-                const record = completedLevels[lvl.id];
-                const stars = record ? record.stars : 0;
-
-                // Alternate zigzag offsets
-                const xOffset = (idx % 2 === 0 ? -36 : 36);
-
-                return (
-                  <View key={lvl.id} style={[styles.nodeRow, { transform: [{ translateX: xOffset }] }]}>
-                    <Pressable
-                      onPress={() => {
-                        if (!isUnlocked) return;
-                        ArrowHaptics.buttonPress();
-                        onSelectLevel(lvl.id);
-                      }}
-                      disabled={!isUnlocked}
-                      style={({ pressed }) => [
-                        styles.nodeCircle,
-                        isCurrent && styles.nodeCurrent,
-                        !isUnlocked && styles.nodeLocked,
-                        pressed && styles.nodePressed,
-                      ]}
-                    >
-                      <LinearGradient
-                        colors={
-                          isCurrent
-                            ? ['#FFE259', '#E5A016']
-                            : isUnlocked
-                            ? ['#20BFFF', '#08639C']
-                            : ['#1C2633', '#0F151E']
-                        }
-                        style={styles.nodeGradient}
-                      >
-                        <Text style={[styles.nodeNumber, !isUnlocked && styles.nodeLockedText]}>
-                          {isUnlocked ? lvl.id : '🔒'}
-                        </Text>
-                      </LinearGradient>
-                    </Pressable>
-
-                    {/* Level Stars Badge */}
-                    {record && record.stars > 0 ? (
-                      <View style={styles.starsBadge}>
-                        <StarsDisplay stars={stars} size="small" />
-                      </View>
-                    ) : null}
-
-                    {/* Level Label */}
-                    <Text style={[styles.nodeLabel, !isUnlocked && styles.labelLocked]}>
-                      {lvl.name}
-                    </Text>
-                  </View>
-                );
-              })}
-            </View>
+          {/* Top Pinnacle Castle */}
+          <View style={styles.topCastle}>
+            <Text style={styles.castleEmoji}>🏰</Text>
+            <Text style={styles.citadelText}>THE ENDLESS RUNIC CITADEL</Text>
           </View>
 
-          {/* Dividing Mountain Pass */}
-          <View style={styles.worldDivider}>
-            <Text style={styles.dividerIcon}>⛰️ 🌲 🏰 🌲 ⛰️</Text>
-          </View>
+          {worldsList.map((world, wIdx) => (
+            <View key={`world-${world.worldId}`} style={styles.worldSection}>
+              {/* World Banner */}
+              <View style={[styles.worldBanner, { borderColor: world.themeColor }]}>
+                <Text style={styles.worldIcon}>{world.worldIcon}</Text>
+                <Text style={[styles.worldTitle, { color: world.themeColor }]}>
+                  WORLD {world.worldId}: {world.worldName.toUpperCase()}
+                </Text>
+              </View>
 
-          {/* ── WORLD 1: WHISPERING FOREST (Lower Area) ── */}
-          <View style={styles.worldSection}>
-            <View style={[styles.worldBanner, styles.forestBanner]}>
-              <Text style={styles.worldIcon}>🌲</Text>
-              <Text style={[styles.worldTitle, { color: COLORS.arrowGreen }]}>
-                WORLD 1: WHISPERING FOREST
-              </Text>
-            </View>
+              {/* Levels in this World */}
+              <View style={styles.nodesContainer}>
+                {world.levels.map((lvl, idx) => {
+                  const isUnlocked = lvl.id <= unlockedLevels;
+                  const isCurrent = lvl.id === unlockedLevels;
+                  const record = completedLevels[lvl.id];
+                  const stars = record ? record.stars : 0;
 
-            <View style={styles.nodesContainer}>
-              {world1Levels.map((lvl, idx) => {
-                const isUnlocked = lvl.id <= unlockedLevels;
-                const isCurrent = lvl.id === unlockedLevels;
-                const record = completedLevels[lvl.id];
-                const stars = record ? record.stars : 0;
+                  // Alternate zigzag offsets
+                  const xOffset = idx % 2 === 0 ? -36 : 36;
 
-                const xOffset = (idx % 2 === 0 ? 36 : -36);
-
-                return (
-                  <View key={lvl.id} style={[styles.nodeRow, { transform: [{ translateX: xOffset }] }]}>
-                    <Pressable
-                      onPress={() => {
-                        if (!isUnlocked) return;
-                        ArrowHaptics.buttonPress();
-                        onSelectLevel(lvl.id);
-                      }}
-                      disabled={!isUnlocked}
-                      style={({ pressed }) => [
-                        styles.nodeCircle,
-                        isCurrent && styles.nodeCurrent,
-                        !isUnlocked && styles.nodeLocked,
-                        pressed && styles.nodePressed,
-                      ]}
+                  return (
+                    <View
+                      key={lvl.id}
+                      style={[styles.nodeRow, { transform: [{ translateX: xOffset }] }]}
                     >
-                      <LinearGradient
-                        colors={
-                          isCurrent
-                            ? ['#FFE259', '#E5A016']
-                            : isUnlocked
-                            ? ['#49E67A', '#137031']
-                            : ['#1C2633', '#0F151E']
-                        }
-                        style={styles.nodeGradient}
+                      <Pressable
+                        onPress={() => {
+                          if (!isUnlocked) return;
+                          ArrowHaptics.buttonPress();
+                          onSelectLevel(lvl.id);
+                        }}
+                        disabled={!isUnlocked}
+                        style={({ pressed }) => [
+                          styles.nodeCircle,
+                          isCurrent && styles.nodeCurrent,
+                          !isUnlocked && styles.nodeLocked,
+                          pressed && styles.nodePressed,
+                        ]}
                       >
-                        <Text style={[styles.nodeNumber, !isUnlocked && styles.nodeLockedText]}>
-                          {isUnlocked ? lvl.id : '🔒'}
-                        </Text>
-                      </LinearGradient>
-                    </Pressable>
+                        <LinearGradient
+                          colors={
+                            isCurrent
+                              ? ['#FFE259', '#E5A016']
+                              : isUnlocked
+                              ? [world.themeColor, '#084870']
+                              : ['#1C2633', '#0F151E']
+                          }
+                          style={styles.nodeGradient}
+                        >
+                          <Text style={[styles.nodeNumber, !isUnlocked && styles.nodeLockedText]}>
+                            {isUnlocked ? lvl.id : '🔒'}
+                          </Text>
+                        </LinearGradient>
+                      </Pressable>
 
-                    {/* Level Stars Badge */}
-                    {record && record.stars > 0 ? (
-                      <View style={styles.starsBadge}>
-                        <StarsDisplay stars={stars} size="small" />
-                      </View>
-                    ) : null}
+                      {/* Level Stars Badge */}
+                      {record && record.stars > 0 ? (
+                        <View style={styles.starsBadge}>
+                          <StarsDisplay stars={stars} size="small" />
+                        </View>
+                      ) : null}
 
-                    {/* Level Label */}
-                    <Text style={[styles.nodeLabel, !isUnlocked && styles.labelLocked]}>
-                      {lvl.name}
-                    </Text>
-                  </View>
-                );
-              })}
+                      {/* Level Label */}
+                      <Text style={[styles.nodeLabel, !isUnlocked && styles.labelLocked]}>
+                        {lvl.name}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+
+              {/* Divider between worlds */}
+              {wIdx < worldsList.length - 1 && (
+                <View style={styles.worldDivider}>
+                  <Text style={styles.dividerIcon}>⛰️ 🌊 🏰 🌲 ⛰️</Text>
+                </View>
+              )}
+            </View>
+          ))}
             </View>
           </View>
         </ScrollView>
