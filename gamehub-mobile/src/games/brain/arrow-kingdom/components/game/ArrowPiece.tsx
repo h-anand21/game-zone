@@ -5,7 +5,7 @@
 // ============================================================
 
 import React, { useRef, useEffect } from 'react';
-import { StyleSheet, Animated, PanResponder, View } from 'react-native';
+import { StyleSheet, Animated } from 'react-native';
 import Svg, { Path, Polygon } from 'react-native-svg';
 import type { ArrowPieceData, Cell, Direction } from '../../game/types';
 import { ArrowHaptics } from '../../utils/haptics';
@@ -13,7 +13,7 @@ import { ArrowHaptics } from '../../utils/haptics';
 interface Props {
   piece: ArrowPieceData;
   cellSize: number;
-  onPress: (piece: ArrowPieceData) => void;
+  onPress?: (piece: ArrowPieceData) => void;
   isBlocked?: boolean;
   isEscaping?: boolean;
   isHinted?: boolean;
@@ -57,11 +57,9 @@ function getArrowHeadPoints(
 export const ArrowPiece: React.FC<Props> = ({
   piece,
   cellSize,
-  onPress,
   isBlocked = false,
   isEscaping = false,
   isHinted = false,
-  disabled = false,
 }) => {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const translateX = useRef(new Animated.Value(0)).current;
@@ -71,7 +69,6 @@ export const ArrowPiece: React.FC<Props> = ({
   // Trigger blocked shake animation
   useEffect(() => {
     if (isBlocked) {
-      ArrowHaptics.blocked();
       const shakeAxis = piece.direction === 'left' || piece.direction === 'right' ? translateX : translateY;
       const nudge = piece.direction === 'right' || piece.direction === 'down' ? 6 : -6;
 
@@ -105,6 +102,15 @@ export const ArrowPiece: React.FC<Props> = ({
     }
   }, [isEscaping, piece.direction, cellSize, translateX, translateY, opacityAnim]);
 
+  // Reset transforms when not animating
+  useEffect(() => {
+    if (!isEscaping && !isBlocked) {
+      translateX.setValue(0);
+      translateY.setValue(0);
+      opacityAnim.setValue(1);
+    }
+  }, [isEscaping, isBlocked, translateX, translateY, opacityAnim]);
+
   // Hint pulse animation
   useEffect(() => {
     if (isHinted) {
@@ -114,70 +120,10 @@ export const ArrowPiece: React.FC<Props> = ({
           Animated.timing(scaleAnim, { toValue: 1, duration: 300, useNativeDriver: true }),
         ])
       ).start();
+    } else {
+      scaleAnim.setValue(1);
     }
   }, [isHinted, scaleAnim]);
-
-  // Touch & Swipe PanResponder
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => !disabled && !piece.removed && !isEscaping,
-      onMoveShouldSetPanResponder: () => !disabled && !piece.removed && !isEscaping,
-      onPanResponderGrant: () => {
-        ArrowHaptics.touch();
-        Animated.spring(scaleAnim, {
-          toValue: 1.05,
-          useNativeDriver: true,
-          speed: 60,
-          bounciness: 0,
-        }).start();
-      },
-      onPanResponderMove: (_, gestureState) => {
-        // Follow finger slightly along valid arrow axis (max 15px)
-        const maxNudge = 15;
-        if (piece.direction === 'right') {
-          translateX.setValue(Math.max(0, Math.min(maxNudge, gestureState.dx)));
-        } else if (piece.direction === 'left') {
-          translateX.setValue(Math.min(0, Math.max(-maxNudge, gestureState.dx)));
-        } else if (piece.direction === 'down') {
-          translateY.setValue(Math.max(0, Math.min(maxNudge, gestureState.dy)));
-        } else if (piece.direction === 'up') {
-          translateY.setValue(Math.min(0, Math.max(-maxNudge, gestureState.dy)));
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        Animated.spring(scaleAnim, {
-          toValue: 1,
-          useNativeDriver: true,
-          speed: 40,
-          bounciness: 8,
-        }).start();
-
-        const threshold = 8;
-        const isTap = Math.abs(gestureState.dx) < 6 && Math.abs(gestureState.dy) < 6;
-        const isSwipeRight = piece.direction === 'right' && gestureState.dx >= threshold;
-        const isSwipeLeft = piece.direction === 'left' && gestureState.dx <= -threshold;
-        const isSwipeDown = piece.direction === 'down' && gestureState.dy >= threshold;
-        const isSwipeUp = piece.direction === 'up' && gestureState.dy <= -threshold;
-
-        if (isTap || isSwipeRight || isSwipeLeft || isSwipeDown || isSwipeUp) {
-          onPress(piece);
-        } else {
-          // Snap back
-          Animated.parallel([
-            Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
-            Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
-          ]).start();
-        }
-      },
-      onPanResponderTerminate: () => {
-        Animated.parallel([
-          Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }),
-          Animated.spring(translateX, { toValue: 0, useNativeDriver: true }),
-          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }),
-        ]).start();
-      },
-    })
-  ).current;
 
   if (piece.removed && !isEscaping) {
     return null;
@@ -191,7 +137,7 @@ export const ArrowPiece: React.FC<Props> = ({
 
   return (
     <Animated.View
-      {...panResponder.panHandlers}
+      pointerEvents="none"
       style={[
         StyleSheet.absoluteFill,
         {
