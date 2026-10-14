@@ -4,8 +4,8 @@
 // tutorial hand animation, and responsive SVG arrow pieces
 // ============================================================
 
-import React, { useMemo } from 'react';
-import { StyleSheet, View, Text, useWindowDimensions, Animated } from 'react-native';
+import React, { useMemo, useCallback, useRef } from 'react';
+import { StyleSheet, View, Text, useWindowDimensions, Pressable, GestureResponderEvent } from 'react-native';
 import Svg, { Line, Rect } from 'react-native-svg';
 import type { ArrowPieceData, ThemeConfig } from '../../game/types';
 import { ArrowPiece } from './ArrowPiece';
@@ -69,11 +69,71 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     return lines;
   }, [rows, cols, cellSize]);
 
+  const touchStartPos = useRef<{ x: number; y: number } | null>(null);
+
+  // Accurate touch hit-testing: map touch point (x, y) to piece
+  const findPieceAt = useCallback(
+    (touchX: number, touchY: number): ArrowPieceData | null => {
+      const col = Math.floor(touchX / cellSize);
+      const row = Math.floor(touchY / cellSize);
+
+      // 1. Direct cell hit
+      if (row >= 0 && row < rows && col >= 0 && col < cols) {
+        const directHit = pieces.find(
+          (p) => !p.removed && p.cells.some((c) => c.row === row && c.col === col)
+        );
+        if (directHit) return directHit;
+      }
+
+      // 2. Proximity search (near arrowhead or borders)
+      let bestPiece: ArrowPieceData | null = null;
+      let minDistance = cellSize * 0.85;
+
+      for (const piece of pieces) {
+        if (piece.removed) continue;
+        for (const cell of piece.cells) {
+          const cx = cell.col * cellSize + cellSize / 2;
+          const cy = cell.row * cellSize + cellSize / 2;
+          const dist = Math.hypot(touchX - cx, touchY - cy);
+          if (dist < minDistance) {
+            minDistance = dist;
+            bestPiece = piece;
+          }
+        }
+      }
+
+      return bestPiece;
+    },
+    [cellSize, cols, pieces, rows]
+  );
+
+  const handleTouchStart = (e: GestureResponderEvent) => {
+    touchStartPos.current = {
+      x: e.nativeEvent.locationX,
+      y: e.nativeEvent.locationY,
+    };
+  };
+
+  const handleTouchEnd = (e: GestureResponderEvent) => {
+    if (disabled) return;
+    const start = touchStartPos.current;
+    const { locationX, locationY } = e.nativeEvent;
+
+    // Check start position (where finger touched down) or current release position
+    const piece = (start ? findPieceAt(start.x, start.y) : null) || findPieceAt(locationX, locationY);
+    if (piece) {
+      onPiecePress(piece);
+    }
+  };
+
   return (
     <View style={styles.outerContainer}>
       {/* Outer Wooden Border Frame */}
       <View style={styles.woodFrame}>
-        <View
+        <Pressable
+          disabled={disabled}
+          onPressIn={handleTouchStart}
+          onPress={handleTouchEnd}
           style={[
             styles.boardFrame,
             {
@@ -126,7 +186,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             key={piece.id}
             piece={piece}
             cellSize={cellSize}
-            onPress={onPiecePress}
             isBlocked={blockedPieceId === piece.id}
             isEscaping={escapingPieceId === piece.id}
             isHinted={hintedPieceId === piece.id}
@@ -143,7 +202,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
             </View>
           </View>
         )}
-        </View>
+        </Pressable>
       </View>
     </View>
   );
