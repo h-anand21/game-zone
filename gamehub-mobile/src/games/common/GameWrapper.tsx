@@ -68,6 +68,9 @@ export const GameWrapper: React.FC<GameWrapperProps> = ({ config, renderGame }) 
 
   const handleFinish = useCallback(
     async (score: number, won: boolean, metadata?: Record<string, unknown>) => {
+      // Yield to the event loop so this never executes inside an ongoing React setState reducer
+      await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
       engine.finish();
       const duration = engine.getDuration();
 
