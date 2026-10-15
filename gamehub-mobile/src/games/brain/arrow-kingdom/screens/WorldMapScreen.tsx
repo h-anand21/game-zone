@@ -170,8 +170,6 @@ export const WorldMapScreen: React.FC<WorldMapScreenProps> = ({
               )}
             </View>
           ))}
-            </View>
-          </View>
         </ScrollView>
       </View>
     </FantasyBackground>
@@ -186,6 +184,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 10,
     alignItems: 'center',
+  },
+  topCastle: {
+    alignItems: 'center',
+    marginBottom: 24,
+    backgroundColor: 'rgba(5, 16, 28, 0.85)',
+    paddingVertical: 14,
+    paddingHorizontal: 22,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#FFE259',
+    shadowColor: '#FFE259',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  castleEmoji: {
+    fontSize: 42,
+    marginBottom: 4,
+  },
+  citadelText: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#FFE259',
+    letterSpacing: 2,
   },
   worldSection: {
     width: '100%',
