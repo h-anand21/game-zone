@@ -18,23 +18,25 @@ interface SnakeProps {
 export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
   const [gameState, setGameState] = useState<SnakeState>(() => getInitialState());
   const pendingDirectionRef = useRef<Direction>('RIGHT');
+  const hasFinishedRef = useRef(false);
+
+  useEffect(() => {
+    if (gameState.gameOver && !hasFinishedRef.current) {
+      hasFinishedRef.current = true;
+      onFinish(gameState.score, gameState.score >= 50, { finalScore: gameState.score });
+    }
+  }, [gameState.gameOver, gameState.score, onFinish]);
 
   useEffect(() => {
     if (isPaused || gameState.gameOver) return;
 
     const intervalTime = Math.max(80, 200 - Math.floor(gameState.score / 30) * 15);
     const timer = setInterval(() => {
-      setGameState((prev) => {
-        const next = moveSnake(prev, pendingDirectionRef.current);
-        if (next.gameOver && !prev.gameOver) {
-          onFinish(next.score, next.score >= 50, { finalScore: next.score });
-        }
-        return next;
-      });
+      setGameState((prev) => moveSnake(prev, pendingDirectionRef.current));
     }, intervalTime);
 
     return () => clearInterval(timer);
-  }, [isPaused, gameState.gameOver, gameState.score, onFinish]);
+  }, [isPaused, gameState.gameOver, gameState.score]);
 
   const changeDirection = (dir: Direction) => {
     const current = gameState.direction;
