@@ -18,22 +18,24 @@ interface SkyJumpProps {
 export const SkyJumpGame: React.FC<SkyJumpProps> = ({ onFinish, isPaused }) => {
   const [jumpState, setJumpState] = useState<SkyJumpState>(() => getInitialSkyJumpState());
   const moveDirRef = useRef<-1 | 0 | 1>(0);
+  const hasFinishedRef = useRef(false);
+
+  useEffect(() => {
+    if (jumpState.gameOver && !hasFinishedRef.current) {
+      hasFinishedRef.current = true;
+      onFinish(jumpState.score, jumpState.score >= 500, { finalScore: jumpState.score });
+    }
+  }, [jumpState.gameOver, jumpState.score, onFinish]);
 
   useEffect(() => {
     if (isPaused || jumpState.gameOver) return;
 
     const timer = setInterval(() => {
-      setJumpState((prev) => {
-        const next = updateSkyJumpStep(prev, moveDirRef.current);
-        if (next.gameOver && !prev.gameOver) {
-          onFinish(next.score, next.score >= 500, { finalScore: next.score });
-        }
-        return next;
-      });
+      setJumpState((prev) => updateSkyJumpStep(prev, moveDirRef.current));
     }, 16);
 
     return () => clearInterval(timer);
-  }, [isPaused, jumpState.gameOver, onFinish]);
+  }, [isPaused, jumpState.gameOver]);
 
   return (
     <View style={styles.container}>
