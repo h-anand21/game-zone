@@ -2,7 +2,7 @@
 // GameHub — Endless Runner Component
 // ============================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, Pressable, type DimensionValue } from 'react-native';
 import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
 import { getInitialRunnerState, updateRunnerStep } from './logic';
