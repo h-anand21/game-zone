@@ -17,25 +17,27 @@ interface EndlessRunnerProps {
 
 export const EndlessRunnerGame: React.FC<EndlessRunnerProps> = ({ onFinish, isPaused }) => {
   const [runnerState, setRunnerState] = useState<RunnerState>(() => getInitialRunnerState());
+  const hasFinishedRef = useRef(false);
+
+  useEffect(() => {
+    if (runnerState.gameOver && !hasFinishedRef.current) {
+      hasFinishedRef.current = true;
+      onFinish(runnerState.score, runnerState.score >= 500, {
+        distance: runnerState.score,
+        coins: runnerState.coinsCollected,
+      });
+    }
+  }, [runnerState.gameOver, runnerState.score, runnerState.coinsCollected, onFinish]);
 
   useEffect(() => {
     if (isPaused || runnerState.gameOver) return;
 
     const timer = setInterval(() => {
-      setRunnerState((prev) => {
-        const next = updateRunnerStep(prev);
-        if (next.gameOver && !prev.gameOver) {
-          onFinish(next.score, next.score >= 500, {
-            distance: next.score,
-            coins: next.coinsCollected,
-          });
-        }
-        return next;
-      });
+      setRunnerState((prev) => updateRunnerStep(prev));
     }, 16);
 
     return () => clearInterval(timer);
-  }, [isPaused, runnerState.gameOver, onFinish]);
+  }, [isPaused, runnerState.gameOver]);
 
   const switchLane = (targetLane: Lane) => {
     if (isPaused) return;
