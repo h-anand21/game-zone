@@ -32,25 +32,28 @@ export const PongGame: React.FC<PongProps> = ({ onFinish, isPaused }) => {
     })
   ).current;
 
+  const hasFinishedRef = useRef(false);
+
+  useEffect(() => {
+    if (pongState.gameOver && !hasFinishedRef.current) {
+      hasFinishedRef.current = true;
+      const won = pongState.playerScore > pongState.aiScore;
+      onFinish(pongState.playerScore * 10, won, {
+        playerScore: pongState.playerScore,
+        aiScore: pongState.aiScore,
+      });
+    }
+  }, [pongState.gameOver, pongState.playerScore, pongState.aiScore, onFinish]);
+
   useEffect(() => {
     if (isPaused || pongState.gameOver) return;
 
     const timer = setInterval(() => {
-      setPongState((prev) => {
-        const next = updatePongStep(prev, touchYRef.current);
-        if (next.gameOver && !prev.gameOver) {
-          const won = next.playerScore > next.aiScore;
-          onFinish(next.playerScore * 10, won, {
-            playerScore: next.playerScore,
-            aiScore: next.aiScore,
-          });
-        }
-        return next;
-      });
+      setPongState((prev) => updatePongStep(prev, touchYRef.current));
     }, 16);
 
     return () => clearInterval(timer);
-  }, [isPaused, pongState.gameOver, onFinish]);
+  }, [isPaused, pongState.gameOver]);
 
   return (
     <View style={styles.container}>
