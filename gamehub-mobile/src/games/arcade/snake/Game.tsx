@@ -1,7 +1,8 @@
 // ============================================================
-// GameHub — Snake Component (Modern Cyber Arcade Edition)
-// Features: Full-Screen Hand Swipe Controls, Warp Portals,
-// Self-Collision-Only Game Over, Eye-Tracking Snake Head, Sleek HUD
+// GameHub — Snake Component (ChatGPT Easter Egg Inspired Edition)
+// 100% Pure Touchscreen Controls (Zero Buttons)
+// Features: Full-Screen Hand Swipe + Tap Steering ("Haath Se Kaatna")
+// Border Warp Portals, Self-Collision-Only Game Over, Minimalist Cyber UI
 // ============================================================
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
@@ -9,13 +10,12 @@ import {
   View,
   Text,
   StyleSheet,
-  Pressable,
   Dimensions,
   PanResponder,
   Animated,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { Colors, Spacing, Typography, BorderRadius, Shadows } from '@/constants/theme';
+import { Shadows } from '@/constants/theme';
 import { getInitialState, moveSnake, GRID_SIZE } from './logic';
 import type { Direction, SnakeState } from './types';
 import type { GameEngine } from '../../engine/GameEngine';
@@ -27,36 +27,61 @@ interface SnakeProps {
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const BOARD_SIZE = Math.min(SCREEN_WIDTH - 28, 360);
+// Maximize board size for modern phone screens so it feels expansive & immersive
+const BOARD_SIZE = Math.min(SCREEN_WIDTH - 24, 380);
 const CELL_SIZE = (BOARD_SIZE - 4) / GRID_SIZE;
 
 export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
   const [gameState, setGameState] = useState<SnakeState>(() => getInitialState());
-  const pendingDirectionRef = useRef<Direction>('RIGHT');
   const currentDirectionRef = useRef<Direction>('RIGHT');
+  const directionQueueRef = useRef<Direction[]>([]);
   const hasFinishedRef = useRef(false);
 
-  // Pulse animation for the food
+  // Pulse animation for the glowing food apple
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  // Border portal glow animation
+  const portalGlowAnim = useRef(new Animated.Value(0.4)).current;
 
   useEffect(() => {
-    const pulse = Animated.loop(
+    // Pulse animation for the food
+    const foodPulse = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: 1.25,
-          duration: 450,
+          duration: 400,
           useNativeDriver: true,
         }),
         Animated.timing(pulseAnim, {
           toValue: 1,
-          duration: 450,
+          duration: 400,
           useNativeDriver: true,
         }),
       ])
     );
-    pulse.start();
-    return () => pulse.stop();
-  }, [pulseAnim]);
+    foodPulse.start();
+
+    // Subtle breathing glow for the warp borders
+    const portalGlow = Animated.loop(
+      Animated.sequence([
+        Animated.timing(portalGlowAnim, {
+          toValue: 0.9,
+          duration: 1200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(portalGlowAnim, {
+          toValue: 0.4,
+          duration: 1200,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    portalGlow.start();
+
+    return () => {
+      foodPulse.stop();
+      portalGlow.stop();
+    };
+  }, [pulseAnim, portalGlowAnim]);
 
   // Handle Game Finish safely outside setState reducer
   useEffect(() => {
@@ -69,15 +94,17 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
     }
   }, [gameState.gameOver, gameState.score, onFinish]);
 
-  // Main game tick loop
+  // Main game tick loop with direction queue
   useEffect(() => {
     if (isPaused || gameState.gameOver) return;
 
-    // Smooth speed scaling based on apples eaten
-    const intervalTime = Math.max(75, 175 - Math.floor(gameState.score / 20) * 12);
+    // Smooth speed scaling based on score
+    const intervalTime = Math.max(75, 175 - Math.floor(gameState.score / 20) * 10);
     const timer = setInterval(() => {
       setGameState((prev) => {
-        const next = moveSnake(prev, pendingDirectionRef.current);
+        // Dequeue next queued turn or keep going straight
+        const nextDir = directionQueueRef.current.shift() || currentDirectionRef.current;
+        const next = moveSnake(prev, nextDir);
         currentDirectionRef.current = next.direction;
         return next;
       });
@@ -86,62 +113,100 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
     return () => clearInterval(timer);
   }, [isPaused, gameState.gameOver, gameState.score]);
 
-  // Change direction with reverse-prevention and haptics
-  const changeDirection = (dir: Direction) => {
-    const current = currentDirectionRef.current;
-    if (
-      (dir === 'UP' && current !== 'DOWN') ||
-      (dir === 'DOWN' && current !== 'UP') ||
-      (dir === 'LEFT' && current !== 'RIGHT') ||
-      (dir === 'RIGHT' && current !== 'LEFT')
-    ) {
-      pendingDirectionRef.current = dir;
+  // Change direction with queue and 180° reverse-lock prevention
+  const queueDirection = (dir: Direction) => {
+    // Determine the last intended direction (from queue or currently moving)
+    const lastDir =
+      directionQueueRef.current.length > 0
+        ? directionQueueRef.current[directionQueueRef.current.length - 1]
+        : currentDirectionRef.current;
+
+    const isOpposite =
+      (dir === 'UP' && lastDir === 'DOWN') ||
+      (dir === 'DOWN' && lastDir === 'UP') ||
+      (dir === 'LEFT' && lastDir === 'RIGHT') ||
+      (dir === 'RIGHT' && lastDir === 'LEFT');
+
+    // Prevent 180-degree self-bite suicide and queue max 2 turns
+    if (!isOpposite && dir !== lastDir && directionQueueRef.current.length < 2) {
+      directionQueueRef.current.push(dir);
       try {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       } catch {}
     }
   };
 
-  // Full-screen Hand Swipe Gesture handler
-  const swipeHandledRef = useRef(false);
+  // Pure Touchscreen Controller: Hand Swipe + Tap to Cut/Turn
+  const touchStartRef = useRef<{ x: number; y: number; time: number }>({ x: 0, y: 0, time: 0 });
+  const swipeTriggeredRef = useRef(false);
+
   const panResponder = useMemo(
     () =>
       PanResponder.create({
         onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: (_, gesture) => {
-          return Math.abs(gesture.dx) > 10 || Math.abs(gesture.dy) > 10;
-        },
-        onPanResponderGrant: () => {
-          swipeHandledRef.current = false;
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderGrant: (evt) => {
+          swipeTriggeredRef.current = false;
+          touchStartRef.current = {
+            x: evt.nativeEvent.pageX,
+            y: evt.nativeEvent.pageY,
+            time: Date.now(),
+          };
         },
         onPanResponderMove: (_, gesture) => {
-          if (swipeHandledRef.current) return;
+          if (swipeTriggeredRef.current) return;
 
-          const SWIPE_THRESHOLD = 18;
+          const SWIPE_THRESHOLD = 14; // Ultra-responsive hand swipe
           const { dx, dy } = gesture;
 
           if (Math.abs(dx) > Math.abs(dy)) {
-            // Horizontal swipe
+            // Horizontal hand swipe
             if (dx > SWIPE_THRESHOLD) {
-              changeDirection('RIGHT');
-              swipeHandledRef.current = true;
+              queueDirection('RIGHT');
+              swipeTriggeredRef.current = true;
             } else if (dx < -SWIPE_THRESHOLD) {
-              changeDirection('LEFT');
-              swipeHandledRef.current = true;
+              queueDirection('LEFT');
+              swipeTriggeredRef.current = true;
             }
           } else {
-            // Vertical swipe
+            // Vertical hand swipe
             if (dy > SWIPE_THRESHOLD) {
-              changeDirection('DOWN');
-              swipeHandledRef.current = true;
+              queueDirection('DOWN');
+              swipeTriggeredRef.current = true;
             } else if (dy < -SWIPE_THRESHOLD) {
-              changeDirection('UP');
-              swipeHandledRef.current = true;
+              queueDirection('UP');
+              swipeTriggeredRef.current = true;
             }
           }
         },
-        onPanResponderRelease: () => {
-          swipeHandledRef.current = false;
+        onPanResponderRelease: (evt, gesture) => {
+          // If user didn't swipe (was a quick tap / "haath se kaatna"),
+          // turn relative to current snake heading!
+          const duration = Date.now() - touchStartRef.current.time;
+          const isTap = Math.abs(gesture.dx) < 12 && Math.abs(gesture.dy) < 12 && duration < 350;
+
+          if (isTap && !swipeTriggeredRef.current) {
+            const touchY = evt.nativeEvent.locationY;
+            const touchX = evt.nativeEvent.locationX;
+            const currentDir = currentDirectionRef.current;
+
+            if (currentDir === 'LEFT' || currentDir === 'RIGHT') {
+              // Moving horizontally: tap top half cuts UP, tap bottom half cuts DOWN
+              if (touchY < BOARD_SIZE / 2) {
+                queueDirection('UP');
+              } else {
+                queueDirection('DOWN');
+              }
+            } else {
+              // Moving vertically: tap left half cuts LEFT, tap right half cuts RIGHT
+              if (touchX < BOARD_SIZE / 2) {
+                queueDirection('LEFT');
+              } else {
+                queueDirection('RIGHT');
+              }
+            }
+          }
+          swipeTriggeredRef.current = false;
         },
       }),
     []
@@ -149,48 +214,51 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
 
   const head = gameState.snake[0];
   const body = gameState.snake.slice(1);
-  const currentDir = pendingDirectionRef.current;
+  const currentDir = currentDirectionRef.current;
 
-  // Eye placement on snake head based on direction
+  // Eye placement on head matching movement direction
   const getEyeStyles = () => {
     switch (currentDir) {
       case 'UP':
-        return { eye1: { top: 2, left: 3 }, eye2: { top: 2, right: 3 } };
+        return { eye1: { top: 2, left: 4 }, eye2: { top: 2, right: 4 } };
       case 'DOWN':
-        return { eye1: { bottom: 2, left: 3 }, eye2: { bottom: 2, right: 3 } };
+        return { eye1: { bottom: 2, left: 4 }, eye2: { bottom: 2, right: 4 } };
       case 'LEFT':
-        return { eye1: { top: 3, left: 2 }, eye2: { bottom: 3, left: 2 } };
+        return { eye1: { top: 4, left: 2 }, eye2: { bottom: 4, left: 2 } };
       case 'RIGHT':
       default:
-        return { eye1: { top: 3, right: 2 }, eye2: { bottom: 3, right: 2 } };
+        return { eye1: { top: 4, right: 2 }, eye2: { bottom: 4, right: 2 } };
     }
   };
   const eyePos = getEyeStyles();
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
-      {/* Modern Cyber HUD Header */}
-      <View style={styles.hudContainer}>
-        <View style={styles.hudStat}>
-          <Text style={styles.statLabel}>SCORE</Text>
-          <Text style={styles.statValue}>🏆 {gameState.score}</Text>
+      {/* ChatGPT Minimalist HUD Header */}
+      <View style={styles.hudCard}>
+        <View style={styles.hudLeft}>
+          <Text style={styles.hudLabel}>SCORE</Text>
+          <Text style={styles.hudValue}>{gameState.score}</Text>
         </View>
 
-        <View style={styles.hudCenterBadge}>
-          <Text style={styles.portalBadgeText}>🌀 WARP WALLS</Text>
-          <Text style={styles.portalSubText}>Pass through borders!</Text>
+        <View style={styles.hudCenter}>
+          <Animated.View style={[styles.portalBadge, { opacity: portalGlowAnim }]}>
+            <Text style={styles.portalBadgeDot}>●</Text>
+            <Text style={styles.portalBadgeText}>WARP WALLS ACTIVE</Text>
+          </Animated.View>
+          <Text style={styles.subHint}>Pass borders • Only self-bite ends game</Text>
         </View>
 
-        <View style={[styles.hudStat, { alignItems: 'flex-end' }]}>
-          <Text style={styles.statLabel}>APPLES</Text>
-          <Text style={styles.statValue}>🍎 {Math.floor(gameState.score / 10)}</Text>
+        <View style={styles.hudRight}>
+          <Text style={styles.hudLabel}>APPLES</Text>
+          <Text style={styles.hudValue}>🍎 {Math.floor(gameState.score / 10)}</Text>
         </View>
       </View>
 
-      {/* Main Game Arena */}
+      {/* Main Game Arena with Glowing Warp Portal Frame */}
       <View style={styles.boardWrapper}>
         <View style={[styles.board, { width: BOARD_SIZE, height: BOARD_SIZE }]}>
-          {/* Subtle Grid Background */}
+          {/* ChatGPT Style Clean Slate Grid */}
           {Array.from({ length: GRID_SIZE }).map((_, r) => (
             <View key={`r-${r}`} style={styles.gridRow}>
               {Array.from({ length: GRID_SIZE }).map((_, c) => (
@@ -203,8 +271,8 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
                       height: CELL_SIZE,
                       backgroundColor:
                         (r + c) % 2 === 0
-                          ? 'rgba(15, 30, 48, 0.45)'
-                          : 'rgba(10, 22, 36, 0.45)',
+                          ? 'rgba(255, 255, 255, 0.025)'
+                          : 'rgba(255, 255, 255, 0.01)',
                     },
                   ]}
                 />
@@ -212,9 +280,9 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
             </View>
           ))}
 
-          {/* Snake Body Segments */}
+          {/* Snake Body Segments (Connected Smooth Pills) */}
           {body.map((segment, index) => {
-            const opacity = Math.max(0.4, 1 - index * 0.02);
+            const opacity = Math.max(0.45, 1 - index * 0.018);
             return (
               <View
                 key={`b-${index}`}
@@ -263,78 +331,22 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
               },
             ]}
           >
-            <Text style={[styles.foodEmoji, { fontSize: CELL_SIZE * 0.85 }]}>🍎</Text>
+            <Text style={[styles.foodEmoji, { fontSize: CELL_SIZE * 0.88 }]}>🍎</Text>
           </Animated.View>
         </View>
       </View>
 
-      {/* Swipe Hand Instruction & Touch Controller */}
-      <View style={styles.bottomSection}>
-        <View style={styles.gestureHintRow}>
-          <Text style={styles.gestureHintText}>
-            👆 Hand Swipe anywhere on screen or tap arrows
+      {/* Pure Touchscreen Bottom Zone (Zero Buttons — Hand Controls Guide) */}
+      <View style={styles.touchControlZone}>
+        <View style={styles.touchHintPill}>
+          <Text style={styles.touchHintIcon}>👆</Text>
+          <Text style={styles.touchHintText}>
+            Swipe or Tap screen to cut / steer snake
           </Text>
         </View>
-
-        {/* Ergonomic Floating Thumb Pad */}
-        <View style={styles.dpad}>
-          {/* UP Button */}
-          <View style={styles.dpadRow}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.dpadBtn,
-                currentDir === 'UP' && styles.dpadBtnActive,
-                pressed && styles.dpadBtnPressed,
-              ]}
-              onPress={() => changeDirection('UP')}
-            >
-              <Text style={styles.dpadArrow}>▲</Text>
-            </Pressable>
-          </View>
-
-          {/* LEFT / CENTER / RIGHT */}
-          <View style={styles.dpadRowMiddle}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.dpadBtn,
-                currentDir === 'LEFT' && styles.dpadBtnActive,
-                pressed && styles.dpadBtnPressed,
-              ]}
-              onPress={() => changeDirection('LEFT')}
-            >
-              <Text style={styles.dpadArrow}>◀</Text>
-            </Pressable>
-
-            <View style={styles.dpadCenterOrb}>
-              <Text style={styles.centerOrbIcon}>⚡</Text>
-            </View>
-
-            <Pressable
-              style={({ pressed }) => [
-                styles.dpadBtn,
-                currentDir === 'RIGHT' && styles.dpadBtnActive,
-                pressed && styles.dpadBtnPressed,
-              ]}
-              onPress={() => changeDirection('RIGHT')}
-            >
-              <Text style={styles.dpadArrow}>▶</Text>
-            </Pressable>
-          </View>
-
-          {/* DOWN Button */}
-          <View style={styles.dpadRow}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.dpadBtn,
-                currentDir === 'DOWN' && styles.dpadBtnActive,
-                pressed && styles.dpadBtnPressed,
-              ]}
-              onPress={() => changeDirection('DOWN')}
-            >
-              <Text style={styles.dpadArrow}>▼</Text>
-            </Pressable>
-          </View>
-        </View>
+        <Text style={styles.touchSubHint}>
+          No buttons needed • 100% gesture touchscreen controls
+        </Text>
       </View>
     </View>
   );
@@ -345,76 +357,86 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
-    backgroundColor: '#070D18',
+    paddingVertical: 14,
+    backgroundColor: '#090D16', // ChatGPT Dark Mode Palette
   },
-  hudContainer: {
+  hudCard: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: BOARD_SIZE,
-    backgroundColor: 'rgba(12, 26, 46, 0.85)',
+    backgroundColor: 'rgba(15, 23, 42, 0.85)',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: '#00E5FF33',
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.25)', // Subtle Emerald Accent
     ...Shadows.md,
   },
-  hudStat: {
+  hudLeft: {
     alignItems: 'flex-start',
   },
-  statLabel: {
+  hudRight: {
+    alignItems: 'flex-end',
+  },
+  hudCenter: {
+    alignItems: 'center',
+  },
+  hudLabel: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#00E5FF',
+    color: '#10B981', // ChatGPT Emerald
     letterSpacing: 1.5,
     marginBottom: 2,
   },
-  statValue: {
-    fontSize: 18,
+  hudValue: {
+    fontSize: 20,
     fontWeight: '900',
-    color: '#FFFFFF',
-    textShadowColor: 'rgba(0, 229, 255, 0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 6,
+    color: '#F8FAFC',
   },
-  hudCenterBadge: {
+  portalBadge: {
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 229, 255, 0.1)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#00E5FF55',
+    borderColor: 'rgba(16, 185, 129, 0.4)',
+    gap: 5,
+  },
+  portalBadgeDot: {
+    color: '#10B981',
+    fontSize: 8,
   },
   portalBadgeText: {
-    fontSize: 11,
-    fontWeight: '900',
-    color: '#00E5FF',
+    fontSize: 10,
+    fontWeight: '800',
+    color: '#34D399',
     letterSpacing: 1,
   },
-  portalSubText: {
+  subHint: {
     fontSize: 9,
-    color: '#A0D2EB',
+    color: '#64748B',
     fontWeight: '600',
+    marginTop: 2,
   },
   boardWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 4,
+    marginVertical: 8,
   },
   board: {
-    backgroundColor: '#0A1526',
-    borderRadius: 20,
-    borderWidth: 2.5,
-    borderColor: '#00E5FF',
+    backgroundColor: '#0F172A', // Deep Sleek Slate
+    borderRadius: 22,
+    borderWidth: 2,
+    borderColor: '#10B981', // Emerald Border
     overflow: 'hidden',
     position: 'relative',
-    shadowColor: '#00E5FF',
+    shadowColor: '#10B981',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.45,
-    shadowRadius: 16,
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
     elevation: 10,
   },
   gridRow: {
@@ -422,27 +444,27 @@ const styles = StyleSheet.create({
   },
   gridCell: {
     borderWidth: 0.5,
-    borderColor: 'rgba(0, 229, 255, 0.05)',
+    borderColor: 'rgba(255, 255, 255, 0.015)',
   },
   snakeSegment: {
     position: 'absolute',
-    backgroundColor: '#00E676',
-    borderRadius: 5,
+    backgroundColor: '#10B981', // Emerald Pill
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#B9F6CA',
-    shadowColor: '#00E676',
+    borderColor: '#34D399',
+    shadowColor: '#10B981',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
+    shadowOpacity: 0.5,
     shadowRadius: 4,
     elevation: 3,
   },
   snakeHead: {
     position: 'absolute',
-    backgroundColor: '#00FF88',
-    borderRadius: 7,
+    backgroundColor: '#34D399', // Bright Head Pill
+    borderRadius: 8,
     borderWidth: 1.5,
     borderColor: '#FFFFFF',
-    shadowColor: '#00FF88',
+    shadowColor: '#34D399',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.9,
     shadowRadius: 8,
@@ -454,7 +476,7 @@ const styles = StyleSheet.create({
     width: 3.5,
     height: 3.5,
     borderRadius: 2,
-    backgroundColor: '#070D18',
+    backgroundColor: '#090D16',
   },
   foodContainer: {
     position: 'absolute',
@@ -465,80 +487,35 @@ const styles = StyleSheet.create({
   foodEmoji: {
     textAlign: 'center',
   },
-  bottomSection: {
+  touchControlZone: {
     width: '100%',
     alignItems: 'center',
-    gap: 8,
+    paddingVertical: 18,
+    gap: 6,
   },
-  gestureHintRow: {
-    backgroundColor: 'rgba(12, 26, 46, 0.6)',
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 229, 255, 0.2)',
-  },
-  gestureHintText: {
-    fontSize: 11,
-    color: '#8BAAC8',
-    fontWeight: '700',
-  },
-  dpad: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 2,
-  },
-  dpadRow: {
-    alignItems: 'center',
-  },
-  dpadRowMiddle: {
+  touchHintPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
-    marginVertical: 4,
+    backgroundColor: 'rgba(15, 23, 42, 0.8)',
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.25)',
+    gap: 8,
   },
-  dpadCenterOrb: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(0, 229, 255, 0.08)',
-    borderWidth: 1.5,
-    borderColor: 'rgba(0, 229, 255, 0.3)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  touchHintIcon: {
+    fontSize: 16,
   },
-  centerOrbIcon: {
-    fontSize: 18,
-    color: '#00E5FF',
+  touchHintText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#E2E8F0',
+    letterSpacing: 0.5,
   },
-  dpadBtn: {
-    width: 54,
-    height: 54,
-    backgroundColor: 'rgba(14, 30, 52, 0.9)',
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: '#00E5FF44',
-    shadowColor: '#00E5FF',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 4,
-  },
-  dpadBtnActive: {
-    borderColor: '#00FF88',
-    backgroundColor: 'rgba(0, 255, 136, 0.2)',
-    shadowColor: '#00FF88',
-    shadowOpacity: 0.7,
-  },
-  dpadBtnPressed: {
-    transform: [{ scale: 0.92 }],
-    backgroundColor: 'rgba(0, 229, 255, 0.35)',
-  },
-  dpadArrow: {
-    fontSize: 22,
-    color: '#FFFFFF',
-    fontWeight: '900',
+  touchSubHint: {
+    fontSize: 10,
+    color: '#64748B',
+    fontWeight: '600',
   },
 });

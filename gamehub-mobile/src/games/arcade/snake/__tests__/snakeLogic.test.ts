@@ -104,4 +104,24 @@ describe('Snake Logic — Edge Wrap & Self Collision', () => {
     const next = moveSnake(state, 'RIGHT');
     expect(next.gameOver).toBe(true);
   });
+
+  it('continuously wraps through borders for 100 steps without ending game', () => {
+    let state = getInitialState(15);
+    // Move RIGHT through right wall 30 times
+    for (let i = 0; i < 30; i++) {
+      state = moveSnake(state, 'RIGHT');
+      expect(state.gameOver).toBe(false);
+      expect(state.snake[0].x).toBeGreaterThanOrEqual(0);
+      expect(state.snake[0].x).toBeLessThan(15);
+    }
+
+    // Turn DOWN and wrap through bottom wall 30 times
+    for (let i = 0; i < 30; i++) {
+      state = moveSnake(state, 'DOWN');
+      expect(state.gameOver).toBe(false);
+      expect(state.snake[0].y).toBeGreaterThanOrEqual(0);
+      expect(state.snake[0].y).toBeLessThan(15);
+    }
+  });
 });
+
