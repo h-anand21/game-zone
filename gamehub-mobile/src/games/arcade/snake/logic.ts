@@ -57,13 +57,16 @@ export function moveSnake(state: SnakeState, newDirection?: Direction): SnakeSta
       break;
   }
 
-  // Wall collision
-  if (head.x < 0 || head.x >= state.gridSize || head.y < 0 || head.y >= state.gridSize) {
-    return { ...state, gameOver: true };
-  }
+  // Edge Wrap: pass through borders smoothly (opposite side teleport)
+  if (head.x < 0) head.x = state.gridSize - 1;
+  else if (head.x >= state.gridSize) head.x = 0;
+  if (head.y < 0) head.y = state.gridSize - 1;
+  else if (head.y >= state.gridSize) head.y = 0;
 
-  // Self collision
-  if (state.snake.some((seg) => seg.x === head.x && seg.y === head.y)) {
+  // Self-collision: Game ends ONLY when the snake runs into itself!
+  const isEating = head.x === state.food.x && head.y === state.food.y;
+  const bodyToCheck = isEating ? state.snake : state.snake.slice(0, -1);
+  if (bodyToCheck.some((seg) => seg.x === head.x && seg.y === head.y)) {
     return { ...state, gameOver: true };
   }
 
@@ -72,7 +75,7 @@ export function moveSnake(state: SnakeState, newDirection?: Direction): SnakeSta
   let newFood = state.food;
 
   // Food collision
-  if (head.x === state.food.x && head.y === state.food.y) {
+  if (isEating) {
     newScore += 10;
     newFood = generateFood(newSnake, state.gridSize);
   } else {
