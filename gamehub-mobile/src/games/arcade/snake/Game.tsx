@@ -1,9 +1,8 @@
 // ============================================================
-// GameHub — Snake Component (ChatGPT Easter Egg Inspired Edition)
-// 100% Pure Touchscreen Controls (Zero Buttons)
-// Instant Tap-To-Steer: Tap Left -> Snake goes Left, Tap Right -> Snake goes Right
-// Tap Top -> Up, Tap Bottom -> Down + Full-Screen Hand Swipe
-// Border Warp Portals, Self-Collision-Only Game Over, Minimalist Cyber UI
+// GameHub — Snake Component (Google Snake & Android Mobile Edition)
+// Ultra-Smooth Fluid Controls: Direct Swipe Steering + Tap to Turn
+// Warp Portals (Walls do not kill), Self-Bite Only Game Over
+// 100% Mobile Touchscreen Architecture (Zero Lag, Fast Tick)
 // ============================================================
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
@@ -31,38 +30,28 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BOARD_SIZE = Math.min(SCREEN_WIDTH - 24, 380);
 const CELL_SIZE = (BOARD_SIZE - 4) / GRID_SIZE;
 
-interface TouchIndicator {
-  id: number;
-  x: number;
-  y: number;
-  arrow: string;
-}
-
 export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
   const [gameState, setGameState] = useState<SnakeState>(() => getInitialState());
   const currentDirectionRef = useRef<Direction>('RIGHT');
-  const directionQueueRef = useRef<Direction[]>([]);
+  const nextDirectionRef = useRef<Direction>('RIGHT');
   const hasFinishedRef = useRef(false);
-
-  // Visual tap feedback ripples
-  const [touchFeedback, setTouchFeedback] = useState<TouchIndicator | null>(null);
 
   // Pulse animation for the glowing food apple
   const pulseAnim = useRef(new Animated.Value(1)).current;
   // Border portal glow animation
-  const portalGlowAnim = useRef(new Animated.Value(0.4)).current;
+  const portalGlowAnim = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
     const foodPulse = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, {
           toValue: 1.25,
-          duration: 400,
+          duration: 380,
           useNativeDriver: true,
         }),
         Animated.timing(pulseAnim, {
           toValue: 1,
-          duration: 400,
+          duration: 380,
           useNativeDriver: true,
         }),
       ])
@@ -72,13 +61,13 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
     const portalGlow = Animated.loop(
       Animated.sequence([
         Animated.timing(portalGlowAnim, {
-          toValue: 0.9,
-          duration: 1200,
+          toValue: 0.95,
+          duration: 1100,
           useNativeDriver: true,
         }),
         Animated.timing(portalGlowAnim, {
-          toValue: 0.4,
-          duration: 1200,
+          toValue: 0.45,
+          duration: 1100,
           useNativeDriver: true,
         }),
       ])
@@ -102,15 +91,15 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
     }
   }, [gameState.gameOver, gameState.score, onFinish]);
 
-  // Main game tick loop
+  // Fast, responsive tick loop (110ms like Google Snake)
   useEffect(() => {
     if (isPaused || gameState.gameOver) return;
 
-    const intervalTime = Math.max(75, 175 - Math.floor(gameState.score / 20) * 10);
+    // Fast, responsive tick loop: 110ms base scaling down to 80ms
+    const intervalTime = Math.max(80, 115 - Math.floor(gameState.score / 30) * 8);
     const timer = setInterval(() => {
       setGameState((prev) => {
-        const nextDir = directionQueueRef.current.shift() || currentDirectionRef.current;
-        const next = moveSnake(prev, nextDir);
+        const next = moveSnake(prev, nextDirectionRef.current);
         currentDirectionRef.current = next.direction;
         return next;
       });
@@ -119,92 +108,32 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
     return () => clearInterval(timer);
   }, [isPaused, gameState.gameOver, gameState.score]);
 
-  // Steer towards target direction (Direct turn or safe double-turn if 180°)
-  const steerTowards = (targetDir: Direction, tapY: number, tapX: number) => {
-    const current =
-      directionQueueRef.current.length > 0
-        ? directionQueueRef.current[directionQueueRef.current.length - 1]
-        : currentDirectionRef.current;
+  // Direction changer with strict 180° self-bite prevention
+  const trySetDirection = (newDir: Direction) => {
+    const current = currentDirectionRef.current;
 
-    if (targetDir === current) return;
-
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {}
-
-    const isOpposite =
-      (targetDir === 'UP' && current === 'DOWN') ||
-      (targetDir === 'DOWN' && current === 'UP') ||
-      (targetDir === 'LEFT' && current === 'RIGHT') ||
-      (targetDir === 'RIGHT' && current === 'LEFT');
-
-    if (!isOpposite) {
-      // Direct 90-degree turn
-      directionQueueRef.current = [targetDir];
-    } else {
-      // User tapped exact opposite side (180° turn):
-      // Safely execute 2-step U-turn so snake turns towards the tapped side without self-bite suicide
-      const centerY = SCREEN_HEIGHT * 0.45;
-      const centerX = SCREEN_WIDTH * 0.5;
-
-      if (targetDir === 'LEFT' || targetDir === 'RIGHT') {
-        const intermediate: Direction = tapY < centerY ? 'UP' : 'DOWN';
-        directionQueueRef.current = [intermediate, targetDir];
-      } else {
-        const intermediate: Direction = tapX < centerX ? 'LEFT' : 'RIGHT';
-        directionQueueRef.current = [intermediate, targetDir];
-      }
-    }
-  };
-
-  // Process directional tap from screen coordinates
-  const handleTap = (pageX: number, pageY: number) => {
-    const centerX = SCREEN_WIDTH / 2;
-    // Board center roughly at 45% of screen height
-    const centerY = SCREEN_HEIGHT * 0.45;
-
-    const dx = pageX - centerX;
-    const dy = pageY - centerY;
-
-    let targetDir: Direction;
-    let arrowChar: string;
-
-    // Check whether tap is more horizontal or vertical
-    if (Math.abs(dx) > Math.abs(dy)) {
-      if (dx < 0) {
-        targetDir = 'LEFT';
-        arrowChar = '◀';
-      } else {
-        targetDir = 'RIGHT';
-        arrowChar = '▶';
-      }
-    } else {
-      if (dy < 0) {
-        targetDir = 'UP';
-        arrowChar = '▲';
-      } else {
-        targetDir = 'DOWN';
-        arrowChar = '▼';
-      }
+    // Prevent direct 180-degree suicide
+    if (
+      (newDir === 'UP' && current === 'DOWN') ||
+      (newDir === 'DOWN' && current === 'UP') ||
+      (newDir === 'LEFT' && current === 'RIGHT') ||
+      (newDir === 'RIGHT' && current === 'LEFT')
+    ) {
+      return false;
     }
 
-    // Show instant visual touch indicator
-    setTouchFeedback({
-      id: Date.now(),
-      x: pageX - 25,
-      y: pageY - 25,
-      arrow: arrowChar,
-    });
-    setTimeout(() => {
-      setTouchFeedback(null);
-    }, 280);
-
-    steerTowards(targetDir, pageY, pageX);
+    if (newDir !== current) {
+      nextDirectionRef.current = newDir;
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      } catch {}
+      return true;
+    }
+    return false;
   };
 
-  // Full-screen PanResponder: Instant Tap on touch-down + fluid drag
-  const swipeHandledRef = useRef(false);
-  const startPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  // Google Snake Style Continuous PanResponder
+  const touchStartRef = useRef<{ x: number; y: number; time: number }>({ x: 0, y: 0, time: 0 });
 
   const panResponder = useMemo(
     () =>
@@ -212,36 +141,66 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
         onStartShouldSetPanResponder: () => true,
         onMoveShouldSetPanResponder: () => true,
         onPanResponderGrant: (evt) => {
-          swipeHandledRef.current = false;
-          const { pageX, pageY } = evt.nativeEvent;
-          startPosRef.current = { x: pageX, y: pageY };
-          // INSTANT RESPONSE ON TOUCH-DOWN: Tap Left -> Goes Left, Tap Right -> Goes Right!
-          handleTap(pageX, pageY);
+          touchStartRef.current = {
+            x: evt.nativeEvent.pageX,
+            y: evt.nativeEvent.pageY,
+            time: Date.now(),
+          };
         },
-        onPanResponderMove: (_, gesture) => {
-          if (swipeHandledRef.current) return;
+        onPanResponderMove: (evt) => {
+          const currentX = evt.nativeEvent.pageX;
+          const currentY = evt.nativeEvent.pageY;
+          const dx = currentX - touchStartRef.current.x;
+          const dy = currentY - touchStartRef.current.y;
+          const distance = Math.hypot(dx, dy);
 
-          const SWIPE_THRESHOLD = 16;
-          const { dx, dy } = gesture;
-
-          if (Math.abs(dx) > SWIPE_THRESHOLD || Math.abs(dy) > SWIPE_THRESHOLD) {
-            let swipeDir: Direction;
+          // Fast threshold (15px): As soon as finger moves, steer!
+          if (distance >= 15) {
+            let desiredDir: Direction;
             if (Math.abs(dx) > Math.abs(dy)) {
-              swipeDir = dx > 0 ? 'RIGHT' : 'LEFT';
+              desiredDir = dx > 0 ? 'RIGHT' : 'LEFT';
             } else {
-              swipeDir = dy > 0 ? 'DOWN' : 'UP';
+              desiredDir = dy > 0 ? 'DOWN' : 'UP';
             }
 
-            swipeHandledRef.current = true;
-            steerTowards(
-              swipeDir,
-              startPosRef.current.y + dy,
-              startPosRef.current.x + dx
-            );
+            const changed = trySetDirection(desiredDir);
+            // Reset anchor so continuous dragging continues steering smoothly without lifting finger
+            if (changed || distance >= 30) {
+              touchStartRef.current = {
+                x: currentX,
+                y: currentY,
+                time: Date.now(),
+              };
+            }
           }
         },
-        onPanResponderRelease: () => {
-          swipeHandledRef.current = false;
+        onPanResponderRelease: (evt, gesture) => {
+          const duration = Date.now() - touchStartRef.current.time;
+          const isTap = Math.abs(gesture.dx) < 14 && Math.abs(gesture.dy) < 14 && duration < 300;
+
+          if (isTap) {
+            const { pageX, pageY } = evt.nativeEvent;
+            const current = currentDirectionRef.current;
+            const centerX = SCREEN_WIDTH / 2;
+            const centerY = SCREEN_HEIGHT * 0.44;
+
+            // Direct Tap Controls:
+            if (current === 'UP' || current === 'DOWN') {
+              // Moving vertically: tapping left goes LEFT, tapping right goes RIGHT
+              if (pageX < centerX) {
+                trySetDirection('LEFT');
+              } else {
+                trySetDirection('RIGHT');
+              }
+            } else {
+              // Moving horizontally: tapping top goes UP, tapping bottom goes DOWN
+              if (pageY < centerY) {
+                trySetDirection('UP');
+              } else {
+                trySetDirection('DOWN');
+              }
+            }
+          }
         },
       }),
     []
@@ -269,7 +228,7 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
-      {/* ChatGPT Minimalist HUD Header */}
+      {/* Modern Android Arcade HUD */}
       <View style={styles.hudCard}>
         <View style={styles.hudLeft}>
           <Text style={styles.hudLabel}>SCORE</Text>
@@ -293,7 +252,7 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
       {/* Main Game Arena with Glowing Warp Portal Frame */}
       <View style={styles.boardWrapper}>
         <View style={[styles.board, { width: BOARD_SIZE, height: BOARD_SIZE }]}>
-          {/* ChatGPT Style Clean Slate Grid */}
+          {/* Subtle Grid Checkerboard */}
           {Array.from({ length: GRID_SIZE }).map((_, r) => (
             <View key={`r-${r}`} style={styles.gridRow}>
               {Array.from({ length: GRID_SIZE }).map((_, c) => (
@@ -307,7 +266,7 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
                       backgroundColor:
                         (r + c) % 2 === 0
                           ? 'rgba(255, 255, 255, 0.025)'
-                          : 'rgba(255, 255, 255, 0.01)',
+                          : 'rgba(255, 255, 255, 0.008)',
                     },
                   ]}
                 />
@@ -317,7 +276,7 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
 
           {/* Snake Body Segments (Connected Smooth Pills) */}
           {body.map((segment, index) => {
-            const opacity = Math.max(0.45, 1 - index * 0.018);
+            const opacity = Math.max(0.5, 1 - index * 0.018);
             return (
               <View
                 key={`b-${index}`}
@@ -371,36 +330,15 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
         </View>
       </View>
 
-      {/* Pure Touchscreen Bottom Zone (Zero Buttons — Hand Controls Guide) */}
+      {/* Pure Touchscreen Gesture Controls Zone */}
       <View style={styles.touchControlZone}>
-        <View style={styles.tapGuidanceContainer}>
-          <View style={styles.tapZoneGuideLeft}>
-            <Text style={styles.tapZoneArrow}>◀</Text>
-            <Text style={styles.tapZoneText}>Tap Left side</Text>
-          </View>
-          <View style={styles.tapZoneDivider} />
-          <View style={styles.tapZoneGuideRight}>
-            <Text style={styles.tapZoneText}>Tap Right side</Text>
-            <Text style={styles.tapZoneArrow}>▶</Text>
-          </View>
+        <View style={styles.touchHintCard}>
+          <Text style={styles.touchHintTitle}>👆 Google Snake Touch Controls</Text>
+          <Text style={styles.touchHintText}>
+            Swipe in any direction to steer • Tap left/right/up/down to turn
+          </Text>
         </View>
-        <Text style={styles.touchSubHint}>
-          Tap anywhere on screen to turn • Swipe to steer
-        </Text>
       </View>
-
-      {/* Instant Visual Touch Feedback Indicator */}
-      {touchFeedback && (
-        <View
-          pointerEvents="none"
-          style={[
-            styles.touchIndicator,
-            { left: touchFeedback.x, top: touchFeedback.y },
-          ]}
-        >
-          <Text style={styles.touchIndicatorText}>{touchFeedback.arrow}</Text>
-        </View>
-      )}
     </View>
   );
 };
@@ -482,7 +420,7 @@ const styles = StyleSheet.create({
   board: {
     backgroundColor: '#0F172A',
     borderRadius: 22,
-    borderWidth: 2,
+    borderWidth: 2.5,
     borderColor: '#10B981',
     overflow: 'hidden',
     position: 'relative',
@@ -543,71 +481,28 @@ const styles = StyleSheet.create({
   touchControlZone: {
     width: BOARD_SIZE,
     alignItems: 'center',
-    paddingVertical: 14,
-    gap: 8,
+    paddingVertical: 12,
   },
-  tapGuidanceContainer: {
-    flexDirection: 'row',
+  touchHintCard: {
     alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    backgroundColor: 'rgba(15, 23, 42, 0.7)',
-    borderRadius: 18,
+    backgroundColor: 'rgba(15, 23, 42, 0.75)',
     paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(16, 185, 129, 0.2)',
+    gap: 3,
   },
-  tapZoneGuideLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  tapZoneGuideRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  tapZoneArrow: {
-    fontSize: 16,
-    color: '#10B981',
-    fontWeight: '900',
-  },
-  tapZoneText: {
+  touchHintTitle: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#94A3B8',
+    fontWeight: '800',
+    color: '#34D399',
+    letterSpacing: 0.5,
   },
-  tapZoneDivider: {
-    width: 1,
-    height: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  touchSubHint: {
+  touchHintText: {
     fontSize: 11,
-    color: '#64748B',
+    color: '#94A3B8',
     fontWeight: '600',
-  },
-  touchIndicator: {
-    position: 'absolute',
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: 'rgba(16, 185, 129, 0.25)',
-    borderWidth: 2,
-    borderColor: '#34D399',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 999,
-    shadowColor: '#34D399',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 8,
-  },
-  touchIndicatorText: {
-    fontSize: 22,
-    color: '#FFFFFF',
-    fontWeight: '900',
+    textAlign: 'center',
   },
 });
