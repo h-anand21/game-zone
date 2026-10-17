@@ -91,12 +91,24 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
     }
   }, [gameState.gameOver, gameState.score, onFinish]);
 
-  // Fast, responsive tick loop (110ms like Google Snake)
+  // Speed Level calculation (Level 1 starts relaxed at 210ms, scales smoothly with score)
+  const speedLevel = Math.min(10, Math.floor(gameState.score / 40) + 1);
+  const intervalTime = Math.max(90, 210 - (speedLevel - 1) * 13);
+
+  const prevLevelRef = useRef(1);
+  useEffect(() => {
+    if (speedLevel > prevLevelRef.current) {
+      prevLevelRef.current = speedLevel;
+      try {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch {}
+    }
+  }, [speedLevel]);
+
+  // Main game tick loop
   useEffect(() => {
     if (isPaused || gameState.gameOver) return;
 
-    // Fast, responsive tick loop: 110ms base scaling down to 80ms
-    const intervalTime = Math.max(80, 115 - Math.floor(gameState.score / 30) * 8);
     const timer = setInterval(() => {
       setGameState((prev) => {
         const next = moveSnake(prev, nextDirectionRef.current);
@@ -106,7 +118,7 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
     }, intervalTime);
 
     return () => clearInterval(timer);
-  }, [isPaused, gameState.gameOver, gameState.score]);
+  }, [isPaused, gameState.gameOver, intervalTime]);
 
   // Direction changer with strict 180° self-bite prevention
   const trySetDirection = (newDir: Direction) => {
