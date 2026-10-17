@@ -248,11 +248,13 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
         </View>
 
         <View style={styles.hudCenter}>
+          <View style={styles.speedBadge}>
+            <Text style={styles.speedBadgeText}>⚡ SPEED LVL {speedLevel}</Text>
+          </View>
           <Animated.View style={[styles.portalBadge, { opacity: portalGlowAnim }]}>
             <Text style={styles.portalBadgeDot}>●</Text>
-            <Text style={styles.portalBadgeText}>WARP WALLS ACTIVE</Text>
+            <Text style={styles.portalBadgeText}>WARP WALLS</Text>
           </Animated.View>
-          <Text style={styles.subHint}>Pass borders • Only self-bite ends game</Text>
         </View>
 
         <View style={styles.hudRight}>
@@ -396,6 +398,21 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '900',
     color: '#F8FAFC',
+  },
+  speedBadge: {
+    backgroundColor: 'rgba(255, 215, 0, 0.15)',
+    paddingHorizontal: 9,
+    paddingVertical: 2,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.4)',
+    marginBottom: 3,
+  },
+  speedBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#FFD700',
+    letterSpacing: 0.8,
   },
   portalBadge: {
     flexDirection: 'row',
