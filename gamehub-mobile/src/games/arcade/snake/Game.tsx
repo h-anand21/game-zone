@@ -347,7 +347,12 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
             ]}
           >
             <Text style={[styles.foodEmoji, { fontSize: CELL_SIZE * 0.88 }]}>🍎</Text>
-          </Animated.View>
+          {/* Level Up Flash Banner */}
+          {levelUpText && (
+            <View style={styles.levelUpOverlay} pointerEvents="none">
+              <Text style={styles.levelUpText}>{levelUpText}</Text>
+            </View>
+          )}
         </View>
       </View>
 
