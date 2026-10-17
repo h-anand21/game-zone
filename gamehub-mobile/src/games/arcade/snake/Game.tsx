@@ -95,13 +95,20 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
   const speedLevel = Math.min(10, Math.floor(gameState.score / 40) + 1);
   const intervalTime = Math.max(90, 210 - (speedLevel - 1) * 13);
 
+  const [levelUpText, setLevelUpText] = useState<string | null>(null);
   const prevLevelRef = useRef(1);
+
   useEffect(() => {
     if (speedLevel > prevLevelRef.current) {
       prevLevelRef.current = speedLevel;
+      setLevelUpText(`⚡ LEVEL ${speedLevel}! SPEED UP`);
       try {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } catch {}
+      const timer = setTimeout(() => {
+        setLevelUpText(null);
+      }, 1400);
+      return () => clearTimeout(timer);
     }
   }, [speedLevel]);
 
