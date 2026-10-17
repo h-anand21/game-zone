@@ -511,33 +511,6 @@ const styles = StyleSheet.create({
   foodEmoji: {
     textAlign: 'center',
   },
-  touchControlZone: {
-    width: BOARD_SIZE,
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  touchHintCard: {
-    alignItems: 'center',
-    backgroundColor: 'rgba(15, 23, 42, 0.75)',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.2)',
-    gap: 3,
-  },
-  touchHintTitle: {
-    fontSize: 12,
-    fontWeight: '800',
-    color: '#34D399',
-    letterSpacing: 0.5,
-  },
-  touchHintText: {
-    fontSize: 11,
-    color: '#94A3B8',
-    fontWeight: '600',
-    textAlign: 'center',
-  },
   levelUpOverlay: {
     position: 'absolute',
     top: '40%',
