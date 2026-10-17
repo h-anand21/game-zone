@@ -357,16 +357,6 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
           )}
         </View>
       </View>
-
-      {/* Pure Touchscreen Gesture Controls Zone */}
-      <View style={styles.touchControlZone}>
-        <View style={styles.touchHintCard}>
-          <Text style={styles.touchHintTitle}>👆 Google Snake Touch Controls</Text>
-          <Text style={styles.touchHintText}>
-            Swipe in any direction to steer • Tap left/right/up/down to turn
-          </Text>
-        </View>
-      </View>
     </View>
   );
 };
