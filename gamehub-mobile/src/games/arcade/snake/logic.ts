@@ -1,17 +1,26 @@
 // ============================================================
-// GameHub — Snake Pure Logic
+// GameHub — Snake Pure Logic (Supports Big Screen Grid)
 // ============================================================
 
 import type { Position, Direction, SnakeState } from './types';
 
 export const GRID_SIZE = 15;
+export const DEFAULT_GRID_COLS = 15;
+export const DEFAULT_GRID_ROWS = 22; // Full-height vertical proportions for modern mobile screens
 
-export function generateFood(snake: Position[], gridSize = GRID_SIZE): Position {
+export function generateFood(
+  snake: Position[],
+  colsOrSize: number = DEFAULT_GRID_COLS,
+  rows?: number
+): Position {
+  const gridCols = colsOrSize;
+  const gridRows = rows ?? colsOrSize;
+
   let newFood: Position;
   while (true) {
     newFood = {
-      x: Math.floor(Math.random() * gridSize),
-      y: Math.floor(Math.random() * gridSize),
+      x: Math.floor(Math.random() * gridCols),
+      y: Math.floor(Math.random() * gridRows),
     };
     if (!snake.some((segment) => segment.x === newFood.x && segment.y === newFood.y)) {
       break;
@@ -20,19 +29,31 @@ export function generateFood(snake: Position[], gridSize = GRID_SIZE): Position 
   return newFood;
 }
 
-export function getInitialState(gridSize = GRID_SIZE): SnakeState {
+export function getInitialState(
+  colsOrSize?: number,
+  rows?: number
+): SnakeState {
+  const gridCols = colsOrSize ?? DEFAULT_GRID_COLS;
+  const gridRows = rows ?? (colsOrSize !== undefined ? colsOrSize : DEFAULT_GRID_ROWS);
+
+  const startX = Math.floor(gridCols / 2);
+  const startY = Math.floor(gridRows / 2);
+
   const initialSnake = [
-    { x: 7, y: 7 },
-    { x: 6, y: 7 },
-    { x: 5, y: 7 },
+    { x: startX, y: startY },
+    { x: startX - 1, y: startY },
+    { x: startX - 2, y: startY },
   ];
+
   return {
     snake: initialSnake,
-    food: generateFood(initialSnake, gridSize),
+    food: generateFood(initialSnake, gridCols, gridRows),
     direction: 'RIGHT',
     score: 0,
     gameOver: false,
-    gridSize,
+    gridSize: gridCols,
+    gridCols,
+    gridRows,
   };
 }
 
@@ -57,11 +78,14 @@ export function moveSnake(state: SnakeState, newDirection?: Direction): SnakeSta
       break;
   }
 
+  const cols = state.gridCols ?? state.gridSize ?? 15;
+  const rows = state.gridRows ?? state.gridSize ?? 15;
+
   // Edge Wrap: pass through borders smoothly (opposite side teleport)
-  if (head.x < 0) head.x = state.gridSize - 1;
-  else if (head.x >= state.gridSize) head.x = 0;
-  if (head.y < 0) head.y = state.gridSize - 1;
-  else if (head.y >= state.gridSize) head.y = 0;
+  if (head.x < 0) head.x = cols - 1;
+  else if (head.x >= cols) head.x = 0;
+  if (head.y < 0) head.y = rows - 1;
+  else if (head.y >= rows) head.y = 0;
 
   // Self-collision: Game ends ONLY when the snake runs into itself!
   const isEating = head.x === state.food.x && head.y === state.food.y;
@@ -77,7 +101,7 @@ export function moveSnake(state: SnakeState, newDirection?: Direction): SnakeSta
   // Food collision
   if (isEating) {
     newScore += 10;
-    newFood = generateFood(newSnake, state.gridSize);
+    newFood = generateFood(newSnake, cols, rows);
   } else {
     newSnake.pop(); // Remove tail
   }
