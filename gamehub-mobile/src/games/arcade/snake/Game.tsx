@@ -14,6 +14,7 @@ import {
   PanResponder,
   Animated,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { getInitialState, moveSnake } from './logic';
 import type { Direction, SnakeState } from './types';
@@ -33,8 +34,8 @@ const CELL_SIZE = Math.floor((SCREEN_WIDTH - 16) / GRID_COLS);
 const BOARD_WIDTH = GRID_COLS * CELL_SIZE;
 
 // Fill the entire available height on the phone screen
-const AVAILABLE_HEIGHT = SCREEN_HEIGHT - 150;
-const GRID_ROWS = Math.max(18, Math.floor(AVAILABLE_HEIGHT / CELL_SIZE));
+const AVAILABLE_HEIGHT = SCREEN_HEIGHT - 165;
+const GRID_ROWS = Math.max(16, Math.floor(AVAILABLE_HEIGHT / CELL_SIZE));
 const BOARD_HEIGHT = GRID_ROWS * CELL_SIZE;
 
 export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
@@ -45,10 +46,15 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
   const nextDirectionRef = useRef<Direction>('RIGHT');
   const hasFinishedRef = useRef(false);
 
+  // Persistent High Score state
+  const [highScore, setHighScore] = useState(0);
+
   // Pulse animation for the glowing food apple
   const pulseAnim = useRef(new Animated.Value(1)).current;
   // Border portal glow animation
   const portalGlowAnim = useRef(new Animated.Value(0.5)).current;
+  // Score pop bounce animation
+  const scorePopAnim = useRef(new Animated.Value(1)).current;
 
   // Level Up announcement
   const [levelUpText, setLevelUpText] = useState<string | null>(null);
@@ -57,6 +63,44 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
   // Speed level: Level 1 starts relaxed at 210ms, scales with level
   const speedLevel = Math.min(10, Math.floor(gameState.score / 40) + 1);
   const intervalTime = Math.max(90, 210 - (speedLevel - 1) * 13);
+
+  // Load High Score on mount
+  useEffect(() => {
+    AsyncStorage.getItem('@snake_best_score')
+      .then((val) => {
+        if (val) {
+          const parsed = parseInt(val, 10);
+          if (!isNaN(parsed)) setHighScore(parsed);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Update High Score in real-time
+  useEffect(() => {
+    if (gameState.score > highScore) {
+      setHighScore(gameState.score);
+      AsyncStorage.setItem('@snake_best_score', String(gameState.score)).catch(() => {});
+    }
+  }, [gameState.score, highScore]);
+
+  // Score pop animation when score increases
+  useEffect(() => {
+    if (gameState.score > 0) {
+      Animated.sequence([
+        Animated.timing(scorePopAnim, {
+          toValue: 1.25,
+          duration: 90,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scorePopAnim, {
+          toValue: 1,
+          duration: 110,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [gameState.score, scorePopAnim]);
 
   useEffect(() => {
     const foodPulse = Animated.loop(
@@ -253,26 +297,37 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
 
   return (
     <View style={styles.container} {...panResponder.panHandlers}>
-      {/* 1. TOP FLOATING CYBER HUD */}
-      <View style={styles.hudCard}>
-        <View style={styles.hudStatBox}>
-          <Text style={styles.hudLabel}>SCORE</Text>
-          <Text style={styles.hudValue}>{gameState.score}</Text>
-        </View>
-
-        <View style={styles.hudCenterBox}>
-          <View style={styles.speedBadge}>
-            <Text style={styles.speedBadgeText}>⚡ SPEED LVL {speedLevel}</Text>
+      {/* 1. TOP PREMIUM UNIFIED ARCADE SCOREBOARD */}
+      <View style={[styles.scoreboardCard, { width: BOARD_WIDTH }]}>
+        {/* CURRENT SCORE (APPLES) */}
+        <View style={styles.scoreBlock}>
+          <Text style={styles.scoreIcon}>🍎</Text>
+          <View style={styles.scoreTextCol}>
+            <Text style={styles.scoreLabel}>SCORE</Text>
+            <Animated.Text
+              style={[
+                styles.scoreValue,
+                { transform: [{ scale: scorePopAnim }] },
+              ]}
+            >
+              {gameState.score}
+            </Animated.Text>
           </View>
-          <Animated.View style={[styles.portalBadge, { opacity: portalGlowAnim }]}>
-            <Text style={styles.portalDot}>●</Text>
-            <Text style={styles.portalText}>WARP WALLS ACTIVE</Text>
-          </Animated.View>
         </View>
 
-        <View style={[styles.hudStatBox, { alignItems: 'flex-end' }]}>
-          <Text style={styles.hudLabel}>APPLES</Text>
-          <Text style={styles.hudValue}>🍎 {Math.floor(gameState.score / 10)}</Text>
+        {/* SPEED BADGE */}
+        <View style={styles.speedBadge}>
+          <Text style={styles.speedBolt}>⚡</Text>
+          <Text style={styles.speedBadgeText}>LVL {speedLevel}</Text>
+        </View>
+
+        {/* HIGH SCORE (BEST) */}
+        <View style={styles.bestBlock}>
+          <Text style={styles.bestIcon}>🏆</Text>
+          <View style={styles.bestTextCol}>
+            <Text style={styles.bestLabel}>BEST</Text>
+            <Text style={styles.bestValue}>{highScore}</Text>
+          </View>
         </View>
       </View>
 
@@ -375,79 +430,90 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     backgroundColor: '#070C16',
   },
-  // HUD
-  hudCard: {
+  // UNIFIED SCOREBOARD CARD
+  scoreboardCard: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    width: BOARD_WIDTH,
-    backgroundColor: 'rgba(12, 22, 38, 0.92)',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(15, 23, 42, 0.95)',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: 'rgba(16, 185, 129, 0.35)',
-    marginBottom: 8,
+    borderColor: 'rgba(16, 185, 129, 0.45)',
+    marginBottom: 10,
     shadowColor: '#10B981',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 4,
   },
-  hudStatBox: {
-    alignItems: 'flex-start',
-    minWidth: 60,
-  },
-  hudCenterBox: {
-    alignItems: 'center',
-  },
-  hudLabel: {
-    fontSize: 9,
-    fontWeight: '800',
-    color: '#10B981',
-    letterSpacing: 1.5,
-    marginBottom: 1,
-  },
-  hudValue: {
-    fontSize: 18,
-    fontWeight: '900',
-    color: '#F8FAFC',
-  },
-  speedBadge: {
-    backgroundColor: 'rgba(255, 215, 0, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 215, 0, 0.45)',
-    marginBottom: 3,
-  },
-  speedBadgeText: {
-    fontSize: 9,
-    fontWeight: '900',
-    color: '#FFD700',
-    letterSpacing: 0.8,
-  },
-  portalBadge: {
+  scoreBlock: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.35)',
-    gap: 4,
+    gap: 8,
   },
-  portalDot: {
-    color: '#10B981',
-    fontSize: 7,
+  scoreIcon: {
+    fontSize: 22,
   },
-  portalText: {
+  scoreTextCol: {
+    alignItems: 'flex-start',
+  },
+  scoreLabel: {
     fontSize: 9,
     fontWeight: '800',
     color: '#34D399',
+    letterSpacing: 1,
+  },
+  scoreValue: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    lineHeight: 23,
+  },
+  speedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(16, 185, 129, 0.16)',
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#10B981',
+  },
+  speedBolt: {
+    fontSize: 12,
+    color: '#10B981',
+  },
+  speedBadgeText: {
+    fontSize: 12,
+    fontWeight: '900',
+    color: '#34D399',
     letterSpacing: 0.8,
+  },
+  bestBlock: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  bestIcon: {
+    fontSize: 20,
+  },
+  bestTextCol: {
+    alignItems: 'flex-end',
+  },
+  bestLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#FBBF24',
+    letterSpacing: 1,
+  },
+  bestValue: {
+    fontSize: 20,
+    fontWeight: '900',
+    color: '#FFD700',
+    lineHeight: 23,
   },
   // BIG ARENA
   bigArenaWrapper: {
