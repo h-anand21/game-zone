@@ -16,4 +16,6 @@ export interface SnakeState {
   score: number;
   gameOver: boolean;
   gridSize: number;
+  gridCols?: number;
+  gridRows?: number;
 }
