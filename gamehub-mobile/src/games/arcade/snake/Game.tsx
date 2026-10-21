@@ -1,7 +1,7 @@
 // ============================================================
-// GameHub — Snake Component (Cyber Arcade Master Edition)
-// Perfectly Balanced Screen Layout: Cyber HUD + Centered Arena + Thumb Deck
-// Controls: Full-Screen Direct Swipe + Tap-To-Turn + Thumb Deck
+// GameHub — Snake Component (Big Screen Full-Immersion Edition)
+// ZERO BUTTONS — 100% Full-Screen Big Arena
+// Fluid Touchscreen Gestures: Direct Hand Swipe & Tap-To-Turn
 // Warp Portals (Walls do not kill), Self-Bite Only Game Over
 // ============================================================
 
@@ -13,11 +13,9 @@ import {
   Dimensions,
   PanResponder,
   Animated,
-  Pressable,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
-import { getInitialState, moveSnake, GRID_SIZE } from './logic';
+import { getInitialState, moveSnake } from './logic';
 import type { Direction, SnakeState } from './types';
 import type { GameEngine } from '../../engine/GameEngine';
 
@@ -28,12 +26,21 @@ interface SnakeProps {
 }
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-// Calculate optimal board size to keep screen perfectly balanced
-const BOARD_SIZE = Math.min(SCREEN_WIDTH - 28, Math.min(SCREEN_HEIGHT * 0.46, 360));
-const CELL_SIZE = (BOARD_SIZE - 4) / GRID_SIZE;
+
+// Dynamic Full-Screen Big Arena Sizing
+const GRID_COLS = 15;
+const CELL_SIZE = Math.floor((SCREEN_WIDTH - 16) / GRID_COLS);
+const BOARD_WIDTH = GRID_COLS * CELL_SIZE;
+
+// Fill the entire available height on the phone screen
+const AVAILABLE_HEIGHT = SCREEN_HEIGHT - 150;
+const GRID_ROWS = Math.max(18, Math.floor(AVAILABLE_HEIGHT / CELL_SIZE));
+const BOARD_HEIGHT = GRID_ROWS * CELL_SIZE;
 
 export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
-  const [gameState, setGameState] = useState<SnakeState>(() => getInitialState());
+  const [gameState, setGameState] = useState<SnakeState>(() =>
+    getInitialState(GRID_COLS, GRID_ROWS)
+  );
   const currentDirectionRef = useRef<Direction>('RIGHT');
   const nextDirectionRef = useRef<Direction>('RIGHT');
   const hasFinishedRef = useRef(false);
@@ -43,11 +50,11 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
   // Border portal glow animation
   const portalGlowAnim = useRef(new Animated.Value(0.5)).current;
 
-  // Level Up banner state
+  // Level Up announcement
   const [levelUpText, setLevelUpText] = useState<string | null>(null);
   const prevLevelRef = useRef(1);
 
-  // Speed level: Level 1 starts relaxed at 210ms, scales with score
+  // Speed level: Level 1 starts relaxed at 210ms, scales with level
   const speedLevel = Math.min(10, Math.floor(gameState.score / 40) + 1);
   const intervalTime = Math.max(90, 210 - (speedLevel - 1) * 13);
 
@@ -155,7 +162,7 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
     return false;
   };
 
-  // Google Snake style continuous touch gesture handler
+  // Google Snake style full-screen touch gesture handler
   const touchStartRef = useRef<{ x: number; y: number; time: number }>({ x: 0, y: 0, time: 0 });
 
   const panResponder = useMemo(
@@ -203,7 +210,7 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
             const { pageX, pageY } = evt.nativeEvent;
             const current = currentDirectionRef.current;
             const centerX = SCREEN_WIDTH / 2;
-            const centerY = SCREEN_HEIGHT * 0.44;
+            const centerY = SCREEN_HEIGHT * 0.45;
 
             if (current === 'UP' || current === 'DOWN') {
               if (pageX < centerX) {
@@ -245,8 +252,8 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
   const eyePos = getEyeStyles();
 
   return (
-    <View style={styles.container}>
-      {/* 1. TOP CYBER HUD */}
+    <View style={styles.container} {...panResponder.panHandlers}>
+      {/* 1. TOP FLOATING CYBER HUD */}
       <View style={styles.hudCard}>
         <View style={styles.hudStatBox}>
           <Text style={styles.hudLabel}>SCORE</Text>
@@ -269,163 +276,92 @@ export const SnakeGame: React.FC<SnakeProps> = ({ onFinish, isPaused }) => {
         </View>
       </View>
 
-      {/* 2. CENTER ARENA (THE HERO) */}
-      <View style={styles.arenaContainer} {...panResponder.panHandlers}>
-        <View style={[styles.boardFrame, { width: BOARD_SIZE + 10, height: BOARD_SIZE + 10 }]}>
-          {/* Neon Corner Brackets */}
-          <View style={[styles.cornerBracket, styles.bracketTL]} />
-          <View style={[styles.cornerBracket, styles.bracketTR]} />
-          <View style={[styles.cornerBracket, styles.bracketBL]} />
-          <View style={[styles.cornerBracket, styles.bracketBR]} />
-
-          {/* Actual Board Surface */}
-          <View style={[styles.board, { width: BOARD_SIZE, height: BOARD_SIZE }]}>
-            {/* Checkerboard Grid */}
-            {Array.from({ length: GRID_SIZE }).map((_, r) => (
-              <View key={`r-${r}`} style={styles.gridRow}>
-                {Array.from({ length: GRID_SIZE }).map((_, c) => (
-                  <View
-                    key={`c-${c}`}
-                    style={[
-                      styles.gridCell,
-                      {
-                        width: CELL_SIZE,
-                        height: CELL_SIZE,
-                        backgroundColor:
-                          (r + c) % 2 === 0
-                            ? 'rgba(255, 255, 255, 0.025)'
-                            : 'rgba(255, 255, 255, 0.008)',
-                      },
-                    ]}
-                  />
-                ))}
-              </View>
-            ))}
-
-            {/* Snake Body Segments */}
-            {body.map((segment, index) => {
-              const opacity = Math.max(0.5, 1 - index * 0.018);
-              return (
+      {/* 2. BIG IMMERSIVE FULL-SCREEN ARENA (ZERO BUTTONS) */}
+      <View style={styles.bigArenaWrapper}>
+        <View style={[styles.board, { width: BOARD_WIDTH, height: BOARD_HEIGHT }]}>
+          {/* Subtle Grid Checkerboard */}
+          {Array.from({ length: GRID_ROWS }).map((_, r) => (
+            <View key={`r-${r}`} style={styles.gridRow}>
+              {Array.from({ length: GRID_COLS }).map((_, c) => (
                 <View
-                  key={`b-${index}`}
+                  key={`c-${c}`}
                   style={[
-                    styles.snakeSegment,
+                    styles.gridCell,
                     {
-                      width: CELL_SIZE - 2,
-                      height: CELL_SIZE - 2,
-                      left: segment.x * CELL_SIZE + 1,
-                      top: segment.y * CELL_SIZE + 1,
-                      opacity,
+                      width: CELL_SIZE,
+                      height: CELL_SIZE,
+                      backgroundColor:
+                        (r + c) % 2 === 0
+                          ? 'rgba(255, 255, 255, 0.025)'
+                          : 'rgba(255, 255, 255, 0.008)',
                     },
                   ]}
                 />
-              );
-            })}
+              ))}
+            </View>
+          ))}
 
-            {/* Snake Head with Cute Eyes */}
-            {head && (
+          {/* Snake Body Segments */}
+          {body.map((segment, index) => {
+            const opacity = Math.max(0.5, 1 - index * 0.015);
+            return (
               <View
+                key={`b-${index}`}
                 style={[
-                  styles.snakeHead,
+                  styles.snakeSegment,
                   {
-                    width: CELL_SIZE,
-                    height: CELL_SIZE,
-                    left: head.x * CELL_SIZE,
-                    top: head.y * CELL_SIZE,
+                    width: CELL_SIZE - 2,
+                    height: CELL_SIZE - 2,
+                    left: segment.x * CELL_SIZE + 1,
+                    top: segment.y * CELL_SIZE + 1,
+                    opacity,
                   },
                 ]}
-              >
-                <View style={[styles.eye, eyePos.eye1]} />
-                <View style={[styles.eye, eyePos.eye2]} />
-              </View>
-            )}
+              />
+            );
+          })}
 
-            {/* Pulsing Glowing Apple */}
-            <Animated.View
+          {/* Snake Head with Cute Eyes */}
+          {head && (
+            <View
               style={[
-                styles.foodContainer,
+                styles.snakeHead,
                 {
                   width: CELL_SIZE,
                   height: CELL_SIZE,
-                  left: gameState.food.x * CELL_SIZE,
-                  top: gameState.food.y * CELL_SIZE,
-                  transform: [{ scale: pulseAnim }],
+                  left: head.x * CELL_SIZE,
+                  top: head.y * CELL_SIZE,
                 },
               ]}
             >
-              <Text style={[styles.foodEmoji, { fontSize: CELL_SIZE * 0.88 }]}>🍎</Text>
-            </Animated.View>
-
-            {/* Level Up Flash Banner */}
-            {levelUpText && (
-              <View style={styles.levelUpOverlay} pointerEvents="none">
-                <Text style={styles.levelUpText}>{levelUpText}</Text>
-              </View>
-            )}
-          </View>
-        </View>
-      </View>
-
-      {/* 3. BOTTOM ERGONOMIC THUMB CONTROLLER DECK */}
-      <View style={styles.deckSection}>
-        <View style={styles.dpadDiamond}>
-          {/* UP Button */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.deckBtn,
-              styles.deckBtnUp,
-              currentDir === 'UP' && styles.deckBtnActive,
-              pressed && styles.deckBtnPressed,
-            ]}
-            onPress={() => trySetDirection('UP')}
-          >
-            <Text style={[styles.deckArrow, currentDir === 'UP' && styles.deckArrowActive]}>▲</Text>
-          </Pressable>
-
-          {/* LEFT & RIGHT & CENTER */}
-          <View style={styles.deckRowMiddle}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.deckBtn,
-                currentDir === 'LEFT' && styles.deckBtnActive,
-                pressed && styles.deckBtnPressed,
-              ]}
-              onPress={() => trySetDirection('LEFT')}
-            >
-              <Text style={[styles.deckArrow, currentDir === 'LEFT' && styles.deckArrowActive]}>◀</Text>
-            </Pressable>
-
-            <View style={styles.deckCenterOrb}>
-              <Text style={styles.centerOrbIcon}>⚡</Text>
+              <View style={[styles.eye, eyePos.eye1]} />
+              <View style={[styles.eye, eyePos.eye2]} />
             </View>
+          )}
 
-            <Pressable
-              style={({ pressed }) => [
-                styles.deckBtn,
-                currentDir === 'RIGHT' && styles.deckBtnActive,
-                pressed && styles.deckBtnPressed,
-              ]}
-              onPress={() => trySetDirection('RIGHT')}
-            >
-              <Text style={[styles.deckArrow, currentDir === 'RIGHT' && styles.deckArrowActive]}>▶</Text>
-            </Pressable>
-          </View>
-
-          {/* DOWN Button */}
-          <Pressable
-            style={({ pressed }) => [
-              styles.deckBtn,
-              styles.deckBtnDown,
-              currentDir === 'DOWN' && styles.deckBtnActive,
-              pressed && styles.deckBtnPressed,
+          {/* Pulsing Glowing Apple */}
+          <Animated.View
+            style={[
+              styles.foodContainer,
+              {
+                width: CELL_SIZE,
+                height: CELL_SIZE,
+                left: gameState.food.x * CELL_SIZE,
+                top: gameState.food.y * CELL_SIZE,
+                transform: [{ scale: pulseAnim }],
+              },
             ]}
-            onPress={() => trySetDirection('DOWN')}
           >
-            <Text style={[styles.deckArrow, currentDir === 'DOWN' && styles.deckArrowActive]}>▼</Text>
-          </Pressable>
-        </View>
+            <Text style={[styles.foodEmoji, { fontSize: CELL_SIZE * 0.88 }]}>🍎</Text>
+          </Animated.View>
 
-        <Text style={styles.deckHint}>Swipe anywhere on arena or use thumb buttons</Text>
+          {/* Level Up Flash Banner */}
+          {levelUpText && (
+            <View style={styles.levelUpOverlay} pointerEvents="none">
+              <Text style={styles.levelUpText}>{levelUpText}</Text>
+            </View>
+          )}
+        </View>
       </View>
     </View>
   );
@@ -435,8 +371,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
+    paddingTop: 8,
+    paddingBottom: 8,
     backgroundColor: '#070C16',
   },
   // HUD
@@ -444,13 +380,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: BOARD_SIZE + 10,
-    backgroundColor: 'rgba(12, 22, 38, 0.88)',
+    width: BOARD_WIDTH,
+    backgroundColor: 'rgba(12, 22, 38, 0.92)',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    borderColor: 'rgba(16, 185, 129, 0.35)',
+    marginBottom: 8,
     shadowColor: '#10B981',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
@@ -512,55 +449,11 @@ const styles = StyleSheet.create({
     color: '#34D399',
     letterSpacing: 0.8,
   },
-  // ARENA
-  arenaContainer: {
+  // BIG ARENA
+  bigArenaWrapper: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
-  },
-  boardFrame: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(10, 18, 32, 0.6)',
-    borderRadius: 22,
-    padding: 5,
-  },
-  cornerBracket: {
-    position: 'absolute',
-    width: 14,
-    height: 14,
-    borderColor: '#10B981',
-    zIndex: 20,
-  },
-  bracketTL: {
-    top: 0,
-    left: 0,
-    borderTopWidth: 2.5,
-    borderLeftWidth: 2.5,
-    borderTopLeftRadius: 6,
-  },
-  bracketTR: {
-    top: 0,
-    right: 0,
-    borderTopWidth: 2.5,
-    borderRightWidth: 2.5,
-    borderTopRightRadius: 6,
-  },
-  bracketBL: {
-    bottom: 0,
-    left: 0,
-    borderBottomWidth: 2.5,
-    borderLeftWidth: 2.5,
-    borderBottomLeftRadius: 6,
-  },
-  bracketBR: {
-    bottom: 0,
-    right: 0,
-    borderBottomWidth: 2.5,
-    borderRightWidth: 2.5,
-    borderBottomRightRadius: 6,
   },
   board: {
     backgroundColor: '#0C1729',
@@ -625,7 +518,7 @@ const styles = StyleSheet.create({
   },
   levelUpOverlay: {
     position: 'absolute',
-    top: '38%',
+    top: '40%',
     left: 20,
     right: 20,
     backgroundColor: 'rgba(5, 12, 22, 0.92)',
@@ -647,78 +540,5 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#FFD700',
     letterSpacing: 1.2,
-  },
-  // BOTTOM CONTROLLER DECK
-  deckSection: {
-    width: '100%',
-    alignItems: 'center',
-    paddingBottom: 6,
-  },
-  dpadDiamond: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  deckBtnUp: {
-    marginBottom: 2,
-  },
-  deckBtnDown: {
-    marginTop: 2,
-  },
-  deckRowMiddle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  deckCenterOrb: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(16, 185, 129, 0.08)',
-    borderWidth: 1.5,
-    borderColor: 'rgba(16, 185, 129, 0.25)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerOrbIcon: {
-    fontSize: 16,
-    color: '#10B981',
-  },
-  deckBtn: {
-    width: 50,
-    height: 50,
-    backgroundColor: 'rgba(14, 25, 42, 0.88)',
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
-    shadowColor: '#10B981',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  deckBtnActive: {
-    borderColor: '#34D399',
-    backgroundColor: 'rgba(16, 185, 129, 0.22)',
-    shadowOpacity: 0.6,
-  },
-  deckBtnPressed: {
-    transform: [{ scale: 0.92 }],
-    backgroundColor: 'rgba(16, 185, 129, 0.35)',
-  },
-  deckArrow: {
-    fontSize: 20,
-    color: '#94A3B8',
-    fontWeight: '900',
-  },
-  deckArrowActive: {
-    color: '#34D399',
-  },
-  deckHint: {
-    fontSize: 10,
-    color: '#64748B',
-    fontWeight: '600',
-    marginTop: 5,
   },
 });
