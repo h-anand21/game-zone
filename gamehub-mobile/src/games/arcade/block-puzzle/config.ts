@@ -1,25 +1,26 @@
 // ============================================================
-// GameHub — Block Puzzle Config
+// GameHub — Block Blast Config
 // ============================================================
 
 import type { GameConfig } from '@/constants/types';
 
 export const BLOCK_PUZZLE_CONFIG: GameConfig = {
   id: 'block-puzzle',
-  name: 'Block Puzzle',
+  name: 'Block Blast',
   category: 'arcade',
   offline: true,
   multiplayer: false,
   route: '/games/block-puzzle',
-  icon: '🟦',
+  icon: '🧩',
   status: 'available',
-  gameVersion: '1.0.0',
-  scoreVersion: 'v1',
+  gameVersion: '2.0.0',
+  scoreVersion: 'v2',
   validation: {
-    maxScore: 100000,
-    minDuration: 10,
-    maxDuration: 7200,
+    maxScore: 500000,
+    minDuration: 5,
+    maxDuration: 14400,
   },
   saveSupport: 'background',
-  description: 'Place block shapes on the grid. Clear full horizontal or vertical lines to score!',
+  description:
+    'Drag jewel blocks onto the 8x8 grid. Blast full rows & columns to trigger explosive combo streaks and set high scores!',
 };
