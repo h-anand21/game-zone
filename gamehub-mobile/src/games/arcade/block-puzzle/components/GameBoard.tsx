@@ -1,128 +1,183 @@
 // ============================================================
-// Block Blast — 8x8 Game Board Component with Ghost Preview
+// Block Blast — 10x20 Falling Grid Game Board
 // ============================================================
 
-import React from 'react';
-import { View, StyleSheet, LayoutChangeEvent, Pressable } from 'react-native';
+import React, { useRef } from 'react';
+import {
+  View,
+  StyleSheet,
+  PanResponder,
+  LayoutChangeEvent,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlockCell } from './BlockCell';
-import type { BlockGrid, GhostPreview } from '../types';
-import { GRID_DIM } from '../logic';
+import type { FallingGrid, ActivePiece, BlockColor } from '../types';
+import { GRID_ROWS, GRID_COLS } from '../logic';
 
 interface GameBoardProps {
-  grid: BlockGrid;
-  boardWidth: number;
-  ghostPreview: GhostPreview | null;
-  onLayoutBoard: (e: LayoutChangeEvent) => void;
-  onCellTap?: (row: number, col: number) => void;
+  grid: FallingGrid;
+  activePiece: ActivePiece | null;
+  ghostRow: number;
+  cellSize: number;
   clearingRows?: number[];
-  clearingCols?: number[];
+  onLayoutBoard?: (e: LayoutChangeEvent) => void;
+  onSwipeLeft?: () => void;
+  onSwipeRight?: () => void;
+  onTapRotate?: () => void;
+  onSwipeDown?: () => void;
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({
   grid,
-  boardWidth,
-  ghostPreview,
-  onLayoutBoard,
-  onCellTap,
+  activePiece,
+  ghostRow,
+  cellSize,
   clearingRows = [],
-  clearingCols = [],
+  onLayoutBoard,
+  onSwipeLeft,
+  onSwipeRight,
+  onTapRotate,
+  onSwipeDown,
 }) => {
-  // Padding & gap layout calculations
-  const PADDING = 8;
-  const GAP = 3.5;
-  const innerWidth = boardWidth - PADDING * 2;
-  const cellSize = Math.floor((innerWidth - GAP * (GRID_DIM - 1)) / GRID_DIM);
+  const GAP = 2;
+  const PADDING = 6;
+  const boardWidth = cellSize * GRID_COLS + GAP * (GRID_COLS - 1) + PADDING * 2;
+  const boardHeight = cellSize * GRID_ROWS + GAP * (GRID_ROWS - 1) + PADDING * 2;
 
-  // Helper to check if (r, c) is covered by ghost preview
-  const isGhostCell = (r: number, c: number): boolean => {
-    if (!ghostPreview) return false;
-    const { row: gr, col: gc, piece } = ghostPreview;
-    const relR = r - gr;
-    const relC = c - gc;
+  // Touch Swipe Gesture on Board
+  const touchStartRef = useRef<{ x: number; y: number; time: number }>({ x: 0, y: 0, time: 0 });
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderGrant: (e) => {
+        touchStartRef.current = {
+          x: e.nativeEvent.pageX,
+          y: e.nativeEvent.pageY,
+          time: Date.now(),
+        };
+      },
+      onPanResponderRelease: (e, gestureState) => {
+        const dx = gestureState.dx;
+        const dy = gestureState.dy;
+        const dt = Date.now() - touchStartRef.current.time;
+
+        if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && dt < 250) {
+          // Tap -> Rotate
+          onTapRotate?.();
+        } else if (dy > 40 && Math.abs(dy) > Math.abs(dx) * 1.3) {
+          // Swipe down -> Drop
+          onSwipeDown?.();
+        } else if (dx < -25) {
+          // Swipe left
+          onSwipeLeft?.();
+        } else if (dx > 25) {
+          // Swipe right
+          onSwipeRight?.();
+        }
+      },
+    })
+  ).current;
+
+  // Helper to check if (r, c) is occupied by active piece
+  const getActivePieceCell = (r: number, c: number): BlockColor | null => {
+    if (!activePiece) return null;
+    const relR = r - activePiece.row;
+    const relC = c - activePiece.col;
     if (
       relR >= 0 &&
-      relR < piece.matrix.length &&
+      relR < activePiece.matrix.length &&
       relC >= 0 &&
-      relC < piece.matrix[relR].length
+      relC < activePiece.matrix[relR].length &&
+      activePiece.matrix[relR][relC]
     ) {
-      return Boolean(piece.matrix[relR][relC]);
+      return activePiece.colorKey;
     }
-    return false;
+    return null;
   };
 
-  return (
-    <View
-      style={[
-        styles.outerBoard,
-        {
-          width: boardWidth,
-          height: boardWidth,
-        },
-      ]}
-      onLayout={onLayoutBoard}
-    >
-      <LinearGradient
-        colors={['#0C1626', '#060B14']}
-        style={[
-          styles.innerBoardGradient,
-          {
-            padding: PADDING,
-          },
-        ]}
-      >
-        {grid.map((row, r) => {
-          const isRowClearing = clearingRows.includes(r);
-          return (
-            <View key={`row-${r}`} style={[styles.gridRow, { gap: GAP }]}>
-              {row.map((cell, c) => {
-                const isColClearing = clearingCols.includes(c);
-                const isCellClearing = isRowClearing || isColClearing;
-                const isGhost = !cell.filled && isGhostCell(r, c);
+  // Helper to check if (r, c) is occupied by ghost piece
+  const isGhostCell = (r: number, c: number): boolean => {
+    if (!activePiece || ghostRow === activePiece.row) return false;
+    const relR = r - ghostRow;
+    const relC = c - activePiece.col;
+    if (
+      relR >= 0 &&
+      relR < activePiece.matrix.length &&
+      relC >= 0 &&
+      relC < activePiece.matrix[relR].length &&
+        activePiece.matrix[relR][relC]
+    ) {
+  return true;
+}
+return false;
+  };
 
-                return (
-                  <Pressable
+return (
+  <View
+    {...panResponder.panHandlers}
+    style={[
+      styles.outerBoard,
+      {
+        width: boardWidth,
+        height: boardHeight,
+      },
+    ]}
+    onLayout={onLayoutBoard}
+  >
+    <LinearGradient
+      colors={['#0B1526', '#050A12']}
+      style={[styles.innerBoard, { padding: PADDING }]}
+    >
+      {grid.map((row, r) => {
+        const isRowClearing = clearingRows.includes(r);
+
+        return (
+          <View key={`row-${r}`} style={[styles.gridRow, { gap: GAP }]}>
+            {row.map((cell, c) => {
+              const activeColor = getActivePieceCell(r, c);
+              const ghost = !cell.filled && !activeColor && isGhostCell(r, c);
+
+              const isFilled = cell.filled || activeColor !== null;
+              const colorKey = activeColor || cell.colorKey;
+
+              return (
+                  <BlockCell
                     key={`cell-${r}-${c}`}
-                    disabled={!onCellTap}
-                    onPress={() => onCellTap?.(r, c)}
-                  >
-                    <BlockCell
-                      size={cellSize}
-                      filled={cell.filled}
-                      colorKey={isGhost ? ghostPreview?.piece.colorKey : cell.colorKey}
-                      isGhost={isGhost}
-                      isClearing={isCellClearing}
-                    />
-                  </Pressable>
-                );
+                    size = { cellSize }
+              filled = { isFilled }
+              colorKey = { ghost? activePiece?.colorKey : colorKey}
+            isGhost={ghost}
+            isClearing={isRowClearing}
+                  />
+            );
               })}
-            </View>
-          );
-        })}
-      </LinearGradient>
-    </View>
-  );
+          </View>
+        );
+      })}
+    </LinearGradient>
+  </View>
+);
 };
 
 const styles = StyleSheet.create({
   outerBoard: {
-    borderRadius: 20,
-    backgroundColor: '#0A1322',
+    borderRadius: 16,
+    backgroundColor: '#091220',
     borderWidth: 2,
     borderColor: '#1C3150',
     shadowColor: '#00E5FF',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
     elevation: 8,
     overflow: 'hidden',
   },
-  innerBoardGradient: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  gridRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-});
+    innerBoard: {
+      flex: 1,
+      justifyContent: 'space-between',
+    },
+    gridRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+  });

@@ -64,208 +64,208 @@ export const JEWEL_COLORS: Record<BlockColor, ColorTheme> = {
 };
 
 export const TETROMINOES: Record<TetrominoType, TetrominoShape> = {
-  // ── 1. I-Bar (Cyan) ──
-  I: {
-    type: 'I',
-    name: 'I-Bar',
-    colorKey: 'cyan',
-    rotations: [
-      [
-        [false, false, false, false],
-        [true, true, true, true],
-        [false, false, false, false],
-        [false, false, false, false],
+    // ── 1. I-Bar (Cyan) ──
+    I: {
+      type: 'I',
+      name: 'I-Bar',
+      colorKey: 'cyan',
+      rotations: [
+        [
+          [false, false, false, false],
+          [true, true, true, true],
+          [false, false, false, false],
+          [false, false, false, false],
+        ],
+        [
+          [false, false, true, false],
+          [false, false, true, false],
+          [false, false, true, false],
+          [false, false, true, false],
+        ],
+        [
+          [false, false, false, false],
+          [false, false, false, false],
+          [true, true, true, true],
+          [false, false, false, false],
+        ],
+        [
+          [false, true, false, false],
+          [false, true, false, false],
+          [false, true, false, false],
+          [false, true, false, false],
+        ],
       ],
-      [
-        [false, false, true, false],
-        [false, false, true, false],
-        [false, false, true, false],
-        [false, false, true, false],
-      ],
-      [
-        [false, false, false, false],
-        [false, false, false, false],
-        [true, true, true, true],
-        [false, false, false, false],
-      ],
-      [
-        [false, true, false, false],
-        [false, true, false, false],
-        [false, true, false, false],
-        [false, true, false, false],
-      ],
-    ],
-  },
+    },
 
-  // ── 2. O-Square (Amber) ──
-  O: {
-    type: 'O',
-    name: 'Square',
-    colorKey: 'amber',
-    rotations: [
-      [
-        [true, true],
-        [true, true],
-      ],
-      [
-        [true, true],
-        [true, true],
-      ],
-      [
-        [true, true],
-        [true, true],
-      ],
-      [
-        [true, true],
-        [true, true],
-      ],
-    ],
-  },
+      // ── 2. O-Square (Amber) ──
+      O: {
+        type: 'O',
+        name: 'Square',
+        colorKey: 'amber',
+        rotations: [
+          [
+            [true, true],
+            [true, true],
+          ],
+          [
+            [true, true],
+            [true, true],
+          ],
+          [
+            [true, true],
+            [true, true],
+          ],
+          [
+            [true, true],
+            [true, true],
+          ],
+        ],
+      },
 
-  // ── 3. T-Shape (Purple) ──
-  T: {
-    type: 'T',
-    name: 'T-Shape',
-    colorKey: 'purple',
-    rotations: [
-      [
-        [false, true, false],
-        [true, true, true],
-        [false, false, false],
-      ],
-      [
-        [false, true, false],
-        [false, true, true],
-        [false, true, false],
-      ],
-      [
-        [false, false, false],
-        [true, true, true],
-        [false, true, false],
-      ],
-      [
-        [false, true, false],
-        [true, true, false],
-        [false, true, false],
-      ],
-    ],
-  },
+          // ── 3. T-Shape (Purple) ──
+          T: {
+            type: 'T',
+            name: 'T-Shape',
+            colorKey: 'purple',
+            rotations: [
+              [
+                [false, true, false],
+                [true, true, true],
+                [false, false, false],
+              ],
+              [
+                [false, true, false],
+                [false, true, true],
+                [false, true, false],
+              ],
+              [
+                [false, false, false],
+                [true, true, true],
+                [false, true, false],
+              ],
+              [
+                [false, true, false],
+                [true, true, false],
+                [false, true, false],
+              ],
+            ],
+          },
 
-  // ── 4. S-Shape (Green) ──
-  S: {
-    type: 'S',
-    name: 'S-Shape',
-    colorKey: 'green',
-    rotations: [
-      [
-        [false, true, true],
-        [true, true, false],
-        [false, false, false],
-      ],
-      [
-        [false, true, false],
-        [false, true, true],
-        [false, false, true],
-      ],
-      [
-        [false, false, false],
-        [false, true, true],
-        [true, true, false],
-      ],
-      [
-        [true, false, false],
-        [true, true, false],
-        [false, true, false],
-      ],
-    ],
-  },
+              // ── 4. S-Shape (Green) ──
+              S: {
+                type: 'S',
+                name: 'S-Shape',
+                colorKey: 'green',
+                rotations: [
+                  [
+                    [false, true, true],
+                    [true, true, false],
+                    [false, false, false],
+                  ],
+                  [
+                    [false, true, false],
+                    [false, true, true],
+                    [false, false, true],
+                  ],
+                  [
+                    [false, false, false],
+                    [false, true, true],
+                    [true, true, false],
+                  ],
+                  [
+                    [true, false, false],
+                    [true, true, false],
+                    [false, true, false],
+                  ],
+                ],
+              },
 
-  // ── 5. Z-Shape (Ruby) ──
-  Z: {
-    type: 'Z',
-    name: 'Z-Shape',
-    colorKey: 'ruby',
-    rotations: [
-      [
-        [true, true, false],
-        [false, true, true],
-        [false, false, false],
-      ],
-      [
-        [false, false, true],
-        [false, true, true],
-        [false, true, false],
-      ],
-      [
-        [false, false, false],
-        [true, true, false],
-        [false, true, true],
-      ],
-      [
-        [false, true, false],
-        [true, true, false],
-        [true, false, false],
-      ],
-    ],
-  },
+                  // ── 5. Z-Shape (Ruby) ──
+                  Z: {
+                    type: 'Z',
+                    name: 'Z-Shape',
+                    colorKey: 'ruby',
+                    rotations: [
+                      [
+                        [true, true, false],
+                        [false, true, true],
+                        [false, false, false],
+                      ],
+                      [
+                        [false, false, true],
+                        [false, true, true],
+                        [false, true, false],
+                      ],
+                      [
+                        [false, false, false],
+                        [true, true, false],
+                        [false, true, true],
+                      ],
+                      [
+                        [false, true, false],
+                        [true, true, false],
+                        [true, false, false],
+                      ],
+                    ],
+                  },
 
-  // ── 6. J-Shape (Blue) ──
-  J: {
-    type: 'J',
-    name: 'J-Shape',
-    colorKey: 'blue',
-    rotations: [
-      [
-        [true, false, false],
-        [true, true, true],
-        [false, false, false],
-      ],
-      [
-        [false, true, true],
-        [false, true, false],
-        [false, true, false],
-      ],
-      [
-        [false, false, false],
-        [true, true, true],
-        [false, false, true],
-      ],
-      [
-        [false, true, false],
-        [false, true, false],
-        [true, true, false],
-      ],
-    ],
-  },
+                      // ── 6. J-Shape (Blue) ──
+                      J: {
+                        type: 'J',
+                        name: 'J-Shape',
+                        colorKey: 'blue',
+                        rotations: [
+                          [
+                            [true, false, false],
+                            [true, true, true],
+                            [false, false, false],
+                          ],
+                          [
+                            [false, true, true],
+                            [false, true, false],
+                            [false, true, false],
+                          ],
+                          [
+                            [false, false, false],
+                            [true, true, true],
+                            [false, false, true],
+                          ],
+                          [
+                            [false, true, false],
+                            [false, true, false],
+                            [true, true, false],
+                          ],
+                        ],
+                      },
 
-  // ── 7. L-Shape (Orange) ──
-  L: {
-    type: 'L',
-    name: 'L-Shape',
-    colorKey: 'orange',
-    rotations: [
-      [
-        [false, false, true],
-        [true, true, true],
-        [false, false, false],
-      ],
-      [
-        [false, true, false],
-        [false, true, false],
-        [false, true, true],
-      ],
-      [
-        [false, false, false],
-        [true, true, true],
-        [true, false, false],
-      ],
-      [
-        [true, true, false],
-        [false, true, false],
-        [false, true, false],
-      ],
-    ],
-  },
-};
+                          // ── 7. L-Shape (Orange) ──
+                          L: {
+                            type: 'L',
+                            name: 'L-Shape',
+                            colorKey: 'orange',
+                            rotations: [
+                              [
+                                [false, false, true],
+                                [true, true, true],
+                                [false, false, false],
+                              ],
+                              [
+                                [false, true, false],
+                                [false, true, false],
+                                [false, true, true],
+                              ],
+                              [
+                                [false, false, false],
+                                [true, true, true],
+                                [true, false, false],
+                              ],
+                              [
+                                [true, true, false],
+                                [false, true, false],
+                                [false, true, false],
+                              ],
+                            ],
+                          },
+                      };
 
 export const ALL_TETROMINO_TYPES: TetrominoType[] = ['I', 'O', 'T', 'S', 'Z', 'J', 'L'];

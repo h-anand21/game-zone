@@ -1,5 +1,5 @@
 // ============================================================
-// Block Blast — 2.5D Jewel Block Cell Component
+// Block Blast — Compact 2.5D Jewel Block Cell Component
 // ============================================================
 
 import React from 'react';
@@ -26,8 +26,9 @@ export const BlockCell: React.FC<BlockCellProps> = ({
   style,
 }) => {
   const theme = JEWEL_COLORS[colorKey] || JEWEL_COLORS.cyan;
-  const radius = Math.max(3, Math.floor(size * 0.16));
+  const radius = Math.max(2, Math.floor(size * 0.18));
 
+  // 1. Empty grooved slot
   if (!filled && !isGhost) {
     return (
       <View
@@ -44,7 +45,7 @@ export const BlockCell: React.FC<BlockCellProps> = ({
     );
   }
 
-  // Ghost Preview Cell (semi-transparent glowing highlight)
+  // 2. Ghost Landing Shadow
   if (isGhost) {
     return (
       <View
@@ -55,25 +56,15 @@ export const BlockCell: React.FC<BlockCellProps> = ({
             height: size,
             borderRadius: radius,
             borderColor: theme.main,
-            backgroundColor: `${theme.main}4D`,
+            backgroundColor: `${theme.main}2E`,
           },
           style,
         ]}
-      >
-        <View
-          style={[
-            styles.ghostInner,
-            {
-              borderRadius: radius - 2,
-              borderColor: theme.highlight,
-            },
-          ]}
-        />
-      </View>
+      />
     );
   }
 
-  // Active 2.5D Jewel Cell
+  // 3. Active 2.5D Jewel Cell
   return (
     <View
       style={[
@@ -100,27 +91,14 @@ export const BlockCell: React.FC<BlockCellProps> = ({
           },
         ]}
       >
-        {/* Top-left specular gloss highlight */}
+        {/* Specular gloss shine at top left */}
         <View
           style={[
             styles.specularShine,
             {
-              width: size * 0.45,
-              height: size * 0.22,
+              width: size * 0.5,
+              height: size * 0.25,
               borderRadius: radius * 0.7,
-            },
-          ]}
-        />
-
-        {/* Center Jewel Core */}
-        <View
-          style={[
-            styles.jewelCore,
-            {
-              width: size * 0.38,
-              height: size * 0.38,
-              borderRadius: radius * 0.5,
-              backgroundColor: 'rgba(255, 255, 255, 0.18)',
             },
           ]}
         />
@@ -131,49 +109,35 @@ export const BlockCell: React.FC<BlockCellProps> = ({
 
 const styles = StyleSheet.create({
   emptySlot: {
-    backgroundColor: '#0F1B2E',
-    borderWidth: 1.2,
-    borderColor: '#182B46',
+    backgroundColor: 'rgba(13, 23, 38, 0.7)',
+    borderWidth: 0.8,
+    borderColor: '#172B47',
   },
   ghostSlot: {
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  ghostInner: {
-    width: '75%',
-    height: '75%',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderStyle: 'dashed',
-    opacity: 0.8,
+    opacity: 0.6,
   },
   cellWrapper: {
     overflow: 'hidden',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1.5 },
     shadowOpacity: 0.35,
-    shadowRadius: 3,
-    elevation: 3,
-    paddingBottom: 2, // 2.5D lower lip
+    shadowRadius: 2,
+    elevation: 2,
+    paddingBottom: 1.5,
   },
   cellGradient: {
     flex: 1,
-    borderWidth: 1.2,
+    borderWidth: 0.8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   specularShine: {
     position: 'absolute',
-    top: 2,
-    left: 3,
-    backgroundColor: 'rgba(255, 255, 255, 0.55)',
-  },
-  jewelCore: {
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    top: 1,
+    left: 1.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.65)',
   },
   clearingCell: {
     transform: [{ scale: 1.15 }],

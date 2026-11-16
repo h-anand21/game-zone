@@ -1,94 +1,98 @@
 // ============================================================
-// Block Blast — Engine Logic Unit Tests
+// Falling Jewel Blast — Logic Engine Unit Tests
 // ============================================================
 
 import {
   createEmptyGrid,
-  canPlacePiece,
-  canPieceFitAnywhere,
-  canAnyPieceFitOnGrid,
-  placePieceOnGrid,
-  detectAndClearLines,
-  calculateMoveScore,
-  generateSmartPieceBatch,
-  GRID_DIM,
+  canPlaceAt,
+  getGhostRow,
+  spawnPiece,
+  tryRotatePiece,
+  lockPiece,
+  clearFullLines,
+  calculateFallingScore,
+  TetrominoBag,
+  GRID_COLS,
+  GRID_ROWS,
 } from '../logic';
-import { createShapePiece, SHAPE_DEFINITIONS } from '../shapes';
 
-describe('Block Blast Logic Engine', () => {
-  it('creates an empty 8x8 grid', () => {
-    const grid = createEmptyGrid();
-    expect(grid.length).toBe(GRID_DIM);
-    expect(grid[0].length).toBe(GRID_DIM);
-    expect(grid.every((row) => row.every((cell) => !cell.filled))).toBe(true);
-  });
+    describe('Falling Jewel Blast Logic Engine', () => {
+      it('creates an empty 10x20 grid', () => {
+        const grid = createEmptyGrid();
+        expect(grid.length).toBe(GRID_ROWS);
+        expect(grid[0].length).toBe(GRID_COLS);
+        expect(grid.every((row) => row.every((c) => !c.filled))).toBe(true);
+      });
 
-  it('validates legal and illegal piece placements', () => {
-    const grid = createEmptyGrid();
-    const square2x2 = [
-      [true, true],
-      [true, true],
-    ];
+        it('correctly calculates ghost landing row', () => {
+          const grid = createEmptyGrid();
+          const piece = spawnPiece('O'); // 2x2 square
+          // With an empty grid, 2x2 square should drop all the way to row 18
+          const ghostRow = getGhostRow(grid, piece.matrix, piece.row, piece.col);
+          expect(ghostRow).toBe(GRID_ROWS - 2); // 18
+        });
 
-    // Legal placement at (0, 0)
-    expect(canPlacePiece(grid, square2x2, 0, 0)).toBe(true);
+        it('rotates a piece with wall kicks near the boundary', () => {
+          const grid = createEmptyGrid();
+          const piece = spawnPiece('I');
+          piece.col = GRID_COLS - 2; // Near right wall
 
-    // Legal placement at (6, 6)
-    expect(canPlacePiece(grid, square2x2, 6, 6)).toBe(true);
+          const rotated = tryRotatePiece(grid, piece, true);
+          expect(rotated.rotationIndex).toBe(1);
+          expect(canPlaceAt(grid, rotated.matrix, rotated.row, rotated.col)).toBe(true);
+        });
 
-    // Illegal placement exceeding boundary at (7, 7)
-    expect(canPlacePiece(grid, square2x2, 7, 7)).toBe(false);
+          it('locks a piece onto the grid and clears full rows with gravity collapse', () => {
+            let grid = createEmptyGrid();
 
-    // Fill cell (0, 0) and check overlap collision
-    grid[0][0].filled = true;
-    expect(canPlacePiece(grid, square2x2, 0, 0)).toBe(false);
-  });
+              // Fill row 19 completely except columns 4 and 5
+              for (let c = 0; c < GRID_COLS; c++) {
+                if (c !== 4 && c !== 5) {
+                  grid[19][c] = { filled: true, colorKey: 'amber' };
+                }
+              }
 
-  it('correctly clears a full horizontal row and vertical column simultaneously', () => {
-    let grid = createEmptyGrid();
+              // Spawn 2x2 square and drop it onto row 18 at col 4
+              const piece = spawnPiece('O');
+              piece.row = 18;
+              piece.col = 4;
 
-    // Fill entire row 3 except (3, 3)
-    for (let c = 0; c < GRID_DIM; c++) {
-      grid[3][c] = { filled: true, colorKey: 'amber' };
-    }
-    // Fill entire col 3 except (3, 3)
-    for (let r = 0; r < GRID_DIM; r++) {
-      grid[r][3] = { filled: true, colorKey: 'cyan' };
-    }
+              // Lock piece
+              grid = lockPiece(grid, piece);
 
-    // Now both row 3 and col 3 are completely filled
-    const clearResult = detectAndClearLines(grid);
-    expect(clearResult.linesCleared).toBe(2);
-    expect(clearResult.clearedRows).toContain(3);
-    expect(clearResult.clearedCols).toContain(3);
+              // Row 19 should now be completely full (all 10 cells)
+              expect(grid[19].every((c) => c.filled)).toBe(true);
 
-    // Cleared cells in newGrid should now be empty
-    expect(clearResult.newGrid[3][3].filled).toBe(false);
-    expect(clearResult.newGrid[3][0].filled).toBe(false);
-    expect(clearResult.newGrid[0][3].filled).toBe(false);
-  });
+              // Clear lines
+              const result = clearFullLines(grid);
+              expect(result.linesCleared).toBe(1);
+              expect(result.clearedRowIndices).toContain(19);
 
-  it('calculates combo score and streak titles properly', () => {
-    // 0 lines cleared (just 4-cell tetromino placement)
-    const move0 = calculateMoveScore(4, 0, 0);
-    expect(move0.pointsEarned).toBe(4);
-    expect(move0.bonusPoints).toBe(0);
+              // After clearing row 19, upper row (cells from row 18) should drop down to row 19!
+              expect(result.newGrid[19][4].filled).toBe(true);
+              expect(result.newGrid[19][5].filled).toBe(true);
+              // Row 0 at the top should be empty
+              expect(result.newGrid[0].every((c) => !c.filled)).toBe(true);
+            });
 
-    // 1 line clear, streak 1
-    const move1 = calculateMoveScore(4, 1, 1);
-    expect(move1.pointsEarned).toBe(104); // 4 + 100
+            it('calculates score for single, double, triple, and tetris clears', () => {
+              const single = calculateFallingScore(1, 1, 1);
+              expect(single.points).toBe(100);
 
-    // 2 lines clear (double blast), streak 2
-    const move2 = calculateMoveScore(4, 2, 2);
-    // lineBase = 2 * 100 + 100 = 300; streakBonus = 300 * 1 * 0.5 = 150; total = 4 + 300 + 150 = 454
-    expect(move2.pointsEarned).toBe(454);
-    expect(move2.comboTitle).toContain('COMBO x2');
-  });
+              const double = calculateFallingScore(2, 2, 1);
+              expect(double.points).toBeGreaterThan(300);
 
-  it('generates a batch of 3 pieces where at least one is placeable', () => {
-    const grid = createEmptyGrid();
-    const batch = generateSmartPieceBatch(grid);
-    expect(batch.length).toBe(3);
-    expect(canAnyPieceFitOnGrid(grid, batch)).toBe(true);
-  });
-});
+              const tetris = calculateFallingScore(4, 1, 1);
+              expect(tetris.points).toBe(1200);
+              expect(tetris.title).toContain('TETRIS');
+            });
+
+              it('7-bag randomizer returns all 7 types in each cycle', () => {
+                const bag = new TetrominoBag();
+                const drawn = new Set<string>();
+                for (let i = 0; i < 7; i++) {
+                  drawn.add(bag.next());
+                }
+                expect(drawn.size).toBe(7);
+              });
+            });
