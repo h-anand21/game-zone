@@ -1,5 +1,5 @@
 // ============================================================
-// GameHub — Block Blast Types & Interfaces
+// GameHub — Falling Jewel Blast Types & Interfaces
 // ============================================================
 
 export type BlockColor =
@@ -11,6 +11,8 @@ export type BlockColor =
   | 'orange'
   | 'blue';
 
+export type TetrominoType = 'I' | 'O' | 'T' | 'S' | 'Z' | 'J' | 'L';
+
 export interface ColorTheme {
   name: BlockColor;
   main: string;
@@ -20,55 +22,34 @@ export interface ColorTheme {
   glow: string;
 }
 
-export interface ShapePiece {
-  id: string;
-  shapeId: string;
+export interface TetrominoShape {
+  type: TetrominoType;
   name: string;
+  rotations: boolean[][][]; // 4 rotation states
+  colorKey: BlockColor;
+}
+
+export interface ActivePiece {
+  type: TetrominoType;
+  rotationIndex: number;
   matrix: boolean[][];
   colorKey: BlockColor;
-  color: string;
-  gradient: [string, string];
-  shadow: string;
-  highlight: string;
-  rowCount: number;
-  colCount: number;
-  cellCount: number;
+  row: number; // Current board row (top-left)
+  col: number; // Current board col (top-left)
 }
 
 export interface GridCellData {
   filled: boolean;
   colorKey?: BlockColor;
-  clearing?: boolean;
+  isClearing?: boolean;
 }
 
-export type BlockGrid = GridCellData[][];
+export type FallingGrid = GridCellData[][]; // 20 rows x 10 cols
 
-export interface GhostPreview {
-  row: number;
-  col: number;
-  valid: boolean;
-  piece: ShapePiece;
-}
-
-export interface DragPosition {
-  x: number;
-  y: number;
-}
-
-export interface ClearResult {
-  newGrid: BlockGrid;
+export interface LineClearResult {
+  newGrid: FallingGrid;
   linesCleared: number;
-  clearedRows: number[];
-  clearedCols: number[];
-  clearedCellCoordinates: Array<{ row: number; col: number; colorKey?: BlockColor }>;
-}
-
-export interface ComboEvent {
-  streak: number;
-  linesCleared: number;
-  bonusPoints: number;
-  totalPoints: number;
-  title: string;
+  clearedRowIndices: number[];
 }
 
 export interface ParticleItem {
@@ -84,6 +65,5 @@ export interface ParticleItem {
 export interface BlastGameStats {
   highScore: number;
   bestCombo: number;
-  totalGames: number;
-  totalLinesCleared: number;
+  totalLines: number;
 }
