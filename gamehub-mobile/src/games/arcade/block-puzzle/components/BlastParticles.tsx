@@ -18,17 +18,27 @@ export const BlastParticles: React.FC<BlastParticlesProps> = ({
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    if (!particles || particles.length === 0) {
+      return;
+    }
+
     progress.setValue(0);
-    Animated.timing(progress, {
+    const anim = Animated.timing(progress, {
       toValue: 1,
       duration: 650,
       useNativeDriver: true,
-    }).start(() => {
-      onComplete?.();
     });
+
+    anim.start(({ finished }) => {
+      if (finished) {
+        onComplete?.();
+      }
+    });
+
+    return () => anim.stop();
   }, [particles]);
 
-  if (!particles.length) return null;
+  if (!particles || particles.length === 0) return null;
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
