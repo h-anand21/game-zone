@@ -392,7 +392,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           </LinearGradient>
         </View>
 
-        {/* Center: 10x20 Compact Falling Board */}
+        {/* Center: Immersive Full-Screen Board with Direct Touch Controls */}
         <View style={styles.boardContainer}>
           <GameBoard
             grid={grid}
@@ -400,22 +400,21 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
             ghostRow={ghostRow}
             cellSize={CELL_SIZE}
             clearingRows={clearingRows}
-            onSwipeLeft={handleMoveLeft}
-            onSwipeRight={handleMoveRight}
-            onTapRotate={handleRotate}
-            onSwipeDown={handleHardDrop}
+            onMoveLeft={handleMoveLeft}
+            onMoveRight={handleMoveRight}
+            onRotate={handleRotate}
+            onSoftDrop={handleSoftDrop}
+            onHardDrop={handleHardDrop}
           />
         </View>
 
-        {/* Bottom Arcade Control Pad */}
-        <ControlPad
-          onMoveLeft={handleMoveLeft}
-          onMoveRight={handleMoveRight}
-          onRotate={handleRotate}
-          onSoftDrop={handleSoftDrop}
-          onHardDrop={handleHardDrop}
-          disabled={isPaused || isGameOver}
-        />
+        {/* Minimal Bottom Gesture Hint Bar */}
+        <View style={styles.gestureHintBar}>
+          <Text style={styles.gestureHintIcon}>✦</Text>
+          <Text style={styles.gestureHintText}>
+            Slide to move  •  Tap to rotate  •  Flick down to drop
+          </Text>
+        </View>
 
         {/* Dynamic Combo Toast Banner */}
         <ComboToast
