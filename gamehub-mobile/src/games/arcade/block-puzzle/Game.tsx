@@ -55,9 +55,17 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   onFinish,
   isPaused = false,
 }) => {
-  // Compact cell size calculation (fits 20 rows comfortably on phone screen)
-  const CELL_SIZE = Math.floor(
-    Math.min((SCREEN_HEIGHT - 330) / GRID_ROWS, (SCREEN_WIDTH - 60) / GRID_COLS, 18)
+  // Dynamic cell sizing: maximizes puzzle board space (fills the screen beautifully)
+  const GAP = 2.5;
+  const PADDING = 6;
+  const HUD_AND_HINTS_HEIGHT = 120;
+  const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HUD_AND_HINTS_HEIGHT;
+  const AVAILABLE_WIDTH = SCREEN_WIDTH - 20;
+
+  const CELL_SIZE = Math.min(
+    Math.floor((AVAILABLE_WIDTH - PADDING * 2 - GAP * (GRID_COLS - 1)) / GRID_COLS),
+    Math.floor((AVAILABLE_HEIGHT - PADDING * 2 - GAP * (GRID_ROWS - 1)) / GRID_ROWS),
+    38
   );
 
   // Bag instance ref
@@ -164,7 +172,11 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
         setClearingRows(clearResult.clearedRowIndices);
         setTimeout(() => setClearingRows([]), 300);
 
-        // Blast Particles
+        // Blast Particles originating accurately from cleared grid slots
+        const boardWidth = CELL_SIZE * GRID_COLS + GAP * (GRID_COLS - 1) + PADDING * 2;
+        const boardLeft = (SCREEN_WIDTH - boardWidth) / 2 + PADDING;
+        const boardTop = 64 + PADDING;
+
         const newParticles: ParticleItem[] = [];
         clearResult.clearedRowIndices.forEach((rowIdx) => {
           for (let col = 0; col < GRID_COLS; col++) {
@@ -175,8 +187,8 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
               const speed = 0.8 + Math.random() * 2.2;
               newParticles.push({
                 id: `p-${rowIdx}-${col}-${p}-${Date.now()}`,
-                x: SCREEN_WIDTH / 2 + (col - 5) * CELL_SIZE,
-                y: 160 + rowIdx * CELL_SIZE,
+                x: boardLeft + col * (CELL_SIZE + GAP) + CELL_SIZE / 2,
+                y: boardTop + rowIdx * (CELL_SIZE + GAP) + CELL_SIZE / 2,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
                 size: 5 + Math.random() * 6,
