@@ -27,7 +27,6 @@ import {
   GRID_ROWS,
 } from './logic';
 import { GameBoard } from './components/GameBoard';
-import { ControlPad } from './components/ControlPad';
 import { NextPiecePreview } from './components/NextPiecePreview';
 import { BlastParticles } from './components/BlastParticles';
 import { ComboToast } from './components/ComboToast';
