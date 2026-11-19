@@ -1,5 +1,6 @@
 // ============================================================
-// Block Blast — 10x20 Falling Grid Game Board
+// Block Blast — Immersive Full-Screen 10x20 Game Board
+// Real-time touch sliding, tap-to-rotate & flick-to-slam
 // ============================================================
 
 import React, { useRef } from 'react';
@@ -21,10 +22,11 @@ interface GameBoardProps {
   cellSize: number;
   clearingRows?: number[];
   onLayoutBoard?: (e: LayoutChangeEvent) => void;
-  onSwipeLeft?: () => void;
-  onSwipeRight?: () => void;
-  onTapRotate?: () => void;
-  onSwipeDown?: () => void;
+  onMoveLeft: () => void;
+  onMoveRight: () => void;
+  onRotate: () => void;
+  onSoftDrop: () => void;
+  onHardDrop: () => void;
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({
@@ -34,45 +36,79 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   cellSize,
   clearingRows = [],
   onLayoutBoard,
-  onSwipeLeft,
-  onSwipeRight,
-  onTapRotate,
-  onSwipeDown,
+  onMoveLeft,
+  onMoveRight,
+  onRotate,
+  onSoftDrop,
+  onHardDrop,
 }) => {
-  const GAP = 2;
+  const GAP = 2.5;
   const PADDING = 6;
   const boardWidth = cellSize * GRID_COLS + GAP * (GRID_COLS - 1) + PADDING * 2;
   const boardHeight = cellSize * GRID_ROWS + GAP * (GRID_ROWS - 1) + PADDING * 2;
 
-  // Touch Swipe Gesture on Board
+  // Real-time Gesture Tracking Refs
   const touchStartRef = useRef<{ x: number; y: number; time: number }>({ x: 0, y: 0, time: 0 });
+  const lastColDeltaRef = useRef<number>(0);
+  const lastDropStepRef = useRef<number>(0);
+
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return Math.abs(gestureState.dx) > 3 || Math.abs(gestureState.dy) > 3;
+      },
       onPanResponderGrant: (e) => {
         touchStartRef.current = {
           x: e.nativeEvent.pageX,
           y: e.nativeEvent.pageY,
           time: Date.now(),
         };
+        lastColDeltaRef.current = 0;
+        lastDropStepRef.current = 0;
+      },
+      onPanResponderMove: (e, gestureState) => {
+        const step = cellSize + GAP;
+
+        // 1. Real-time Column Slide Tracking
+        const totalDx = gestureState.dx;
+        const targetColDelta = Math.trunc(totalDx / step);
+        const colDiff = targetColDelta - lastColDeltaRef.current;
+
+        if (colDiff > 0) {
+          for (let i = 0; i < colDiff; i++) {
+            onMoveRight();
+          }
+          lastColDeltaRef.current = targetColDelta;
+        } else if (colDiff < 0) {
+          for (let i = 0; i < Math.abs(colDiff); i++) {
+            onMoveLeft();
+          }
+          lastColDeltaRef.current = targetColDelta;
+        }
+
+        // 2. Drag Downward Soft Drop
+        const totalDy = gestureState.dy;
+        if (totalDy > step * 1.4) {
+          const dropStep = Math.trunc(totalDy / (step * 1.4));
+          if (dropStep > lastDropStepRef.current) {
+            onSoftDrop();
+            lastDropStepRef.current = dropStep;
+          }
+        }
       },
       onPanResponderRelease: (e, gestureState) => {
         const dx = gestureState.dx;
         const dy = gestureState.dy;
         const dt = Date.now() - touchStartRef.current.time;
 
-        if (Math.abs(dx) < 10 && Math.abs(dy) < 10 && dt < 250) {
-          // Tap -> Rotate
-          onTapRotate?.();
-        } else if (dy > 40 && Math.abs(dy) > Math.abs(dx) * 1.3) {
-          // Swipe down -> Drop
-          onSwipeDown?.();
-        } else if (dx < -25) {
-          // Swipe left
-          onSwipeLeft?.();
-        } else if (dx > 25) {
-          // Swipe right
-          onSwipeRight?.();
+        // Quick Tap: Rotate piece!
+        if (Math.abs(dx) < 14 && Math.abs(dy) < 14 && dt < 240) {
+          onRotate();
+        }
+        // Fast downward flick: Hard Drop (Instant Slam)!
+        else if (dy > 45 && gestureState.vy > 0.75) {
+          onHardDrop();
         }
       },
     })
@@ -105,79 +141,79 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       relR < activePiece.matrix.length &&
       relC >= 0 &&
       relC < activePiece.matrix[relR].length &&
-        activePiece.matrix[relR][relC]
+      activePiece.matrix[relR][relC]
     ) {
-  return true;
-}
-return false;
+      return true;
+    }
+    return false;
   };
 
-return (
-  <View
-    {...panResponder.panHandlers}
-    style={[
-      styles.outerBoard,
-      {
-        width: boardWidth,
-        height: boardHeight,
-      },
-    ]}
-    onLayout={onLayoutBoard}
-  >
-    <LinearGradient
-      colors={['#0B1526', '#050A12']}
-      style={[styles.innerBoard, { padding: PADDING }]}
+  return (
+    <View
+      {...panResponder.panHandlers}
+      style={[
+        styles.outerBoard,
+        {
+          width: boardWidth,
+          height: boardHeight,
+        },
+      ]}
+      onLayout={onLayoutBoard}
     >
-      {grid.map((row, r) => {
-        const isRowClearing = clearingRows.includes(r);
+      <LinearGradient
+        colors={['#0D1A30', '#060D18']}
+        style={[styles.innerBoard, { padding: PADDING }]}
+      >
+        {grid.map((row, r) => {
+          const isRowClearing = clearingRows.includes(r);
 
-        return (
-          <View key={`row-${r}`} style={[styles.gridRow, { gap: GAP }]}>
-            {row.map((cell, c) => {
-              const activeColor = getActivePieceCell(r, c);
-              const ghost = !cell.filled && !activeColor && isGhostCell(r, c);
+          return (
+            <View key={`row-${r}`} style={[styles.gridRow, { gap: GAP }]}>
+              {row.map((cell, c) => {
+                const activeColor = getActivePieceCell(r, c);
+                const ghost = !cell.filled && !activeColor && isGhostCell(r, c);
 
-              const isFilled = cell.filled || activeColor !== null;
-              const colorKey = activeColor || cell.colorKey;
+                const isFilled = cell.filled || activeColor !== null;
+                const colorKey = activeColor || cell.colorKey;
 
-              return (
+                return (
                   <BlockCell
                     key={`cell-${r}-${c}`}
-                    size = { cellSize }
-              filled = { isFilled }
-              colorKey = { ghost? activePiece?.colorKey : colorKey}
-            isGhost={ghost}
-            isClearing={isRowClearing}
+                    size={cellSize}
+                    filled={isFilled}
+                    colorKey={ghost ? activePiece?.colorKey : colorKey}
+                    isGhost={ghost}
+                    isClearing={isRowClearing}
                   />
-            );
+                );
               })}
-          </View>
-        );
-      })}
-    </LinearGradient>
-  </View>
-);
+            </View>
+          );
+        })}
+      </LinearGradient>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   outerBoard: {
-    borderRadius: 16,
+    borderRadius: 20,
     backgroundColor: '#091220',
     borderWidth: 2,
-    borderColor: '#1C3150',
+    borderColor: '#1E3558',
     shadowColor: '#00E5FF',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.22,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
+    elevation: 10,
     overflow: 'hidden',
   },
-    innerBoard: {
-      flex: 1,
-      justifyContent: 'space-between',
-    },
-    gridRow: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-    },
-  });
+  innerBoard: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  gridRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+});
