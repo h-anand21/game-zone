@@ -101,13 +101,14 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         const dx = gestureState.dx;
         const dy = gestureState.dy;
         const dt = Date.now() - touchStartRef.current.time;
+        const step = cellSize + GAP;
 
         // Quick Tap: Rotate piece!
-        if (Math.abs(dx) < 14 && Math.abs(dy) < 14 && dt < 240) {
+        if (Math.abs(dx) < 18 && Math.abs(dy) < 18 && dt < 280) {
           onRotate();
         }
         // Fast downward flick: Hard Drop (Instant Slam)!
-        else if (dy > 45 && gestureState.vy > 0.75) {
+        else if ((dy > 35 && gestureState.vy > 0.45) || dy > step * 2.5) {
           onHardDrop();
         }
       },
