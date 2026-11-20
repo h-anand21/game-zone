@@ -211,10 +211,12 @@ const styles = StyleSheet.create({
   },
   innerBoard: {
     flex: 1,
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: GAP,
   },
   gridRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 });
