@@ -1,5 +1,7 @@
 // ============================================================
 // Block Blast — Falling Jewel Blast Master Component
+// Production Architecture: Pure Full-Screen UI, Symmetrical HUD,
+// Intuitive Touch Gestures & Dynamic Display Scaling
 // ============================================================
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -9,8 +11,9 @@ import {
   StyleSheet,
   Dimensions,
   StatusBar,
+  Pressable,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -26,11 +29,12 @@ import {
   GRID_COLS,
   GRID_ROWS,
 } from './logic';
-import { GameBoard } from './components/GameBoard';
+import { GameBoard, BOARD_GAP, BOARD_PADDING } from './components/GameBoard';
 import { NextPiecePreview } from './components/NextPiecePreview';
 import { BlastParticles } from './components/BlastParticles';
 import { ComboToast } from './components/ComboToast';
 import { GameOverModal } from './components/GameOverModal';
+import { PauseOverlay } from '../../common/PauseOverlay';
 import { BlockHaptics } from './haptics';
 import { BlockSound } from './sound';
 import { JEWEL_COLORS } from './shapes';
@@ -55,17 +59,30 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   onFinish,
   isPaused = false,
 }) => {
-  // Dynamic cell sizing: maximizes puzzle board space (fills the screen beautifully)
-  const GAP = 2.5;
-  const PADDING = 6;
-  const HUD_AND_HINTS_HEIGHT = 120;
-  const AVAILABLE_HEIGHT = SCREEN_HEIGHT - HUD_AND_HINTS_HEIGHT;
-  const AVAILABLE_WIDTH = SCREEN_WIDTH - 20;
+  const insets = useSafeAreaInsets();
+  const [isLocalPaused, setIsLocalPaused] = useState(false);
+  const isGamePaused = isPaused || isLocalPaused;
+
+  // Precise UI Layout Metric Budget
+  const TOP_NAV_HEIGHT = 42;
+  const HUD_CARD_HEIGHT = 66;
+  const GESTURE_HINT_HEIGHT = 28;
+  const SPACING_TOTAL = 26; // internal margins & gaps
+  const NON_BOARD_HEIGHT =
+    insets.top +
+    insets.bottom +
+    TOP_NAV_HEIGHT +
+    HUD_CARD_HEIGHT +
+    GESTURE_HINT_HEIGHT +
+    SPACING_TOTAL;
+
+  const AVAILABLE_HEIGHT = Math.max(380, SCREEN_HEIGHT - NON_BOARD_HEIGHT);
+  const AVAILABLE_WIDTH = SCREEN_WIDTH - 24;
 
   const CELL_SIZE = Math.min(
-    Math.floor((AVAILABLE_WIDTH - PADDING * 2 - GAP * (GRID_COLS - 1)) / GRID_COLS),
-    Math.floor((AVAILABLE_HEIGHT - PADDING * 2 - GAP * (GRID_ROWS - 1)) / GRID_ROWS),
-    38
+    Math.floor((AVAILABLE_WIDTH - BOARD_PADDING * 2 - BOARD_GAP * (GRID_COLS - 1)) / GRID_COLS),
+    Math.floor((AVAILABLE_HEIGHT - BOARD_PADDING * 2 - BOARD_GAP * (GRID_ROWS - 1)) / GRID_ROWS),
+    34
   );
 
   // Bag instance ref
@@ -108,8 +125,8 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   gridRef.current = grid;
   const activePieceRef = useRef(activePiece);
   activePieceRef.current = activePiece;
-  const isPausedRef = useRef(isPaused);
-  isPausedRef.current = isPaused;
+  const isGamePausedRef = useRef(isGamePaused);
+  isGamePausedRef.current = isGamePaused;
   const isGameOverRef = useRef(isGameOver);
   isGameOverRef.current = isGameOver;
 
@@ -170,12 +187,12 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
 
         // Flash rows
         setClearingRows(clearResult.clearedRowIndices);
-        setTimeout(() => setClearingRows([]), 300);
+        setTimeout(() => setClearingRows([]), 280);
 
         // Blast Particles originating accurately from cleared grid slots
-        const boardWidth = CELL_SIZE * GRID_COLS + GAP * (GRID_COLS - 1) + PADDING * 2;
-        const boardLeft = (SCREEN_WIDTH - boardWidth) / 2 + PADDING;
-        const boardTop = 64 + PADDING;
+        const boardWidth = CELL_SIZE * GRID_COLS + BOARD_GAP * (GRID_COLS - 1) + BOARD_PADDING * 2;
+        const boardLeft = (SCREEN_WIDTH - boardWidth) / 2 + BOARD_PADDING;
+        const boardTop = insets.top + TOP_NAV_HEIGHT + HUD_CARD_HEIGHT + 24 + BOARD_PADDING;
 
         const newParticles: ParticleItem[] = [];
         clearResult.clearedRowIndices.forEach((rowIdx) => {
@@ -187,8 +204,8 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
               const speed = 0.8 + Math.random() * 2.2;
               newParticles.push({
                 id: `p-${rowIdx}-${col}-${p}-${Date.now()}`,
-                x: boardLeft + col * (CELL_SIZE + GAP) + CELL_SIZE / 2,
-                y: boardTop + rowIdx * (CELL_SIZE + GAP) + CELL_SIZE / 2,
+                x: boardLeft + col * (CELL_SIZE + BOARD_GAP) + CELL_SIZE / 2,
+                y: boardTop + rowIdx * (CELL_SIZE + BOARD_GAP) + CELL_SIZE / 2,
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
                 size: 5 + Math.random() * 6,
@@ -223,10 +240,6 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
       if (!canPlaceAt(clearResult.newGrid, newActive.matrix, newActive.row, newActive.col)) {
         setIsGameOver(true);
         BlockHaptics.gameOver();
-        onFinish?.(score, false, {
-          totalLines: linesClearedTotal,
-          bestCombo,
-        });
         setActivePiece(null);
       } else {
         setActivePiece(newActive);
@@ -241,7 +254,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
       linesClearedTotal,
       nextType,
       CELL_SIZE,
-      onFinish,
+      insets.top,
     ]
   );
 
@@ -252,7 +265,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
    * Safe downward step function invoked by interval
    */
   const stepDown = useCallback(() => {
-    if (isPausedRef.current || isGameOverRef.current) return;
+    if (isGamePausedRef.current || isGameOverRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
 
@@ -267,7 +280,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
    * Automatic Fall Tick (Steady timer interval, independent of per-step renders)
    */
   useEffect(() => {
-    if (isPaused || isGameOver) return;
+    if (isGamePaused || isGameOver) return;
 
     // Drop speed scales with level (starts at 560ms, speeds up to 160ms)
     const dropInterval = Math.max(160, 560 - (level - 1) * 38);
@@ -277,11 +290,11 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
     }, dropInterval);
 
     return () => clearInterval(timer);
-  }, [isPaused, isGameOver, level, stepDown]);
+  }, [isGamePaused, isGameOver, level, stepDown]);
 
   // ── User Controls ──
   const handleMoveLeft = useCallback(() => {
-    if (isPausedRef.current || isGameOverRef.current) return;
+    if (isGamePausedRef.current || isGameOverRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
     if (canPlaceAt(gridRef.current, current.matrix, current.row, current.col - 1)) {
@@ -290,7 +303,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   }, []);
 
   const handleMoveRight = useCallback(() => {
-    if (isPausedRef.current || isGameOverRef.current) return;
+    if (isGamePausedRef.current || isGameOverRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
     if (canPlaceAt(gridRef.current, current.matrix, current.row, current.col + 1)) {
@@ -299,7 +312,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   }, []);
 
   const handleRotate = useCallback(() => {
-    if (isPausedRef.current || isGameOverRef.current) return;
+    if (isGamePausedRef.current || isGameOverRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
     const rotated = tryRotatePiece(gridRef.current, current, true);
@@ -311,7 +324,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   }, [stepDown]);
 
   const handleHardDrop = useCallback(() => {
-    if (isPausedRef.current || isGameOverRef.current) return;
+    if (isGamePausedRef.current || isGameOverRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
     const targetRow = getGhostRow(gridRef.current, current.matrix, current.row, current.col);
@@ -341,58 +354,89 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
     setComboStreak(0);
     setIsNewRecord(false);
     setIsGameOver(false);
+    setIsLocalPaused(false);
+  };
+
+  const handleExit = () => {
+    onFinish?.(score, false, {
+      totalLines: linesClearedTotal,
+      bestCombo,
+    });
   };
 
   return (
-    <SafeAreaView style={styles.safeContainer}>
+    <View style={styles.outerContainer}>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
       <LinearGradient
-        colors={['#081220', '#040810']}
-        style={styles.container}
+        colors={['#07111E', '#030810']}
+        style={[
+          styles.container,
+          {
+            paddingTop: insets.top + 4,
+            paddingBottom: Math.max(6, insets.bottom),
+          },
+        ]}
       >
-        {/* Top HUD: Score, Streak, Level, Next Piece */}
-        <View style={styles.hudRow}>
-          {/* Score Box */}
-          <LinearGradient
-            colors={['#162844', '#0E1A2C']}
-            style={styles.hudPill}
+        {/* 1. TOP NAV BAR */}
+        <View style={styles.topNav}>
+          <Pressable
+            onPress={handleExit}
+            style={({ pressed }) => [styles.navBtn, pressed && styles.btnPressed]}
+            hitSlop={12}
           >
-            <Text style={styles.hudLabel}>SCORE</Text>
-            <Text style={styles.hudValue}>{score.toLocaleString()}</Text>
-          </LinearGradient>
+            <Text style={styles.navBtnText}>←</Text>
+          </Pressable>
 
-          {/* Level / Streak Box */}
-          <View style={styles.middleHudCol}>
-            {comboStreak > 1 ? (
-              <View style={styles.streakBadge}>
-                <Text style={styles.streakFlame}>🔥</Text>
-                <Text style={styles.streakText}>x{comboStreak} COMBO</Text>
-              </View>
-            ) : (
-              <View style={styles.levelBadge}>
-                <Text style={styles.levelText}>LVL {level}</Text>
-                <Text style={styles.linesText}>{linesClearedTotal} Lines</Text>
-              </View>
-            )}
+          <View style={styles.titleBadge}>
+            <Text style={styles.titleEmoji}>💎</Text>
+            <View>
+              <Text style={styles.titleText}>BLOCK BLAST</Text>
+              <Text style={styles.titleSub}>JEWEL PUZZLE</Text>
+            </View>
           </View>
 
-          {/* Next Piece Preview */}
-          <NextPiecePreview nextType={nextType} />
-
-          {/* High Score Box */}
-          <LinearGradient
-            colors={['#2A2410', '#181408']}
-            style={[styles.hudPill, styles.highScorePill]}
+          <Pressable
+            onPress={() => setIsLocalPaused(true)}
+            style={({ pressed }) => [styles.navBtn, pressed && styles.btnPressed]}
+            hitSlop={12}
           >
-            <Text style={[styles.hudLabel, { color: '#FFE082' }]}>👑 BEST</Text>
-            <Text style={[styles.hudValue, { color: '#FFD600' }]}>
-              {highScore.toLocaleString()}
-            </Text>
-          </LinearGradient>
+            <Text style={styles.navBtnText}>⏸</Text>
+          </Pressable>
         </View>
 
-        {/* Center: Immersive Full-Screen Board with Direct Touch Controls */}
+        {/* 2. UNIFIED ARCADE DASHBOARD (SYMMETRICAL HUD CARD) */}
+        <LinearGradient
+          colors={['#10223A', '#0B1728']}
+          style={styles.hudCard}
+        >
+          {/* Left: Score & Level */}
+          <View style={styles.hudLeft}>
+            <Text style={styles.hudLabel}>SCORE</Text>
+            <Text style={styles.hudScoreValue}>{score.toLocaleString()}</Text>
+            <Text style={styles.hudSubInfo}>LVL {level} • {linesClearedTotal} Lines</Text>
+          </View>
+
+          {/* Center: Next Piece Capsule */}
+          <View style={styles.hudCenter}>
+            <NextPiecePreview nextType={nextType} compact={true} />
+          </View>
+
+          {/* Right: Best Record & Streak */}
+          <View style={styles.hudRight}>
+            <Text style={[styles.hudLabel, { color: '#FCD34D' }]}>BEST 👑</Text>
+            <Text style={styles.hudBestValue}>{highScore.toLocaleString()}</Text>
+            {comboStreak > 1 ? (
+              <View style={styles.streakBadge}>
+                <Text style={styles.streakText}>🔥 x{comboStreak} COMBO</Text>
+              </View>
+            ) : (
+              <Text style={styles.hudSubInfo}>TOP SCORE</Text>
+            )}
+          </View>
+        </LinearGradient>
+
+        {/* 3. CENTER: IMMERSIVE GAME BOARD */}
         <View style={styles.boardContainer}>
           <GameBoard
             grid={grid}
@@ -408,12 +452,13 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           />
         </View>
 
-        {/* Minimal Bottom Gesture Hint Bar */}
+        {/* 4. SLEEK GESTURE HINT BAR */}
         <View style={styles.gestureHintBar}>
-          <Text style={styles.gestureHintIcon}>✦</Text>
-          <Text style={styles.gestureHintText}>
-            Slide to move  •  Tap to rotate  •  Flick down to drop
-          </Text>
+          <Text style={styles.gestureHintItem}>◀  Slide : Move</Text>
+          <Text style={styles.gestureHintDot}>•</Text>
+          <Text style={styles.gestureHintItem}>↺  Tap : Rotate</Text>
+          <Text style={styles.gestureHintDot}>•</Text>
+          <Text style={styles.gestureHintItem}>▼  Flick : Drop</Text>
         </View>
 
         {/* Dynamic Combo Toast Banner */}
@@ -440,109 +485,168 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           bestCombo={bestCombo}
           linesCleared={linesClearedTotal}
           onRestart={handleRestart}
+          onExit={handleExit}
         />
+
+        {/* Pause Overlay */}
+        {isLocalPaused && (
+          <PauseOverlay
+            onResume={() => setIsLocalPaused(false)}
+            onRestart={handleRestart}
+            onQuit={handleExit}
+          />
+        )}
       </LinearGradient>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeContainer: {
+  outerContainer: {
     flex: 1,
-    backgroundColor: '#081220',
+    backgroundColor: '#07111E',
   },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 2,
+    paddingHorizontal: 12,
   },
-  hudRow: {
+  // 1. TOP NAV
+  topNav: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: 14,
-    marginTop: 2,
-    marginBottom: 4,
-    gap: 6,
+    height: 42,
+    marginBottom: 6,
   },
-  hudPill: {
-    flex: 1,
-    maxWidth: 96,
-    height: 44,
-    borderRadius: 14,
+  navBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.14)',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  btnPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.94 }],
+  },
+  navBtnText: {
+    fontSize: 18,
+    color: '#E2E8F0',
+    fontWeight: '700',
+  },
+  titleBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  titleEmoji: {
+    fontSize: 22,
+  },
+  titleText: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#F0F9FF',
+    letterSpacing: 1.2,
+  },
+  titleSub: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#38BDF8',
+    letterSpacing: 1.5,
+  },
+
+  // 2. UNIFIED ARCADE HUD CARD
+  hudCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    height: 66,
+    borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: '#243C60',
+    borderColor: '#1E3B64',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginBottom: 6,
     shadowColor: '#00E5FF',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  highScorePill: {
-    borderColor: '#614C10',
-    shadowColor: '#FFD600',
+  hudLeft: {
+    flex: 1,
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  hudCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
+  },
+  hudRight: {
+    flex: 1,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
   },
   hudLabel: {
     fontSize: 9,
     fontWeight: '900',
-    color: '#8CA0B8',
+    color: '#38BDF8',
     letterSpacing: 1,
+    marginBottom: 1,
   },
-  hudValue: {
-    fontSize: 15,
+  hudScoreValue: {
+    fontSize: 18,
     fontWeight: '900',
     color: '#FFFFFF',
     letterSpacing: 0.5,
+    lineHeight: 22,
   },
-  middleHudCol: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 80,
+  hudBestValue: {
+    fontSize: 18,
+    fontWeight: '900',
+    color: '#FCD34D',
+    letterSpacing: 0.5,
+    lineHeight: 22,
+  },
+  hudSubInfo: {
+    fontSize: 9.5,
+    fontWeight: '700',
+    color: '#94A3B8',
+    letterSpacing: 0.3,
   },
   streakBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 109, 0, 0.2)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 14,
-    borderWidth: 1.5,
+    backgroundColor: 'rgba(255, 109, 0, 0.22)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+    borderWidth: 1,
     borderColor: '#FF6D00',
-    gap: 3,
-  },
-  streakFlame: {
-    fontSize: 13,
+    marginTop: 1,
   },
   streakText: {
-    fontSize: 10,
+    fontSize: 9,
     fontWeight: '900',
     color: '#FF9100',
-    letterSpacing: 0.8,
+    letterSpacing: 0.5,
   },
-  levelBadge: {
-    alignItems: 'center',
-  },
-  levelText: {
-    fontSize: 12,
-    fontWeight: '900',
-    color: '#4DE7FF',
-    letterSpacing: 1.2,
-  },
-  linesText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#8CA0B8',
-  },
+
+  // 3. BOARD CONTAINER
   boardContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
   },
+
+  // 4. BOTTOM GESTURE HINT BAR
   gestureHintBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -551,17 +655,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 20,
-    marginBottom: 6,
-    gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    marginTop: 4,
+    gap: 8,
   },
-  gestureHintIcon: {
-    fontSize: 10,
-    color: '#00E5FF',
-  },
-  gestureHintText: {
+  gestureHintItem: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#8CA0B8',
-    letterSpacing: 0.4,
+    color: '#94A3B8',
+    letterSpacing: 0.3,
+  },
+  gestureHintDot: {
+    fontSize: 10,
+    color: '#38BDF8',
   },
 });
