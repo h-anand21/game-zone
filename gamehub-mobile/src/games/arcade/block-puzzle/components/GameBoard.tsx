@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: GAP,
+    gap: BOARD_GAP,
   },
   gridRow: {
     flexDirection: 'row',
