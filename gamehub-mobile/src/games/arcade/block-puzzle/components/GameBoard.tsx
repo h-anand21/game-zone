@@ -15,6 +15,9 @@ import { BlockCell } from './BlockCell';
 import type { FallingGrid, ActivePiece, BlockColor } from '../types';
 import { GRID_ROWS, GRID_COLS } from '../logic';
 
+export const BOARD_GAP = 2;
+export const BOARD_PADDING = 6;
+
 interface GameBoardProps {
   grid: FallingGrid;
   activePiece: ActivePiece | null;
@@ -42,8 +45,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   onSoftDrop,
   onHardDrop,
 }) => {
-  const GAP = 2.5;
-  const PADDING = 6;
+  const GAP = BOARD_GAP;
+  const PADDING = BOARD_PADDING;
   const boardWidth = cellSize * GRID_COLS + GAP * (GRID_COLS - 1) + PADDING * 2;
   const boardHeight = cellSize * GRID_ROWS + GAP * (GRID_ROWS - 1) + PADDING * 2;
 
