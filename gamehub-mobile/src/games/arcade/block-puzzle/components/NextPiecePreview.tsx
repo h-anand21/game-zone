@@ -4,28 +4,28 @@
 
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { BlockCell } from './BlockCell';
 import { TETROMINOES } from '../shapes';
 import type { TetrominoType } from '../types';
 
 interface NextPiecePreviewProps {
   nextType: TetrominoType | null;
+  compact?: boolean;
 }
 
-export const NextPiecePreview: React.FC<NextPiecePreviewProps> = ({ nextType }) => {
+export const NextPiecePreview: React.FC<NextPiecePreviewProps> = ({
+  nextType,
+  compact = false,
+}) => {
   if (!nextType) return null;
 
   const shape = TETROMINOES[nextType];
   const matrix = shape.rotations[0];
-  const MINI_CELL_SIZE = 13;
-  const GAP = 1.5;
+  const MINI_CELL_SIZE = compact ? 8.5 : 10;
+  const GAP = 1;
 
   return (
-    <LinearGradient
-      colors={['#162844', '#0E1A2C']}
-      style={styles.container}
-    >
+    <View style={styles.capsule}>
       <Text style={styles.label}>NEXT</Text>
       <View style={styles.matrixContainer}>
         {matrix.map((row, r) => (
@@ -49,28 +49,29 @@ export const NextPiecePreview: React.FC<NextPiecePreviewProps> = ({ nextType }) 
           </View>
         ))}
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    borderRadius: 14,
-    paddingVertical: 6,
-    paddingHorizontal: 10,
+  capsule: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#243C60',
-    minWidth: 72,
-    minHeight: 52,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+    backgroundColor: 'rgba(8, 16, 28, 0.7)',
+    borderWidth: 1,
+    borderColor: '#1D3B62',
+    minWidth: 54,
+    height: 48,
   },
   label: {
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: '900',
-    color: '#8CA0B8',
+    color: '#00E5FF',
     letterSpacing: 1.2,
-    marginBottom: 4,
+    marginBottom: 2,
   },
   matrixContainer: {
     alignItems: 'center',
@@ -78,6 +79,5 @@ const styles = StyleSheet.create({
   },
   matrixRow: {
     flexDirection: 'row',
-    marginVertical: 1,
   },
 });
