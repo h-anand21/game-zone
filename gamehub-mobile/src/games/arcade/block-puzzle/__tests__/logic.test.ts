@@ -102,7 +102,7 @@ import {
 
                 const lvl1Config = getLevelConfig(1);
                 expect(lvl1Config.name).toBe('Genesis Glade');
-                expect(lvl1Config.targetLines).toBe(3);
+                expect(lvl1Config.targetLines).toBe(2);
 
                 const lvl1Grid = createGridForLevel(1);
                 expect(lvl1Grid.length).toBe(GRID_ROWS);
@@ -111,10 +111,10 @@ import {
                 // Top rows empty
                 expect(lvl1Grid[0].every((c: any) => !c.filled)).toBe(true);
 
-                // Bottom rows pre-laid
-                expect(lvl1Grid[18][0].filled).toBe(true);
-                expect(lvl1Grid[18][0].colorKey).toBe('cyan');
-                expect(lvl1Grid[18][4].filled).toBe(false);
+                // Bottom row 19 pre-laid with wide center gap
+                expect(lvl1Grid[19][0].filled).toBe(true);
+                expect(lvl1Grid[19][0].colorKey).toBe('cyan');
+                expect(lvl1Grid[19][4].filled).toBe(false);
 
                 // Spawning check
                 const spawnP = spawnPiece('I');
