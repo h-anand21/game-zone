@@ -182,6 +182,11 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
    * Initializes or restarts a level with its handcrafted pre-laid block layout
    */
   const loadLevel = useCallback((lvlNumber: number) => {
+    if (lockTimerRef.current) {
+      clearTimeout(lockTimerRef.current);
+      lockTimerRef.current = null;
+    }
+    isGroundedRef.current = false;
     bagRef.current = new TetrominoBag();
     const newGrid = createGridForLevel(lvlNumber);
     setGrid(newGrid);
