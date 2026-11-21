@@ -340,7 +340,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   lockCurrentPieceRef.current = lockCurrentPiece;
 
   // Lock Delay Grace Period (allows sliding/rotating when piece touches ground)
-  const lockTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isGroundedRef = useRef<boolean>(false);
 
   const clearLockTimer = useCallback(() => {
