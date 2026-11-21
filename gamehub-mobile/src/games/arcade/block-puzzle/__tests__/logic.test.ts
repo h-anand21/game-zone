@@ -95,4 +95,29 @@ import {
                 }
                 expect(drawn.size).toBe(7);
               });
+
+              it('correctly creates handcrafted pre-laid layouts for levels', () => {
+                const { createGridForLevel, getLevelConfig, TOTAL_LEVELS } = require('../levels');
+                expect(TOTAL_LEVELS).toBe(15);
+
+                const lvl1Config = getLevelConfig(1);
+                expect(lvl1Config.name).toBe('Genesis Glade');
+                expect(lvl1Config.targetLines).toBe(3);
+
+                const lvl1Grid = createGridForLevel(1);
+                expect(lvl1Grid.length).toBe(GRID_ROWS);
+                expect(lvl1Grid[0].length).toBe(GRID_COLS);
+
+                // Top rows empty
+                expect(lvl1Grid[0].every((c: any) => !c.filled)).toBe(true);
+
+                // Bottom rows pre-laid
+                expect(lvl1Grid[18][0].filled).toBe(true);
+                expect(lvl1Grid[18][0].colorKey).toBe('cyan');
+                expect(lvl1Grid[18][4].filled).toBe(false);
+
+                // Spawning check
+                const spawnP = spawnPiece('I');
+                expect(canPlaceAt(lvl1Grid, spawnP.matrix, spawnP.row, spawnP.col)).toBe(true);
+              });
             });

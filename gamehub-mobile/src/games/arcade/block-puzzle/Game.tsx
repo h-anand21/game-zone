@@ -1,7 +1,7 @@
 // ============================================================
 // Block Blast — Falling Jewel Blast Master Component
-// Production Architecture: Pure Full-Screen UI, Symmetrical HUD,
-// Intuitive Touch Gestures & Dynamic Display Scaling
+// Production Level-Based Architecture: 15 Handcrafted Pre-laid
+// Layouts, Level Progression, Stars, Symmetrical Arcade HUD
 // ============================================================
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -17,7 +17,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  createEmptyGrid,
   canPlaceAt,
   getGhostRow,
   spawnPiece,
@@ -29,11 +28,18 @@ import {
   GRID_COLS,
   GRID_ROWS,
 } from './logic';
+import {
+  getLevelConfig,
+  createGridForLevel,
+  TOTAL_LEVELS,
+} from './levels';
 import { GameBoard, BOARD_GAP, BOARD_PADDING } from './components/GameBoard';
 import { NextPiecePreview } from './components/NextPiecePreview';
 import { BlastParticles } from './components/BlastParticles';
 import { ComboToast } from './components/ComboToast';
 import { GameOverModal } from './components/GameOverModal';
+import { LevelCompleteModal } from './components/LevelCompleteModal';
+import { LevelSelectModal } from './components/LevelSelectModal';
 import { PauseOverlay } from '../../common/PauseOverlay';
 import { BlockHaptics } from './haptics';
 import { BlockSound } from './sound';
@@ -47,6 +53,9 @@ import type {
 import type { GameEngine } from '../../engine/GameEngine';
 
 const STORAGE_KEY_HIGH_SCORE = '@falling_jewel_blast_high_score_v1';
+const STORAGE_KEY_UNLOCKED_LEVEL = '@block_blast_unlocked_level_v1';
+const STORAGE_KEY_LEVEL_STARS = '@block_blast_level_stars_v1';
+
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface BlockPuzzleProps {
@@ -63,9 +72,19 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   const [isLocalPaused, setIsLocalPaused] = useState(false);
   const isGamePaused = isPaused || isLocalPaused;
 
+  // Level Progression State
+  const [currentLevel, setCurrentLevel] = useState<number>(1);
+  const [unlockedLevel, setUnlockedLevel] = useState<number>(1);
+  const [levelStars, setLevelStars] = useState<Record<number, number>>({});
+  const [levelLinesCleared, setLevelLinesCleared] = useState<number>(0);
+  const [isLevelComplete, setIsLevelComplete] = useState<boolean>(false);
+  const [showLevelSelect, setShowLevelSelect] = useState<boolean>(false);
+
+  const levelConfig = getLevelConfig(currentLevel);
+
   // Precise UI Layout Metric Budget
   const TOP_NAV_HEIGHT = 42;
-  const HUD_CARD_HEIGHT = 66;
+  const HUD_CARD_HEIGHT = 68;
   const GESTURE_HINT_HEIGHT = 28;
   const SPACING_TOTAL = 26; // internal margins & gaps
   const NON_BOARD_HEIGHT =
@@ -88,8 +107,8 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   // Bag instance ref
   const bagRef = useRef<TetrominoBag>(new TetrominoBag());
 
-  // Grid & Active Falling Piece State
-  const [grid, setGrid] = useState<FallingGrid>(() => createEmptyGrid());
+  // Grid & Active Falling Piece State (initialized with current level's pre-laid layout)
+  const [grid, setGrid] = useState<FallingGrid>(() => createGridForLevel(1));
   const [activePiece, setActivePiece] = useState<ActivePiece | null>(() =>
     spawnPiece(bagRef.current.next())
   );
@@ -100,7 +119,6 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   const [highScore, setHighScore] = useState<number>(0);
   const [isNewRecord, setIsNewRecord] = useState<boolean>(false);
   const [linesClearedTotal, setLinesClearedTotal] = useState<number>(0);
-  const [level, setLevel] = useState<number>(1);
   const [comboStreak, setComboStreak] = useState<number>(0);
   const [bestCombo, setBestCombo] = useState<number>(0);
 
@@ -129,26 +147,55 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   isGamePausedRef.current = isGamePaused;
   const isGameOverRef = useRef(isGameOver);
   isGameOverRef.current = isGameOver;
+  const isLevelCompleteRef = useRef(isLevelComplete);
+  isLevelCompleteRef.current = isLevelComplete;
 
   // Calculate Ghost Row
   const ghostRow = activePiece
     ? getGhostRow(grid, activePiece.matrix, activePiece.row, activePiece.col)
     : 0;
 
-  // Load High Score on Mount
+  // Load High Score & Persistent Level Progression on Mount
   useEffect(() => {
     (async () => {
       try {
-        const saved = await AsyncStorage.getItem(STORAGE_KEY_HIGH_SCORE);
-        if (saved) {
-          setHighScore(parseInt(saved, 10) || 0);
+        const savedScore = await AsyncStorage.getItem(STORAGE_KEY_HIGH_SCORE);
+        if (savedScore) {
+          setHighScore(parseInt(savedScore, 10) || 0);
+        }
+
+        const savedUnlocked = await AsyncStorage.getItem(STORAGE_KEY_UNLOCKED_LEVEL);
+        if (savedUnlocked) {
+          const parsed = parseInt(savedUnlocked, 10);
+          if (parsed >= 1) setUnlockedLevel(parsed);
+        }
+
+        const savedStars = await AsyncStorage.getItem(STORAGE_KEY_LEVEL_STARS);
+        if (savedStars) {
+          setLevelStars(JSON.parse(savedStars));
         }
       } catch {}
     })();
   }, []);
 
   /**
-   * Commits the current piece to the board, triggers line clears, and spawns next piece
+   * Initializes or restarts a level with its handcrafted pre-laid block layout
+   */
+  const loadLevel = useCallback((lvlNumber: number) => {
+    bagRef.current = new TetrominoBag();
+    const newGrid = createGridForLevel(lvlNumber);
+    setGrid(newGrid);
+    setActivePiece(spawnPiece(bagRef.current.next()));
+    setNextType(bagRef.current.next());
+    setCurrentLevel(lvlNumber);
+    setLevelLinesCleared(0);
+    setIsLevelComplete(false);
+    setIsGameOver(false);
+    setIsLocalPaused(false);
+  }, []);
+
+  /**
+   * Commits the current piece to the board, triggers line clears, and updates level progress
    */
   const lockCurrentPiece = useCallback(
     (pieceToLock: ActivePiece) => {
@@ -165,13 +212,16 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
         setComboStreak(nextStreak);
         if (nextStreak > bestCombo) setBestCombo(nextStreak);
 
-        const scoreInfo = calculateFallingScore(lines, nextStreak, level);
+        const scoreInfo = calculateFallingScore(lines, nextStreak, currentLevel);
         const nextScore = score + scoreInfo.points;
         setScore(nextScore);
 
         const nextTotalLines = linesClearedTotal + lines;
         setLinesClearedTotal(nextTotalLines);
-        setLevel(Math.floor(nextTotalLines / 8) + 1);
+
+        // Update Level Lines Goal
+        const nextLevelLines = levelLinesCleared + lines;
+        setLevelLinesCleared(nextLevelLines);
 
         // High Score
         if (nextScore > highScore) {
@@ -180,10 +230,29 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           AsyncStorage.setItem(STORAGE_KEY_HIGH_SCORE, nextScore.toString()).catch(() => {});
         }
 
-        // Haptic & Sound
-        BlockHaptics.lineBlast();
-        BlockHaptics.comboStreak(nextStreak);
-        BlockSound.playComboChime(nextStreak);
+        // Check if Level Goal Reached!
+        if (nextLevelLines >= levelConfig.targetLines) {
+          setIsLevelComplete(true);
+          BlockHaptics.comboStreak(5);
+          BlockSound.playComboChime(8);
+
+          // Unlock next level progression
+          const nextUnlocked = Math.max(unlockedLevel, currentLevel + 1);
+          setUnlockedLevel(nextUnlocked);
+          AsyncStorage.setItem(STORAGE_KEY_UNLOCKED_LEVEL, nextUnlocked.toString()).catch(() => {});
+
+          // Calculate & persist star ratings
+          const starsEarned = nextStreak >= 3 ? 3 : nextStreak >= 2 ? 2 : 1;
+          const bestStars = Math.max(levelStars[currentLevel] || 0, starsEarned);
+          const updatedStars = { ...levelStars, [currentLevel]: bestStars };
+          setLevelStars(updatedStars);
+          AsyncStorage.setItem(STORAGE_KEY_LEVEL_STARS, JSON.stringify(updatedStars)).catch(() => {});
+        } else {
+          // Haptic & Sound
+          BlockHaptics.lineBlast();
+          BlockHaptics.comboStreak(nextStreak);
+          BlockSound.playComboChime(nextStreak);
+        }
 
         // Flash rows
         setClearingRows(clearResult.clearedRowIndices);
@@ -250,7 +319,11 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
       highScore,
       comboStreak,
       bestCombo,
-      level,
+      currentLevel,
+      levelLinesCleared,
+      levelConfig.targetLines,
+      unlockedLevel,
+      levelStars,
       linesClearedTotal,
       nextType,
       CELL_SIZE,
@@ -265,7 +338,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
    * Safe downward step function invoked by interval
    */
   const stepDown = useCallback(() => {
-    if (isGamePausedRef.current || isGameOverRef.current) return;
+    if (isGamePausedRef.current || isGameOverRef.current || isLevelCompleteRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
 
@@ -277,24 +350,23 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   }, []);
 
   /**
-   * Automatic Fall Tick (Steady timer interval, independent of per-step renders)
+   * Automatic Fall Tick (Drop speed dynamically governed by Level Config)
    */
   useEffect(() => {
-    if (isGamePaused || isGameOver) return;
+    if (isGamePaused || isGameOver || isLevelComplete) return;
 
-    // Drop speed scales with level (starts at 560ms, speeds up to 160ms)
-    const dropInterval = Math.max(160, 560 - (level - 1) * 38);
+    const dropInterval = levelConfig.dropSpeed || 500;
 
     const timer = setInterval(() => {
       stepDown();
     }, dropInterval);
 
     return () => clearInterval(timer);
-  }, [isGamePaused, isGameOver, level, stepDown]);
+  }, [isGamePaused, isGameOver, isLevelComplete, levelConfig.dropSpeed, stepDown]);
 
   // ── User Controls ──
   const handleMoveLeft = useCallback(() => {
-    if (isGamePausedRef.current || isGameOverRef.current) return;
+    if (isGamePausedRef.current || isGameOverRef.current || isLevelCompleteRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
     if (canPlaceAt(gridRef.current, current.matrix, current.row, current.col - 1)) {
@@ -303,7 +375,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   }, []);
 
   const handleMoveRight = useCallback(() => {
-    if (isGamePausedRef.current || isGameOverRef.current) return;
+    if (isGamePausedRef.current || isGameOverRef.current || isLevelCompleteRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
     if (canPlaceAt(gridRef.current, current.matrix, current.row, current.col + 1)) {
@@ -312,7 +384,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   }, []);
 
   const handleRotate = useCallback(() => {
-    if (isGamePausedRef.current || isGameOverRef.current) return;
+    if (isGamePausedRef.current || isGameOverRef.current || isLevelCompleteRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
     const rotated = tryRotatePiece(gridRef.current, current, true);
@@ -324,7 +396,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   }, [stepDown]);
 
   const handleHardDrop = useCallback(() => {
-    if (isGamePausedRef.current || isGameOverRef.current) return;
+    if (isGamePausedRef.current || isGameOverRef.current || isLevelCompleteRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
     const targetRow = getGhostRow(gridRef.current, current.matrix, current.row, current.col);
@@ -343,26 +415,33 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
     setComboToast((prev) => (prev.visible ? { ...prev, visible: false } : prev));
   }, []);
 
-  const handleRestart = () => {
-    bagRef.current = new TetrominoBag();
-    setGrid(createEmptyGrid());
-    setActivePiece(spawnPiece(bagRef.current.next()));
-    setNextType(bagRef.current.next());
-    setScore(0);
-    setLevel(1);
-    setLinesClearedTotal(0);
-    setComboStreak(0);
-    setIsNewRecord(false);
-    setIsGameOver(false);
-    setIsLocalPaused(false);
+  // Level Progression Actions
+  const handleNextLevel = () => {
+    const nextLvl = currentLevel + 1;
+    if (nextLvl <= TOTAL_LEVELS) {
+      loadLevel(nextLvl);
+    }
+  };
+
+  const handleReplayLevel = () => {
+    loadLevel(currentLevel);
+  };
+
+  const handleSelectLevel = (lvl: number) => {
+    setShowLevelSelect(false);
+    loadLevel(lvl);
   };
 
   const handleExit = () => {
     onFinish?.(score, false, {
       totalLines: linesClearedTotal,
       bestCombo,
+      currentLevel,
     });
   };
+
+  // Level goal progress percentage
+  const goalProgress = Math.min(1, levelLinesCleared / Math.max(1, levelConfig.targetLines));
 
   return (
     <View style={styles.outerContainer}>
@@ -388,13 +467,21 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
             <Text style={styles.navBtnText}>←</Text>
           </Pressable>
 
-          <View style={styles.titleBadge}>
-            <Text style={styles.titleEmoji}>💎</Text>
+          {/* Level Selector Button */}
+          <Pressable
+            onPress={() => setShowLevelSelect(true)}
+            style={({ pressed }) => [styles.levelSelectorBtn, pressed && styles.btnPressed]}
+          >
+            <Text style={styles.levelSelectorEmoji}>🏆</Text>
             <View>
-              <Text style={styles.titleText}>BLOCK BLAST</Text>
-              <Text style={styles.titleSub}>JEWEL PUZZLE</Text>
+              <Text style={styles.levelSelectorText}>
+                LVL {currentLevel} • {levelConfig.name} ▾
+              </Text>
+              <Text style={styles.levelSelectorSub}>
+                Goal: {levelLinesCleared}/{levelConfig.targetLines} Lines
+              </Text>
             </View>
-          </View>
+          </Pressable>
 
           <Pressable
             onPress={() => setIsLocalPaused(true)}
@@ -410,11 +497,11 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           colors={['#10223A', '#0B1728']}
           style={styles.hudCard}
         >
-          {/* Left: Score & Level */}
+          {/* Left: Score & High Score */}
           <View style={styles.hudLeft}>
             <Text style={styles.hudLabel}>SCORE</Text>
             <Text style={styles.hudScoreValue}>{score.toLocaleString()}</Text>
-            <Text style={styles.hudSubInfo}>LVL {level} • {linesClearedTotal} Lines</Text>
+            <Text style={styles.hudSubInfo}>👑 BEST: {highScore.toLocaleString()}</Text>
           </View>
 
           {/* Center: Next Piece Capsule */}
@@ -422,21 +509,32 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
             <NextPiecePreview nextType={nextType} compact={true} />
           </View>
 
-          {/* Right: Best Record & Streak */}
+          {/* Right: Level Goal Progress & Streak */}
           <View style={styles.hudRight}>
-            <Text style={[styles.hudLabel, { color: '#FCD34D' }]}>BEST 👑</Text>
-            <Text style={styles.hudBestValue}>{highScore.toLocaleString()}</Text>
-            {comboStreak > 1 ? (
+            <Text style={[styles.hudLabel, { color: '#00E5FF' }]}>GOAL 🎯</Text>
+            <Text style={styles.hudGoalValue}>
+              {levelLinesCleared} / {levelConfig.targetLines}
+            </Text>
+
+            {/* Mini Goal Progress Bar */}
+            <View style={styles.progressBarBg}>
+              <View
+                style={[
+                  styles.progressBarFill,
+                  { width: `${Math.round(goalProgress * 100)}%` },
+                ]}
+              />
+            </View>
+
+            {comboStreak > 1 && (
               <View style={styles.streakBadge}>
                 <Text style={styles.streakText}>🔥 x{comboStreak} COMBO</Text>
               </View>
-            ) : (
-              <Text style={styles.hudSubInfo}>TOP SCORE</Text>
             )}
           </View>
         </LinearGradient>
 
-        {/* 3. CENTER: IMMERSIVE GAME BOARD */}
+        {/* 3. CENTER: IMMERSIVE GAME BOARD WITH PRE-LAID JEWEL BLOCKS */}
         <View style={styles.boardContainer}>
           <GameBoard
             grid={grid}
@@ -476,15 +574,49 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           onComplete={handleClearParticles}
         />
 
-        {/* Game Over Modal */}
+        {/* Level Complete Celebration Modal */}
+        <LevelCompleteModal
+          visible={isLevelComplete}
+          level={currentLevel}
+          levelName={levelConfig.name}
+          score={score}
+          bestCombo={bestCombo}
+          linesCleared={levelLinesCleared}
+          hasNextLevel={currentLevel < TOTAL_LEVELS}
+          onNextLevel={handleNextLevel}
+          onReplay={handleReplayLevel}
+          onLevelSelect={() => {
+            setIsLevelComplete(false);
+            setShowLevelSelect(true);
+          }}
+          onExit={handleExit}
+        />
+
+        {/* Level Selection Modal */}
+        <LevelSelectModal
+          visible={showLevelSelect}
+          currentLevel={currentLevel}
+          unlockedLevel={unlockedLevel}
+          levelStars={levelStars}
+          onSelectLevel={handleSelectLevel}
+          onClose={() => setShowLevelSelect(false)}
+        />
+
+        {/* Game Over Modal (Level Failed) */}
         <GameOverModal
           visible={isGameOver}
           score={score}
           highScore={highScore}
           isNewRecord={isNewRecord}
           bestCombo={bestCombo}
-          linesCleared={linesClearedTotal}
-          onRestart={handleRestart}
+          linesCleared={levelLinesCleared}
+          level={currentLevel}
+          levelTarget={levelConfig.targetLines}
+          onRestart={handleReplayLevel}
+          onLevelSelect={() => {
+            setIsGameOver(false);
+            setShowLevelSelect(true);
+          }}
           onExit={handleExit}
         />
 
@@ -492,7 +624,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
         {isLocalPaused && (
           <PauseOverlay
             onResume={() => setIsLocalPaused(false)}
-            onRestart={handleRestart}
+            onRestart={handleReplayLevel}
             onQuit={handleExit}
           />
         )}
@@ -540,25 +672,31 @@ const styles = StyleSheet.create({
     color: '#E2E8F0',
     fontWeight: '700',
   },
-  titleBadge: {
+  levelSelectorBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    backgroundColor: 'rgba(0, 229, 255, 0.08)',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 229, 255, 0.25)',
   },
-  titleEmoji: {
-    fontSize: 22,
+  levelSelectorEmoji: {
+    fontSize: 18,
   },
-  titleText: {
-    fontSize: 15,
+  levelSelectorText: {
+    fontSize: 13,
     fontWeight: '900',
     color: '#F0F9FF',
-    letterSpacing: 1.2,
+    letterSpacing: 0.5,
   },
-  titleSub: {
+  levelSelectorSub: {
     fontSize: 9,
     fontWeight: '800',
     color: '#38BDF8',
-    letterSpacing: 1.5,
+    letterSpacing: 0.5,
   },
 
   // 2. UNIFIED ARCADE HUD CARD
@@ -567,7 +705,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    height: 66,
+    height: 68,
     borderRadius: 16,
     borderWidth: 1.5,
     borderColor: '#1E3B64',
@@ -609,12 +747,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     lineHeight: 22,
   },
-  hudBestValue: {
-    fontSize: 18,
+  hudGoalValue: {
+    fontSize: 15,
     fontWeight: '900',
-    color: '#FCD34D',
+    color: '#00E5FF',
     letterSpacing: 0.5,
-    lineHeight: 22,
+    lineHeight: 20,
   },
   hudSubInfo: {
     fontSize: 9.5,
@@ -622,17 +760,30 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     letterSpacing: 0.3,
   },
+  progressBarBg: {
+    width: 72,
+    height: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginTop: 2,
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#00E5FF',
+    borderRadius: 2,
+  },
   streakBadge: {
     backgroundColor: 'rgba(255, 109, 0, 0.22)',
     paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
+    paddingVertical: 1,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#FF6D00',
-    marginTop: 1,
+    marginTop: 2,
   },
   streakText: {
-    fontSize: 9,
+    fontSize: 8.5,
     fontWeight: '900',
     color: '#FF9100',
     letterSpacing: 0.5,
