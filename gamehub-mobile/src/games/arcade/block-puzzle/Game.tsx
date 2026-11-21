@@ -174,7 +174,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
         if (savedStars) {
           setLevelStars(JSON.parse(savedStars));
         }
-      } catch {}
+      } catch { }
     })();
   }, []);
 
@@ -227,7 +227,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
         if (nextScore > highScore) {
           setHighScore(nextScore);
           setIsNewRecord(true);
-          AsyncStorage.setItem(STORAGE_KEY_HIGH_SCORE, nextScore.toString()).catch(() => {});
+          AsyncStorage.setItem(STORAGE_KEY_HIGH_SCORE, nextScore.toString()).catch(() => { });
         }
 
         // Check if Level Goal Reached!
@@ -239,14 +239,14 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           // Unlock next level progression
           const nextUnlocked = Math.max(unlockedLevel, currentLevel + 1);
           setUnlockedLevel(nextUnlocked);
-          AsyncStorage.setItem(STORAGE_KEY_UNLOCKED_LEVEL, nextUnlocked.toString()).catch(() => {});
+          AsyncStorage.setItem(STORAGE_KEY_UNLOCKED_LEVEL, nextUnlocked.toString()).catch(() => { });
 
           // Calculate & persist star ratings
           const starsEarned = nextStreak >= 3 ? 3 : nextStreak >= 2 ? 2 : 1;
           const bestStars = Math.max(levelStars[currentLevel] || 0, starsEarned);
           const updatedStars = { ...levelStars, [currentLevel]: bestStars };
           setLevelStars(updatedStars);
-          AsyncStorage.setItem(STORAGE_KEY_LEVEL_STARS, JSON.stringify(updatedStars)).catch(() => {});
+          AsyncStorage.setItem(STORAGE_KEY_LEVEL_STARS, JSON.stringify(updatedStars)).catch(() => { });
         } else {
           // Haptic & Sound
           BlockHaptics.lineBlast();
