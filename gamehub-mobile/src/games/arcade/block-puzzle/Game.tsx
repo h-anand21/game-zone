@@ -334,8 +334,34 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   const lockCurrentPieceRef = useRef(lockCurrentPiece);
   lockCurrentPieceRef.current = lockCurrentPiece;
 
+  // Lock Delay Grace Period (allows sliding/rotating when piece touches ground)
+  const lockTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isGroundedRef = useRef<boolean>(false);
+
+  const clearLockTimer = useCallback(() => {
+    if (lockTimerRef.current) {
+      clearTimeout(lockTimerRef.current);
+      lockTimerRef.current = null;
+    }
+    isGroundedRef.current = false;
+  }, []);
+
+  const resetLockTimerIfGrounded = useCallback(() => {
+    if (isGroundedRef.current) {
+      if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
+      lockTimerRef.current = setTimeout(() => {
+        lockTimerRef.current = null;
+        isGroundedRef.current = false;
+        const latest = activePieceRef.current;
+        if (latest && !canPlaceAt(gridRef.current, latest.matrix, latest.row + 1, latest.col)) {
+          lockCurrentPieceRef.current(latest);
+        }
+      }, 500);
+    }
+  }, []);
+
   /**
-   * Safe downward step function invoked by interval
+   * Safe downward step function with 500ms floor grace period
    */
   const stepDown = useCallback(() => {
     if (isGamePausedRef.current || isGameOverRef.current || isLevelCompleteRef.current) return;
@@ -343,26 +369,45 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
     if (!current) return;
 
     if (canPlaceAt(gridRef.current, current.matrix, current.row + 1, current.col)) {
+      clearLockTimer();
       setActivePiece((prev) => (prev ? { ...prev, row: prev.row + 1 } : null));
     } else {
-      lockCurrentPieceRef.current(current);
+      // Piece is touching the floor or stack
+      if (!isGroundedRef.current) {
+        isGroundedRef.current = true;
+        if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
+        lockTimerRef.current = setTimeout(() => {
+          lockTimerRef.current = null;
+          isGroundedRef.current = false;
+          const latest = activePieceRef.current;
+          if (latest && !canPlaceAt(gridRef.current, latest.matrix, latest.row + 1, latest.col)) {
+            lockCurrentPieceRef.current(latest);
+          }
+        }, 500);
+      } else {
+        if (!lockTimerRef.current) {
+          lockCurrentPieceRef.current(current);
+        }
+      }
     }
-  }, []);
+  }, [clearLockTimer]);
 
   /**
-   * Automatic Fall Tick (Drop speed dynamically governed by Level Config)
+   * Automatic Fall Tick (Drop speed dynamically governed by Level Config & gentle in-level acceleration)
    */
   useEffect(() => {
     if (isGamePaused || isGameOver || isLevelComplete) return;
 
-    const dropInterval = levelConfig.dropSpeed || 500;
+    // Relaxed base speed (e.g. 1100ms for Level 1), gently scales by 20ms per cleared line
+    const baseSpeed = levelConfig.dropSpeed || 1000;
+    const currentInterval = Math.max(220, baseSpeed - levelLinesCleared * 20);
 
     const timer = setInterval(() => {
       stepDown();
-    }, dropInterval);
+    }, currentInterval);
 
     return () => clearInterval(timer);
-  }, [isGamePaused, isGameOver, isLevelComplete, levelConfig.dropSpeed, stepDown]);
+  }, [isGamePaused, isGameOver, isLevelComplete, levelConfig.dropSpeed, levelLinesCleared, stepDown]);
 
   // ── User Controls ──
   const handleMoveLeft = useCallback(() => {
@@ -371,8 +416,9 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
     if (!current) return;
     if (canPlaceAt(gridRef.current, current.matrix, current.row, current.col - 1)) {
       setActivePiece((prev) => (prev ? { ...prev, col: prev.col - 1 } : null));
+      resetLockTimerIfGrounded();
     }
-  }, []);
+  }, [resetLockTimerIfGrounded]);
 
   const handleMoveRight = useCallback(() => {
     if (isGamePausedRef.current || isGameOverRef.current || isLevelCompleteRef.current) return;
@@ -380,8 +426,9 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
     if (!current) return;
     if (canPlaceAt(gridRef.current, current.matrix, current.row, current.col + 1)) {
       setActivePiece((prev) => (prev ? { ...prev, col: prev.col + 1 } : null));
+      resetLockTimerIfGrounded();
     }
-  }, []);
+  }, [resetLockTimerIfGrounded]);
 
   const handleRotate = useCallback(() => {
     if (isGamePausedRef.current || isGameOverRef.current || isLevelCompleteRef.current) return;
@@ -389,7 +436,8 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
     if (!current) return;
     const rotated = tryRotatePiece(gridRef.current, current, true);
     setActivePiece(rotated);
-  }, []);
+    resetLockTimerIfGrounded();
+  }, [resetLockTimerIfGrounded]);
 
   const handleSoftDrop = useCallback(() => {
     stepDown();
@@ -399,13 +447,14 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
     if (isGamePausedRef.current || isGameOverRef.current || isLevelCompleteRef.current) return;
     const current = activePieceRef.current;
     if (!current) return;
+    clearLockTimer();
     const targetRow = getGhostRow(gridRef.current, current.matrix, current.row, current.col);
     const slammedPiece: ActivePiece = {
       ...current,
       row: targetRow,
     };
     lockCurrentPieceRef.current(slammedPiece);
-  }, []);
+  }, [clearLockTimer]);
 
   const handleClearParticles = useCallback(() => {
     setParticles((prev) => (prev.length > 0 ? [] : prev));
