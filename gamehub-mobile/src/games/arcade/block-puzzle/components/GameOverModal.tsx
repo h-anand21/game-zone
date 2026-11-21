@@ -13,7 +13,10 @@ interface GameOverModalProps {
   isNewRecord: boolean;
   bestCombo: number;
   linesCleared: number;
+  level?: number;
+  levelTarget?: number;
   onRestart: () => void;
+  onLevelSelect?: () => void;
   onExit?: () => void;
 }
 
@@ -24,9 +27,14 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   isNewRecord,
   bestCombo,
   linesCleared,
+  level,
+  levelTarget,
   onRestart,
+  onLevelSelect,
   onExit,
 }) => {
+  const isLevelMode = typeof level === 'number';
+
   return (
     <Modal
       visible={visible}
@@ -40,8 +48,14 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
           style={styles.modalCard}
         >
           {/* Header */}
-          <Text style={styles.titleText}>NO MORE MOVES!</Text>
-          <Text style={styles.subText}>The board is out of space</Text>
+          <Text style={styles.titleText}>
+            {isLevelMode ? `LEVEL ${level} FAILED` : 'NO MORE MOVES!'}
+          </Text>
+          <Text style={styles.subText}>
+            {isLevelMode
+              ? `Cleared ${linesCleared} of ${levelTarget || 0} target lines`
+              : 'The board is out of space'}
+          </Text>
 
           {/* New Record Badge */}
           {isNewRecord && (
@@ -89,9 +103,24 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                 end={{ x: 1, y: 1 }}
                 style={styles.btnGradient}
               >
-                <Text style={styles.restartBtnText}>PLAY AGAIN</Text>
+                <Text style={styles.restartBtnText}>
+                  {isLevelMode ? 'RETRY LEVEL' : 'PLAY AGAIN'}
+                </Text>
               </LinearGradient>
             </Pressable>
+
+            {isLevelMode && onLevelSelect && (
+              <Pressable
+                onPress={onLevelSelect}
+                style={({ pressed }) => [
+                  styles.exitButton,
+                  { backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.15)' },
+                  pressed && { opacity: 0.8 },
+                ]}
+              >
+                <Text style={[styles.exitBtnText, { color: '#00E5FF' }]}>📋 CHOOSE LEVEL</Text>
+              </Pressable>
+            )}
 
             {onExit && (
               <Pressable
