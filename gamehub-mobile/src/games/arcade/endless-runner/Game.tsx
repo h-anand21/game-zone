@@ -680,7 +680,7 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
         <View style={styles.playfield}>
           {/* Ambient Lighting Glow Behind Tubes */}
           <View style={styles.ambientGlowCyan} pointerEvents="none" />
-          <View style={styles.ambientGlowPurple} pointerEvents="none" />
+          <View style={styles.ambientGlowBlue} pointerEvents="none" />
 
           {/* Row 1 Tubes & Base Shelf */}
           <View style={styles.rowWrapper}>
@@ -1076,14 +1076,14 @@ const styles = StyleSheet.create({
     borderRadius: 110,
     backgroundColor: 'rgba(0, 207, 255, 0.07)',
   },
-  ambientGlowPurple: {
+  ambientGlowBlue: {
     position: 'absolute',
     bottom: '22%',
     right: '8%',
     width: 240,
     height: 240,
     borderRadius: 120,
-    backgroundColor: 'rgba(124, 58, 237, 0.07)',
+    backgroundColor: 'rgba(14, 165, 233, 0.08)',
   },
   rowWrapper: {
     alignItems: 'center',
@@ -1184,12 +1184,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -5,
     right: -5,
-    backgroundColor: '#7C3AED',
+    backgroundColor: '#0284C7',
     paddingHorizontal: 5,
     paddingVertical: 1,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#C084FC',
+    borderColor: '#38BDF8',
   },
   undoBadgeText: {
     fontSize: 9,

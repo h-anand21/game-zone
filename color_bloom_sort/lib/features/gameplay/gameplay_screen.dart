@@ -103,7 +103,7 @@ class _GameplayScreenState extends State<GameplayScreen> with SingleTickerProvid
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF141B3B),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: Color(0xFF7C3AED), width: 2)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: const BorderSide(color: Color(0xFF00CFFF), width: 2)),
         title: const Text('🎉 LEVEL SOLVED!', textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF00CFFF), fontWeight: FontWeight.bold)),
         content: Column(
           mainAxisSize: MainAxisSize.min,

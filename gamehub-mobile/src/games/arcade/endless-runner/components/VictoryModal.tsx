@@ -119,7 +119,7 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
               ]}
             >
               <LinearGradient
-                colors={['#00CFFF', '#7C3AED']}
+                colors={['#00CFFF', '#0284C7']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.btnGradient}
@@ -175,10 +175,10 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 26,
     borderWidth: 2,
-    borderColor: '#7C3AED',
+    borderColor: '#00CFFF',
     padding: 22,
     alignItems: 'center',
-    shadowColor: '#7C3AED',
+    shadowColor: '#00CFFF',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.45,
     shadowRadius: 18,
@@ -187,12 +187,12 @@ const styles = StyleSheet.create({
   bannerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(124, 58, 237, 0.2)',
+    backgroundColor: 'rgba(0, 207, 255, 0.15)',
     paddingHorizontal: 14,
     paddingVertical: 5,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#7C3AED',
+    borderColor: '#00CFFF',
     marginBottom: 10,
     gap: 6,
   },

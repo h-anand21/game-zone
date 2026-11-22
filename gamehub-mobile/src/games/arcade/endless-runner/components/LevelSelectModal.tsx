@@ -74,7 +74,7 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
                   <LinearGradient
                     colors={
                       isCurrent
-                        ? ['#00CFFF33', '#7C3AED33']
+                        ? ['#00CFFF33', '#0284C733']
                         : isUnlocked
                         ? ['#16243D', '#0B1424']
                         : ['#0A0E18', '#05070D']
@@ -117,9 +117,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#0C1222',
     borderRadius: 24,
     borderWidth: 1.5,
-    borderColor: '#7C3AED',
+    borderColor: '#00CFFF',
     padding: 18,
-    shadowColor: '#7C3AED',
+    shadowColor: '#00CFFF',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 16,
