@@ -123,22 +123,42 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
               ? theme.accent
               : theme.tubeOutline,
             borderWidth: isSelected || isHintSource || isHintDest || isSolved ? 2.5 : 1.5,
-            shadowColor: isSolved ? '#FBBF24' : theme.accent,
-            shadowOpacity: isSelected || isSolved || isHintSource ? 0.7 : 0.15,
-            shadowRadius: isSelected || isSolved ? 10 : 4,
-            elevation: isSelected || isSolved ? 8 : 2,
+            shadowColor: isSolved ? '#FBBF24' : isSelected ? theme.accent : '#000000',
+            shadowOpacity: isSelected || isSolved ? 0.8 : isHintSource ? 0.6 : 0.25,
+            shadowRadius: isSelected || isSolved ? 12 : 5,
+            elevation: isSelected || isSolved ? 10 : 3,
             transform: [{ scale: hintPulseAnim }, { translateX: shakeAnim }],
           },
         ]}
       >
-        {/* Glass Rim Top Opening (Elliptical collar) */}
+        {/* Soft Grounding Drop Shadow Under Tube */}
         <View
+          style={[
+            styles.tubeGroundShadow,
+            {
+              width: tubeWidth * 0.88,
+              bottom: -6,
+            },
+          ]}
+        />
+
+        {/* Glass Rim Top Opening (Elliptical collar) */}
+        <LinearGradient
+          colors={
+            isSelected
+              ? [theme.accent, 'rgba(255, 255, 255, 0.3)']
+              : isSolved
+              ? ['#FBBF24', '#F59E0B']
+              : ['rgba(255, 255, 255, 0.35)', 'rgba(255, 255, 255, 0.12)']
+          }
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
           style={[
             styles.tubeRim,
             {
               width: tubeWidth + 6,
               left: -3,
-              borderColor: isSelected ? theme.accent : theme.tubeOutline,
+              borderColor: isSelected ? theme.accent : isSolved ? '#FBBF24' : theme.tubeOutline,
             },
           ]}
         />
@@ -147,7 +167,7 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
         <LinearGradient
           colors={[
             theme.tubeGlass,
-            'rgba(255, 255, 255, 0.04)',
+            'rgba(255, 255, 255, 0.05)',
             theme.tubeGlass,
           ]}
           start={{ x: 0, y: 0 }}
@@ -160,8 +180,21 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
             },
           ]}
         >
-          {/* Vertical Glass Specular Highlight Streak */}
+          {/* Vertical Glass Specular Highlight Streak (Left) */}
           <View style={styles.glassReflectionStreak} />
+
+          {/* Secondary Soft Ambient Reflection Streak (Right) */}
+          <View style={styles.glassReflectionRight} />
+
+          {/* Bottom Hemispherical Ambient Rim */}
+          <View
+            style={[
+              styles.bottomReflection,
+              {
+                width: tubeWidth * 0.6,
+              },
+            ]}
+          />
 
           {/* Balls Stacked Bottom-To-Top */}
           <View style={styles.ballsColumn}>
@@ -202,9 +235,14 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
 
         {/* Solved Sparkle Badge */}
         {isSolved && (
-          <View style={styles.solvedBadge}>
-            <Animated.Text style={styles.solvedSparkle}>✨</Animated.Text>
-          </View>
+          <LinearGradient
+            colors={['#F59E0B', '#D97706']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.solvedBadge}
+          >
+            <Animated.Text style={styles.solvedSparkle}>✨ 100%</Animated.Text>
+          </LinearGradient>
         )}
       </Animated.View>
     </Pressable>
@@ -222,10 +260,18 @@ const styles = StyleSheet.create({
     opacity: 0.88,
     transform: [{ scale: 0.97 }],
   },
+  tubeGroundShadow: {
+    position: 'absolute',
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    alignSelf: 'center',
+    zIndex: -1,
+  },
   tubeFrame: {
     position: 'absolute',
     bottom: 0,
-    backgroundColor: 'rgba(10, 18, 36, 0.45)',
+    backgroundColor: 'rgba(10, 18, 36, 0.55)',
     borderTopWidth: 0,
     overflow: 'visible',
     shadowOffset: { width: 0, height: 4 },
@@ -236,7 +282,6 @@ const styles = StyleSheet.create({
     height: 7,
     borderRadius: 4,
     borderWidth: 1.5,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     zIndex: 10,
   },
   glassBody: {
@@ -249,11 +294,28 @@ const styles = StyleSheet.create({
   glassReflectionStreak: {
     position: 'absolute',
     top: 6,
-    left: 4,
+    left: 3.5,
     width: 2.5,
-    height: '85%',
+    height: '84%',
     backgroundColor: 'rgba(255, 255, 255, 0.22)',
     borderRadius: 2,
+  },
+  glassReflectionRight: {
+    position: 'absolute',
+    top: 10,
+    right: 3.5,
+    width: 1.5,
+    height: '75%',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderRadius: 1,
+  },
+  bottomReflection: {
+    position: 'absolute',
+    bottom: 3,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    alignSelf: 'center',
   },
   ballsColumn: {
     flexDirection: 'column-reverse',
@@ -267,17 +329,23 @@ const styles = StyleSheet.create({
   },
   solvedBadge: {
     position: 'absolute',
-    top: -14,
+    top: -16,
     alignSelf: 'center',
-    backgroundColor: 'rgba(251, 191, 36, 0.25)',
-    paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderRadius: 8,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#FBBF24',
+    borderColor: '#FDE68A',
+    shadowColor: '#F59E0B',
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
+    elevation: 8,
     zIndex: 20,
   },
   solvedSparkle: {
-    fontSize: 12,
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
   },
 });

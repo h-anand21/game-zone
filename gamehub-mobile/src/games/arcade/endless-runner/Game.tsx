@@ -25,6 +25,7 @@ import {
   canMove,
   executeMove,
   isPuzzleSolved,
+  isTubeSolved,
   generateLevel,
   findHint,
 } from './logic';
@@ -117,6 +118,10 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
 
   const row1Tubes = isLargeSet ? tubes.slice(0, tubesPerRow) : tubes;
   const row2Tubes = isLargeSet ? tubes.slice(tubesPerRow) : [];
+
+  const solvedTubesCount = tubes.filter((t) => isTubeSolved(t)).length;
+  const totalColorCount = Math.max(1, new Set(tubes.flat()).size);
+  const solvePercent = Math.min(100, Math.round((solvedTubesCount / totalColorCount) * 100));
 
   // Load persistent save data on mount
   useEffect(() => {
@@ -639,11 +644,27 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
           </Pressable>
         </View>
 
-        {/* 2. SUB-BAR: MOVE COUNTER & ACTIVE HINT NOTICE */}
+        {/* 2. SUB-BAR: MOVE COUNTER, PROGRESS & HINT NOTICE */}
         <View style={styles.subBar}>
           <View style={styles.movesPill}>
             <Text style={styles.movesLabel}>MOVES</Text>
             <Text style={styles.movesValue}>{movesCount}</Text>
+          </View>
+
+          {/* Solved Tubes Progress */}
+          <View style={styles.progressPill}>
+            <Text style={styles.progressLabel}>PROGRESS</Text>
+            <View style={styles.progressBarTrack}>
+              <View
+                style={[
+                  styles.progressBarFill,
+                  { width: `${solvePercent}%` },
+                ]}
+              />
+            </View>
+            <Text style={styles.progressValue}>
+              {solvedTubesCount}/{totalColorCount}
+            </Text>
           </View>
 
           {activeHint && (
@@ -657,62 +678,88 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
 
         {/* 3. MAIN GAMEPLAY PLAYFIELD: GLASS TEST TUBES */}
         <View style={styles.playfield}>
-          {/* Row 1 Tubes */}
-          <View
-            style={styles.tubesRow}
-            onLayout={(e) => {
-              rowLayouts.current[0] = e.nativeEvent.layout;
-            }}
-          >
-            {row1Tubes.map((tube, idx) => (
-              <GlassTube
-                key={`row1-tube-${idx}`}
-                tubeIndex={idx}
-                tube={tube}
-                ballSize={calculatedBallSize}
-                isSelected={selectedTube === idx && !animatingMove}
-                hiddenTopBall={animatingMove?.from === idx}
-                isHintSource={activeHint?.fromTube === idx}
-                isHintDest={activeHint?.toTube === idx}
-                isShaking={shakingTube === idx}
-                theme={theme}
-                onPress={handleTubePress}
-                onLayout={(e) => {
-                  tubeLayouts.current[idx] = e.nativeEvent.layout;
-                }}
-              />
-            ))}
-          </View>
+          {/* Ambient Lighting Glow Behind Tubes */}
+          <View style={styles.ambientGlowCyan} pointerEvents="none" />
+          <View style={styles.ambientGlowPurple} pointerEvents="none" />
 
-          {/* Row 2 Tubes (for puzzles with 8+ tubes) */}
-          {row2Tubes.length > 0 && (
+          {/* Row 1 Tubes & Base Shelf */}
+          <View style={styles.rowWrapper}>
             <View
               style={styles.tubesRow}
               onLayout={(e) => {
-                rowLayouts.current[1] = e.nativeEvent.layout;
+                rowLayouts.current[0] = e.nativeEvent.layout;
               }}
             >
-              {row2Tubes.map((tube, idx) => {
-                const actualIndex = tubesPerRow + idx;
-                return (
-                  <GlassTube
-                    key={`row2-tube-${actualIndex}`}
-                    tubeIndex={actualIndex}
-                    tube={tube}
-                    ballSize={calculatedBallSize}
-                    isSelected={selectedTube === actualIndex && !animatingMove}
-                    hiddenTopBall={animatingMove?.from === actualIndex}
-                    isHintSource={activeHint?.fromTube === actualIndex}
-                    isHintDest={activeHint?.toTube === actualIndex}
-                    isShaking={shakingTube === actualIndex}
-                    theme={theme}
-                    onPress={handleTubePress}
-                    onLayout={(e) => {
-                      tubeLayouts.current[actualIndex] = e.nativeEvent.layout;
-                    }}
-                  />
-                );
-              })}
+              {row1Tubes.map((tube, idx) => (
+                <GlassTube
+                  key={`row1-tube-${idx}`}
+                  tubeIndex={idx}
+                  tube={tube}
+                  ballSize={calculatedBallSize}
+                  isSelected={selectedTube === idx && !animatingMove}
+                  hiddenTopBall={animatingMove?.from === idx}
+                  isHintSource={activeHint?.fromTube === idx}
+                  isHintDest={activeHint?.toTube === idx}
+                  isShaking={shakingTube === idx}
+                  theme={theme}
+                  onPress={handleTubePress}
+                  onLayout={(e) => {
+                    tubeLayouts.current[idx] = e.nativeEvent.layout;
+                  }}
+                />
+              ))}
+            </View>
+            {/* Laboratory Rack Stand Shelf */}
+            <View style={styles.rackShelf}>
+              <LinearGradient
+                colors={['rgba(255, 255, 255, 0.22)', 'rgba(255, 255, 255, 0.05)']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={styles.rackShelfBar}
+              />
+            </View>
+          </View>
+
+          {/* Row 2 Tubes & Base Shelf (for puzzles with 8+ tubes) */}
+          {row2Tubes.length > 0 && (
+            <View style={[styles.rowWrapper, { marginTop: 14 }]}>
+              <View
+                style={styles.tubesRow}
+                onLayout={(e) => {
+                  rowLayouts.current[1] = e.nativeEvent.layout;
+                }}
+              >
+                {row2Tubes.map((tube, idx) => {
+                  const actualIndex = tubesPerRow + idx;
+                  return (
+                    <GlassTube
+                      key={`row2-tube-${actualIndex}`}
+                      tubeIndex={actualIndex}
+                      tube={tube}
+                      ballSize={calculatedBallSize}
+                      isSelected={selectedTube === actualIndex && !animatingMove}
+                      hiddenTopBall={animatingMove?.from === actualIndex}
+                      isHintSource={activeHint?.fromTube === actualIndex}
+                      isHintDest={activeHint?.toTube === actualIndex}
+                      isShaking={shakingTube === actualIndex}
+                      theme={theme}
+                      onPress={handleTubePress}
+                      onLayout={(e) => {
+                        tubeLayouts.current[actualIndex] = e.nativeEvent.layout;
+                      }}
+                    />
+                  );
+                })}
+              </View>
+              {/* Row 2 Rack Stand Shelf */}
+              <View style={styles.rackShelf}>
+                <LinearGradient
+                  colors={['rgba(255, 255, 255, 0.22)', 'rgba(255, 255, 255, 0.05)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0, y: 1 }}
+                  style={styles.rackShelfBar}
+                />
+              </View>
             </View>
           )}
 
@@ -755,8 +802,15 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               pressed && styles.btnPressed,
             ]}
           >
-            <Text style={styles.toolIcon}>↩️</Text>
-            <Text style={styles.toolLabel}>Undo ({undoStack.length})</Text>
+            <View style={styles.toolIconWrap}>
+              <Text style={styles.toolIcon}>↩️</Text>
+              {undoStack.length > 0 && (
+                <View style={styles.undoBadge}>
+                  <Text style={styles.undoBadgeText}>{undoStack.length}</Text>
+                </View>
+              )}
+            </View>
+            <Text style={styles.toolLabel}>UNDO</Text>
           </Pressable>
 
           {/* Hint */}
@@ -764,8 +818,10 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
             onPress={handleHint}
             style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
           >
-            <Text style={styles.toolIcon}>💡</Text>
-            <Text style={styles.toolLabel}>Hint</Text>
+            <View style={[styles.toolIconWrap, activeHint && styles.toolIconWrapActive]}>
+              <Text style={styles.toolIcon}>💡</Text>
+            </View>
+            <Text style={[styles.toolLabel, activeHint && styles.toolLabelActive]}>HINT</Text>
           </Pressable>
 
           {/* Extra Tube */}
@@ -778,8 +834,13 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               pressed && styles.btnPressed,
             ]}
           >
-            <Text style={styles.toolIcon}>🧪+</Text>
-            <Text style={styles.toolLabel}>+Tube</Text>
+            <View style={styles.toolIconWrap}>
+              <Text style={styles.toolIcon}>🧪</Text>
+              <View style={styles.plusBadge}>
+                <Text style={styles.plusBadgeText}>+</Text>
+              </View>
+            </View>
+            <Text style={styles.toolLabel}>+TUBE</Text>
           </Pressable>
 
           {/* Themes */}
@@ -787,8 +848,10 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
             onPress={() => setShowThemeShop(true)}
             style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
           >
-            <Text style={styles.toolIcon}>🎨</Text>
-            <Text style={styles.toolLabel}>Themes</Text>
+            <View style={styles.toolIconWrap}>
+              <Text style={styles.toolIcon}>🎨</Text>
+            </View>
+            <Text style={styles.toolLabel}>THEMES</Text>
           </Pressable>
         </View>
 
@@ -947,6 +1010,40 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#FFFFFF',
   },
+  progressPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    gap: 6,
+  },
+  progressLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#94A3B8',
+    letterSpacing: 0.8,
+  },
+  progressBarTrack: {
+    width: 46,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: '#34D399',
+    borderRadius: 3,
+  },
+  progressValue: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#34D399',
+  },
   hintNoticePill: {
     backgroundColor: 'rgba(0, 207, 255, 0.2)',
     paddingHorizontal: 10,
@@ -970,6 +1067,47 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     position: 'relative',
   },
+  ambientGlowCyan: {
+    position: 'absolute',
+    top: '20%',
+    left: '8%',
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: 'rgba(0, 207, 255, 0.07)',
+  },
+  ambientGlowPurple: {
+    position: 'absolute',
+    bottom: '22%',
+    right: '8%',
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    backgroundColor: 'rgba(124, 58, 237, 0.07)',
+  },
+  rowWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  rackShelf: {
+    height: 6,
+    width: '100%',
+    marginTop: -2,
+    alignItems: 'center',
+    zIndex: 1,
+  },
+  rackShelfBar: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 3,
+    borderWidth: 0.8,
+    borderColor: 'rgba(255, 255, 255, 0.22)',
+    shadowColor: '#000000',
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 3,
+  },
   floatingBall: {
     position: 'absolute',
     top: 0,
@@ -982,6 +1120,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexWrap: 'nowrap',
+    zIndex: 2,
   },
 
   // 4. BOTTOM ACTION TOOLBAR
@@ -990,30 +1129,87 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    paddingVertical: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 20,
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    shadowColor: '#000000',
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   toolBtn: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  toolIconWrap: {
+    position: 'relative',
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  toolIconWrapActive: {
+    backgroundColor: 'rgba(0, 207, 255, 0.2)',
+    borderColor: '#00CFFF',
+    shadowColor: '#00CFFF',
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 6,
   },
   disabledToolBtn: {
     opacity: 0.35,
   },
   toolIcon: {
     fontSize: 20,
-    marginBottom: 2,
   },
   toolLabel: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '800',
     color: '#94A3B8',
-    letterSpacing: 0.3,
+    letterSpacing: 0.6,
+  },
+  toolLabelActive: {
+    color: '#00CFFF',
+  },
+  undoBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: '#7C3AED',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#C084FC',
+  },
+  undoBadgeText: {
+    fontSize: 9,
+    fontWeight: '900',
+    color: '#FFFFFF',
+  },
+  plusBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    backgroundColor: '#34D399',
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  plusBadgeText: {
+    fontSize: 10,
+    fontWeight: '900',
+    color: '#0A0E1F',
   },
 });
