@@ -13,6 +13,9 @@ import {
   Dimensions,
   StatusBar,
   Pressable,
+  Animated,
+  Easing,
+  LayoutChangeEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,11 +30,13 @@ import {
 } from './logic';
 import { THEMES } from './colors';
 import { GlassTube } from './components/GlassTube';
+import { GlossyBall } from './components/GlossyBall';
 import { VictoryModal } from './components/VictoryModal';
 import { ThemeShopModal } from './components/ThemeShopModal';
 import { LevelSelectModal } from './components/LevelSelectModal';
 import type {
   Tube,
+  BallColor,
   MoveRecord,
   ThemeId,
   HintMove,
@@ -78,7 +83,40 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
   const [showThemeShop, setShowThemeShop] = useState<boolean>(false);
   const [showLevelSelect, setShowLevelSelect] = useState<boolean>(false);
 
+  // Animation State for Traveling & Dropping Ball
+  const [animatingMove, setAnimatingMove] = useState<{
+    from: number;
+    to: number;
+    ballColor: BallColor;
+  } | null>(null);
+  const animBallX = useRef(new Animated.Value(0)).current;
+  const animBallY = useRef(new Animated.Value(0)).current;
+  const animBallScaleX = useRef(new Animated.Value(1)).current;
+  const animBallScaleY = useRef(new Animated.Value(1)).current;
+  const isAnimatingRef = useRef(false);
+
+  // Illegal Move Shake Feedback
+  const [shakingTube, setShakingTube] = useState<number | null>(null);
+
+  // Layout Registry for Precision Ball Drop Positioning
+  const rowLayouts = useRef<{ [key: number]: { x: number; y: number; width: number; height: number } }>({});
+  const tubeLayouts = useRef<{ [key: number]: { x: number; y: number; width: number; height: number } }>({});
+
   const theme = THEMES[selectedTheme] || THEMES.midnight;
+
+  // Responsive tube size & multi-row calculation
+  const totalTubes = tubes.length;
+  const isLargeSet = totalTubes >= 8;
+  const tubesPerRow = isLargeSet ? Math.ceil(totalTubes / 2) : totalTubes;
+
+  const availablePlayWidth = SCREEN_WIDTH - 28;
+  const calculatedBallSize = Math.max(
+    28,
+    Math.min(48, Math.floor((availablePlayWidth - tubesPerRow * 16) / tubesPerRow))
+  );
+
+  const row1Tubes = isLargeSet ? tubes.slice(0, tubesPerRow) : tubes;
+  const row2Tubes = isLargeSet ? tubes.slice(tubesPerRow) : [];
 
   // Load persistent save data on mount
   useEffect(() => {
@@ -153,11 +191,14 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
    */
   const startLevel = useCallback(
     (lvlNum: number) => {
+      if (isAnimatingRef.current) return;
+
       const lvl = generateLevel(lvlNum);
       setCurrentLevel(lvlNum);
       setTubes(lvl.tubes);
       setInitialTubes(lvl.tubes.map((t) => [...t]));
       setSelectedTube(null);
+      setAnimatingMove(null);
       setUndoStack([]);
       setMovesCount(0);
       setAddedExtraTube(false);
@@ -171,9 +212,190 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
   );
 
   /**
+   * Calculates exact (x, y) coordinates of a ball inside or lifted above a tube
+   */
+  const getBallCoordinates = useCallback(
+    (tubeIndex: number, slotIndex: number, isLifted: boolean) => {
+      const rowIndex = isLargeSet && tubeIndex >= tubesPerRow ? 1 : 0;
+      const rowLayout = rowLayouts.current[rowIndex];
+      const tubeLayout = tubeLayouts.current[tubeIndex];
+
+      if (!rowLayout || !tubeLayout) {
+        return null;
+      }
+
+      // Horizontal center inside tube
+      const tubeX = rowLayout.x + tubeLayout.x;
+      const ballX = tubeX + (tubeLayout.width - calculatedBallSize) / 2;
+
+      // Vertical position
+      const tubeY = rowLayout.y + tubeLayout.y;
+      if (isLifted) {
+        // Lifted slightly above the tube opening
+        return { x: ballX, y: tubeY + 4 };
+      } else {
+        // Inside tube at slot (0 = bottom, 1, 2, 3 = top)
+        const tubeBottom = tubeY + tubeLayout.height - 6;
+        const ballY = tubeBottom - calculatedBallSize - slotIndex * (calculatedBallSize + 2);
+        return { x: ballX, y: ballY };
+      }
+    },
+    [isLargeSet, tubesPerRow, calculatedBallSize]
+  );
+
+  /**
+   * Orchestrates the 2-phase ball flight and realistic drop animation
+   */
+  const animateMove = useCallback(
+    (from: number, to: number, onComplete: () => void) => {
+      const sourceTube = tubes[from];
+      if (!sourceTube || sourceTube.length === 0) {
+        onComplete();
+        return;
+      }
+      const movedBall = sourceTube[sourceTube.length - 1];
+
+      const startPos = getBallCoordinates(from, sourceTube.length - 1, true);
+      const destRimPos = getBallCoordinates(to, 0, true);
+      const destDropPos = getBallCoordinates(to, tubes[to]?.length ?? 0, false);
+
+      if (!startPos || !destRimPos || !destDropPos) {
+        onComplete();
+        return;
+      }
+
+      isAnimatingRef.current = true;
+      setAnimatingMove({ from, to, ballColor: movedBall });
+      setSelectedTube(null);
+
+      animBallX.setValue(startPos.x);
+      animBallY.setValue(startPos.y);
+      animBallScaleX.setValue(1);
+      animBallScaleY.setValue(1);
+
+      const dx = Math.abs(destRimPos.x - startPos.x);
+      const arcApexY = Math.min(startPos.y, destRimPos.y) - Math.min(36, Math.max(16, dx * 0.15));
+      const travelDuration = Math.min(240, Math.max(160, Math.round(dx * 0.45) + 110));
+
+      // Phase 1: Arc Glide to destination tube opening
+      const arcX = Animated.timing(animBallX, {
+        toValue: destRimPos.x,
+        duration: travelDuration,
+        easing: Easing.bezier(0.25, 0.1, 0.25, 1),
+        useNativeDriver: true,
+      });
+
+      const arcY = Animated.sequence([
+        Animated.timing(animBallY, {
+          toValue: arcApexY,
+          duration: travelDuration * 0.45,
+          easing: Easing.out(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(animBallY, {
+          toValue: destRimPos.y,
+          duration: travelDuration * 0.55,
+          easing: Easing.in(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ]);
+
+      // Phase 2: DROP ANIMATION into the tube with gravity acceleration
+      const dropDistance = Math.max(20, destDropPos.y - destRimPos.y);
+      const dropDuration = Math.min(220, Math.max(130, Math.round(dropDistance * 1.1)));
+
+      const dropPlunge = Animated.timing(animBallY, {
+        toValue: destDropPos.y,
+        duration: dropDuration,
+        easing: Easing.in(Easing.quad), // Accelerate down like gravity
+        useNativeDriver: true,
+      });
+
+      // Phase 3: Impact bounce and settle
+      const impactBounce = Animated.sequence([
+        // Squash on contact
+        Animated.parallel([
+          Animated.timing(animBallScaleX, {
+            toValue: 1.12,
+            duration: 40,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animBallScaleY, {
+            toValue: 0.88,
+            duration: 40,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Micro rebound
+        Animated.parallel([
+          Animated.timing(animBallY, {
+            toValue: destDropPos.y - 6,
+            duration: 50,
+            easing: Easing.out(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(animBallScaleX, {
+            toValue: 0.96,
+            duration: 50,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animBallScaleY, {
+            toValue: 1.04,
+            duration: 50,
+            useNativeDriver: true,
+          }),
+        ]),
+        // Settle
+        Animated.parallel([
+          Animated.timing(animBallY, {
+            toValue: destDropPos.y,
+            duration: 50,
+            easing: Easing.in(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(animBallScaleX, {
+            toValue: 1,
+            duration: 50,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animBallScaleY, {
+            toValue: 1,
+            duration: 50,
+            useNativeDriver: true,
+          }),
+        ]),
+      ]);
+
+      Animated.sequence([
+        Animated.parallel([arcX, arcY]),
+        dropPlunge,
+        impactBounce,
+      ]).start(() => {
+        try {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        } catch {}
+
+        setAnimatingMove(null);
+        isAnimatingRef.current = false;
+        onComplete();
+      });
+    },
+    [
+      tubes,
+      getBallCoordinates,
+      animBallX,
+      animBallY,
+      animBallScaleX,
+      animBallScaleY,
+    ]
+  );
+
+  /**
    * Handles user tapping on a tube
    */
   const handleTubePress = (tubeIdx: number) => {
+    if (isAnimatingRef.current) return;
+
     // 1. If no tube is currently selected: select this tube if it has balls
     if (selectedTube === null) {
       const source = tubes[tubeIdx];
@@ -201,32 +423,33 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
       const from = selectedTube;
       const to = tubeIdx;
 
-      const { newTubes, movedBall } = executeMove(tubes, from, to);
-      const nextMoves = movesCount + 1;
+      animateMove(from, to, () => {
+        const { newTubes, movedBall } = executeMove(tubes, from, to);
+        const nextMoves = movesCount + 1;
 
-      setTubes(newTubes);
-      setSelectedTube(null);
-      setMovesCount(nextMoves);
-      setActiveHint(null);
+        setTubes(newTubes);
+        setMovesCount(nextMoves);
+        setActiveHint(null);
 
-      // Record for Undo
-      setUndoStack((prev) => [...prev, { fromTube: from, toTube: to, color: movedBall }]);
+        // Record for Undo
+        setUndoStack((prev) => [...prev, { fromTube: from, toTube: to, color: movedBall }]);
 
-      try {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      } catch {}
-
-      // Check Win Condition!
-      if (isPuzzleSolved(newTubes)) {
-        handleLevelComplete(nextMoves, newTubes);
-      } else {
-        persistState({ tubes: newTubes });
-      }
+        // Check Win Condition!
+        if (isPuzzleSolved(newTubes)) {
+          handleLevelComplete(nextMoves, newTubes);
+        } else {
+          persistState({ tubes: newTubes });
+        }
+      });
     } else {
       // Illegal move feedback
       try {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       } catch {}
+
+      setShakingTube(tubeIdx);
+      setTimeout(() => setShakingTube(null), 320);
+
       // Keep selection or switch if destination tube also has balls
       const dest = tubes[tubeIdx];
       if (dest && dest.length > 0) {
@@ -268,37 +491,40 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
   };
 
   /**
-   * Booster 1: Undo Move
+   * Booster 1: Undo Move with Animated Return Flight & Drop
    */
   const handleUndo = () => {
-    if (undoStack.length === 0) return;
+    if (isAnimatingRef.current || undoStack.length === 0) return;
 
     const lastMove = undoStack[undoStack.length - 1];
     const newUndoStack = undoStack.slice(0, -1);
 
-    // Move ball back from dest to source
-    const newTubes = tubes.map((t) => [...t]);
-    const ball = newTubes[lastMove.toTube].pop();
-    if (ball) {
-      newTubes[lastMove.fromTube].push(ball);
-    }
+    animateMove(lastMove.toTube, lastMove.fromTube, () => {
+      const newTubes = tubes.map((t) => [...t]);
+      const ball = newTubes[lastMove.toTube].pop();
+      if (ball) {
+        newTubes[lastMove.fromTube].push(ball);
+      }
 
-    setTubes(newTubes);
-    setUndoStack(newUndoStack);
-    setSelectedTube(null);
-    setActiveHint(null);
+      setTubes(newTubes);
+      setUndoStack(newUndoStack);
+      setSelectedTube(null);
+      setActiveHint(null);
 
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    } catch {}
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      } catch {}
 
-    persistState({ tubes: newTubes });
+      persistState({ tubes: newTubes });
+    });
   };
 
   /**
    * Booster 2: Hint (BFS Solver)
    */
   const handleHint = () => {
+    if (isAnimatingRef.current) return;
+
     if (activeHint) {
       // Execute the active hint
       handleTubePress(activeHint.fromTube);
@@ -324,7 +550,7 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
    * Booster 3: Add Extra Tube
    */
   const handleAddTube = () => {
-    if (addedExtraTube || tubes.length >= 14) return;
+    if (isAnimatingRef.current || addedExtraTube || tubes.length >= 14) return;
 
     const newTubes: Tube[] = [...tubes, []];
     setTubes(newTubes);
@@ -341,9 +567,12 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
    * Restart Current Puzzle
    */
   const handleRestart = () => {
+    if (isAnimatingRef.current) return;
+
     const reset = initialTubes.map((t) => [...t]);
     setTubes(reset);
     setSelectedTube(null);
+    setAnimatingMove(null);
     setUndoStack([]);
     setMovesCount(0);
     setActiveHint(null);
@@ -360,20 +589,6 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
   const handleExit = () => {
     onFinish?.(currentLevel * 100 + coins, false);
   };
-
-  // Responsive tube size & multi-row calculation
-  const totalTubes = tubes.length;
-  const isLargeSet = totalTubes >= 8;
-  const tubesPerRow = isLargeSet ? Math.ceil(totalTubes / 2) : totalTubes;
-
-  const availablePlayWidth = SCREEN_WIDTH - 28;
-  const calculatedBallSize = Math.max(
-    28,
-    Math.min(48, Math.floor((availablePlayWidth - tubesPerRow * 16) / tubesPerRow))
-  );
-
-  const row1Tubes = isLargeSet ? tubes.slice(0, tubesPerRow) : tubes;
-  const row2Tubes = isLargeSet ? tubes.slice(tubesPerRow) : [];
 
   return (
     <View style={styles.outerContainer}>
@@ -443,25 +658,40 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
         {/* 3. MAIN GAMEPLAY PLAYFIELD: GLASS TEST TUBES */}
         <View style={styles.playfield}>
           {/* Row 1 Tubes */}
-          <View style={styles.tubesRow}>
+          <View
+            style={styles.tubesRow}
+            onLayout={(e) => {
+              rowLayouts.current[0] = e.nativeEvent.layout;
+            }}
+          >
             {row1Tubes.map((tube, idx) => (
               <GlassTube
                 key={`row1-tube-${idx}`}
                 tubeIndex={idx}
                 tube={tube}
                 ballSize={calculatedBallSize}
-                isSelected={selectedTube === idx}
+                isSelected={selectedTube === idx && !animatingMove}
+                hiddenTopBall={animatingMove?.from === idx}
                 isHintSource={activeHint?.fromTube === idx}
                 isHintDest={activeHint?.toTube === idx}
+                isShaking={shakingTube === idx}
                 theme={theme}
                 onPress={handleTubePress}
+                onLayout={(e) => {
+                  tubeLayouts.current[idx] = e.nativeEvent.layout;
+                }}
               />
             ))}
           </View>
 
           {/* Row 2 Tubes (for puzzles with 8+ tubes) */}
           {row2Tubes.length > 0 && (
-            <View style={styles.tubesRow}>
+            <View
+              style={styles.tubesRow}
+              onLayout={(e) => {
+                rowLayouts.current[1] = e.nativeEvent.layout;
+              }}
+            >
               {row2Tubes.map((tube, idx) => {
                 const actualIndex = tubesPerRow + idx;
                 return (
@@ -470,15 +700,46 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
                     tubeIndex={actualIndex}
                     tube={tube}
                     ballSize={calculatedBallSize}
-                    isSelected={selectedTube === actualIndex}
+                    isSelected={selectedTube === actualIndex && !animatingMove}
+                    hiddenTopBall={animatingMove?.from === actualIndex}
                     isHintSource={activeHint?.fromTube === actualIndex}
                     isHintDest={activeHint?.toTube === actualIndex}
+                    isShaking={shakingTube === actualIndex}
                     theme={theme}
                     onPress={handleTubePress}
+                    onLayout={(e) => {
+                      tubeLayouts.current[actualIndex] = e.nativeEvent.layout;
+                    }}
                   />
                 );
               })}
             </View>
+          )}
+
+          {/* Animated Transferring & Dropping Ball Overlay */}
+          {animatingMove && (
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.floatingBall,
+                {
+                  width: calculatedBallSize,
+                  height: calculatedBallSize,
+                  transform: [
+                    { translateX: animBallX },
+                    { translateY: animBallY },
+                    { scaleX: animBallScaleX },
+                    { scaleY: animBallScaleY },
+                  ],
+                },
+              ]}
+            >
+              <GlossyBall
+                color={animatingMove.ballColor}
+                size={calculatedBallSize}
+                isSelected={false}
+              />
+            </Animated.View>
           )}
         </View>
 
@@ -707,6 +968,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
+    position: 'relative',
+  },
+  floatingBall: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    zIndex: 999,
+    elevation: 20,
   },
   tubesRow: {
     flexDirection: 'row',

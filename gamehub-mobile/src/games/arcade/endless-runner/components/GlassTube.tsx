@@ -4,7 +4,7 @@
 // ============================================================
 
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Pressable, Animated } from 'react-native';
+import { View, StyleSheet, Pressable, Animated, LayoutChangeEvent } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlossyBall } from './GlossyBall';
 import { isTubeSolved } from '../logic';
@@ -17,8 +17,11 @@ interface GlassTubeProps {
   isSelected: boolean;
   isHintSource?: boolean;
   isHintDest?: boolean;
+  isShaking?: boolean;
+  hiddenTopBall?: boolean;
   theme: ThemeConfig;
   onPress: (index: number) => void;
+  onLayout?: (e: LayoutChangeEvent) => void;
 }
 
 export const GlassTube: React.FC<GlassTubeProps> = ({
@@ -28,8 +31,11 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
   isSelected,
   isHintSource = false,
   isHintDest = false,
+  isShaking = false,
+  hiddenTopBall = false,
   theme,
   onPress,
+  onLayout,
 }) => {
   const isSolved = isTubeSolved(tube);
   const tubeWidth = ballSize + 14;
@@ -70,11 +76,26 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
     }
   }, [isHintSource, isHintDest, hintPulseAnim]);
 
+  // Shake animation on illegal move
+  const shakeAnim = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (isShaking) {
+      Animated.sequence([
+        Animated.timing(shakeAnim, { toValue: -6, duration: 40, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 6, duration: 50, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: -4, duration: 40, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 4, duration: 40, useNativeDriver: true }),
+        Animated.timing(shakeAnim, { toValue: 0, duration: 40, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [isShaking, shakeAnim]);
+
   const bottomRadius = tubeWidth / 2;
 
   return (
     <Pressable
       onPress={() => onPress(tubeIndex)}
+      onLayout={onLayout}
       style={({ pressed }) => [
         styles.tubeOuter,
         {
@@ -106,7 +127,7 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
             shadowOpacity: isSelected || isSolved || isHintSource ? 0.7 : 0.15,
             shadowRadius: isSelected || isSolved ? 10 : 4,
             elevation: isSelected || isSolved ? 8 : 2,
-            transform: [{ scale: hintPulseAnim }],
+            transform: [{ scale: hintPulseAnim }, { translateX: shakeAnim }],
           },
         ]}
       >
@@ -146,6 +167,10 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
           <View style={styles.ballsColumn}>
             {tube.map((color, idx) => {
               const isTopBall = idx === tube.length - 1;
+              if (isTopBall && hiddenTopBall) {
+                return null;
+              }
+
               const ballTransform =
                 isTopBall && isSelected
                   ? [{ translateY: liftAnim }]
