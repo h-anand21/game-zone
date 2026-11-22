@@ -1,25 +1,26 @@
 // ============================================================
-// GameHub — Endless Runner Config
+// GameHub — Color Bloom Sort Config (Replaces Endless Runner)
 // ============================================================
 
 import type { GameConfig } from '@/constants/types';
 
 export const ENDLESS_RUNNER_CONFIG: GameConfig = {
   id: 'endless-runner',
-  name: 'Endless Runner',
+  name: 'Color Bloom Sort',
   category: 'arcade',
   offline: true,
   multiplayer: false,
   route: '/games/endless-runner',
-  icon: '🏃',
+  icon: '🧪',
   status: 'available',
-  gameVersion: '1.0.0',
-  scoreVersion: 'v1',
+  gameVersion: '2.0.0',
+  scoreVersion: 'v2',
   validation: {
     maxScore: 500000,
-    minDuration: 5,
-    maxDuration: 3600,
+    minDuration: 2,
+    maxDuration: 14400,
   },
-  saveSupport: 'none',
-  description: 'Switch lanes to dodge obstacles and collect coins in this fast-paced runner!',
+  saveSupport: 'background',
+  description:
+    'Sort vibrant glossy balls into matching glass test tubes! Relaxing, satisfying puzzle with 500+ solvable levels, undo, hint solver, extra tube booster, and customizable themes.',
 };
