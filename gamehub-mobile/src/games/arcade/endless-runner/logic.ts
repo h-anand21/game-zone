@@ -218,8 +218,8 @@ const HANDCRAFTED_TUTORIAL_LEVELS: Record<number, Tube[]> = {
   ],
   3: [
     ['red', 'green', 'blue', 'red'],
-    ['blue', 'red', 'amber', 'green'],
-    ['amber', 'blue', 'green', 'amber'],
+    ['blue', 'red', 'green', 'green'],
+    ['blue', 'blue', 'red', 'green'],
     [],
     [],
   ],
