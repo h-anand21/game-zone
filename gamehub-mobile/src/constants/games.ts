@@ -140,11 +140,11 @@ export const GAME_REGISTRY: GameConfig[] = [
     saveSupport: 'none', description: 'Jump higher and higher',
   },
   {
-    id: 'endless-runner', name: 'Endless Runner', category: 'arcade',
+    id: 'endless-runner', name: 'Color Bloom Sort', category: 'arcade',
     offline: true, multiplayer: false, route: '/games/endless-runner',
-    icon: '🏃', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
-    validation: { maxScore: 500000, minDuration: 5, maxDuration: 3600 },
-    saveSupport: 'none', description: 'Run, dodge, collect',
+    icon: '🧪', status: 'available', gameVersion: '2.0.0', scoreVersion: 'v2',
+    validation: { maxScore: 500000, minDuration: 2, maxDuration: 14400 },
+    saveSupport: 'background', description: 'Sort vibrant glossy balls into matching glass test tubes! 500+ levels, undo & hints.',
   },
   {
     id: 'block-puzzle', name: 'Block Puzzle', category: 'arcade',
