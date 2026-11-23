@@ -42,16 +42,19 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
   const tubeHeight = ballSize * 4 + 24;
 
   // Lift animation for the top ball when selected
+  // Dynamically lifts top ball up to float right above the tube opening regardless of stack height
   const liftAnim = useRef(new Animated.Value(0)).current;
+  const targetLift =
+    tube.length > 0 ? (4 - tube.length) * (ballSize + 2) + ballSize * 0.95 : 0;
 
   useEffect(() => {
     Animated.spring(liftAnim, {
-      toValue: isSelected ? -ballSize * 0.95 : 0,
+      toValue: isSelected ? -targetLift : 0,
       friction: 7,
       tension: 110,
       useNativeDriver: true,
     }).start();
-  }, [isSelected, liftAnim, ballSize]);
+  }, [isSelected, liftAnim, targetLift]);
 
   // Hint pulse animation
   const hintPulseAnim = useRef(new Animated.Value(1)).current;
@@ -101,6 +104,8 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
         {
           width: tubeWidth,
           height: tubeHeight + ballSize * 0.95, // extra clearance for lifted ball
+          marginHorizontal: ballSize >= 44 ? 5 : ballSize >= 38 ? 4 : 3,
+          marginVertical: 6,
         },
         pressed && styles.pressed,
       ]}

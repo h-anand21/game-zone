@@ -100,6 +100,7 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
   const [shakingTube, setShakingTube] = useState<number | null>(null);
 
   // Layout Registry for Precision Ball Drop Positioning
+  const rowWrapperLayouts = useRef<{ [key: number]: { x: number; y: number; width: number; height: number } }>({});
   const rowLayouts = useRef<{ [key: number]: { x: number; y: number; width: number; height: number } }>({});
   const tubeLayouts = useRef<{ [key: number]: { x: number; y: number; width: number; height: number } }>({});
 
@@ -107,13 +108,13 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
 
   // Responsive tube size & multi-row calculation
   const totalTubes = tubes.length;
-  const isLargeSet = totalTubes >= 8;
+  const isLargeSet = totalTubes >= 6;
   const tubesPerRow = isLargeSet ? Math.ceil(totalTubes / 2) : totalTubes;
 
-  const availablePlayWidth = SCREEN_WIDTH - 28;
+  const availablePlayWidth = SCREEN_WIDTH - 24;
   const calculatedBallSize = Math.max(
-    28,
-    Math.min(48, Math.floor((availablePlayWidth - tubesPerRow * 16) / tubesPerRow))
+    30,
+    Math.min(48, Math.floor((availablePlayWidth - tubesPerRow * 14) / tubesPerRow))
   );
 
   const row1Tubes = isLargeSet ? tubes.slice(0, tubesPerRow) : tubes;
@@ -198,6 +199,11 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
     (lvlNum: number) => {
       if (isAnimatingRef.current) return;
 
+      // Reset layout measurements so new tube configurations re-measure cleanly
+      rowWrapperLayouts.current = {};
+      rowLayouts.current = {};
+      tubeLayouts.current = {};
+
       const lvl = generateLevel(lvlNum);
       setCurrentLevel(lvlNum);
       setTubes(lvl.tubes);
@@ -222,26 +228,34 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
   const getBallCoordinates = useCallback(
     (tubeIndex: number, slotIndex: number, isLifted: boolean) => {
       const rowIndex = isLargeSet && tubeIndex >= tubesPerRow ? 1 : 0;
+      const rowWrapper = rowWrapperLayouts.current[rowIndex];
       const rowLayout = rowLayouts.current[rowIndex];
       const tubeLayout = tubeLayouts.current[tubeIndex];
 
-      if (!rowLayout || !tubeLayout) {
+      if (!tubeLayout) {
         return null;
       }
 
-      // Horizontal center inside tube
-      const tubeX = rowLayout.x + tubeLayout.x;
+      const rowWrapperX = rowWrapper?.x ?? 0;
+      const rowWrapperY = rowWrapper?.y ?? 0;
+      const rowX = rowLayout?.x ?? 0;
+      const rowY = rowLayout?.y ?? 0;
+
+      // Absolute horizontal position inside playfield
+      const tubeX = rowWrapperX + rowX + tubeLayout.x;
       const ballX = tubeX + (tubeLayout.width - calculatedBallSize) / 2;
 
-      // Vertical position
-      const tubeY = rowLayout.y + tubeLayout.y;
+      // Absolute vertical position inside playfield
+      const tubeY = rowWrapperY + rowY + tubeLayout.y;
+
       if (isLifted) {
-        // Lifted slightly above the tube opening
-        return { x: ballX, y: tubeY + 4 };
+        // Hovering right above the top rim of the tube (matches GlassTube resting lift)
+        return { x: ballX, y: tubeY + 14 };
       } else {
-        // Inside tube at slot (0 = bottom, 1, 2, 3 = top)
-        const tubeBottom = tubeY + tubeLayout.height - 6;
-        const ballY = tubeBottom - calculatedBallSize - slotIndex * (calculatedBallSize + 2);
+        // Inside tube at slotIndex (0 = bottom, 1, 2, 3 = top)
+        // Matches exact paddingBottom (4px) in GlassTube's glassBody
+        const outerHeight = tubeLayout.height;
+        const ballY = tubeY + outerHeight - 4 - calculatedBallSize - slotIndex * (calculatedBallSize + 2);
         return { x: ballX, y: ballY };
       }
     },
@@ -279,8 +293,9 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
       animBallScaleY.setValue(1);
 
       const dx = Math.abs(destRimPos.x - startPos.x);
+      const dy = Math.abs(destRimPos.y - startPos.y);
       const arcApexY = Math.min(startPos.y, destRimPos.y) - Math.min(36, Math.max(16, dx * 0.15));
-      const travelDuration = Math.min(240, Math.max(160, Math.round(dx * 0.45) + 110));
+      const travelDuration = Math.min(260, Math.max(160, Math.round(Math.hypot(dx, dy) * 0.45) + 110));
 
       // Phase 1: Arc Glide to destination tube opening
       const arcX = Animated.timing(animBallX, {
@@ -684,7 +699,12 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
           <View style={styles.ambientGlowBlue} pointerEvents="none" />
 
           {/* Row 1 Tubes & Base Shelf */}
-          <View style={styles.rowWrapper}>
+          <View
+            style={styles.rowWrapper}
+            onLayout={(e) => {
+              rowWrapperLayouts.current[0] = e.nativeEvent.layout;
+            }}
+          >
             <View
               style={styles.tubesRow}
               onLayout={(e) => {
@@ -721,9 +741,14 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
             </View>
           </View>
 
-          {/* Row 2 Tubes & Base Shelf (for puzzles with 8+ tubes) */}
+          {/* Row 2 Tubes & Base Shelf (for puzzles with 6+ tubes) */}
           {row2Tubes.length > 0 && (
-            <View style={[styles.rowWrapper, { marginTop: 14 }]}>
+            <View
+              style={[styles.rowWrapper, { marginTop: 14 }]}
+              onLayout={(e) => {
+                rowWrapperLayouts.current[1] = e.nativeEvent.layout;
+              }}
+            >
               <View
                 style={styles.tubesRow}
                 onLayout={(e) => {
