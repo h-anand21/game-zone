@@ -679,130 +679,38 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
 
         {/* 3. MAIN GAMEPLAY PLAYFIELD: GLASS TEST TUBES */}
         <View style={styles.playfield}>
-          {/* Row 1 Tubes */}
-          <View
-            style={styles.tubesRow}
-            onLayout={(e) => {
-              rowLayouts.current[0] = e.nativeEvent.layout;
-            }}
-          >
-            {row1Tubes.map((tube, idx) => (
-              <GlassTube
-                key={`row1-tube-${idx}`}
-                tubeIndex={idx}
-                tube={tube}
-                ballSize={calculatedBallSize}
-                isSelected={selectedTube === idx && !animatingMove}
-                hiddenTopBall={animatingMove?.from === idx}
-                isHintSource={activeHint?.fromTube === idx}
-                isHintDest={activeHint?.toTube === idx}
-                isShaking={shakingTube === idx}
-                theme={theme}
-                onPress={handleTubePress}
-                onLayout={(e) => {
-                  tubeLayouts.current[idx] = e.nativeEvent.layout;
-                }}
-              />
-            ))}
-          </View>
           {/* Ambient Lighting Glow Behind Tubes */}
           <View style={styles.ambientGlowCyan} pointerEvents="none" />
           <View style={styles.ambientGlowBlue} pointerEvents="none" />
 
-          {/* Row 2 Tubes (for puzzles with 8+ tubes) */}
-          {row2Tubes.length > 0 && (
-
-            < View style={styles.rowWrapper}>
-          <View
-            style={styles.tubesRow}
-            onLayout={(e) => {
-              rowLayouts.current[1] = e.nativeEvent.layout;
-              rowLayouts.current[0] = e.nativeEvent.layout;
-            }}
-          >
-            {row2Tubes.map((tube, idx) => {
-              const actualIndex = tubesPerRow + idx;
-              return (
-                <GlassTube
-                  key={`row2-tube-${actualIndex}`}
-                  tubeIndex={actualIndex}
-                  tube={tube}
-                  ballSize={calculatedBallSize}
-                  isSelected={selectedTube === actualIndex && !animatingMove}
-                  hiddenTopBall={animatingMove?.from === actualIndex}
-                  isHintSource={activeHint?.fromTube === actualIndex}
-                  isHintDest={activeHint?.toTube === actualIndex}
-                  isShaking={shakingTube === actualIndex}
-                  theme={theme}
-                  onPress={handleTubePress}
-                  onLayout={(e) => {
-                    tubeLayouts.current[actualIndex] = e.nativeEvent.layout;
-                  }}
-                />
-              );
-            })}
-            {row1Tubes.map((tube, idx) => (
-              <GlassTube
-                key={`row1-tube-${idx}`}
-                tubeIndex={idx}
-                tube={tube}
-                ballSize={calculatedBallSize}
-                isSelected={selectedTube === idx && !animatingMove}
-                hiddenTopBall={animatingMove?.from === idx}
-                isHintSource={activeHint?.fromTube === idx}
-                isHintDest={activeHint?.toTube === idx}
-                isShaking={shakingTube === idx}
-                theme={theme}
-                onPress={handleTubePress}
-                onLayout={(e) => {
-                  tubeLayouts.current[idx] = e.nativeEvent.layout;
-                }}
-              />
-            ))}
-          </View>
-          {/* Laboratory Rack Stand Shelf */}
-          <View style={styles.rackShelf}>
-            <LinearGradient
-              colors={['rgba(255, 255, 255, 0.22)', 'rgba(255, 255, 255, 0.05)']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={styles.rackShelfBar}
-            />
-          </View>
-        </View>
-
-        {/* Row 2 Tubes & Base Shelf (for puzzles with 8+ tubes) */}
-        {row2Tubes.length > 0 && (
-          <View style={[styles.rowWrapper, { marginTop: 14 }]}>
+          {/* Row 1 Tubes & Base Shelf */}
+          <View style={styles.rowWrapper}>
             <View
               style={styles.tubesRow}
               onLayout={(e) => {
-                rowLayouts.current[1] = e.nativeEvent.layout;
+                rowLayouts.current[0] = e.nativeEvent.layout;
               }}
             >
-              {row2Tubes.map((tube, idx) => {
-                const actualIndex = tubesPerRow + idx;
-                return (
-                  <GlassTube
-                    key={`row2-tube-${actualIndex}`}
-                    tubeIndex={actualIndex}
-                    tube={tube}
-                    ballSize={calculatedBallSize}
-                    isSelected={selectedTube === actualIndex && !animatingMove}
-                    hiddenTopBall={animatingMove?.from === actualIndex}
-                    isHintSource={activeHint?.fromTube === actualIndex}
-                    isHintDest={activeHint?.toTube === actualIndex}
-                    isShaking={shakingTube === actualIndex}
-                    theme={theme}
-                    onPress={handleTubePress}
-                    onLayout={(e) => {
-                      tubeLayouts.current[actualIndex] = e.nativeEvent.layout;
-                    }}
-                  />
-                );
-              })}
+              {row1Tubes.map((tube, idx) => (
+                <GlassTube
+                  key={`row1-tube-${idx}`}
+                  tubeIndex={idx}
+                  tube={tube}
+                  ballSize={calculatedBallSize}
+                  isSelected={selectedTube === idx && !animatingMove}
+                  hiddenTopBall={animatingMove?.from === idx}
+                  isHintSource={activeHint?.fromTube === idx}
+                  isHintDest={activeHint?.toTube === idx}
+                  isShaking={shakingTube === idx}
+                  theme={theme}
+                  onPress={handleTubePress}
+                  onLayout={(e) => {
+                    tubeLayouts.current[idx] = e.nativeEvent.layout;
+                  }}
+                />
+              ))}
             </View>
-            {/* Row 2 Rack Stand Shelf */}
+            {/* Laboratory Rack Stand Shelf */}
             <View style={styles.rackShelf}>
               <LinearGradient
                 colors={['rgba(255, 255, 255, 0.22)', 'rgba(255, 255, 255, 0.05)']}
@@ -812,109 +720,143 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               />
             </View>
           </View>
-        )}
 
-        {/* Animated Transferring & Dropping Ball Overlay */}
-        {animatingMove && (
-          <Animated.View
-            pointerEvents="none"
-            style={[
-              styles.floatingBall,
-              {
-                width: calculatedBallSize,
-                height: calculatedBallSize,
-                transform: [
-                  { translateX: animBallX },
-                  { translateY: animBallY },
-                  { scaleX: animBallScaleX },
-                  { scaleY: animBallScaleY },
-                ],
-              },
+          {/* Row 2 Tubes & Base Shelf (for puzzles with 8+ tubes) */}
+          {row2Tubes.length > 0 && (
+            <View style={[styles.rowWrapper, { marginTop: 14 }]}>
+              <View
+                style={styles.tubesRow}
+                onLayout={(e) => {
+                  rowLayouts.current[1] = e.nativeEvent.layout;
+                }}
+              >
+                {row2Tubes.map((tube, idx) => {
+                  const actualIndex = tubesPerRow + idx;
+                  return (
+                    <GlassTube
+                      key={`row2-tube-${actualIndex}`}
+                      tubeIndex={actualIndex}
+                      tube={tube}
+                      ballSize={calculatedBallSize}
+                      isSelected={selectedTube === actualIndex && !animatingMove}
+                      hiddenTopBall={animatingMove?.from === actualIndex}
+                      isHintSource={activeHint?.fromTube === actualIndex}
+                      isHintDest={activeHint?.toTube === actualIndex}
+                      isShaking={shakingTube === actualIndex}
+                      theme={theme}
+                      onPress={handleTubePress}
+                      onLayout={(e) => {
+                        tubeLayouts.current[actualIndex] = e.nativeEvent.layout;
+                      }}
+                    />
+                  );
+                })}
+              </View>
+              {/* Row 2 Rack Stand Shelf */}
+              <View style={styles.rackShelf}>
+                <LinearGradient
+                  colors={['rgba(255, 255, 255, 0.22)', 'rgba(255, 255, 255, 0.05)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0, y: 1 }}
+                  style={styles.rackShelfBar}
+                />
+              </View>
+            </View>
+          )}
+
+          {/* Animated Transferring & Dropping Ball Overlay */}
+          {animatingMove && (
+            <Animated.View
+              pointerEvents="none"
+              style={[
+                styles.floatingBall,
+                {
+                  width: calculatedBallSize,
+                  height: calculatedBallSize,
+                  transform: [
+                    { translateX: animBallX },
+                    { translateY: animBallY },
+                    { scaleX: animBallScaleX },
+                    { scaleY: animBallScaleY },
+                  ],
+                },
+              ]}
+            >
+              <GlossyBall
+                color={animatingMove.ballColor}
+                size={calculatedBallSize}
+                isSelected={false}
+              />
+            </Animated.View>
+          )}
+        </View>
+
+        {/* 4. BOTTOM ACTION TOOLBAR */}
+        <View style={styles.toolbar}>
+          {/* Undo */}
+          <Pressable
+            onPress={handleUndo}
+            disabled={undoStack.length === 0}
+            style={({ pressed }) => [
+              styles.toolBtn,
+              undoStack.length === 0 && styles.disabledToolBtn,
+              pressed && styles.btnPressed,
             ]}
           >
-            <GlossyBall
-              color={animatingMove.ballColor}
-              size={calculatedBallSize}
-              isSelected={false}
-            />
-          </Animated.View>
-        )}
-    </View>
+            <View style={styles.toolIconWrap}>
+              <Text style={styles.toolIcon}>↩️</Text>
+              {undoStack.length > 0 && (
+                <View style={styles.undoBadge}>
+                  <Text style={styles.undoBadgeText}>{undoStack.length}</Text>
+                </View>
+              )}
+            </View>
+            <Text style={styles.toolLabel}>UNDO</Text>
+          </Pressable>
 
-        {/* 4. BOTTOM ACTION TOOLBAR */ }
-  <View style={styles.toolbar}>
-    {/* Undo */}
-    <Pressable
-      onPress={handleUndo}
-      disabled={undoStack.length === 0}
-      style={({ pressed }) => [
-        styles.toolBtn,
-        undoStack.length === 0 && styles.disabledToolBtn,
-        pressed && styles.btnPressed,
-      ]}
-    >
-      <Text style={styles.toolIcon}>↩️</Text>
-      <Text style={styles.toolLabel}>Undo ({undoStack.length})</Text>
-      <View style={styles.toolIconWrap}>
-        <Text style={styles.toolIcon}>↩️</Text>
-        {undoStack.length > 0 && (
-          <View style={styles.undoBadge}>
-            <Text style={styles.undoBadgeText}>{undoStack.length}</Text>
-          </View>
-        )}
-      </View>
-      <Text style={styles.toolLabel}>UNDO</Text>
-    </Pressable>
+          {/* Hint */}
+          <Pressable
+            onPress={handleHint}
+            style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
+          >
+            <View style={[styles.toolIconWrap, activeHint && styles.toolIconWrapActive]}>
+              <Text style={styles.toolIcon}>💡</Text>
+            </View>
+            <Text style={[styles.toolLabel, activeHint && styles.toolLabelActive]}>HINT</Text>
+          </Pressable>
 
-    {/* Hint */}
-    <Pressable
-      onPress={handleHint}
-      style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
-    >
-      <Text style={styles.toolIcon}>💡</Text>
-      <Text style={styles.toolLabel}>Hint</Text>
-      <View style={[styles.toolIconWrap, activeHint && styles.toolIconWrapActive]}>
-        <Text style={styles.toolIcon}>💡</Text>
-      </View>
-      <Text style={[styles.toolLabel, activeHint && styles.toolLabelActive]}>HINT</Text>
-    </Pressable>
+          {/* Extra Tube */}
+          <Pressable
+            onPress={handleAddTube}
+            disabled={addedExtraTube || tubes.length >= 14}
+            style={({ pressed }) => [
+              styles.toolBtn,
+              (addedExtraTube || tubes.length >= 14) && styles.disabledToolBtn,
+              pressed && styles.btnPressed,
+            ]}
+          >
+            <View style={styles.toolIconWrap}>
+              <Text style={styles.toolIcon}>🧪</Text>
+              <View style={styles.plusBadge}>
+                <Text style={styles.plusBadgeText}>+</Text>
+              </View>
+            </View>
+            <Text style={styles.toolLabel}>+TUBE</Text>
+          </Pressable>
 
-    {/* Extra Tube */}
-    <Pressable
-      onPress={handleAddTube}
-      disabled={addedExtraTube || tubes.length >= 14}
-      style={({ pressed }) => [
-        styles.toolBtn,
-        (addedExtraTube || tubes.length >= 14) && styles.disabledToolBtn,
-        pressed && styles.btnPressed,
-      ]}
-    >
-      <Text style={styles.toolIcon}>🧪+</Text>
-      <Text style={styles.toolLabel}>+Tube</Text>
-      <View style={styles.toolIconWrap}>
-        <Text style={styles.toolIcon}>🧪</Text>
-        <View style={styles.plusBadge}>
-          <Text style={styles.plusBadgeText}>+</Text>
+          {/* Themes */}
+          <Pressable
+            onPress={() => setShowThemeShop(true)}
+            style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
+          >
+            <View style={styles.toolIconWrap}>
+              <Text style={styles.toolIcon}>🎨</Text>
+            </View>
+            <Text style={styles.toolLabel}>THEMES</Text>
+          </Pressable>
         </View>
-      </View>
-      <Text style={styles.toolLabel}>+TUBE</Text>
-    </Pressable>
 
-    {/* Themes */}
-    <Pressable
-      onPress={() => setShowThemeShop(true)}
-      style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
-    >
-      <Text style={styles.toolIcon}>🎨</Text>
-      <Text style={styles.toolLabel}>Themes</Text>
-      <View style={styles.toolIconWrap}>
-        <Text style={styles.toolIcon}>🎨</Text>
-      </View>
-      <Text style={styles.toolLabel}>THEMES</Text>
-    </Pressable>
-  </View>
-
-  {/* Victory Celebration Modal */ }
+        {/* Victory Celebration Modal */ }
   <VictoryModal
     visible={showVictory}
     level={currentLevel}
