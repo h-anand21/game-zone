@@ -711,7 +711,7 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
 
           {/* Row 2 Tubes (for puzzles with 8+ tubes) */}
           {row2Tubes.length > 0 && (
-            {/* Row 1 Tubes & Base Shelf */ }
+
             < View style={styles.rowWrapper}>
           <View
             style={styles.tubesRow}
