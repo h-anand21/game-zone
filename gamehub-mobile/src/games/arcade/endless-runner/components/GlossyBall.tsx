@@ -3,7 +3,7 @@
 // Rich radial gradients, specular highlight reflections & smooth animations
 // ============================================================
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BALL_VISUALS } from '../colors';
@@ -25,8 +25,8 @@ export const GlossyBall: React.FC<GlossyBallProps> = ({
   style,
 }) => {
   const visual = BALL_VISUALS[color] || BALL_VISUALS.red;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [scaleAnim] = useState(() => new Animated.Value(1));
+  const [pulseAnim] = useState(() => new Animated.Value(1));
 
   // Selection bounce animation
   useEffect(() => {

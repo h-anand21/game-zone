@@ -3,7 +3,7 @@
 // Confetti particles, stars rating, moves taken & coin rewards
 // ============================================================
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, Pressable, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -26,8 +26,8 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
   onReplay,
   onExit,
 }) => {
-  const scaleAnim = useRef(new Animated.Value(0.85)).current;
-  const bounceAnim = useRef(new Animated.Value(0)).current;
+  const [scaleAnim] = useState(() => new Animated.Value(0.85));
+  const [bounceAnim] = useState(() => new Animated.Value(0));
 
   useEffect(() => {
     if (visible) {

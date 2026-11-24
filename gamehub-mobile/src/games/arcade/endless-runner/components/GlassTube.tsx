@@ -3,7 +3,7 @@
 // Glass rim, reflections, animated ball lift, and solved sparkles
 // ============================================================
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable, Animated, LayoutChangeEvent } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlossyBall } from './GlossyBall';
@@ -43,7 +43,7 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
 
   // Lift animation for the top ball when selected
   // Dynamically lifts top ball up to float right above the tube opening regardless of stack height
-  const liftAnim = useRef(new Animated.Value(0)).current;
+  const [liftAnim] = useState(() => new Animated.Value(0));
   const targetLift =
     tube.length > 0 ? (4 - tube.length) * (ballSize + 2) + ballSize * 0.95 : 0;
 
@@ -57,7 +57,7 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
   }, [isSelected, liftAnim, targetLift]);
 
   // Hint pulse animation
-  const hintPulseAnim = useRef(new Animated.Value(1)).current;
+  const [hintPulseAnim] = useState(() => new Animated.Value(1));
   useEffect(() => {
     if (isHintSource || isHintDest) {
       Animated.loop(
@@ -80,7 +80,7 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
   }, [isHintSource, isHintDest, hintPulseAnim]);
 
   // Shake animation on illegal move
-  const shakeAnim = useRef(new Animated.Value(0)).current;
+  const [shakeAnim] = useState(() => new Animated.Value(0));
   useEffect(() => {
     if (isShaking) {
       Animated.sequence([

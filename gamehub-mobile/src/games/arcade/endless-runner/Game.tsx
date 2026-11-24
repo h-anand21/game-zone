@@ -15,7 +15,6 @@ import {
   Pressable,
   Animated,
   Easing,
-  LayoutChangeEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -45,7 +44,7 @@ import type {
 import type { GameEngine } from '../../engine/GameEngine';
 
 const STORAGE_KEY_SAVE = '@color_bloom_sort_state_v1';
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface ColorBloomSortProps {
   engine?: GameEngine;
@@ -90,10 +89,10 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
     to: number;
     ballColor: BallColor;
   } | null>(null);
-  const animBallX = useRef(new Animated.Value(0)).current;
-  const animBallY = useRef(new Animated.Value(0)).current;
-  const animBallScaleX = useRef(new Animated.Value(1)).current;
-  const animBallScaleY = useRef(new Animated.Value(1)).current;
+  const [animBallX] = useState(() => new Animated.Value(0));
+  const [animBallY] = useState(() => new Animated.Value(0));
+  const [animBallScaleX] = useState(() => new Animated.Value(1));
+  const [animBallScaleY] = useState(() => new Animated.Value(1));
   const isAnimatingRef = useRef(false);
 
   // Illegal Move Shake Feedback

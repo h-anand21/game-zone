@@ -72,11 +72,10 @@ export function isTubeSolved(tube: Tube): boolean {
  */
 export function isPuzzleSolved(tubes: Tube[]): boolean {
   let solvedTubesCount = 0;
-  let emptyTubesCount = 0;
 
   for (const tube of tubes) {
     if (tube.length === 0) {
-      emptyTubesCount++;
+      continue;
     } else if (isTubeSolved(tube)) {
       solvedTubesCount++;
     } else {
