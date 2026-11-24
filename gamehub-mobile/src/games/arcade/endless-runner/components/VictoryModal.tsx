@@ -14,6 +14,7 @@ interface VictoryModalProps {
   coinsEarned: number;
   onNextLevel: () => void;
   onReplay: () => void;
+  onClose?: () => void;
   onExit?: () => void;
 }
 
@@ -24,6 +25,7 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
   coinsEarned,
   onNextLevel,
   onReplay,
+  onClose,
   onExit,
 }) => {
   const [scaleAnim] = useState(() => new Animated.Value(0.85));
@@ -66,6 +68,7 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
       transparent
       animationType="fade"
       statusBarTranslucent
+      onRequestClose={onClose || onExit}
     >
       <View style={styles.overlay}>
         <Animated.View
@@ -80,6 +83,17 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
             colors={['#181E3B', '#0A0E1F']}
             style={styles.modalCard}
           >
+            {/* Top Close Dismiss Button */}
+            {onClose && (
+              <Pressable
+                onPress={onClose}
+                style={styles.closeModalBtn}
+                hitSlop={12}
+              >
+                <Text style={styles.closeModalBtnText}>✕</Text>
+              </Pressable>
+            )}
+
             {/* Top Glow Trophy Banner */}
             <View style={styles.bannerBadge}>
               <Text style={styles.bannerEmoji}>🎉</Text>
@@ -301,5 +315,24 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#E2E8F0',
     letterSpacing: 0.6,
+  },
+  closeModalBtn: {
+    position: 'absolute',
+    top: 14,
+    right: 14,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
+    zIndex: 10,
+  },
+  closeModalBtnText: {
+    fontSize: 15,
+    color: '#94A3B8',
+    fontWeight: '800',
   },
 });

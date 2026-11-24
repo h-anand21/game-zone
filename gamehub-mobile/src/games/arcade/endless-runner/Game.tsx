@@ -119,6 +119,7 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
   const row1Tubes = isLargeSet ? tubes.slice(0, tubesPerRow) : tubes;
   const row2Tubes = isLargeSet ? tubes.slice(tubesPerRow) : [];
 
+  const isLevelCompleted = tubes.length > 0 && isPuzzleSolved(tubes);
   const solvedTubesCount = tubes.filter((t) => isTubeSolved(t)).length;
   const totalColorCount = Math.max(1, new Set(tubes.flat()).size);
   const solvePercent = Math.min(100, Math.round((solvedTubesCount / totalColorCount) * 100));
@@ -137,15 +138,23 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
           if (parsed.selectedTheme) setSelectedTheme(parsed.selectedTheme);
           if (parsed.unlockedThemes) setUnlockedThemes(parsed.unlockedThemes);
 
-          // Restore active puzzle if level matches
-          if (parsed.tubes && parsed.tubes.length > 0) {
+          // Restore active puzzle if level matches and puzzle is not already solved
+          if (parsed.tubes && parsed.tubes.length > 0 && !isPuzzleSolved(parsed.tubes)) {
             setTubes(parsed.tubes);
             setInitialTubes(parsed.initialTubes || parsed.tubes);
             setMovesCount(parsed.movesCount || 0);
           } else {
-            const lvl = generateLevel(parsed.currentLevel || 1);
+            // If saved tubes are already solved, advance to next level so user is never stuck
+            const targetLvl =
+              parsed.tubes && isPuzzleSolved(parsed.tubes)
+                ? (parsed.currentLevel || 1) + 1
+                : parsed.currentLevel || 1;
+            setCurrentLevel(targetLvl);
+            setUnlockedLevel((prev) => Math.max(prev, targetLvl));
+            const lvl = generateLevel(targetLvl);
             setTubes(lvl.tubes);
             setInitialTubes(lvl.tubes.map((t) => [...t]));
+            setMovesCount(0);
           }
         }
       } catch { }
@@ -196,7 +205,8 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
    */
   const startLevel = useCallback(
     (lvlNum: number) => {
-      if (isAnimatingRef.current) return;
+      // Force reset any stuck animation flag so next level loading is never blocked
+      isAnimatingRef.current = false;
 
       // Reset layout measurements so new tube configurations re-measure cleanly
       rowWrapperLayouts.current = {};
@@ -642,6 +652,16 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
             <Text style={styles.levelBadgeText}>LEVEL {currentLevel} ▾</Text>
           </Pressable>
 
+          {/* Quick Header Next Button if Level is Solved */}
+          {isLevelCompleted && (
+            <Pressable
+              onPress={() => startLevel(currentLevel + 1)}
+              style={({ pressed }) => [styles.headerNextBtn, pressed && styles.btnPressed]}
+            >
+              <Text style={styles.headerNextBtnText}>NEXT ➔</Text>
+            </Pressable>
+          )}
+
           {/* Coin Counter */}
           <View style={styles.coinBadge}>
             <Text style={styles.coinEmoji}>🪙</Text>
@@ -813,83 +833,123 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               />
             </Animated.View>
           )}
+          {/* Level Solved Celebration Floating Bar (if modal was closed) */}
+          {isLevelCompleted && !showVictory && (
+            <Pressable
+              onPress={() => setShowVictory(true)}
+              style={styles.completedFloatingBanner}
+            >
+              <Text style={styles.completedBannerEmoji}>🎉</Text>
+              <View style={styles.completedBannerTextBox}>
+                <Text style={styles.completedBannerTitle}>LEVEL {currentLevel} COMPLETED!</Text>
+                <Text style={styles.completedBannerSub}>Tap to view rewards or press Next below ➔</Text>
+              </View>
+            </Pressable>
+          )}
         </View>
 
         {/* 4. BOTTOM ACTION TOOLBAR */}
-        <View style={styles.toolbar}>
-          {/* Undo */}
-          <Pressable
-            onPress={handleUndo}
-            disabled={undoStack.length === 0}
-            style={({ pressed }) => [
-              styles.toolBtn,
-              undoStack.length === 0 && styles.disabledToolBtn,
-              pressed && styles.btnPressed,
-            ]}
-          >
-            <View style={styles.toolIconWrap}>
-              <Text style={styles.toolIcon}>↩️</Text>
-              {undoStack.length > 0 && (
-                <View style={styles.undoBadge}>
-                  <Text style={styles.undoBadgeText}>{undoStack.length}</Text>
-                </View>
-              )}
-            </View>
-            <Text style={styles.toolLabel}>UNDO</Text>
-          </Pressable>
+        {isLevelCompleted ? (
+          <View style={styles.completedToolbar}>
+            <Pressable
+              onPress={() => startLevel(currentLevel + 1)}
+              style={({ pressed }) => [styles.nextLevelMainBtn, pressed && styles.btnPressed]}
+            >
+              <LinearGradient
+                colors={['#00CFFF', '#0284C7']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.nextLevelMainGradient}
+              >
+                <Text style={styles.nextLevelMainBtnText}>NEXT LEVEL {currentLevel + 1} ➔</Text>
+              </LinearGradient>
+            </Pressable>
 
-          {/* Hint */}
-          <Pressable
-            onPress={handleHint}
-            style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
-          >
-            <View style={[styles.toolIconWrap, activeHint && styles.toolIconWrapActive]}>
-              <Text style={styles.toolIcon}>💡</Text>
-            </View>
-            <Text style={[styles.toolLabel, activeHint && styles.toolLabelActive]}>HINT</Text>
-          </Pressable>
-
-          {/* Extra Tube */}
-          <Pressable
-            onPress={handleAddTube}
-            disabled={addedExtraTube || tubes.length >= 14}
-            style={({ pressed }) => [
-              styles.toolBtn,
-              (addedExtraTube || tubes.length >= 14) && styles.disabledToolBtn,
-              pressed && styles.btnPressed,
-            ]}
-          >
-            <View style={styles.toolIconWrap}>
-              <Text style={styles.toolIcon}>🧪</Text>
-              <View style={styles.plusBadge}>
-                <Text style={styles.plusBadgeText}>+</Text>
+            <Pressable
+              onPress={handleRestart}
+              style={({ pressed }) => [styles.replaySmallBtn, pressed && styles.btnPressed]}
+              hitSlop={8}
+            >
+              <Text style={styles.replaySmallText}>↺</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View style={styles.toolbar}>
+            {/* Undo */}
+            <Pressable
+              onPress={handleUndo}
+              disabled={undoStack.length === 0}
+              style={({ pressed }) => [
+                styles.toolBtn,
+                undoStack.length === 0 && styles.disabledToolBtn,
+                pressed && styles.btnPressed,
+              ]}
+            >
+              <View style={styles.toolIconWrap}>
+                <Text style={styles.toolIcon}>↩️</Text>
+                {undoStack.length > 0 && (
+                  <View style={styles.undoBadge}>
+                    <Text style={styles.undoBadgeText}>{undoStack.length}</Text>
+                  </View>
+                )}
               </View>
-            </View>
-            <Text style={styles.toolLabel}>+TUBE</Text>
-          </Pressable>
+              <Text style={styles.toolLabel}>UNDO</Text>
+            </Pressable>
 
-          {/* Themes */}
-          <Pressable
-            onPress={() => setShowThemeShop(true)}
-            style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
-          >
-            <View style={styles.toolIconWrap}>
-              <Text style={styles.toolIcon}>🎨</Text>
-            </View>
-            <Text style={styles.toolLabel}>THEMES</Text>
-          </Pressable>
-        </View>
+            {/* Hint */}
+            <Pressable
+              onPress={handleHint}
+              style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
+            >
+              <View style={[styles.toolIconWrap, activeHint && styles.toolIconWrapActive]}>
+                <Text style={styles.toolIcon}>💡</Text>
+              </View>
+              <Text style={[styles.toolLabel, activeHint && styles.toolLabelActive]}>HINT</Text>
+            </Pressable>
 
-        {/* Victory Celebration Modal */ }
-  <VictoryModal
-    visible={showVictory}
-    level={currentLevel}
-    moves={movesCount}
-    coinsEarned={50}
-    onNextLevel={() => startLevel(currentLevel + 1)}
-    onReplay={handleRestart}
-    onExit={handleExit}
-  />
+            {/* Extra Tube */}
+            <Pressable
+              onPress={handleAddTube}
+              disabled={addedExtraTube || tubes.length >= 14}
+              style={({ pressed }) => [
+                styles.toolBtn,
+                (addedExtraTube || tubes.length >= 14) && styles.disabledToolBtn,
+                pressed && styles.btnPressed,
+              ]}
+            >
+              <View style={styles.toolIconWrap}>
+                <Text style={styles.toolIcon}>🧪</Text>
+                <View style={styles.plusBadge}>
+                  <Text style={styles.plusBadgeText}>+</Text>
+                </View>
+              </View>
+              <Text style={styles.toolLabel}>+TUBE</Text>
+            </Pressable>
+
+            {/* Themes */}
+            <Pressable
+              onPress={() => setShowThemeShop(true)}
+              style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
+            >
+              <View style={styles.toolIconWrap}>
+                <Text style={styles.toolIcon}>🎨</Text>
+              </View>
+              <Text style={styles.toolLabel}>THEMES</Text>
+            </Pressable>
+          </View>
+        )}
+
+        {/* Victory Celebration Modal */}
+        <VictoryModal
+          visible={showVictory}
+          level={currentLevel}
+          moves={movesCount}
+          coinsEarned={50}
+          onNextLevel={() => startLevel(currentLevel + 1)}
+          onReplay={handleRestart}
+          onClose={() => setShowVictory(false)}
+          onExit={handleExit}
+        />
 
   {/* Theme Customization Shop */ }
   <ThemeShopModal
@@ -1238,5 +1298,102 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '900',
     color: '#0A0E1F',
+  },
+
+  // Completed Level Header Action
+  headerNextBtn: {
+    backgroundColor: '#00CFFF',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+    shadowColor: '#00CFFF',
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  headerNextBtnText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#0A0E1F',
+    letterSpacing: 0.8,
+  },
+
+  // Completed Level Floating Celebration Banner
+  completedFloatingBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 207, 255, 0.15)',
+    borderWidth: 1.5,
+    borderColor: '#00CFFF',
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 16,
+    marginBottom: 8,
+    shadowColor: '#00CFFF',
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  completedBannerEmoji: {
+    fontSize: 22,
+    marginRight: 10,
+  },
+  completedBannerTextBox: {
+    flex: 1,
+  },
+  completedBannerTitle: {
+    fontSize: 13,
+    fontWeight: '900',
+    color: '#00CFFF',
+    letterSpacing: 0.5,
+  },
+  completedBannerSub: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#94A3B8',
+  },
+
+  // Completed Level Toolbar
+  completedToolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    gap: 12,
+  },
+  nextLevelMainBtn: {
+    flex: 1,
+    height: 48,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#00CFFF',
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  nextLevelMainGradient: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  nextLevelMainBtnText: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#FFFFFF',
+    letterSpacing: 1,
+  },
+  replaySmallBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.16)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  replaySmallText: {
+    fontSize: 20,
+    color: '#E2E8F0',
   },
 });
