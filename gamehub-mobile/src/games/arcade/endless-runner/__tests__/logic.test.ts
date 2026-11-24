@@ -107,8 +107,8 @@ describe('Color Bloom Sort Puzzle Engine', () => {
     expect(hint?.color).toBe('red');
   });
 
-  it('deterministic generator creates 100% valid solvable levels', () => {
-    for (const lvl of [1, 2, 3, 5, 10, 50, 100]) {
+  it('deterministic generator creates 100% valid solvable levels including infinite levels', () => {
+    for (const lvl of [1, 2, 3, 5, 10, 50, 100, 250, 500, 1000, 5000]) {
       const levelData = generateLevel(lvl);
       expect(levelData.levelNumber).toBe(lvl);
       expect(levelData.tubes.length).toBeGreaterThanOrEqual(3);

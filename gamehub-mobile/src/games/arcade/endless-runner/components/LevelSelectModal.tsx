@@ -24,9 +24,9 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
   onSelectLevel,
   onClose,
 }) => {
-  // Show up to 100 visible level cards in this view (or max 500)
-  const totalLevels = 500;
-  const levelNumbers = Array.from({ length: Math.min(totalLevels, Math.max(50, unlockedLevel + 20)) }, (_, i) => i + 1);
+  // Unlimited level list: dynamically expands with player progression
+  const displayedCount = Math.max(60, Math.ceil((unlockedLevel + 24) / 12) * 12);
+  const levelNumbers = Array.from({ length: displayedCount }, (_, i) => i + 1);
 
   return (
     <Modal
@@ -41,7 +41,7 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>SELECT LEVEL</Text>
-              <Text style={styles.subtitle}>500+ Solvable Handcrafted Challenges</Text>
+              <Text style={styles.subtitle}>Unlimited Solvable Puzzle Challenges</Text>
             </View>
 
             <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={12}>

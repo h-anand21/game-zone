@@ -232,7 +232,7 @@ const HANDCRAFTED_TUTORIAL_LEVELS: Record<number, Tube[]> = {
 };
 
 /**
- * Generates a guaranteed solvable puzzle for any level from 1 to 500+
+ * Generates a guaranteed solvable puzzle for any level from 1 to Infinity (unlimited levels)
  */
 export function generateLevel(levelNumber: number): LevelData {
   const clampedLevel = Math.max(1, levelNumber);
@@ -248,7 +248,7 @@ export function generateLevel(levelNumber: number): LevelData {
     };
   }
 
-  // Determine difficulty scaling
+  // Determine difficulty scaling (endless progression without ceiling)
   let colorCount: number;
   let emptyTubeCount = 2;
 
@@ -264,24 +264,34 @@ export function generateLevel(levelNumber: number): LevelData {
   } else if (clampedLevel <= 100) {
     colorCount = 6;
     emptyTubeCount = 2;
-  } else if (clampedLevel <= 220) {
+  } else if (clampedLevel <= 250) {
     colorCount = 7;
     emptyTubeCount = 2;
-  } else if (clampedLevel <= 360) {
+  } else if (clampedLevel <= 500) {
     colorCount = 8;
     emptyTubeCount = 2;
   } else {
-    colorCount = 9;
+    // Endless progression: cycles through 7, 8, 9 colors for balanced mobile screen gameplay
+    colorCount = 7 + (clampedLevel % 3);
     emptyTubeCount = 2;
   }
 
   colorCount = Math.min(colorCount, ALL_BALL_COLORS.length);
 
-  const colorsUsed = ALL_BALL_COLORS.slice(0, colorCount);
-  const totalTubes = colorCount + emptyTubeCount;
-
   // Seeded PRNG for deterministic, reproducible generation
   const prng = new DeterministicPRNG(clampedLevel * 104729 + 7919);
+
+  // Permute available colors deterministically so different levels use different vibrant palettes
+  const shuffledColors = [...ALL_BALL_COLORS];
+  for (let i = shuffledColors.length - 1; i > 0; i--) {
+    const j = prng.nextInt(0, i);
+    const temp = shuffledColors[i];
+    shuffledColors[i] = shuffledColors[j];
+    shuffledColors[j] = temp;
+  }
+
+  const colorsUsed = shuffledColors.slice(0, colorCount);
+  const totalTubes = colorCount + emptyTubeCount;
 
   // Start from solved state
   const tubes: Tube[] = [];
@@ -293,7 +303,7 @@ export function generateLevel(levelNumber: number): LevelData {
   }
 
   // Shuffle via legal reverse moves to guarantee 100% solvability
-  const shuffleSteps = Math.min(60, 24 + clampedLevel * 2);
+  const shuffleSteps = Math.min(80, 24 + Math.floor(Math.min(clampedLevel, 120) * 0.5));
 
   for (let step = 0; step < shuffleSteps; step++) {
     const validReverseMoves: { from: number; to: number }[] = [];

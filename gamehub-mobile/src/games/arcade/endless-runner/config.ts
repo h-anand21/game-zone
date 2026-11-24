@@ -16,11 +16,11 @@ export const ENDLESS_RUNNER_CONFIG: GameConfig = {
   gameVersion: '2.0.0',
   scoreVersion: 'v2',
   validation: {
-    maxScore: 500000,
+    maxScore: 999999999,
     minDuration: 2,
     maxDuration: 14400,
   },
   saveSupport: 'background',
   description:
-    'Sort vibrant glossy balls into matching glass test tubes! Relaxing, satisfying puzzle with 500+ solvable levels, undo, hint solver, extra tube booster, and customizable themes.',
+    'Sort vibrant glossy balls into matching glass test tubes! Relaxing, satisfying puzzle with unlimited solvable levels, undo, hint solver, extra tube booster, and customizable themes.',
 };
