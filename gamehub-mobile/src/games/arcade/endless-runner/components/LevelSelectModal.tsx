@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, Pressable, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { CloseIcon, LockIcon, StarIcon } from './GameIcons';
 
 interface LevelSelectModalProps {
   visible: boolean;
@@ -45,7 +46,7 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
             </View>
 
             <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={12}>
-              <Text style={styles.closeText}>✕</Text>
+              <CloseIcon size={15} color="#94A3B8" />
             </Pressable>
           </View>
 
@@ -86,11 +87,17 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
                     </Text>
 
                     {!isUnlocked ? (
-                      <Text style={styles.lockIcon}>🔒</Text>
+                      <View style={styles.lockIconWrap}>
+                        <LockIcon size={12} color="#64748B" />
+                      </View>
+                    ) : stars > 0 ? (
+                      <View style={styles.starsMiniRow}>
+                        {Array.from({ length: stars }, (_, idx) => (
+                          <StarIcon key={`star-${idx}`} size={10} filled />
+                        ))}
+                      </View>
                     ) : (
-                      <Text style={styles.starText}>
-                        {stars > 0 ? '⭐'.repeat(stars) : '•'}
-                      </Text>
+                      <View style={styles.unearnedDot} />
                     )}
                   </LinearGradient>
                 </Pressable>
@@ -154,11 +161,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  closeText: {
-    fontSize: 14,
-    color: '#94A3B8',
-    fontWeight: '900',
-  },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -203,12 +205,21 @@ const styles = StyleSheet.create({
   currentNum: {
     color: '#00CFFF',
   },
-  lockIcon: {
-    fontSize: 10,
-    marginTop: 2,
+  lockIconWrap: {
+    marginTop: 4,
   },
-  starText: {
-    fontSize: 8,
-    marginTop: 2,
+  starsMiniRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+    marginTop: 4,
+  },
+  unearnedDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(148, 163, 184, 0.45)',
+    marginTop: 6,
   },
 });

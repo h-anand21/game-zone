@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Pressable, Animated, LayoutChangeEvent } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GlossyBall } from './GlossyBall';
+import { SparkleIcon } from './GameIcons';
 import { isTubeSolved } from '../logic';
 import type { Tube, ThemeConfig } from '../types';
 
@@ -246,7 +247,8 @@ export const GlassTube: React.FC<GlassTubeProps> = ({
             end={{ x: 1, y: 0 }}
             style={styles.solvedBadge}
           >
-            <Animated.Text style={styles.solvedSparkle}>✨ 100%</Animated.Text>
+            <SparkleIcon size={10} color="#FEF08A" />
+            <Animated.Text style={styles.solvedSparkle}>100%</Animated.Text>
           </LinearGradient>
         )}
       </Animated.View>
@@ -336,7 +338,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -16,
     alignSelf: 'center',
-    paddingHorizontal: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingHorizontal: 7,
     paddingVertical: 2,
     borderRadius: 10,
     borderWidth: 1,
