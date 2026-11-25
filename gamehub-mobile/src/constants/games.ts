@@ -133,11 +133,11 @@ export const GAME_REGISTRY: GameConfig[] = [
     saveSupport: 'none', description: 'Classic Pong — first to 11',
   },
   {
-    id: 'sky-jump', name: 'Sky Jump', category: 'arcade',
+    id: 'sky-jump', name: 'Wood Screw: Nuts & Bolts', category: 'arcade',
     offline: true, multiplayer: false, route: '/games/sky-jump',
-    icon: '🚀', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
-    validation: { maxScore: 100000, minDuration: 5, maxDuration: 1800 },
-    saveSupport: 'none', description: 'Jump higher and higher',
+    icon: '🔩', status: 'available', gameVersion: '2.0.0', scoreVersion: 'v2',
+    validation: { maxScore: 999999999, minDuration: 2, maxDuration: 14400 },
+    saveSupport: 'background', description: 'Unscrew bolts, drop wooden planks, and clear multi-layer board puzzles!',
   },
   {
     id: 'endless-runner', name: 'Color Bloom Sort', category: 'arcade',
