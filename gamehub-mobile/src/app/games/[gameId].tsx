@@ -38,178 +38,178 @@ export default function GameScreen() {
   const categoryColor = CATEGORY_COLORS[gameConfig.category] || Colors.primary;
 
   // Dedicated Full-Screen Experience for Standalone Games
-  if ((cleanGameId === 'sky-jump' || cleanGameId === 'endless-runner' || cleanGameId === 'block-puzzle' || cleanGameId === 'mind-lock' || cleanGameId === 'find-one' || cleanGameId === 'number-rush' || cleanGameId === 'reverse-mind' || cleanGameId === 'memory-rush' || cleanGameId === 'pattern-break' || cleanGameId === 'pattern-quest' || cleanGameId === 'path-mind' || cleanGameId === 'arrow-kingdom' || cleanGameId === 'aim-rush' || cleanGameId === 'one-tap' || cleanGameId === 'dont-tap-wrong' || cleanGameId === 'reaction-fire' || cleanGameId === 'stack-master') && registeredGame) {
-    const GameComponent = registeredGame.component;
-    return (
-      <>
-        <Stack.Screen options={{ gestureEnabled: false, headerShown: false }} />
-        <GameComponent
-          engine={undefined as any}
-          onFinish={() => {
-            if (router.canGoBack()) {
-              router.back();
-            } else {
-              router.replace('/(tabs)/games');
-            }
-          }}
-          isPaused={false}
+    if ((cleanGameId === 'sky-jump' || cleanGameId === 'endless-runner' || cleanGameId === 'block-puzzle' || cleanGameId === 'mind-lock' || cleanGameId === 'find-one' || cleanGameId === 'number-rush' || cleanGameId === 'reverse-mind' || cleanGameId === 'memory-rush' || cleanGameId === 'pattern-break' || cleanGameId === 'pattern-quest' || cleanGameId === 'path-mind' || cleanGameId === 'arrow-kingdom' || cleanGameId === 'aim-rush' || cleanGameId === 'one-tap' || cleanGameId === 'dont-tap-wrong' || cleanGameId === 'reaction-fire' || cleanGameId === 'stack-master') && registeredGame) {
+      const GameComponent = registeredGame.component;
+      return (
+        <>
+          <Stack.Screen options={{ gestureEnabled: false, headerShown: false }} />
+          <GameComponent
+            engine={undefined as any}
+            onFinish={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace('/(tabs)/games');
+              }
+            }}
+            isPaused={false}
+          />
+        </>
+      );
+    }
+
+
+    // Active Gameplay Mode
+    if (isPlaying && registeredGame) {
+      const GameComponent = registeredGame.component;
+      return (
+        <GameWrapper
+          config={registeredGame.config}
+          renderGame={(props) => <GameComponent {...props} />}
         />
-      </>
-    );
-  }
+      );
+    }
 
-
-  // Active Gameplay Mode
-  if (isPlaying && registeredGame) {
-    const GameComponent = registeredGame.component;
+    // Pre-Game Launch Details Screen
     return (
-      <GameWrapper
-        config={registeredGame.config}
-        renderGame={(props) => <GameComponent {...props} />}
-      />
-    );
-  }
-
-  // Pre-Game Launch Details Screen
-  return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backArrow}>
-          <Text style={styles.backArrowText}>←</Text>
-        </Pressable>
-        <Text style={styles.headerTitle}>{gameConfig.name}</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
-      {/* Game Details */}
-      <View style={styles.center}>
-        <View style={[styles.iconWrapper, { backgroundColor: categoryColor + '20' }]}>
-          <Text style={styles.gameIcon}>{gameConfig.icon}</Text>
+      <View style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Pressable onPress={() => router.back()} style={styles.backArrow}>
+            <Text style={styles.backArrowText}>←</Text>
+          </Pressable>
+          <Text style={styles.headerTitle}>{gameConfig.name}</Text>
+          <View style={{ width: 40 }} />
         </View>
-        <Text style={styles.gameName}>{gameConfig.name}</Text>
-        <Text style={styles.gameDescription}>{gameConfig.description}</Text>
 
-        <View style={styles.tags}>
-          <View style={[styles.tag, { backgroundColor: categoryColor + '20' }]}>
-            <Text style={[styles.tagText, { color: categoryColor }]}>{gameConfig.category}</Text>
+        {/* Game Details */}
+        <View style={styles.center}>
+          <View style={[styles.iconWrapper, { backgroundColor: categoryColor + '20' }]}>
+            <Text style={styles.gameIcon}>{gameConfig.icon}</Text>
           </View>
-          {gameConfig.offline && (
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>Offline</Text>
+          <Text style={styles.gameName}>{gameConfig.name}</Text>
+          <Text style={styles.gameDescription}>{gameConfig.description}</Text>
+
+          <View style={styles.tags}>
+            <View style={[styles.tag, { backgroundColor: categoryColor + '20' }]}>
+              <Text style={[styles.tagText, { color: categoryColor }]}>{gameConfig.category}</Text>
+            </View>
+            {gameConfig.offline && (
+              <View style={styles.tag}>
+                <Text style={styles.tagText}>Offline</Text>
+              </View>
+            )}
+          </View>
+
+          {registeredGame ? (
+            <Pressable
+              style={({ pressed }) => [
+                styles.playButton,
+                { backgroundColor: categoryColor },
+                pressed && styles.pressed,
+              ]}
+              onPress={() => setIsPlaying(true)}
+            >
+              <Text style={styles.playButtonText}>▶ Play Now</Text>
+            </Pressable>
+          ) : (
+            <View style={styles.comingSoonCard}>
+              <Text style={styles.comingSoonText}>🚧 Coming Soon</Text>
+              <Text style={styles.comingSoonSubtext}>
+                {gameConfig.status === 'coming-soon'
+                  ? 'This game is under development'
+                  : 'Implementation scheduled in next phase'}
+              </Text>
             </View>
           )}
         </View>
-
-        {registeredGame ? (
-          <Pressable
-            style={({ pressed }) => [
-              styles.playButton,
-              { backgroundColor: categoryColor },
-              pressed && styles.pressed,
-            ]}
-            onPress={() => setIsPlaying(true)}
-          >
-            <Text style={styles.playButtonText}>▶ Play Now</Text>
-          </Pressable>
-        ) : (
-          <View style={styles.comingSoonCard}>
-            <Text style={styles.comingSoonText}>🚧 Coming Soon</Text>
-            <Text style={styles.comingSoonSubtext}>
-              {gameConfig.status === 'coming-soon'
-                ? 'This game is under development'
-                : 'Implementation scheduled in next phase'}
-            </Text>
-          </View>
-        )}
       </View>
-    </View>
-  );
-}
+    );
+  }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 60,
-    paddingHorizontal: Spacing.md,
-    paddingBottom: Spacing.md,
-  },
-  backArrow: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
-  backArrowText: { fontSize: 24, color: Colors.textPrimary },
-  headerTitle: {
-    fontSize: Typography.h4,
-    color: Colors.textPrimary,
-    fontWeight: Typography.semibold,
-  },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.xl },
-  iconWrapper: {
-    width: 100,
-    height: 100,
-    borderRadius: BorderRadius.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: Spacing.lg,
-  },
-  gameIcon: { fontSize: 48 },
-  gameName: {
-    fontSize: Typography.h2,
-    color: Colors.textPrimary,
-    fontWeight: Typography.bold,
-    marginBottom: Spacing.sm,
-  },
-  gameDescription: {
-    fontSize: Typography.body,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: Spacing.lg,
-  },
-  tags: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.xl },
-  tag: {
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
-    borderRadius: BorderRadius.full,
-    backgroundColor: Colors.surfaceLight,
-  },
-  tagText: {
-    fontSize: Typography.caption,
-    color: Colors.textMuted,
-    fontWeight: Typography.medium,
-    textTransform: 'capitalize',
-  },
-  playButton: {
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.xxl,
-    borderRadius: BorderRadius.lg,
-    minWidth: 200,
-    alignItems: 'center',
-  },
-  playButtonText: { fontSize: Typography.h4, color: '#FFFFFF', fontWeight: Typography.bold },
-  comingSoonCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: Colors.border,
-  },
-  comingSoonText: {
-    fontSize: Typography.h4,
-    color: Colors.warning,
-    fontWeight: Typography.semibold,
-  },
-  comingSoonSubtext: { fontSize: Typography.bodySmall, color: Colors.textMuted, marginTop: Spacing.xs },
-  errorIcon: { fontSize: 48, marginBottom: Spacing.md },
-  errorText: { fontSize: Typography.h3, color: Colors.textPrimary, fontWeight: Typography.semibold },
-  backButton: {
-    marginTop: Spacing.lg,
-    backgroundColor: Colors.primary,
-    borderRadius: BorderRadius.md,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.xl,
-  },
-  backButtonText: { color: '#FFFFFF', fontSize: Typography.body, fontWeight: Typography.semibold },
-  pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
-});
+  const styles = StyleSheet.create({
+    container: { flex: 1, backgroundColor: Colors.background },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingTop: 60,
+      paddingHorizontal: Spacing.md,
+      paddingBottom: Spacing.md,
+    },
+    backArrow: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center' },
+    backArrowText: { fontSize: 24, color: Colors.textPrimary },
+    headerTitle: {
+      fontSize: Typography.h4,
+      color: Colors.textPrimary,
+      fontWeight: Typography.semibold,
+    },
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.xl },
+    iconWrapper: {
+      width: 100,
+      height: 100,
+      borderRadius: BorderRadius.xl,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: Spacing.lg,
+    },
+    gameIcon: { fontSize: 48 },
+    gameName: {
+      fontSize: Typography.h2,
+      color: Colors.textPrimary,
+      fontWeight: Typography.bold,
+      marginBottom: Spacing.sm,
+    },
+    gameDescription: {
+      fontSize: Typography.body,
+      color: Colors.textSecondary,
+      textAlign: 'center',
+      marginBottom: Spacing.lg,
+    },
+    tags: { flexDirection: 'row', gap: Spacing.sm, marginBottom: Spacing.xl },
+    tag: {
+      paddingHorizontal: Spacing.md,
+      paddingVertical: Spacing.xs,
+      borderRadius: BorderRadius.full,
+      backgroundColor: Colors.surfaceLight,
+    },
+    tagText: {
+      fontSize: Typography.caption,
+      color: Colors.textMuted,
+      fontWeight: Typography.medium,
+      textTransform: 'capitalize',
+    },
+    playButton: {
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.xxl,
+      borderRadius: BorderRadius.lg,
+      minWidth: 200,
+      alignItems: 'center',
+    },
+    playButtonText: { fontSize: Typography.h4, color: '#FFFFFF', fontWeight: Typography.bold },
+    comingSoonCard: {
+      backgroundColor: Colors.surface,
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.lg,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: Colors.border,
+    },
+    comingSoonText: {
+      fontSize: Typography.h4,
+      color: Colors.warning,
+      fontWeight: Typography.semibold,
+    },
+    comingSoonSubtext: { fontSize: Typography.bodySmall, color: Colors.textMuted, marginTop: Spacing.xs },
+    errorIcon: { fontSize: 48, marginBottom: Spacing.md },
+    errorText: { fontSize: Typography.h3, color: Colors.textPrimary, fontWeight: Typography.semibold },
+    backButton: {
+      marginTop: Spacing.lg,
+      backgroundColor: Colors.primary,
+      borderRadius: BorderRadius.md,
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.xl,
+    },
+    backButtonText: { color: '#FFFFFF', fontSize: Typography.body, fontWeight: Typography.semibold },
+    pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  });
