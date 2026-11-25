@@ -34,6 +34,19 @@ import { GlossyBall } from './components/GlossyBall';
 import { VictoryModal } from './components/VictoryModal';
 import { ThemeShopModal } from './components/ThemeShopModal';
 import { LevelSelectModal } from './components/LevelSelectModal';
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  BulbHintIcon,
+  ChevronDownIcon,
+  CoinIcon,
+  PaletteIcon,
+  PlusIcon,
+  RestartIcon,
+  TestTubeIcon,
+  TrophyIcon,
+  UndoIcon,
+} from './components/GameIcons';
 import type {
   Tube,
   BallColor,
@@ -640,7 +653,7 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
             style={({ pressed }) => [styles.iconBtn, pressed && styles.btnPressed]}
             hitSlop={12}
           >
-            <Text style={styles.iconBtnText}>←</Text>
+            <ArrowLeftIcon size={18} color="#E2E8F0" />
           </Pressable>
 
           {/* Level Selector Button */}
@@ -648,8 +661,9 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
             onPress={() => setShowLevelSelect(true)}
             style={({ pressed }) => [styles.levelBadge, pressed && styles.btnPressed]}
           >
-            <Text style={styles.levelBadgeEmoji}>🧪</Text>
-            <Text style={styles.levelBadgeText}>LEVEL {currentLevel} ▾</Text>
+            <TestTubeIcon size={16} color="#00CFFF" />
+            <Text style={styles.levelBadgeText}>LEVEL {currentLevel}</Text>
+            <ChevronDownIcon size={13} color="#00CFFF" />
           </Pressable>
 
           {/* Quick Header Next Button if Level is Solved */}
@@ -658,13 +672,14 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               onPress={() => startLevel(currentLevel + 1)}
               style={({ pressed }) => [styles.headerNextBtn, pressed && styles.btnPressed]}
             >
-              <Text style={styles.headerNextBtnText}>NEXT ➔</Text>
+              <Text style={styles.headerNextBtnText}>NEXT</Text>
+              <ArrowRightIcon size={12} color="#0A0E1F" />
             </Pressable>
           )}
 
           {/* Coin Counter */}
           <View style={styles.coinBadge}>
-            <Text style={styles.coinEmoji}>🪙</Text>
+            <CoinIcon size={16} />
             <Text style={styles.coinText}>{coins}</Text>
           </View>
 
@@ -674,11 +689,10 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
             style={({ pressed }) => [styles.iconBtn, pressed && styles.btnPressed]}
             hitSlop={12}
           >
-            <Text style={styles.iconBtnText}>🔄</Text>
+            <RestartIcon size={18} color="#E2E8F0" />
           </Pressable>
         </View>
 
-        {/* 2. SUB-BAR: MOVE COUNTER & ACTIVE HINT NOTICE */}
         {/* 2. SUB-BAR: MOVE COUNTER, PROGRESS & HINT NOTICE */}
         <View style={styles.subBar}>
           <View style={styles.movesPill}>
@@ -704,9 +718,8 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
 
           {activeHint && (
             <View style={styles.hintNoticePill}>
-              <Text style={styles.hintNoticeText}>
-                💡 Tap highlighted tube!
-              </Text>
+              <BulbHintIcon size={13} color="#00CFFF" active />
+              <Text style={styles.hintNoticeText}>Tap highlighted tube!</Text>
             </View>
           )}
         </View>
@@ -839,10 +852,15 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               onPress={() => setShowVictory(true)}
               style={styles.completedFloatingBanner}
             >
-              <Text style={styles.completedBannerEmoji}>🎉</Text>
+              <View style={styles.completedBannerIconWrap}>
+                <TrophyIcon size={22} />
+              </View>
               <View style={styles.completedBannerTextBox}>
                 <Text style={styles.completedBannerTitle}>LEVEL {currentLevel} COMPLETED!</Text>
-                <Text style={styles.completedBannerSub}>Tap to view rewards or press Next below ➔</Text>
+                <View style={styles.completedBannerSubRow}>
+                  <Text style={styles.completedBannerSub}>Tap to view rewards or press Next below</Text>
+                  <ArrowRightIcon size={11} color="#94A3B8" />
+                </View>
               </View>
             </Pressable>
           )}
@@ -861,7 +879,8 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
                 end={{ x: 1, y: 0 }}
                 style={styles.nextLevelMainGradient}
               >
-                <Text style={styles.nextLevelMainBtnText}>NEXT LEVEL {currentLevel + 1} ➔</Text>
+                <Text style={styles.nextLevelMainBtnText}>NEXT LEVEL {currentLevel + 1}</Text>
+                <ArrowRightIcon size={17} color="#FFFFFF" />
               </LinearGradient>
             </Pressable>
 
@@ -870,7 +889,7 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               style={({ pressed }) => [styles.replaySmallBtn, pressed && styles.btnPressed]}
               hitSlop={8}
             >
-              <Text style={styles.replaySmallText}>↺</Text>
+              <RestartIcon size={20} color="#E2E8F0" />
             </Pressable>
           </View>
         ) : (
@@ -886,7 +905,7 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               ]}
             >
               <View style={styles.toolIconWrap}>
-                <Text style={styles.toolIcon}>↩️</Text>
+                <UndoIcon size={20} color={undoStack.length === 0 ? '#64748B' : '#E2E8F0'} />
                 {undoStack.length > 0 && (
                   <View style={styles.undoBadge}>
                     <Text style={styles.undoBadgeText}>{undoStack.length}</Text>
@@ -902,7 +921,11 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
             >
               <View style={[styles.toolIconWrap, activeHint && styles.toolIconWrapActive]}>
-                <Text style={styles.toolIcon}>💡</Text>
+                <BulbHintIcon
+                  size={20}
+                  color={activeHint ? '#00CFFF' : '#FBBF24'}
+                  active={!!activeHint}
+                />
               </View>
               <Text style={[styles.toolLabel, activeHint && styles.toolLabelActive]}>HINT</Text>
             </Pressable>
@@ -918,9 +941,12 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               ]}
             >
               <View style={styles.toolIconWrap}>
-                <Text style={styles.toolIcon}>🧪</Text>
+                <TestTubeIcon
+                  size={20}
+                  color={addedExtraTube || tubes.length >= 14 ? '#64748B' : '#38BDF8'}
+                />
                 <View style={styles.plusBadge}>
-                  <Text style={styles.plusBadgeText}>+</Text>
+                  <PlusIcon size={9} color="#0A0E1F" />
                 </View>
               </View>
               <Text style={styles.toolLabel}>+TUBE</Text>
@@ -932,7 +958,7 @@ export const EndlessRunnerGame: React.FC<ColorBloomSortProps> = ({
               style={({ pressed }) => [styles.toolBtn, pressed && styles.btnPressed]}
             >
               <View style={styles.toolIconWrap}>
-                <Text style={styles.toolIcon}>🎨</Text>
+                <PaletteIcon size={21} color="#E2E8F0" />
               </View>
               <Text style={styles.toolLabel}>THEMES</Text>
             </Pressable>
@@ -1019,11 +1045,6 @@ const styles = StyleSheet.create({
     opacity: 0.7,
     transform: [{ scale: 0.94 }],
   },
-  iconBtnText: {
-    fontSize: 18,
-    color: '#E2E8F0',
-    fontWeight: '700',
-  },
   levelBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1034,9 +1055,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(0, 207, 255, 0.35)',
     gap: 6,
-  },
-  levelBadgeEmoji: {
-    fontSize: 16,
   },
   levelBadgeText: {
     fontSize: 13,
@@ -1054,9 +1072,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(251, 191, 36, 0.35)',
     gap: 5,
-  },
-  coinEmoji: {
-    fontSize: 14,
   },
   coinText: {
     fontSize: 13,
@@ -1130,6 +1145,9 @@ const styles = StyleSheet.create({
     color: '#34D399',
   },
   hintNoticePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: 'rgba(0, 207, 255, 0.2)',
     paddingHorizontal: 10,
     paddingVertical: 3,
@@ -1254,10 +1272,6 @@ const styles = StyleSheet.create({
   disabledToolBtn: {
     opacity: 0.35,
   },
-  toolIcon: {
-    fontSize: 20,
-    marginBottom: 2,
-  },
   toolLabel: {
     fontSize: 9,
     fontWeight: '800',
@@ -1294,14 +1308,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  plusBadgeText: {
-    fontSize: 10,
-    fontWeight: '900',
-    color: '#0A0E1F',
-  },
 
   // Completed Level Header Action
   headerNextBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: '#00CFFF',
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -1334,8 +1346,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  completedBannerEmoji: {
-    fontSize: 22,
+  completedBannerIconWrap: {
     marginRight: 10,
   },
   completedBannerTextBox: {
@@ -1346,6 +1357,11 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#00CFFF',
     letterSpacing: 0.5,
+  },
+  completedBannerSubRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   completedBannerSub: {
     fontSize: 10,
@@ -1373,6 +1389,8 @@ const styles = StyleSheet.create({
   },
   nextLevelMainGradient: {
     flex: 1,
+    flexDirection: 'row',
+    gap: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1391,9 +1409,5 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.16)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  replaySmallText: {
-    fontSize: 20,
-    color: '#E2E8F0',
   },
 });
