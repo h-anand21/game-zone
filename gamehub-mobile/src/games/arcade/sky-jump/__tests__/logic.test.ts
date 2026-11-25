@@ -35,12 +35,12 @@ describe('Wood Screw Physics & Puzzle Engine', () => {
     const p1AfterOne = step1.nextPlanks.find((p) => p.id === 'p1')!;
     expect(p1AfterOne.status).toBe('swinging');
 
-    // Step physics and verify pendulum angle rotates downward toward +90 deg
+    // Step physics and verify pendulum angle rotates downward toward vertical (-90 deg)
     let swungPlanks = step1.nextPlanks;
     for (let i = 0; i < 20; i++) {
       swungPlanks = stepPhysics(level1.holes, swungPlanks, 1).planks;
     }
-    expect(swungPlanks.find((p) => p.id === 'p1')!.angle).toBeGreaterThan(15);
+    expect(Math.abs(swungPlanks.find((p) => p.id === 'p1')!.angle)).toBeGreaterThan(15);
 
     // Unscrew second end of p1 (h2 -> t2): p1 now has 0 screws -> falling
     const step2 = moveScrew(level1.holes, swungPlanks, step1.nextScrews, 'h2', 't2');

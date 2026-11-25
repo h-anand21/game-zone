@@ -426,18 +426,20 @@ export function hasAnyValidMove(
 }
 
 /**
- * Lightweight bounded BFS/DFS solver used to verify level solvability.
+ * Bounded priority best-first solver used to verify level solvability.
  * Returns true if the level can clear all planks within `maxVisited` states.
  */
 export function isLevelSolvableFast(
   holes: BoardHole[],
   initialPlanks: WoodPlank[],
   initialScrews: ScrewItem[],
-  maxVisited = 900
+  maxVisited = 1500
 ): boolean {
   interface Node {
     planks: WoodPlank[];
     screws: ScrewItem[];
+    score: number;
+    depth: number;
   }
 
   const serialize = (planks: WoodPlank[], screws: ScrewItem[]) => {
@@ -446,8 +448,8 @@ export function isLevelSolvableFast(
       .sort()
       .join(',');
     const activePlankKeys = planks
-      .map((p) => `${p.id}:${p.status === 'falling' || p.status === 'cleared' ? 'X' : Math.round(p.angle / 15)}`)
-      .join('|');
+      .map((p) => `${p.status === 'falling' || p.status === 'cleared' ? 'X' : Math.round(p.angle / 30)}`)
+      .join('');
     return `${screwKeys}#${activePlankKeys}`;
   };
 
@@ -455,14 +457,16 @@ export function isLevelSolvableFast(
   if (isAllPlanksDetached(settledInit)) return true;
 
   const visited = new Set<string>();
-  const queue: Node[] = [{ planks: settledInit, screws: cloneScrews(initialScrews) }];
+  const pq: Node[] = [{ planks: settledInit, screws: cloneScrews(initialScrews), score: 0, depth: 0 }];
   visited.add(serialize(settledInit, initialScrews));
 
-  while (queue.length > 0 && visited.size < maxVisited) {
-    const curr = queue.shift()!;
-
-    // Score candidate moves to prioritize dropping/swinging planks first (greedy best-first feel)
-    const candidates: { from: string; to: string; nextPlanks: WoodPlank[]; nextScrews: ScrewItem[]; score: number }[] = [];
+  while (pq.length > 0 && visited.size < maxVisited) {
+    // Pick highest-priority candidate state
+    let bestIdx = 0;
+    for (let i = 1; i < pq.length; i++) {
+      if (pq[i].score > pq[bestIdx].score) bestIdx = i;
+    }
+    const curr = pq.splice(bestIdx, 1)[0];
 
     for (const screw of curr.screws) {
       for (const hole of holes) {
@@ -482,27 +486,19 @@ export function isLevelSolvableFast(
         }
         const key = serialize(settled, nextScrews);
         if (!visited.has(key)) {
-          const score =
-            getDetachedPlankCount(settled) * 10 +
-            settled.filter((p) => p.status === 'swinging').length * 3;
-          candidates.push({
-            from: screw.holeId,
-            to: hole.id,
-            nextPlanks: settled,
-            nextScrews,
+          visited.add(key);
+          const detached = getDetachedPlankCount(settled);
+          const swinging = settled.filter((p) => p.status === 'swinging').length;
+          const emptyCount = holes.filter((hh) => !nextScrews.some((ns) => ns.holeId === hh.id)).length;
+          const score = detached * 50 + emptyCount * 5 + swinging * 4 - curr.depth * 2;
+          pq.push({
+            planks: settled,
+            screws: nextScrews,
             score,
+            depth: curr.depth + 1,
           });
+          if (visited.size >= maxVisited) return false;
         }
-      }
-    }
-
-    candidates.sort((a, b) => b.score - a.score);
-    for (const cand of candidates.slice(0, 8)) {
-      const key = serialize(cand.nextPlanks, cand.nextScrews);
-      if (!visited.has(key)) {
-        visited.add(key);
-        queue.push({ planks: cand.nextPlanks, screws: cand.nextScrews });
-        if (visited.size >= maxVisited) break;
       }
     }
   }

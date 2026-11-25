@@ -237,27 +237,27 @@ function createLevel4(): WoodLevelData {
 
 /**
  * Level 5 — Symmetrical Green Pine Tree (matches Uploaded Image 1!)
+ * Two vertical trunk bars meet cleanly so every single bar uses 2 pins and is solvable with 2 empty holes!
  */
 function createLevel5(): WoodLevelData {
   const holes: BoardHole[] = [
     { id: 't1', x: 64, y: 44 },
     { id: 't2', x: 256, y: 44 },
-    // Central trunk line
+    // Central trunk line (upper bar: c0-c1, lower bar: c2-c3)
     { id: 'c0', x: 160, y: 108 },
-    { id: 'c1', x: 160, y: 170 },
-    { id: 'c2', x: 160, y: 232 },
-    { id: 'c3', x: 160, y: 294 },
-    { id: 'c4', x: 160, y: 356 },
+    { id: 'c1', x: 160, y: 176 },
+    { id: 'c2', x: 160, y: 248 },
+    { id: 'c3', x: 160, y: 316 },
     // Left branch tips
-    { id: 'l1', x: 112, y: 156 },
-    { id: 'l2', x: 92, y: 220 },
-    { id: 'l3', x: 72, y: 286 },
-    { id: 'l4', x: 54, y: 356 },
+    { id: 'l1', x: 112, y: 158 },
+    { id: 'l2', x: 92, y: 224 },
+    { id: 'l3', x: 72, y: 294 },
+    { id: 'l4', x: 54, y: 362 },
     // Right branch tips
-    { id: 'r1', x: 208, y: 156 },
-    { id: 'r2', x: 228, y: 220 },
-    { id: 'r3', x: 248, y: 286 },
-    { id: 'r4', x: 266, y: 356 },
+    { id: 'r1', x: 208, y: 158 },
+    { id: 'r2', x: 228, y: 224 },
+    { id: 'r3', x: 248, y: 294 },
+    { id: 'r4', x: 266, y: 362 },
   ];
 
   const planks: PlankSpec[] = [
@@ -270,8 +270,9 @@ function createLevel5(): WoodLevelData {
     { id: 'p_r3', color: 'green', layer: 2, holeIds: ['c2', 'r3'], thickness: 22 },
     { id: 'p_l4', color: 'green', layer: 3, holeIds: ['c3', 'l4'], thickness: 22 },
     { id: 'p_r4', color: 'green', layer: 3, holeIds: ['c3', 'r4'], thickness: 22 },
-    // Central vertical spine
-    { id: 'p_trunk', color: 'green', layer: 4, holeIds: ['c0', 'c1', 'c2', 'c3', 'c4'], thickness: 22 },
+    // Split central vertical spine (matches Image 1 seam and stays solvable with 2 empty holes!)
+    { id: 'p_trunk_top', color: 'green', layer: 4, holeIds: ['c0', 'c1'], thickness: 22 },
+    { id: 'p_trunk_bot', color: 'green', layer: 4, holeIds: ['c2', 'c3'], thickness: 22 },
   ];
 
   return buildLevel(5, 'Pine Tree', 180, holes, planks, new Set(['t1', 't2']));
