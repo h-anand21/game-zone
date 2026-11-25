@@ -99,21 +99,21 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
                 style={styles.closeModalBtn}
                 hitSlop={12}
               >
-                <Text style={styles.closeModalBtnText}>✕</Text>
+                <CloseIcon size={15} color="#94A3B8" />
               </Pressable>
             )}
 
             {/* Top Glow Trophy Banner */}
             <View style={styles.bannerBadge}>
-              <Text style={styles.bannerEmoji}>🎉</Text>
+              <TrophyIcon size={17} />
               <Text style={styles.bannerText}>LEVEL {level} SOLVED!</Text>
             </View>
 
             {/* Stars Row */}
             <View style={styles.starsRow}>
-              <Text style={[styles.star, stars >= 1 ? styles.starFilled : styles.starDim]}>⭐</Text>
-              <Text style={[styles.star, styles.starCenter, stars >= 2 ? styles.starFilled : styles.starDim]}>⭐</Text>
-              <Text style={[styles.star, stars >= 3 ? styles.starFilled : styles.starDim]}>⭐</Text>
+              <StarIcon size={32} filled={stars >= 1} />
+              <StarIcon size={42} filled={stars >= 2} style={styles.starCenter} />
+              <StarIcon size={32} filled={stars >= 3} />
             </View>
 
             <Text style={styles.subtitle}>All colors beautifully bloomed!</Text>
@@ -129,7 +129,10 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
 
               <View style={styles.statBox}>
                 <Text style={styles.statLabel}>REWARD</Text>
-                <Text style={[styles.statValue, { color: '#FBBF24' }]}>+{coinsEarned} 🪙</Text>
+                <View style={styles.rewardValueRow}>
+                  <Text style={[styles.statValue, { color: '#FBBF24' }]}>+{coinsEarned}</Text>
+                  <CoinIcon size={19} />
+                </View>
               </View>
             </View>
 
@@ -147,7 +150,10 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
                 end={{ x: 1, y: 1 }}
                 style={styles.btnGradient}
               >
-                <Text style={styles.primaryBtnText}>NEXT LEVEL ➔</Text>
+                <View style={styles.btnContentRow}>
+                  <Text style={styles.primaryBtnText}>NEXT LEVEL</Text>
+                  <ArrowRightIcon size={16} color="#FFFFFF" />
+                </View>
               </LinearGradient>
             </Pressable>
 
@@ -160,7 +166,10 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
                   pressed && { opacity: 0.8 },
                 ]}
               >
-                <Text style={styles.secondaryBtnText}>🔄 REPLAY</Text>
+                <View style={styles.secondaryBtnRow}>
+                  <RestartIcon size={14} color="#E2E8F0" />
+                  <Text style={styles.secondaryBtnText}>REPLAY</Text>
+                </View>
               </Pressable>
 
               {onExit && (
@@ -171,7 +180,10 @@ export const VictoryModal: React.FC<VictoryModalProps> = ({
                     pressed && { opacity: 0.8 },
                   ]}
                 >
-                  <Text style={styles.secondaryBtnText}>🚪 MENU</Text>
+                  <View style={styles.secondaryBtnRow}>
+                    <MenuGridIcon size={14} color="#E2E8F0" />
+                    <Text style={styles.secondaryBtnText}>MENU</Text>
+                  </View>
                 </Pressable>
               )}
             </View>
@@ -219,9 +231,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     gap: 6,
   },
-  bannerEmoji: {
-    fontSize: 16,
-  },
   bannerText: {
     fontSize: 13,
     fontWeight: '900',
@@ -232,21 +241,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
-    marginVertical: 6,
-  },
-  star: {
-    fontSize: 32,
+    gap: 12,
+    marginVertical: 8,
   },
   starCenter: {
-    fontSize: 42,
-    marginBottom: 6,
-  },
-  starFilled: {
-    opacity: 1,
-  },
-  starDim: {
-    opacity: 0.2,
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 12,
@@ -286,6 +285,11 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     color: '#FFFFFF',
   },
+  rewardValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
   primaryBtn: {
     width: '100%',
     height: 48,
@@ -297,6 +301,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  btnContentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   primaryBtnText: {
     fontSize: 15,
@@ -319,6 +328,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  secondaryBtnRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   secondaryBtnText: {
     fontSize: 12,
     fontWeight: '800',
@@ -338,10 +352,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.15)',
     zIndex: 10,
-  },
-  closeModalBtnText: {
-    fontSize: 15,
-    color: '#94A3B8',
-    fontWeight: '800',
   },
 });
