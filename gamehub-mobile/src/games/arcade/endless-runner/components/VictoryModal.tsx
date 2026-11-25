@@ -6,6 +6,15 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Modal, Pressable, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import {
+  ArrowRightIcon,
+  CloseIcon,
+  CoinIcon,
+  MenuGridIcon,
+  RestartIcon,
+  StarIcon,
+  TrophyIcon,
+} from './GameIcons';
 
 interface VictoryModalProps {
   visible: boolean;

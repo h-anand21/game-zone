@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Modal, Pressable, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { THEMES } from '../colors';
+import { CheckIcon, CloseIcon, CoinIcon, PaletteIcon } from './GameIcons';
 import type { ThemeId, ThemeConfig } from '../types';
 
 interface ThemeShopModalProps {
@@ -42,12 +43,18 @@ export const ThemeShopModal: React.FC<ThemeShopModalProps> = ({
           {/* Header */}
           <View style={styles.header}>
             <View>
-              <Text style={styles.title}>THEME GALLERY</Text>
-              <Text style={styles.balanceText}>Balance: {coins} 🪙</Text>
+              <View style={styles.titleRow}>
+                <PaletteIcon size={18} color="#00CFFF" />
+                <Text style={styles.title}>THEME GALLERY</Text>
+              </View>
+              <View style={styles.balanceRow}>
+                <CoinIcon size={14} />
+                <Text style={styles.balanceText}>Balance: {coins}</Text>
+              </View>
             </View>
 
             <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={12}>
-              <Text style={styles.closeText}>✕</Text>
+              <CloseIcon size={15} color="#94A3B8" />
             </Pressable>
           </View>
 
@@ -83,6 +90,7 @@ export const ThemeShopModal: React.FC<ThemeShopModalProps> = ({
                     {/* Action Button */}
                     {isSelected ? (
                       <View style={styles.activeBadge}>
+                        <CheckIcon size={12} color="#00CFFF" />
                         <Text style={styles.activeText}>EQUIPPED</Text>
                       </View>
                     ) : isUnlocked ? (
@@ -98,7 +106,8 @@ export const ThemeShopModal: React.FC<ThemeShopModalProps> = ({
                         disabled={!canAfford}
                         style={[styles.buyBtn, !canAfford && styles.disabledBuyBtn]}
                       >
-                        <Text style={styles.buyBtnText}>{t.price} 🪙</Text>
+                        <CoinIcon size={13} />
+                        <Text style={styles.buyBtnText}>{t.price}</Text>
                       </Pressable>
                     )}
                   </LinearGradient>
@@ -143,17 +152,27 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   title: {
     fontSize: 18,
     fontWeight: '900',
     color: '#F8FAFC',
     letterSpacing: 1,
   },
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    marginTop: 4,
+  },
   balanceText: {
     fontSize: 12,
     fontWeight: '700',
     color: '#FBBF24',
-    marginTop: 2,
   },
   closeBtn: {
     width: 32,
@@ -162,11 +181,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  closeText: {
-    fontSize: 14,
-    color: '#94A3B8',
-    fontWeight: '900',
   },
   list: {
     gap: 12,
@@ -212,6 +226,9 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   activeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     backgroundColor: 'rgba(0, 207, 255, 0.2)',
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -240,8 +257,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
   buyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
     backgroundColor: '#F59E0B',
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 10,
   },
