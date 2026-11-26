@@ -84,7 +84,23 @@ describe('Wood Screw Physics & Puzzle Engine', () => {
       expect(data.levelNumber).toBe(lvl);
       expect(data.planks.length).toBeGreaterThanOrEqual(4);
       expect(data.screws.length).toBeGreaterThanOrEqual(4);
+      expect(data.timeLimitSeconds).toBeGreaterThanOrEqual(45);
+      expect(data.timeLimitSeconds).toBeLessThanOrEqual(150);
       expect(isLevelSolvableFast(data.holes, data.planks, data.screws, 1500)).toBe(true);
     }
+  });
+
+  it('scales timer limits smoothly according to level difficulty', () => {
+    const l1 = generateWoodScrewLevel(1);
+    const l2 = generateWoodScrewLevel(2);
+    const l5 = generateWoodScrewLevel(5);
+    const l7 = generateWoodScrewLevel(7);
+    const l10 = generateWoodScrewLevel(10);
+
+    expect(l1.timeLimitSeconds).toBe(45);
+    expect(l2.timeLimitSeconds).toBe(60);
+    expect(l1.timeLimitSeconds).toBeLessThan(l5.timeLimitSeconds);
+    expect(l5.timeLimitSeconds).toBeLessThan(l7.timeLimitSeconds);
+    expect(l10.timeLimitSeconds).toBeLessThanOrEqual(140);
   });
 });

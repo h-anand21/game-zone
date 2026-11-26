@@ -170,7 +170,7 @@ function createLevel1(): WoodLevelData {
     { id: 'p1', color: 'amber', layer: 0, holeIds: ['h1', 'h2'] },
     { id: 'p2', color: 'green', layer: 1, holeIds: ['h3', 'h4'] },
   ];
-  return buildLevel(1, 'Wood Basics', 180, holes, planks, new Set(['t1', 't2']));
+  return buildLevel(1, 'Wood Basics', 45, holes, planks, new Set(['t1', 't2']));
 }
 
 function createLevel2(): WoodLevelData {
@@ -188,7 +188,7 @@ function createLevel2(): WoodLevelData {
     { id: 'p2', color: 'amber', layer: 1, holeIds: ['h1', 'h3', 'h5'] },
     { id: 'p3', color: 'sienna', layer: 2, holeIds: ['h2', 'h3', 'h4'] },
   ];
-  return buildLevel(2, 'Cross Lock', 180, holes, planks, new Set(['t1', 't2']));
+  return buildLevel(2, 'Cross Lock', 60, holes, planks, new Set(['t1', 't2']));
 }
 
 function createLevel3(): WoodLevelData {
@@ -209,7 +209,7 @@ function createLevel3(): WoodLevelData {
     { id: 'p4', color: 'amber', layer: 1, holeIds: ['h3', 'h4'] },
     { id: 'p5', color: 'sienna', layer: 2, holeIds: ['h5', 'h6'] },
   ];
-  return buildLevel(3, 'Twin Gate', 190, holes, planks, new Set(['t1', 't2']));
+  return buildLevel(3, 'Twin Gate', 75, holes, planks, new Set(['t1', 't2']));
 }
 
 function createLevel4(): WoodLevelData {
@@ -232,7 +232,7 @@ function createLevel4(): WoodLevelData {
     { id: 'p5', color: 'green', layer: 2, holeIds: ['r1', 'r2'] },
     { id: 'p6', color: 'walnut', layer: 3, holeIds: ['l2', 'r2'] },
   ];
-  return buildLevel(4, 'Timber Crown', 195, holes, planks, new Set(['t1', 't2', 't3']));
+  return buildLevel(4, 'Timber Crown', 85, holes, planks, new Set(['t1', 't2', 't3']));
 }
 
 /**
@@ -275,7 +275,7 @@ function createLevel5(): WoodLevelData {
     { id: 'p_trunk_bot', color: 'green', layer: 4, holeIds: ['c2', 'c3'], thickness: 22 },
   ];
 
-  return buildLevel(5, 'Pine Tree', 180, holes, planks, new Set(['t1', 't2']));
+  return buildLevel(5, 'Pine Tree', 105, holes, planks, new Set(['t1', 't2']));
 }
 
 function createLevel6(): WoodLevelData {
@@ -300,7 +300,7 @@ function createLevel6(): WoodLevelData {
     { id: 'p7', color: 'green', layer: 3, holeIds: ['ul', 'lr'] },
     { id: 'p8', color: 'caramel', layer: 4, holeIds: ['ur', 'll'] },
   ];
-  return buildLevel(6, 'Timber Hexagon', 200, holes, planks, new Set(['t1', 't2', 't3']));
+  return buildLevel(6, 'Timber Hexagon', 110, holes, planks, new Set(['t1', 't2', 't3']));
 }
 
 /**
@@ -355,7 +355,7 @@ function createLevel7(): WoodLevelData {
     { id: 'p_a_front', color: 'amber', layer: 4, holeIds: ['sr', 'bot_l'], thickness: 22 },
   ];
 
-  return buildLevel(7, 'Cedar Lattice', 210, holes, planks, new Set(['t1', 't2', 't3']));
+  return buildLevel(7, 'Cedar Lattice', 130, holes, planks, new Set(['t1', 't2', 't3']));
 }
 
 function createLevel8(): WoodLevelData {
@@ -381,7 +381,7 @@ function createLevel8(): WoodLevelData {
     { id: 'p5', color: 'sienna', layer: 2, holeIds: ['h2', 'h5', 'h8'] },
     { id: 'p6', color: 'caramel', layer: 3, holeIds: ['h4', 'h5', 'h6'] },
   ];
-  return buildLevel(8, 'Master Grid', 210, holes, planks, new Set(['t1', 't2', 't3']));
+  return buildLevel(8, 'Master Grid', 120, holes, planks, new Set(['t1', 't2', 't3']));
 }
 
 function createLevel9(): WoodLevelData {
@@ -403,7 +403,7 @@ function createLevel9(): WoodLevelData {
     { id: 'p5', color: 'walnut', layer: 3, holeIds: ['a1', 'a2'] },
     { id: 'p6', color: 'caramel', layer: 3, holeIds: ['b1', 'b2'] },
   ];
-  return buildLevel(9, 'Butterfly Wings', 200, holes, planks, new Set(['t1', 't2', 't3']));
+  return buildLevel(9, 'Butterfly Wings', 110, holes, planks, new Set(['t1', 't2', 't3']));
 }
 
 function createLevel10(): WoodLevelData {
@@ -430,7 +430,7 @@ function createLevel10(): WoodLevelData {
     { id: 'p8', color: 'sienna', layer: 4, holeIds: ['p_l2', 'p_bot'] },
     { id: 'p9', color: 'amber', layer: 4, holeIds: ['p_r2', 'p_bot'] },
   ];
-  return buildLevel(10, 'Twin Diamond', 220, holes, planks, new Set(['t1', 't2', 't3']));
+  return buildLevel(10, 'Twin Diamond', 140, holes, planks, new Set(['t1', 't2', 't3']));
 }
 
 const HANDCRAFTED_FACTORIES: Record<number, () => WoodLevelData> = {
@@ -509,6 +509,21 @@ const TITLES = [
   'Walnut Frame',
 ];
 
+/**
+ * Computes responsive time budget based on level progression, plank count, and screw count.
+ * Easy levels get brisk 45–85s limits; complex/higher levels scale fairly without feeling bloated.
+ */
+export function computeLevelTimeLimit(
+  levelNumber: number,
+  plankCount: number,
+  screwCount: number
+): number {
+  const baseByComplexity = 30 + plankCount * 7 + screwCount * 2;
+  const speedPressure = Math.min(35, Math.floor(Math.max(0, levelNumber - 10) / 12) * 3);
+  const floorBySize = 45 + plankCount * 4;
+  return Math.max(floorBySize, Math.min(150, baseByComplexity - speedPressure));
+}
+
 function generateProceduralLevel(levelNumber: number): WoodLevelData {
   const stagingHoles: BoardHole[] = [
     { id: 't1', x: 70, y: 46 },
@@ -521,7 +536,6 @@ function generateProceduralLevel(levelNumber: number): WoodLevelData {
   const emptyIds = new Set(['t1', 't2', 't3']);
 
   const targetPlankCount = Math.min(9, 5 + Math.floor((levelNumber - 11) / 8));
-  const timeLimit = Math.max(150, 210 - Math.floor((levelNumber - 11) / 15) * 5);
 
   for (let attempt = 0; attempt < 24; attempt++) {
     const prng = new SeededPRNG(levelNumber * 104729 + attempt * 7919 + 31);
@@ -559,10 +573,15 @@ function generateProceduralLevel(levelNumber: number): WoodLevelData {
     const candidate = buildLevel(
       levelNumber,
       TITLES[levelNumber % TITLES.length],
-      timeLimit,
+      100,
       levelHoles,
       specs,
       emptyIds
+    );
+    candidate.timeLimitSeconds = computeLevelTimeLimit(
+      levelNumber,
+      candidate.planks.length,
+      candidate.screws.length
     );
 
     if (isLevelSolvableFast(candidate.holes, candidate.planks, candidate.screws, 750)) {
@@ -576,7 +595,11 @@ function generateProceduralLevel(levelNumber: number): WoodLevelData {
     ...fallback,
     levelNumber,
     title: TITLES[levelNumber % TITLES.length],
-    timeLimitSeconds: timeLimit,
+    timeLimitSeconds: computeLevelTimeLimit(
+      levelNumber,
+      fallback.planks.length,
+      fallback.screws.length
+    ),
   };
 }
 
