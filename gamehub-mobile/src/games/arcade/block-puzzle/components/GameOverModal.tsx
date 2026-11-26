@@ -1,10 +1,12 @@
 // ============================================================
-// Block Blast — Game Over Modal Dialog
+// Block Puzzle — Carved Wooden Game Over Modal Dialog
 // ============================================================
 
 import React from 'react';
 import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { WOOD_PALETTE } from './woodTheme';
+import { CrownScoreIcon, LevelsGridIcon, ReplayWoodIcon } from './WoodBlockIcons';
 
 interface GameOverModalProps {
   visible: boolean;
@@ -44,23 +46,24 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
     >
       <View style={styles.overlay}>
         <LinearGradient
-          colors={['#16233B', '#0A1220']}
+          colors={WOOD_PALETTE.modalCardGradient}
           style={styles.modalCard}
         >
           {/* Header */}
           <Text style={styles.titleText}>
-            {isLevelMode ? `LEVEL ${level} FAILED` : 'NO MORE MOVES!'}
+            {isLevelMode ? `LEVEL ${level} FAILED` : 'NO MORE MOVES'}
           </Text>
           <Text style={styles.subText}>
             {isLevelMode
               ? `Cleared ${linesCleared} of ${levelTarget || 0} target lines`
-              : 'The board is out of space'}
+              : 'The wooden tray is out of space'}
           </Text>
 
           {/* New Record Badge */}
           {isNewRecord && (
             <View style={styles.recordBadge}>
-              <Text style={styles.recordBadgeText}>👑 NEW HIGH SCORE! 👑</Text>
+              <CrownScoreIcon size={15} />
+              <Text style={styles.recordBadgeText}>NEW HIGH SCORE</Text>
             </View>
           )}
 
@@ -98,11 +101,12 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
               ]}
             >
               <LinearGradient
-                colors={['#FFE57F', '#FFD600', '#FF9100']}
+                colors={WOOD_PALETTE.goldCtaGradient}
                 start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+                end={{ x: 0, y: 1 }}
                 style={styles.btnGradient}
               >
+                <ReplayWoodIcon size={17} color={WOOD_PALETTE.goldCtaText} />
                 <Text style={styles.restartBtnText}>
                   {isLevelMode ? 'RETRY LEVEL' : 'PLAY AGAIN'}
                 </Text>
@@ -113,12 +117,12 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
               <Pressable
                 onPress={onLevelSelect}
                 style={({ pressed }) => [
-                  styles.exitButton,
-                  { backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.15)' },
+                  styles.levelSelectBtn,
                   pressed && { opacity: 0.8 },
                 ]}
               >
-                <Text style={[styles.exitBtnText, { color: '#00E5FF' }]}>📋 CHOOSE LEVEL</Text>
+                <LevelsGridIcon size={15} color={WOOD_PALETTE.textGold} />
+                <Text style={styles.levelSelectBtnText}>CHOOSE LEVEL</Text>
               </Pressable>
             )}
 
@@ -143,65 +147,68 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(3, 7, 14, 0.85)',
+    backgroundColor: WOOD_PALETTE.modalOverlay,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
   },
   modalCard: {
     width: '100%',
-    maxWidth: 340,
+    maxWidth: 344,
     borderRadius: 24,
     padding: 24,
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#243C60',
-    shadowColor: '#00E5FF',
+    borderWidth: 2.5,
+    borderColor: WOOD_PALETTE.modalBorder,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.45,
     shadowRadius: 16,
     elevation: 12,
   },
   titleText: {
     fontSize: 22,
     fontWeight: '900',
-    color: '#FF5252',
-    letterSpacing: 1.5,
+    color: WOOD_PALETTE.dangerText,
+    letterSpacing: 1.4,
   },
   subText: {
     fontSize: 12,
-    color: '#8CA0B8',
+    color: WOOD_PALETTE.textCream,
     marginTop: 4,
   },
   recordBadge: {
-    backgroundColor: 'rgba(255, 214, 0, 0.15)',
-    borderColor: '#FFD600',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: WOOD_PALETTE.pillDarkBg,
+    borderColor: WOOD_PALETTE.comboBorderGlow,
     borderWidth: 1.5,
     borderRadius: 16,
     paddingHorizontal: 14,
-    paddingVertical: 4,
+    paddingVertical: 5,
     marginTop: 12,
   },
   recordBadgeText: {
-    color: '#FFE082',
+    color: WOOD_PALETTE.textGold,
     fontSize: 12,
     fontWeight: '900',
     letterSpacing: 1,
   },
   scoreContainer: {
-    marginVertical: 18,
+    marginVertical: 16,
     alignItems: 'center',
   },
   scoreLabel: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#8CA0B8',
+    color: WOOD_PALETTE.textMuted,
     letterSpacing: 1.2,
   },
   scoreValue: {
-    fontSize: 44,
+    fontSize: 42,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: WOOD_PALETTE.textLight,
     letterSpacing: 1,
     marginTop: 2,
   },
@@ -210,12 +217,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    backgroundColor: 'rgba(8, 15, 26, 0.6)',
+    backgroundColor: WOOD_PALETTE.pillDarkBg,
     borderRadius: 16,
     paddingVertical: 12,
     paddingHorizontal: 8,
-    borderWidth: 1,
-    borderColor: '#182B46',
+    borderWidth: 1.5,
+    borderColor: WOOD_PALETTE.pillDarkBorder,
     marginBottom: 20,
   },
   statBox: {
@@ -225,18 +232,18 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: 24,
-    backgroundColor: '#1E3554',
+    backgroundColor: 'rgba(255, 224, 163, 0.18)',
   },
   statLabel: {
     fontSize: 9,
-    color: '#8CA0B8',
+    color: WOOD_PALETTE.textMuted,
     fontWeight: '800',
     letterSpacing: 0.5,
   },
   statNumber: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#4DE7FF',
+    color: WOOD_PALETTE.textGold,
     marginTop: 3,
   },
   buttonCol: {
@@ -246,31 +253,47 @@ const styles = StyleSheet.create({
   restartButton: {
     width: '100%',
     height: 52,
-    borderRadius: 26,
+    borderRadius: 20,
     overflow: 'hidden',
-    shadowColor: '#FFD600',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 6,
+    borderWidth: 2,
+    borderColor: WOOD_PALETTE.goldCtaBorder,
   },
   btnGradient: {
     flex: 1,
+    flexDirection: 'row',
+    gap: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   restartBtnText: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#07111F',
+    color: WOOD_PALETTE.goldCtaText,
     letterSpacing: 1,
   },
+  levelSelectBtn: {
+    paddingVertical: 11,
+    backgroundColor: WOOD_PALETTE.pillDarkBg,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: WOOD_PALETTE.pillDarkBorder,
+    flexDirection: 'row',
+    gap: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  levelSelectBtnText: {
+    color: WOOD_PALETTE.textGold,
+    fontSize: 13,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
   exitButton: {
-    paddingVertical: 10,
+    paddingVertical: 8,
     alignItems: 'center',
   },
   exitBtnText: {
-    color: '#8CA0B8',
+    color: WOOD_PALETTE.textMuted,
     fontSize: 13,
     fontWeight: '700',
   },

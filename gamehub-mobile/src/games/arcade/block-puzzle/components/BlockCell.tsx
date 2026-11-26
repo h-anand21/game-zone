@@ -1,11 +1,13 @@
 // ============================================================
-// Block Blast — Compact 2.5D Jewel Block Cell Component
+// Block Puzzle — Carved Honey-Gold Woodblock Cell Component
+// Matches the 3D chamfered oak tiles & espresso tray recesses
 // ============================================================
 
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { JEWEL_COLORS } from '../shapes';
+import { WOOD_PALETTE } from './woodTheme';
 import type { BlockColor } from '../types';
 
 interface BlockCellProps {
@@ -14,21 +16,23 @@ interface BlockCellProps {
   colorKey?: BlockColor;
   isGhost?: boolean;
   isClearing?: boolean;
+  checkerAlt?: boolean;
   style?: ViewStyle;
 }
 
 export const BlockCell: React.FC<BlockCellProps> = ({
   size,
   filled = false,
-  colorKey = 'cyan',
+  colorKey = 'amber',
   isGhost = false,
   isClearing = false,
+  checkerAlt = false,
   style,
 }) => {
-  const theme = JEWEL_COLORS[colorKey] || JEWEL_COLORS.cyan;
-  const radius = Math.max(2, Math.floor(size * 0.18));
+  const theme = JEWEL_COLORS[colorKey] || JEWEL_COLORS.amber;
+  const radius = Math.max(2, Math.floor(size * 0.14));
 
-  // 1. Empty grooved slot
+  // 1. Recessed Dark Espresso Board Socket (Checkerboard Pattern)
   if (!filled && !isGhost) {
     return (
       <View
@@ -38,6 +42,7 @@ export const BlockCell: React.FC<BlockCellProps> = ({
             width: size,
             height: size,
             borderRadius: radius,
+            backgroundColor: checkerAlt ? WOOD_PALETTE.slotDark : WOOD_PALETTE.slotLight,
           },
           style,
         ]}
@@ -45,7 +50,7 @@ export const BlockCell: React.FC<BlockCellProps> = ({
     );
   }
 
-  // 2. Ghost Landing Shadow
+  // 2. Warm Golden Ghost Landing Preview
   if (isGhost) {
     return (
       <View
@@ -55,8 +60,6 @@ export const BlockCell: React.FC<BlockCellProps> = ({
             width: size,
             height: size,
             borderRadius: radius,
-            borderColor: theme.main,
-            backgroundColor: `${theme.main}2E`,
           },
           style,
         ]}
@@ -64,7 +67,9 @@ export const BlockCell: React.FC<BlockCellProps> = ({
     );
   }
 
-  // 3. Active 2.5D Jewel Cell
+  const bevelWidth = Math.max(1, Math.round(size * 0.08));
+
+  // 3. Carved 3D Honey-Gold Woodblock Tile with Subtle Horizontal Grain
   return (
     <View
       style={[
@@ -80,28 +85,45 @@ export const BlockCell: React.FC<BlockCellProps> = ({
       ]}
     >
       <LinearGradient
-        colors={theme.gradient}
-        start={{ x: 0.1, y: 0 }}
-        end={{ x: 0.9, y: 1 }}
+        colors={isClearing ? ['#FFF9D2', '#FDE047'] : theme.gradient}
+        start={{ x: 0.15, y: 0 }}
+        end={{ x: 0.85, y: 1 }}
         style={[
-          styles.cellGradient,
+          styles.cellFace,
           {
-            borderRadius: radius,
-            borderColor: theme.highlight,
+            borderRadius: Math.max(1.5, radius - 0.5),
+            borderTopWidth: bevelWidth,
+            borderLeftWidth: bevelWidth,
+            borderBottomWidth: bevelWidth,
+            borderRightWidth: bevelWidth,
+            borderTopColor: WOOD_PALETTE.tileHighlight,
+            borderLeftColor: WOOD_PALETTE.tileHighlight,
+            borderBottomColor: theme.shadow,
+            borderRightColor: theme.shadow,
           },
         ]}
       >
-        {/* Specular gloss shine at top left */}
+        {/* Subtle horizontal wood-grain fibers inside tile */}
         <View
           style={[
-            styles.specularShine,
-            {
-              width: size * 0.5,
-              height: size * 0.25,
-              borderRadius: radius * 0.7,
-            },
+            styles.grainLine,
+            { top: '28%', backgroundColor: WOOD_PALETTE.tileGrainLight },
           ]}
         />
+        <View
+          style={[
+            styles.grainLine,
+            { top: '56%', backgroundColor: WOOD_PALETTE.tileGrainDark },
+          ]}
+        />
+        {size >= 16 && (
+          <View
+            style={[
+              styles.grainLine,
+              { top: '76%', width: '68%', backgroundColor: WOOD_PALETTE.tileGrainLight },
+            ]}
+          />
+        )}
       </LinearGradient>
     </View>
   );
@@ -109,38 +131,39 @@ export const BlockCell: React.FC<BlockCellProps> = ({
 
 const styles = StyleSheet.create({
   emptySlot: {
-    backgroundColor: 'rgba(13, 23, 38, 0.7)',
-    borderWidth: 0.8,
-    borderColor: '#172B47',
+    borderWidth: 0.6,
+    borderColor: WOOD_PALETTE.slotBorder,
   },
   ghostSlot: {
     borderWidth: 1.5,
     borderStyle: 'dashed',
-    opacity: 0.6,
+    borderColor: WOOD_PALETTE.ghostBorder,
+    backgroundColor: WOOD_PALETTE.ghostFill,
   },
   cellWrapper: {
     overflow: 'hidden',
-    shadowColor: '#000',
+    borderWidth: 0.75,
+    borderColor: WOOD_PALETTE.tileSeam,
+    shadowColor: '#1E0D03',
     shadowOffset: { width: 0, height: 1.5 },
-    shadowOpacity: 0.35,
-    shadowRadius: 2,
+    shadowOpacity: 0.4,
+    shadowRadius: 1.5,
     elevation: 2,
-    paddingBottom: 1.5,
   },
-  cellGradient: {
+  cellFace: {
     flex: 1,
-    borderWidth: 0.8,
-    alignItems: 'center',
+    overflow: 'hidden',
     justifyContent: 'center',
   },
-  specularShine: {
+  grainLine: {
     position: 'absolute',
-    top: 1,
-    left: 1.5,
-    backgroundColor: 'rgba(255, 255, 255, 0.65)',
+    left: '8%',
+    width: '84%',
+    height: 1,
+    borderRadius: 1,
   },
   clearingCell: {
-    transform: [{ scale: 1.15 }],
-    opacity: 0.9,
+    transform: [{ scale: 1.08 }],
+    borderColor: '#FFFBEB',
   },
 });

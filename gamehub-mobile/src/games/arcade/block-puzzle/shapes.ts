@@ -4,63 +4,33 @@
 
 import type { BlockColor, ColorTheme, TetrominoShape, TetrominoType } from './types';
 
+const createWoodTone = (
+  name: BlockColor,
+  main: string,
+  topHex: string,
+  bottomHex: string,
+  shadow: string
+): ColorTheme => ({
+  name,
+  main,
+  gradient: [topHex, bottomHex],
+  shadow,
+  highlight: 'rgba(255, 245, 190, 0.85)',
+  glow: 'rgba(253, 224, 71, 0.6)',
+});
+
+/**
+ * Cohesive Honey-Gold Oak woodblock palette mapped onto existing BlockColor keys
+ * so levels, saves, and logic stay 100% compatible while every tile renders as carved gold wood.
+ */
 export const JEWEL_COLORS: Record<BlockColor, ColorTheme> = {
-  cyan: {
-    name: 'cyan',
-    main: '#00E5FF',
-    gradient: ['#80F3FF', '#0091EA'],
-    shadow: '#005FB8',
-    highlight: 'rgba(255, 255, 255, 0.65)',
-    glow: 'rgba(0, 229, 255, 0.5)',
-  },
-  amber: {
-    name: 'amber',
-    main: '#FFD600',
-    gradient: ['#FFE57F', '#FF9100'],
-    shadow: '#B26500',
-    highlight: 'rgba(255, 255, 255, 0.65)',
-    glow: 'rgba(255, 214, 0, 0.5)',
-  },
-  ruby: {
-    name: 'ruby',
-    main: '#FF2A55',
-    gradient: ['#FF708D', '#D50032'],
-    shadow: '#8C0020',
-    highlight: 'rgba(255, 255, 255, 0.65)',
-    glow: 'rgba(255, 42, 85, 0.5)',
-  },
-  green: {
-    name: 'green',
-    main: '#00E676',
-    gradient: ['#B9F6CA', '#00A344'],
-    shadow: '#00662A',
-    highlight: 'rgba(255, 255, 255, 0.65)',
-    glow: 'rgba(0, 230, 118, 0.5)',
-  },
-  purple: {
-    name: 'purple',
-    main: '#D500F9',
-    gradient: ['#EA80FC', '#8E24AA'],
-    shadow: '#59007A',
-    highlight: 'rgba(255, 255, 255, 0.65)',
-    glow: 'rgba(213, 0, 249, 0.5)',
-  },
-  orange: {
-    name: 'orange',
-    main: '#FF9100',
-    gradient: ['#FFB74D', '#E65100'],
-    shadow: '#993300',
-    highlight: 'rgba(255, 255, 255, 0.65)',
-    glow: 'rgba(255, 145, 0, 0.5)',
-  },
-  blue: {
-    name: 'blue',
-    main: '#2979FF',
-    gradient: ['#82B1FF', '#1565C0'],
-    shadow: '#0D47A1',
-    highlight: 'rgba(255, 255, 255, 0.65)',
-    glow: 'rgba(41, 121, 255, 0.5)',
-  },
+  cyan: createWoodTone('cyan', '#F4C652', '#FCE386', '#E4A62C', '#9E6110'),
+  amber: createWoodTone('amber', '#F6CA58', '#FFF0A0', '#E8AE30', '#A46612'),
+  ruby: createWoodTone('ruby', '#EEBA46', '#FAD975', '#DC9922', '#95580D'),
+  green: createWoodTone('green', '#F3C754', '#FCE58A', '#E2A42B', '#9A5F10'),
+  purple: createWoodTone('purple', '#F0BE4A', '#FBDE7A', '#DF9D24', '#985B0E'),
+  orange: createWoodTone('orange', '#F5C44E', '#FDE180', '#E5A228', '#9D6010'),
+  blue: createWoodTone('blue', '#F2C350', '#FCE082', '#E1A029', '#995C0E'),
 };
 
 export const TETROMINOES: Record<TetrominoType, TetrominoShape> = {

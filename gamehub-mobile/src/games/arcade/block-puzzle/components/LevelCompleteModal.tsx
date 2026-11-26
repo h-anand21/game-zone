@@ -1,10 +1,18 @@
 // ============================================================
-// Block Blast — Level Complete Celebratory Modal
+// Block Puzzle — Carved Wooden Level Complete Modal
 // ============================================================
 
 import React from 'react';
 import { View, Text, StyleSheet, Modal, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { WOOD_PALETTE } from './woodTheme';
+import {
+  StarGoldIcon,
+  TrophyWoodIcon,
+  ComboSparkleIcon,
+  ReplayWoodIcon,
+  LevelsGridIcon,
+} from './WoodBlockIcons';
 
 interface LevelCompleteModalProps {
   visible: boolean;
@@ -33,7 +41,6 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({
   onLevelSelect,
   onExit,
 }) => {
-  // Star calculation based on performance
   const stars = bestCombo >= 4 ? 3 : bestCombo >= 2 ? 2 : 1;
 
   return (
@@ -45,21 +52,24 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({
     >
       <View style={styles.overlay}>
         <LinearGradient
-          colors={['#102A4C', '#071324']}
+          colors={WOOD_PALETTE.modalCardGradient}
           style={styles.modalCard}
         >
           {/* Top Badge */}
           <View style={styles.badgeRow}>
-            <Text style={styles.badgeText}>⭐ LEVEL {level} CLEARED! ⭐</Text>
+            <TrophyWoodIcon size={15} />
+            <Text style={styles.badgeText}>LEVEL {level} CLEARED</Text>
           </View>
 
           <Text style={styles.levelTitle}>{levelName}</Text>
 
-          {/* Stars Display */}
+          {/* 3-Star Carved Trophy Row */}
           <View style={styles.starsRow}>
-            <Text style={[styles.star, stars >= 1 ? styles.starFilled : styles.starDim]}>⭐</Text>
-            <Text style={[styles.star, styles.starCenter, stars >= 2 ? styles.starFilled : styles.starDim]}>⭐</Text>
-            <Text style={[styles.star, stars >= 3 ? styles.starFilled : styles.starDim]}>⭐</Text>
+            <StarGoldIcon size={32} filled={stars >= 1} />
+            <View style={styles.centerStarOffset}>
+              <StarGoldIcon size={40} filled={stars >= 2} />
+            </View>
+            <StarGoldIcon size={32} filled={stars >= 3} />
           </View>
 
           {/* Score Box */}
@@ -77,7 +87,10 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>MAX COMBO</Text>
-              <Text style={styles.statNumber}>🔥 x{bestCombo}</Text>
+              <View style={styles.comboValueRow}>
+                <ComboSparkleIcon size={14} />
+                <Text style={styles.statNumber}>x{bestCombo}</Text>
+              </View>
             </View>
           </View>
 
@@ -92,17 +105,18 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({
                 ]}
               >
                 <LinearGradient
-                  colors={['#00E5FF', '#0091EA']}
+                  colors={WOOD_PALETTE.goldCtaGradient}
                   start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
+                  end={{ x: 0, y: 1 }}
                   style={styles.btnGradient}
                 >
-                  <Text style={styles.primaryBtnText}>NEXT LEVEL ➔</Text>
+                  <Text style={styles.primaryBtnText}>NEXT LEVEL</Text>
                 </LinearGradient>
               </Pressable>
             ) : (
               <View style={styles.allCompleteBadge}>
-                <Text style={styles.allCompleteText}>🏆 ALL 15 LEVELS CONQUERED! 🏆</Text>
+                <TrophyWoodIcon size={16} />
+                <Text style={styles.allCompleteText}>ALL 15 LEVELS CONQUERED</Text>
               </View>
             )}
 
@@ -114,7 +128,8 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({
                   pressed && { opacity: 0.8 },
                 ]}
               >
-                <Text style={styles.secondaryBtnText}>🔄 REPLAY</Text>
+                <ReplayWoodIcon size={15} color={WOOD_PALETTE.textLight} />
+                <Text style={styles.secondaryBtnText}>REPLAY</Text>
               </Pressable>
 
               <Pressable
@@ -124,7 +139,8 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({
                   pressed && { opacity: 0.8 },
                 ]}
               >
-                <Text style={styles.secondaryBtnText}>📋 LEVELS</Text>
+                <LevelsGridIcon size={15} color={WOOD_PALETTE.textCream} />
+                <Text style={styles.secondaryBtnText}>LEVELS</Text>
               </Pressable>
             </View>
 
@@ -149,66 +165,59 @@ export const LevelCompleteModal: React.FC<LevelCompleteModalProps> = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(2, 6, 14, 0.88)',
+    backgroundColor: WOOD_PALETTE.modalOverlay,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
   },
   modalCard: {
     width: '100%',
-    maxWidth: 360,
+    maxWidth: 356,
     borderRadius: 24,
-    borderWidth: 2,
-    borderColor: '#00E5FF',
+    borderWidth: 2.5,
+    borderColor: WOOD_PALETTE.modalBorder,
     padding: 22,
     alignItems: 'center',
-    shadowColor: '#00E5FF',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.45,
     shadowRadius: 18,
     elevation: 12,
   },
   badgeRow: {
-    backgroundColor: 'rgba(0, 229, 255, 0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: WOOD_PALETTE.pillDarkBg,
+    paddingHorizontal: 14,
+    paddingVertical: 5,
     borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 229, 255, 0.4)',
-    marginBottom: 6,
+    borderWidth: 1.5,
+    borderColor: WOOD_PALETTE.comboBorderGlow,
+    marginBottom: 8,
   },
   badgeText: {
     fontSize: 11,
     fontWeight: '900',
-    color: '#00E5FF',
-    letterSpacing: 1.5,
+    color: WOOD_PALETTE.textGold,
+    letterSpacing: 1.3,
   },
   levelTitle: {
     fontSize: 20,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: WOOD_PALETTE.textLight,
     letterSpacing: 0.5,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   starsRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 10,
     marginBottom: 14,
   },
-  star: {
-    fontSize: 28,
-  },
-  starCenter: {
-    fontSize: 36,
-    marginBottom: 4,
-  },
-  starFilled: {
-    opacity: 1,
-  },
-  starDim: {
-    opacity: 0.25,
+  centerStarOffset: {
+    marginBottom: 6,
   },
   scoreContainer: {
     alignItems: 'center',
@@ -217,25 +226,25 @@ const styles = StyleSheet.create({
   scoreLabel: {
     fontSize: 10,
     fontWeight: '800',
-    color: '#94A3B8',
+    color: WOOD_PALETTE.textMuted,
     letterSpacing: 1.2,
     marginBottom: 2,
   },
   scoreValue: {
-    fontSize: 32,
+    fontSize: 34,
     fontWeight: '900',
-    color: '#00E5FF',
+    color: WOOD_PALETTE.textGold,
     letterSpacing: 1,
   },
   statsRow: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: WOOD_PALETTE.pillDarkBg,
     borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1.5,
+    borderColor: WOOD_PALETTE.pillDarkBorder,
     width: '100%',
     paddingVertical: 10,
-    marginBottom: 16,
+    marginBottom: 18,
   },
   statBox: {
     flex: 1,
@@ -244,20 +253,25 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: '70%',
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(255, 224, 163, 0.18)',
     alignSelf: 'center',
   },
   statLabel: {
-    fontSize: 8.5,
+    fontSize: 9,
+    color: WOOD_PALETTE.textMuted,
     fontWeight: '800',
-    color: '#94A3B8',
-    letterSpacing: 0.8,
+    letterSpacing: 0.5,
     marginBottom: 2,
+  },
+  comboValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   statNumber: {
     fontSize: 16,
     fontWeight: '900',
-    color: '#FFFFFF',
+    color: WOOD_PALETTE.textLight,
   },
   buttonCol: {
     width: '100%',
@@ -266,8 +280,10 @@ const styles = StyleSheet.create({
   primaryButton: {
     width: '100%',
     height: 48,
-    borderRadius: 14,
+    borderRadius: 16,
     overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: WOOD_PALETTE.goldCtaBorder,
   },
   btnGradient: {
     flex: 1,
@@ -277,22 +293,25 @@ const styles = StyleSheet.create({
   primaryBtnText: {
     fontSize: 15,
     fontWeight: '900',
-    color: '#030D1A',
+    color: WOOD_PALETTE.goldCtaText,
     letterSpacing: 1,
   },
   allCompleteBadge: {
-    backgroundColor: 'rgba(255, 214, 0, 0.15)',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: WOOD_PALETTE.pillDarkBg,
     paddingVertical: 12,
     borderRadius: 14,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#FFD600',
+    borderWidth: 1.5,
+    borderColor: WOOD_PALETTE.comboBorderGlow,
   },
   allCompleteText: {
     fontSize: 12,
     fontWeight: '900',
-    color: '#FFD600',
-    letterSpacing: 1,
+    color: WOOD_PALETTE.textGold,
+    letterSpacing: 0.9,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -301,30 +320,32 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     flex: 1,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.15)',
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: WOOD_PALETTE.pillDarkBg,
+    borderWidth: 1.5,
+    borderColor: WOOD_PALETTE.pillDarkBorder,
+    flexDirection: 'row',
+    gap: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
   secondaryBtnText: {
     fontSize: 12,
     fontWeight: '800',
-    color: '#E2E8F0',
+    color: WOOD_PALETTE.textLight,
     letterSpacing: 0.8,
   },
   exitButton: {
     width: '100%',
-    height: 38,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
   exitBtnText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#64748B',
+    color: WOOD_PALETTE.textMuted,
     letterSpacing: 0.5,
   },
 });

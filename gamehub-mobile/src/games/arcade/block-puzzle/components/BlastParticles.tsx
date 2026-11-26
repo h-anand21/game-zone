@@ -1,5 +1,5 @@
 // ============================================================
-// Block Blast — Explosive Line Clear Particles
+// Block Puzzle — Golden Line-Clear Sparkle & Wood Dust Particles
 // ============================================================
 
 import React, { useEffect, useRef } from 'react';
@@ -25,7 +25,7 @@ export const BlastParticles: React.FC<BlastParticlesProps> = ({
     progress.setValue(0);
     const anim = Animated.timing(progress, {
       toValue: 1,
-      duration: 650,
+      duration: 620,
       useNativeDriver: true,
     });
 
@@ -45,22 +45,22 @@ export const BlastParticles: React.FC<BlastParticlesProps> = ({
       {particles.map((p) => {
         const translateX = progress.interpolate({
           inputRange: [0, 1],
-          outputRange: [p.x, p.x + p.vx * 70],
+          outputRange: [p.x, p.x + p.vx * 68],
         });
 
         const translateY = progress.interpolate({
           inputRange: [0, 1],
-          outputRange: [p.y, p.y + p.vy * 70 + 30], // slight gravity
+          outputRange: [p.y, p.y + p.vy * 68 + 26],
         });
 
         const scale = progress.interpolate({
-          inputRange: [0, 0.3, 1],
-          outputRange: [1.2, 1.4, 0],
+          inputRange: [0, 0.25, 1],
+          outputRange: [1.1, 1.35, 0],
         });
 
         const opacity = progress.interpolate({
-          inputRange: [0, 0.7, 1],
-          outputRange: [1, 0.8, 0],
+          inputRange: [0, 0.65, 1],
+          outputRange: [1, 0.85, 0],
         });
 
         return (
@@ -71,10 +71,10 @@ export const BlastParticles: React.FC<BlastParticlesProps> = ({
               {
                 width: p.size,
                 height: p.size,
-                borderRadius: p.size * 0.3,
+                borderRadius: p.size * 0.4,
                 backgroundColor: p.color,
-                shadowColor: p.color,
-                transform: [{ translateX }, { translateY }, { scale }],
+                shadowColor: '#FDE047',
+                transform: [{ translateX }, { translateY }, { scale }, { rotate: '45deg' }],
                 opacity,
               },
             ]}
@@ -88,8 +88,8 @@ export const BlastParticles: React.FC<BlastParticlesProps> = ({
 const styles = StyleSheet.create({
   particle: {
     position: 'absolute',
-    shadowOpacity: 0.8,
+    shadowOpacity: 0.9,
     shadowRadius: 6,
-    elevation: 4,
+    elevation: 5,
   },
 });

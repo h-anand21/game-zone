@@ -40,7 +40,20 @@ import { ComboToast } from './components/ComboToast';
 import { GameOverModal } from './components/GameOverModal';
 import { LevelCompleteModal } from './components/LevelCompleteModal';
 import { LevelSelectModal } from './components/LevelSelectModal';
-import { PauseOverlay } from '../../common/PauseOverlay';
+import { WoodBackground } from './components/WoodBackground';
+import { WoodPauseModal } from './components/WoodPauseModal';
+import { WOOD_PALETTE } from './components/woodTheme';
+import {
+  BackArrowIcon,
+  GearSettingsIcon,
+  CrownScoreIcon,
+  ComboSparkleIcon,
+  TrophyWoodIcon,
+  TargetGoalIcon,
+  SlideHintIcon,
+  RotateHintIcon,
+  DropHintIcon,
+} from './components/WoodBlockIcons';
 import { BlockHaptics } from './haptics';
 import { BlockSound } from './sound';
 import { JEWEL_COLORS } from './shapes';
@@ -82,9 +95,10 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
 
   const levelConfig = getLevelConfig(currentLevel);
 
-  // Precise UI Layout Metric Budget
-  const TOP_NAV_HEIGHT = 42;
-  const HUD_CARD_HEIGHT = 68;
+  // Precise UI Layout Metric Budget (includes 4px oak tray outer bevel border)
+  const BOARD_FRAME = 4;
+  const TOP_NAV_HEIGHT = 44;
+  const HUD_CARD_HEIGHT = 70;
   const GESTURE_HINT_HEIGHT = 28;
   const SPACING_TOTAL = 26; // internal margins & gaps
   const NON_BOARD_HEIGHT =
@@ -99,8 +113,14 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   const AVAILABLE_WIDTH = SCREEN_WIDTH - 24;
 
   const CELL_SIZE = Math.min(
-    Math.floor((AVAILABLE_WIDTH - BOARD_PADDING * 2 - BOARD_GAP * (GRID_COLS - 1)) / GRID_COLS),
-    Math.floor((AVAILABLE_HEIGHT - BOARD_PADDING * 2 - BOARD_GAP * (GRID_ROWS - 1)) / GRID_ROWS),
+    Math.floor(
+      (AVAILABLE_WIDTH - (BOARD_PADDING + BOARD_FRAME) * 2 - BOARD_GAP * (GRID_COLS - 1)) /
+        GRID_COLS
+    ),
+    Math.floor(
+      (AVAILABLE_HEIGHT - (BOARD_PADDING + BOARD_FRAME) * 2 - BOARD_GAP * (GRID_ROWS - 1)) /
+        GRID_ROWS
+    ),
     34
   );
 
@@ -264,15 +284,16 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
         setTimeout(() => setClearingRows([]), 280);
 
         // Blast Particles originating accurately from cleared grid slots
-        const boardWidth = CELL_SIZE * GRID_COLS + BOARD_GAP * (GRID_COLS - 1) + BOARD_PADDING * 2;
-        const boardLeft = (SCREEN_WIDTH - boardWidth) / 2 + BOARD_PADDING;
-        const boardTop = insets.top + TOP_NAV_HEIGHT + HUD_CARD_HEIGHT + 24 + BOARD_PADDING;
+        const trayInset = BOARD_PADDING + BOARD_FRAME;
+        const boardWidth = CELL_SIZE * GRID_COLS + BOARD_GAP * (GRID_COLS - 1) + trayInset * 2;
+        const boardLeft = (SCREEN_WIDTH - boardWidth) / 2 + trayInset;
+        const boardTop = insets.top + TOP_NAV_HEIGHT + HUD_CARD_HEIGHT + 24 + trayInset;
 
         const newParticles: ParticleItem[] = [];
         clearResult.clearedRowIndices.forEach((rowIdx) => {
           for (let col = 0; col < GRID_COLS; col++) {
             const colorKey = lockedGrid[rowIdx]?.[col]?.colorKey || pieceToLock.colorKey;
-            const colorHex = JEWEL_COLORS[colorKey]?.main || '#00E5FF';
+            const warmWoodHex = JEWEL_COLORS[colorKey]?.main || '#F6CA58';
             for (let p = 0; p < 2; p++) {
               const angle = Math.random() * Math.PI * 2;
               const speed = 0.8 + Math.random() * 2.2;
@@ -283,7 +304,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
                 vx: Math.cos(angle) * speed,
                 vy: Math.sin(angle) * speed,
                 size: 5 + Math.random() * 6,
-                color: colorHex,
+                color: p % 2 === 0 ? '#FFF3B0' : warmWoodHex,
               });
             }
           }
@@ -498,11 +519,10 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   const goalProgress = Math.min(1, levelLinesCleared / Math.max(1, levelConfig.targetLines));
 
   return (
-    <View style={styles.outerContainer}>
+    <WoodBackground>
       <StatusBar barStyle="light-content" translucent backgroundColor="transparent" />
 
-      <LinearGradient
-        colors={['#07111E', '#030810']}
+      <View
         style={[
           styles.container,
           {
@@ -511,22 +531,27 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           },
         ]}
       >
-        {/* 1. TOP NAV BAR */}
+        {/* 1. TOP WOODEN NAV BAR */}
         <View style={styles.topNav}>
           <Pressable
             onPress={handleExit}
-            style={({ pressed }) => [styles.navBtn, pressed && styles.btnPressed]}
+            style={({ pressed }) => [styles.woodIconBtn, pressed && styles.btnPressed]}
             hitSlop={12}
           >
-            <Text style={styles.navBtnText}>←</Text>
+            <LinearGradient
+              colors={WOOD_PALETTE.oakButtonGradient}
+              style={styles.woodIconBtnInner}
+            >
+              <BackArrowIcon size={18} color={WOOD_PALETTE.goldCtaText} />
+            </LinearGradient>
           </Pressable>
 
-          {/* Level Selector Button */}
+          {/* Level Selector Wooden Pill */}
           <Pressable
             onPress={() => setShowLevelSelect(true)}
             style={({ pressed }) => [styles.levelSelectorBtn, pressed && styles.btnPressed]}
           >
-            <Text style={styles.levelSelectorEmoji}>🏆</Text>
+            <TrophyWoodIcon size={17} />
             <View>
               <Text style={styles.levelSelectorText}>
                 LVL {currentLevel} • {levelConfig.name} ▾
@@ -539,38 +564,61 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
 
           <Pressable
             onPress={() => setIsLocalPaused(true)}
-            style={({ pressed }) => [styles.navBtn, pressed && styles.btnPressed]}
+            style={({ pressed }) => [styles.woodIconBtn, pressed && styles.btnPressed]}
             hitSlop={12}
           >
-            <Text style={styles.navBtnText}>⏸</Text>
+            <LinearGradient
+              colors={WOOD_PALETTE.oakButtonGradient}
+              style={styles.woodIconBtnInner}
+            >
+              <GearSettingsIcon size={21} />
+            </LinearGradient>
           </Pressable>
         </View>
 
-        {/* 2. UNIFIED ARCADE DASHBOARD (SYMMETRICAL HUD CARD) */}
+        {/* 2. CLASSIC WOODEN HUD (CROWN SCORE + NEXT POCKET + GLOWING COMBO) */}
         <LinearGradient
-          colors={['#10223A', '#0B1728']}
+          colors={WOOD_PALETTE.hudPanelGradient}
           style={styles.hudCard}
         >
-          {/* Left: Score & High Score */}
+          {/* Left: Crown Score Pill & Best Record */}
           <View style={styles.hudLeft}>
-            <Text style={styles.hudLabel}>SCORE</Text>
-            <Text style={styles.hudScoreValue}>{score.toLocaleString()}</Text>
-            <Text style={styles.hudSubInfo}>👑 BEST: {highScore.toLocaleString()}</Text>
+            <View style={styles.scoreHeaderRow}>
+              <CrownScoreIcon size={15} />
+              <Text style={styles.hudLabel}>SCORE</Text>
+            </View>
+            <View style={styles.scorePill}>
+              <Text style={styles.hudScoreValue}>{score.toLocaleString()}</Text>
+            </View>
+            <Text style={styles.hudSubInfo}>BEST {highScore.toLocaleString()}</Text>
           </View>
 
-          {/* Center: Next Piece Capsule */}
+          {/* Center: Dark Espresso Next Piece Pocket */}
           <View style={styles.hudCenter}>
             <NextPiecePreview nextType={nextType} compact={true} />
           </View>
 
-          {/* Right: Level Goal Progress & Streak */}
+          {/* Right: Glowing Gold Combo Capsule + Goal Progress */}
           <View style={styles.hudRight}>
-            <Text style={[styles.hudLabel, { color: '#00E5FF' }]}>GOAL 🎯</Text>
-            <Text style={styles.hudGoalValue}>
-              {levelLinesCleared} / {levelConfig.targetLines}
-            </Text>
+            <View
+              style={[
+                styles.comboPill,
+                comboStreak > 0 && styles.comboPillActive,
+              ]}
+            >
+              <ComboSparkleIcon size={13} />
+              <Text style={styles.comboPillLabel}>
+                COMBO {comboStreak > 0 ? `${comboStreak}` : '0'}
+              </Text>
+            </View>
 
-            {/* Mini Goal Progress Bar */}
+            <View style={styles.goalRow}>
+              <TargetGoalIcon size={12} />
+              <Text style={styles.hudGoalValue}>
+                {levelLinesCleared}/{levelConfig.targetLines}
+              </Text>
+            </View>
+
             <View style={styles.progressBarBg}>
               <View
                 style={[
@@ -579,16 +627,10 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
                 ]}
               />
             </View>
-
-            {comboStreak > 1 && (
-              <View style={styles.streakBadge}>
-                <Text style={styles.streakText}>🔥 x{comboStreak} COMBO</Text>
-              </View>
-            )}
           </View>
         </LinearGradient>
 
-        {/* 3. CENTER: IMMERSIVE GAME BOARD WITH PRE-LAID JEWEL BLOCKS */}
+        {/* 3. CENTER: CARVED RECESSED WOODEN TRAY (10x20 GRID) */}
         <View style={styles.boardContainer}>
           <GameBoard
             grid={grid}
@@ -604,16 +646,25 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           />
         </View>
 
-        {/* 4. SLEEK GESTURE HINT BAR */}
+        {/* 4. SLEEK WOODEN GESTURE HINT BAR (SVG ICONS) */}
         <View style={styles.gestureHintBar}>
-          <Text style={styles.gestureHintItem}>◀  Slide : Move</Text>
+          <View style={styles.hintPair}>
+            <SlideHintIcon size={12} />
+            <Text style={styles.gestureHintItem}>Slide: Move</Text>
+          </View>
           <Text style={styles.gestureHintDot}>•</Text>
-          <Text style={styles.gestureHintItem}>↺  Tap : Rotate</Text>
+          <View style={styles.hintPair}>
+            <RotateHintIcon size={12} />
+            <Text style={styles.gestureHintItem}>Tap: Rotate</Text>
+          </View>
           <Text style={styles.gestureHintDot}>•</Text>
-          <Text style={styles.gestureHintItem}>▼  Flick : Drop</Text>
+          <View style={styles.hintPair}>
+            <DropHintIcon size={12} />
+            <Text style={styles.gestureHintItem}>Flick: Drop</Text>
+          </View>
         </View>
 
-        {/* Dynamic Combo Toast Banner */}
+        {/* Dynamic Carved Wood Combo Toast Banner */}
         <ComboToast
           visible={comboToast.visible}
           title={comboToast.title}
@@ -622,7 +673,7 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           onHide={handleHideComboToast}
         />
 
-        {/* Explosive Line Blast Particles */}
+        {/* Golden Line-Clear Sparkle Particles */}
         <BlastParticles
           particles={particles}
           onComplete={handleClearParticles}
@@ -674,83 +725,86 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
           onExit={handleExit}
         />
 
-        {/* Pause Overlay */}
-        {isLocalPaused && (
-          <PauseOverlay
-            onResume={() => setIsLocalPaused(false)}
-            onRestart={handleReplayLevel}
-            onQuit={handleExit}
-          />
-        )}
-      </LinearGradient>
-    </View>
+        {/* Carved Wooden Pause & Settings Modal */}
+        <WoodPauseModal
+          visible={isLocalPaused}
+          level={currentLevel}
+          levelName={levelConfig.name}
+          onResume={() => setIsLocalPaused(false)}
+          onRestart={handleReplayLevel}
+          onLevels={() => {
+            setIsLocalPaused(false);
+            setShowLevelSelect(true);
+          }}
+          onQuit={handleExit}
+        />
+      </View>
+    </WoodBackground>
   );
 };
 
 const styles = StyleSheet.create({
-  outerContainer: {
-    flex: 1,
-    backgroundColor: '#07111E',
-  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
   },
-  // 1. TOP NAV
+  // 1. TOP WOODEN NAV
   topNav: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    height: 42,
-    marginBottom: 6,
+    height: 44,
+    marginBottom: 4,
   },
-  navBtn: {
+  woodIconBtn: {
     width: 38,
     height: 38,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.14)',
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: WOOD_PALETTE.oakButtonBorder,
+    overflow: 'hidden',
+    shadowColor: '#261003',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.35,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+  woodIconBtnInner: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    borderTopWidth: 1.5,
+    borderTopColor: WOOD_PALETTE.oakButtonHighlight,
   },
   btnPressed: {
-    opacity: 0.7,
+    opacity: 0.78,
     transform: [{ scale: 0.94 }],
-  },
-  navBtnText: {
-    fontSize: 18,
-    color: '#E2E8F0',
-    fontWeight: '700',
   },
   levelSelectorBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: 'rgba(0, 229, 255, 0.08)',
-    paddingHorizontal: 12,
+    backgroundColor: WOOD_PALETTE.pillDarkBg,
+    paddingHorizontal: 13,
     paddingVertical: 5,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 229, 255, 0.25)',
-  },
-  levelSelectorEmoji: {
-    fontSize: 18,
+    borderRadius: 13,
+    borderWidth: 1.5,
+    borderColor: WOOD_PALETTE.pillDarkBorder,
   },
   levelSelectorText: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '900',
-    color: '#F0F9FF',
-    letterSpacing: 0.5,
+    color: WOOD_PALETTE.textLight,
+    letterSpacing: 0.4,
   },
   levelSelectorSub: {
     fontSize: 9,
     fontWeight: '800',
-    color: '#38BDF8',
-    letterSpacing: 0.5,
+    color: WOOD_PALETTE.textGold,
+    letterSpacing: 0.4,
   },
 
   // 2. UNIFIED ARCADE HUD CARD
@@ -851,28 +905,33 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 
-  // 4. BOTTOM GESTURE HINT BAR
+  // 4. BOTTOM WOOD GESTURE HINT BAR
   gestureHintBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    paddingVertical: 5,
+    paddingHorizontal: 14,
+    backgroundColor: 'rgba(48, 22, 7, 0.78)',
+    borderRadius: 18,
+    borderWidth: 1.2,
+    borderColor: WOOD_PALETTE.pillDarkBorder,
     marginTop: 4,
-    gap: 8,
+    gap: 7,
+  },
+  hintPair: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   gestureHintItem: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#94A3B8',
-    letterSpacing: 0.3,
+    fontSize: 10.5,
+    fontWeight: '800',
+    color: WOOD_PALETTE.textCream,
+    letterSpacing: 0.2,
   },
   gestureHintDot: {
     fontSize: 10,
-    color: '#38BDF8',
+    color: WOOD_PALETTE.textGold,
   },
 });

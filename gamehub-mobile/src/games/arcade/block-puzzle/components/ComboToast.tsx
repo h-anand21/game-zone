@@ -1,10 +1,12 @@
 // ============================================================
-// Block Blast — Animated Combo & Score Toast Banner
+// Block Puzzle — Carved Wooden Combo & Score Ribbon Banner
 // ============================================================
 
 import React, { useEffect, useRef } from 'react';
-import { Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { WOOD_PALETTE } from './woodTheme';
+import { ComboSparkleIcon } from './WoodBlockIcons';
 
 interface ComboToastProps {
   visible: boolean;
@@ -49,20 +51,20 @@ export const ComboToast: React.FC<ComboToastProps> = ({
 
   const scale = anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0.4, 1],
+    outputRange: [0.45, 1],
   });
 
   const translateY = anim.interpolate({
     inputRange: [0, 1],
-    outputRange: [20, -10],
+    outputRange: [18, -10],
   });
 
-  const isHighStreak = streak >= 3;
-  const gradientColors: [string, string] = isHighStreak
-    ? ['#FFD600', '#FF1744']
-    : streak >= 2
-    ? ['#00E5FF', '#D500F9']
-    : ['#00E676', '#0091EA'];
+  const gradientColors: [string, string] =
+    streak >= 3
+      ? ['#FFF099', '#F59E0B']
+      : streak >= 2
+      ? ['#FCE283', '#E49B23']
+      : ['#F7D070', '#D98E24'];
 
   return (
     <Animated.View
@@ -78,10 +80,14 @@ export const ComboToast: React.FC<ComboToastProps> = ({
       <LinearGradient
         colors={gradientColors}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        end={{ x: 0, y: 1 }}
         style={styles.toastCard}
       >
-        <Text style={styles.toastTitle}>{title}</Text>
+        <View style={styles.titleRow}>
+          <ComboSparkleIcon size={17} />
+          <Text style={styles.toastTitle}>{title}</Text>
+          <ComboSparkleIcon size={17} />
+        </View>
         <Text style={styles.toastPoints}>+{pointsEarned} PTS</Text>
       </LinearGradient>
     </Animated.View>
@@ -94,32 +100,37 @@ const styles = StyleSheet.create({
     top: '38%',
     alignSelf: 'center',
     zIndex: 99999,
-    shadowColor: '#000',
+    shadowColor: '#1E0C02',
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.55,
     shadowRadius: 10,
     elevation: 12,
   },
   toastCard: {
     paddingHorizontal: 22,
     paddingVertical: 10,
-    borderRadius: 24,
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
+    borderRadius: 20,
+    borderWidth: 2.5,
+    borderColor: WOOD_PALETTE.goldCtaBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
   toastTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '900',
-    color: '#07111F',
-    letterSpacing: 1.2,
+    color: WOOD_PALETTE.goldCtaText,
+    letterSpacing: 1.1,
     textAlign: 'center',
   },
   toastPoints: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '900',
-    color: '#07111F',
+    color: WOOD_PALETTE.goldCtaText,
     marginTop: 2,
   },
 });
