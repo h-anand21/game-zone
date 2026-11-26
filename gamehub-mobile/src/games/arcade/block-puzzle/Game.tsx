@@ -124,15 +124,19 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
     34
   );
 
-  // Bag instance ref
-  const bagRef = useRef<TetrominoBag>(new TetrominoBag());
+  // Initialize bag & starting pieces lazily outside render ref reads
+  const [initialDeal] = useState(() => {
+    const bag = new TetrominoBag();
+    const first = spawnPiece(bag.next());
+    const upcoming = bag.next();
+    return { bag, first, upcoming };
+  });
+  const bagRef = useRef<TetrominoBag>(initialDeal.bag);
 
   // Grid & Active Falling Piece State (initialized with current level's pre-laid layout)
   const [grid, setGrid] = useState<FallingGrid>(() => createGridForLevel(1));
-  const [activePiece, setActivePiece] = useState<ActivePiece | null>(() =>
-    spawnPiece(bagRef.current.next())
-  );
-  const [nextType, setNextType] = useState<TetrominoType>(() => bagRef.current.next());
+  const [activePiece, setActivePiece] = useState<ActivePiece | null>(initialDeal.first);
+  const [nextType, setNextType] = useState<TetrominoType>(initialDeal.upcoming);
 
   // Score & Game Progression
   const [score, setScore] = useState<number>(0);
@@ -158,17 +162,22 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
     streak: 0,
   });
 
-  // Mutable refs for rock-solid timer execution without re-render cascades
+  // Mutable refs for timer & gesture callbacks, synced via effect
   const gridRef = useRef(grid);
-  gridRef.current = grid;
   const activePieceRef = useRef(activePiece);
-  activePieceRef.current = activePiece;
   const isGamePausedRef = useRef(isGamePaused);
-  isGamePausedRef.current = isGamePaused;
   const isGameOverRef = useRef(isGameOver);
-  isGameOverRef.current = isGameOver;
   const isLevelCompleteRef = useRef(isLevelComplete);
-  isLevelCompleteRef.current = isLevelComplete;
+  const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isGroundedRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    gridRef.current = grid;
+    activePieceRef.current = activePiece;
+    isGamePausedRef.current = isGamePaused;
+    isGameOverRef.current = isGameOver;
+    isLevelCompleteRef.current = isLevelComplete;
+  }, [grid, activePiece, isGamePaused, isGameOver, isLevelComplete]);
 
   // Calculate Ghost Row
   const ghostRow = activePiece
@@ -358,11 +367,10 @@ export const BlockPuzzleGame: React.FC<BlockPuzzleProps> = ({
   );
 
   const lockCurrentPieceRef = useRef(lockCurrentPiece);
-  lockCurrentPieceRef.current = lockCurrentPiece;
 
-  // Lock Delay Grace Period (allows sliding/rotating when piece touches ground)
-  const lockTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isGroundedRef = useRef<boolean>(false);
+  useEffect(() => {
+    lockCurrentPieceRef.current = lockCurrentPiece;
+  }, [lockCurrentPiece]);
 
   const clearLockTimer = useCallback(() => {
     if (lockTimerRef.current) {

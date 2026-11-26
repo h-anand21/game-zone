@@ -79,8 +79,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const lastColDeltaRef = useRef<number>(0);
   const lastDropStepRef = useRef<number>(0);
 
-  const [panResponder] = useState(() =>
-    PanResponder.create({
+  const [panHandlers, setPanHandlers] = useState<
+    ReturnType<typeof PanResponder.create>['panHandlers']
+  >({});
+
+  useEffect(() => {
+    const responder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: (_, gestureState) => {
         return Math.abs(gestureState.dx) > 3 || Math.abs(gestureState.dy) > 3;
@@ -136,8 +140,9 @@ export const GameBoard: React.FC<GameBoardProps> = ({
           current.onHardDrop();
         }
       },
-    })
-  );
+    });
+    setPanHandlers(responder.panHandlers);
+  }, []);
 
   const getActivePieceCell = (r: number, c: number): BlockColor | null => {
     if (!activePiece) return null;
@@ -173,7 +178,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
   return (
     <View
-      {...panResponder.panHandlers}
+      {...panHandlers}
       style={[
         styles.outerBevelFrame,
         {
