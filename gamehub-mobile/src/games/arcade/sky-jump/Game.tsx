@@ -47,7 +47,9 @@ import {
 import { WallWoodBackground, WoodBoardSvg } from './components/WoodPlanksSvg';
 import {
   ArrowRightWoodIcon,
+  ChevronDownWoodIcon,
   FreezeClockIcon,
+  LevelsGridWoodIcon,
   PauseButtonIcon,
   PlusGreenIcon,
   RestartHeartIcon,
@@ -574,10 +576,16 @@ export const SkyJumpGame: React.FC<WoodScrewGameProps> = ({
             </LinearGradient>
           </Pressable>
 
-          {/* Center Stack: Level X + 2-Segment Green/Brown Progress + Brown Timer Pill */}
+          {/* Center Stack: Tappable Level X / ∞ Pill + 2-Segment Green/Brown Progress + Brown Timer Pill */}
           <View style={styles.centerHudStack}>
-            <Pressable onPress={() => setShowLevelSelect(true)} hitSlop={8}>
-              <Text style={styles.levelTitleText}>Level {currentLevel}</Text>
+            <Pressable
+              onPress={() => setShowLevelSelect(true)}
+              style={({ pressed }) => [styles.levelSelectorPill, pressed && styles.btnPressed]}
+              hitSlop={6}
+            >
+              <LevelsGridWoodIcon size={13} color="#FDE68A" />
+              <Text style={styles.levelTitleText}>Level {currentLevel} / ∞</Text>
+              <ChevronDownWoodIcon size={12} color="#FDE68A" />
             </Pressable>
 
             {/* Dual-Segment Capsule Progress Bar */}
@@ -859,16 +867,32 @@ const styles = StyleSheet.create({
   },
   centerHudStack: {
     alignItems: 'center',
-    gap: 5,
+    gap: 4,
     marginTop: -2,
   },
+  levelSelectorPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: WOOD_UI_COLORS.hudPillBg,
+    borderWidth: 2,
+    borderColor: WOOD_UI_COLORS.hudPillBorder,
+    paddingHorizontal: 12,
+    paddingVertical: 3,
+    borderRadius: 14,
+    shadowColor: '#2B1203',
+    shadowOffset: { width: 0, height: 1.5 },
+    shadowOpacity: 0.35,
+    shadowRadius: 2,
+    elevation: 3,
+  },
   levelTitleText: {
-    fontSize: 19,
+    fontSize: 15,
     fontWeight: '900',
     color: WOOD_UI_COLORS.hudText,
     textShadowColor: WOOD_UI_COLORS.hudTextStroke,
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 2,
+    textShadowOffset: { width: 0, height: 1.5 },
+    textShadowRadius: 1.5,
     letterSpacing: 0.4,
   },
   progressOuterCapsule: {

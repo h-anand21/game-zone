@@ -321,3 +321,36 @@ export const HeartBadgeIcon: React.FC<IconProps> = ({ size = 16 }) => (
     />
   </Svg>
 );
+
+/**
+ * Compact 2x2 rounded grid icon indicating the Level Selection section
+ */
+export const LevelsGridWoodIcon: React.FC<IconProps> = ({
+  size = 14,
+  color = '#FDE68A',
+}) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Rect x="3" y="3" width="8" height="8" rx="2.2" fill={color} />
+    <Rect x="13" y="3" width="8" height="8" rx="2.2" fill={color} />
+    <Rect x="3" y="13" width="8" height="8" rx="2.2" fill={color} />
+    <Rect x="13" y="13" width="8" height="8" rx="2.2" fill={color} opacity={0.75} />
+  </Svg>
+);
+
+/**
+ * Downward dropdown chevron indicating an interactive selector pill
+ */
+export const ChevronDownWoodIcon: React.FC<IconProps> = ({
+  size = 12,
+  color = '#FDE68A',
+}) => (
+  <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+    <Polyline
+      points="5 9 12 16 19 9"
+      stroke={color}
+      strokeWidth={3.2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);

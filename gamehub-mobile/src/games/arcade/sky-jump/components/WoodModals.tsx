@@ -365,8 +365,12 @@ export const WoodLevelSelectModal: React.FC<WoodLevelSelectModalProps> = ({
   onSelectLevel,
   onClose,
 }) => {
-  const displayedCount = Math.max(48, Math.ceil((unlockedLevel + 24) / 12) * 12);
+  const [extraPages, setExtraPages] = useState<number>(0);
+
+  const baseCount = Math.max(48, Math.ceil((unlockedLevel + 24) / 12) * 12);
+  const displayedCount = baseCount + extraPages * 48;
   const levelList = Array.from({ length: displayedCount }, (_, i) => i + 1);
+  const totalStars = Object.values(levelStars).reduce((sum, s) => sum + s, 0);
 
   return (
     <Modal
@@ -377,19 +381,42 @@ export const WoodLevelSelectModal: React.FC<WoodLevelSelectModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={[styles.modalFrame, { maxHeight: '82%' }]}>
+        <View style={[styles.modalFrame, { maxHeight: '85%' }]}>
           <LinearGradient
             colors={[WOOD_UI_COLORS.boardTop, WOOD_UI_COLORS.boardBottom]}
             style={[styles.woodCard, { paddingBottom: 16 }]}
           >
             <View style={styles.levelModalHeader}>
               <View>
-                <Text style={styles.levelModalTitle}>SELECT LEVEL</Text>
-                <Text style={styles.levelModalSubtitle}>Unlimited Wooden Puzzles</Text>
+                <Text style={styles.levelModalTitle}>LEVELS SECTION</Text>
+                <Text style={styles.levelModalSubtitle}>
+                  Handcrafted (1–10) + Unlimited Puzzles (11–∞)
+                </Text>
               </View>
               <Pressable onPress={onClose} style={styles.closeBtnInline} hitSlop={10}>
                 <CloseWoodIcon size={14} color="#FFFFFF" />
               </Pressable>
+            </View>
+
+            {/* Clear Level Progress Summary Bar */}
+            <View style={styles.levelSummaryStrip}>
+              <View style={styles.levelSummaryCol}>
+                <Text style={styles.levelSummaryLabel}>UNLOCKED</Text>
+                <Text style={styles.levelSummaryVal}>{unlockedLevel}</Text>
+              </View>
+              <View style={styles.levelSummarySep} />
+              <View style={styles.levelSummaryCol}>
+                <Text style={styles.levelSummaryLabel}>STARS</Text>
+                <View style={styles.summaryStarsRow}>
+                  <Text style={styles.levelSummaryVal}>{totalStars}</Text>
+                  <StarWoodIcon size={13} filled />
+                </View>
+              </View>
+              <View style={styles.levelSummarySep} />
+              <View style={styles.levelSummaryCol}>
+                <Text style={styles.levelSummaryLabel}>TOTAL</Text>
+                <Text style={styles.levelSummaryVal}>∞</Text>
+              </View>
             </View>
 
             <ScrollView
@@ -448,6 +475,16 @@ export const WoodLevelSelectModal: React.FC<WoodLevelSelectModalProps> = ({
                   </Pressable>
                 );
               })}
+
+              {/* Expandable Infinite Levels Loader */}
+              <Pressable
+                onPress={() => setExtraPages((p) => p + 1)}
+                style={({ pressed }) => [styles.loadMoreLevelsBtn, pressed && styles.btnPressed]}
+              >
+                <Text style={styles.loadMoreLevelsText}>
+                  SHOW MORE LEVELS (+48) • Showing 1–{displayedCount}
+                </Text>
+              </Pressable>
             </ScrollView>
           </LinearGradient>
         </View>
@@ -739,5 +776,56 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 1.5,
     marginTop: 2,
+  },
+  levelSummaryStrip: {
+    flexDirection: 'row',
+    width: '100%',
+    backgroundColor: 'rgba(107, 54, 20, 0.16)',
+    borderRadius: 12,
+    borderWidth: 1.8,
+    borderColor: WOOD_UI_COLORS.boardBorder,
+    paddingVertical: 7,
+    marginBottom: 12,
+  },
+  levelSummaryCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  levelSummarySep: {
+    width: 1.5,
+    backgroundColor: WOOD_UI_COLORS.boardBorder,
+  },
+  levelSummaryLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: '#7A390E',
+    letterSpacing: 0.6,
+  },
+  levelSummaryVal: {
+    fontSize: 15,
+    fontWeight: '900',
+    color: '#3B1A06',
+  },
+  summaryStarsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  loadMoreLevelsBtn: {
+    width: '100%',
+    marginTop: 8,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: WOOD_UI_COLORS.hudPillBg,
+    borderWidth: 2,
+    borderColor: WOOD_UI_COLORS.btnOutline,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadMoreLevelsText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#FDE68A',
+    letterSpacing: 0.5,
   },
 });
