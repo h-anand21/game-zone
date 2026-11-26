@@ -6,9 +6,9 @@
 import React, { useEffect, useState } from 'react';
 import {
   Animated,
+  FlatList,
   Modal,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -381,10 +381,10 @@ export const WoodLevelSelectModal: React.FC<WoodLevelSelectModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        <View style={[styles.modalFrame, { maxHeight: '85%' }]}>
+        <View style={[styles.modalFrame, styles.levelModalFrame]}>
           <LinearGradient
             colors={[WOOD_UI_COLORS.boardTop, WOOD_UI_COLORS.boardBottom]}
-            style={[styles.woodCard, { paddingBottom: 16 }]}
+            style={[styles.woodCard, styles.levelWoodCard]}
           >
             <View style={styles.levelModalHeader}>
               <View>
@@ -419,19 +419,22 @@ export const WoodLevelSelectModal: React.FC<WoodLevelSelectModalProps> = ({
               </View>
             </View>
 
-            <ScrollView
+            {/* Strict 4-Column Virtualized Grid (never clips or wraps to 3 columns) */}
+            <FlatList
+              data={levelList}
+              keyExtractor={(lvl) => `wood-lvl-${lvl}`}
+              numColumns={4}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.levelGrid}
-              style={{ width: '100%' }}
-            >
-              {levelList.map((lvl) => {
+              style={styles.levelListFlex}
+              contentContainerStyle={styles.levelGridContent}
+              columnWrapperStyle={styles.levelGridRow}
+              renderItem={({ item: lvl }) => {
                 const isUnlocked = lvl <= unlockedLevel;
                 const isCurrent = lvl === currentLevel;
                 const stars = levelStars[lvl] || 0;
 
                 return (
                   <Pressable
-                    key={`wood-lvl-${lvl}`}
                     disabled={!isUnlocked}
                     onPress={() => isUnlocked && onSelectLevel(lvl)}
                     style={({ pressed }) => [
@@ -474,18 +477,21 @@ export const WoodLevelSelectModal: React.FC<WoodLevelSelectModalProps> = ({
                     </LinearGradient>
                   </Pressable>
                 );
-              })}
+              }}
+            />
 
-              {/* Expandable Infinite Levels Loader */}
+            {/* Pinned Bottom Footer (always visible, never clipped) */}
+            <View style={styles.levelModalFooter}>
+              <Text style={styles.levelFooterCount}>
+                Showing 1–{displayedCount} of ∞
+              </Text>
               <Pressable
                 onPress={() => setExtraPages((p) => p + 1)}
                 style={({ pressed }) => [styles.loadMoreLevelsBtn, pressed && styles.btnPressed]}
               >
-                <Text style={styles.loadMoreLevelsText}>
-                  SHOW MORE LEVELS (+48) • Showing 1–{displayedCount}
-                </Text>
+                <Text style={styles.loadMoreLevelsText}>+48 MORE</Text>
               </Pressable>
-            </ScrollView>
+            </View>
           </LinearGradient>
         </View>
       </View>
@@ -713,13 +719,21 @@ const styles = StyleSheet.create({
     color: '#6B3614',
     textDecorationLine: 'underline',
   },
+  levelModalFrame: {
+    height: '82%',
+    maxHeight: 680,
+  },
+  levelWoodCard: {
+    flex: 1,
+    paddingBottom: 12,
+  },
   levelModalHeader: {
     flexDirection: 'row',
     width: '100%',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 14,
-    paddingBottom: 10,
+    marginBottom: 12,
+    paddingBottom: 8,
     borderBottomWidth: 2,
     borderBottomColor: WOOD_UI_COLORS.boardBorder,
   },
@@ -730,19 +744,24 @@ const styles = StyleSheet.create({
     letterSpacing: 0.8,
   },
   levelModalSubtitle: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '700',
     color: '#7A390E',
   },
-  levelGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+  levelListFlex: {
+    flex: 1,
+    width: '100%',
+  },
+  levelGridContent: {
+    paddingBottom: 8,
+  },
+  levelGridRow: {
     gap: 8,
-    justifyContent: 'flex-start',
-    paddingBottom: 10,
+    marginBottom: 8,
   },
   levelCell: {
-    width: '22.8%',
+    flex: 1,
+    maxWidth: '24%',
     aspectRatio: 1,
     borderRadius: 12,
     borderWidth: 2,
@@ -811,10 +830,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 3,
   },
-  loadMoreLevelsBtn: {
+  levelModalFooter: {
+    flexDirection: 'row',
     width: '100%',
-    marginTop: 8,
-    paddingVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    marginTop: 6,
+    borderTopWidth: 2,
+    borderTopColor: WOOD_UI_COLORS.boardBorder,
+  },
+  levelFooterCount: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: '#4E270D',
+  },
+  loadMoreLevelsBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
     borderRadius: 12,
     backgroundColor: WOOD_UI_COLORS.hudPillBg,
     borderWidth: 2,

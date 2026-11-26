@@ -3,8 +3,8 @@
 // Choose and replay from 500+ deterministic puzzle levels
 // ============================================================
 
-import React from 'react';
-import { View, Text, StyleSheet, Modal, Pressable, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Modal, Pressable, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { CloseIcon, LockIcon, StarIcon } from './GameIcons';
 
@@ -25,8 +25,11 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
   onSelectLevel,
   onClose,
 }) => {
-  // Unlimited level list: dynamically expands with player progression
-  const displayedCount = Math.max(60, Math.ceil((unlockedLevel + 24) / 12) * 12);
+  const [extraPages, setExtraPages] = useState<number>(0);
+
+  // Unlimited level list: dynamically expands cleanly in 4-column rows of 48
+  const baseCount = Math.max(48, Math.ceil((unlockedLevel + 24) / 12) * 12);
+  const displayedCount = baseCount + extraPages * 48;
   const levelNumbers = Array.from({ length: displayedCount }, (_, i) => i + 1);
 
   return (
@@ -35,6 +38,7 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
       transparent
       animationType="slide"
       statusBarTranslucent
+      onRequestClose={onClose}
     >
       <View style={styles.overlay}>
         <View style={styles.modalCard}>
@@ -42,7 +46,9 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>SELECT LEVEL</Text>
-              <Text style={styles.subtitle}>Unlimited Solvable Puzzle Challenges</Text>
+              <Text style={styles.subtitle}>
+                Unlocked: {unlockedLevel} • Unlimited Levels (∞)
+              </Text>
             </View>
 
             <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={12}>
@@ -50,19 +56,22 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
             </Pressable>
           </View>
 
-          {/* Level Numbers Grid */}
-          <ScrollView
+          {/* 4-Column Virtualized Grid (never wraps to 3 columns or clips) */}
+          <FlatList
+            data={levelNumbers}
+            keyExtractor={(lvl) => `lvl-${lvl}`}
+            numColumns={4}
             showsVerticalScrollIndicator={false}
+            style={styles.gridList}
             contentContainerStyle={styles.grid}
-          >
-            {levelNumbers.map((lvl) => {
+            columnWrapperStyle={styles.gridRow}
+            renderItem={({ item: lvl }) => {
               const isUnlocked = lvl <= unlockedLevel;
               const isCurrent = lvl === currentLevel;
               const stars = levelStars[lvl] || 0;
 
               return (
                 <Pressable
-                  key={`lvl-${lvl}`}
                   onPress={() => isUnlocked && onSelectLevel(lvl)}
                   disabled={!isUnlocked}
                   style={({ pressed }) => [
@@ -102,8 +111,21 @@ export const LevelSelectModal: React.FC<LevelSelectModalProps> = ({
                   </LinearGradient>
                 </Pressable>
               );
-            })}
-          </ScrollView>
+            }}
+          />
+
+          {/* Pinned Footer Bar */}
+          <View style={styles.footerRow}>
+            <Text style={styles.footerCountText}>
+              Showing 1–{displayedCount} of ∞
+            </Text>
+            <Pressable
+              onPress={() => setExtraPages((p) => p + 1)}
+              style={({ pressed }) => [styles.loadMoreBtn, pressed && styles.pressed]}
+            >
+              <Text style={styles.loadMoreBtnText}>+48 MORE</Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </Modal>
@@ -120,7 +142,8 @@ const styles = StyleSheet.create({
   },
   modalCard: {
     width: '100%',
-    maxHeight: '85%',
+    height: '82%',
+    maxHeight: 660,
     backgroundColor: '#0C1222',
     borderRadius: 24,
     borderWidth: 1.5,
@@ -136,7 +159,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 16,
+    marginBottom: 14,
     paddingBottom: 10,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.08)',
@@ -161,15 +184,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  gridList: {
+    flex: 1,
+    width: '100%',
+  },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    paddingBottom: 8,
+  },
+  gridRow: {
     gap: 8,
-    justifyContent: 'flex-start',
-    paddingBottom: 12,
+    marginBottom: 8,
   },
   levelBox: {
-    width: '23%',
+    flex: 1,
+    maxWidth: '24%',
     aspectRatio: 1,
     borderRadius: 12,
     overflow: 'hidden',
@@ -221,5 +249,33 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: 'rgba(148, 163, 184, 0.45)',
     marginTop: 6,
+  },
+  footerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 10,
+    marginTop: 6,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  footerCountText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#94A3B8',
+  },
+  loadMoreBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 10,
+    backgroundColor: 'rgba(0, 207, 255, 0.16)',
+    borderWidth: 1,
+    borderColor: '#00CFFF',
+  },
+  loadMoreBtnText: {
+    fontSize: 11,
+    fontWeight: '900',
+    color: '#00CFFF',
+    letterSpacing: 0.5,
   },
 });
