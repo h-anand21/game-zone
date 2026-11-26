@@ -3,7 +3,7 @@
 // Preserves real-time touch sliding, tap-to-rotate & flick-to-slam
 // ============================================================
 
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -54,12 +54,32 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   const boardHeight =
     cellSize * GRID_ROWS + GAP * (GRID_ROWS - 1) + PADDING * 2 + FRAME_BORDER * 2;
 
-  // Real-time Gesture Tracking Refs (unchanged core gameplay input)
+  // Keep latest gesture handlers & cellSize synced in a ref outside render
+  const gestureRef = useRef({
+    cellSize,
+    onMoveLeft,
+    onMoveRight,
+    onRotate,
+    onSoftDrop,
+    onHardDrop,
+  });
+
+  useEffect(() => {
+    gestureRef.current = {
+      cellSize,
+      onMoveLeft,
+      onMoveRight,
+      onRotate,
+      onSoftDrop,
+      onHardDrop,
+    };
+  }, [cellSize, onMoveLeft, onMoveRight, onRotate, onSoftDrop, onHardDrop]);
+
   const touchStartRef = useRef<{ x: number; y: number; time: number }>({ x: 0, y: 0, time: 0 });
   const lastColDeltaRef = useRef<number>(0);
   const lastDropStepRef = useRef<number>(0);
 
-  const panResponder = useRef(
+  const [panResponder] = useState(() =>
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: (_, gestureState) => {
@@ -75,7 +95,8 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         lastDropStepRef.current = 0;
       },
       onPanResponderMove: (_e, gestureState) => {
-        const step = cellSize + GAP;
+        const current = gestureRef.current;
+        const step = current.cellSize + BOARD_GAP;
 
         const totalDx = gestureState.dx;
         const targetColDelta = Math.trunc(totalDx / step);
@@ -83,12 +104,12 @@ export const GameBoard: React.FC<GameBoardProps> = ({
 
         if (colDiff > 0) {
           for (let i = 0; i < colDiff; i++) {
-            onMoveRight();
+            current.onMoveRight();
           }
           lastColDeltaRef.current = targetColDelta;
         } else if (colDiff < 0) {
           for (let i = 0; i < Math.abs(colDiff); i++) {
-            onMoveLeft();
+            current.onMoveLeft();
           }
           lastColDeltaRef.current = targetColDelta;
         }
@@ -97,25 +118,26 @@ export const GameBoard: React.FC<GameBoardProps> = ({
         if (totalDy > step * 1.4) {
           const dropStep = Math.trunc(totalDy / (step * 1.4));
           if (dropStep > lastDropStepRef.current) {
-            onSoftDrop();
+            current.onSoftDrop();
             lastDropStepRef.current = dropStep;
           }
         }
       },
       onPanResponderRelease: (_e, gestureState) => {
+        const current = gestureRef.current;
         const dx = gestureState.dx;
         const dy = gestureState.dy;
         const dt = Date.now() - touchStartRef.current.time;
-        const step = cellSize + GAP;
+        const step = current.cellSize + BOARD_GAP;
 
         if (Math.abs(dx) < 18 && Math.abs(dy) < 18 && dt < 280) {
-          onRotate();
+          current.onRotate();
         } else if ((dy > 35 && gestureState.vy > 0.45) || dy > step * 2.5) {
-          onHardDrop();
+          current.onHardDrop();
         }
       },
     })
-  ).current;
+  );
 
   const getActivePieceCell = (r: number, c: number): BlockColor | null => {
     if (!activePiece) return null;
@@ -248,7 +270,11 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   clearRowBeam: {
-    ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     borderRadius: 4,
   },
 });

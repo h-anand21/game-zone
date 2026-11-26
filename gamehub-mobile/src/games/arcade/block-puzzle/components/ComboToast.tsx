@@ -2,7 +2,7 @@
 // Block Puzzle — Carved Wooden Combo & Score Ribbon Banner
 // ============================================================
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { WOOD_PALETTE } from './woodTheme';
@@ -23,7 +23,12 @@ export const ComboToast: React.FC<ComboToastProps> = ({
   streak,
   onHide,
 }) => {
-  const anim = useRef(new Animated.Value(0)).current;
+  const [anim] = useState(() => new Animated.Value(0));
+  const onHideRef = useRef(onHide);
+
+  useEffect(() => {
+    onHideRef.current = onHide;
+  }, [onHide]);
 
   useEffect(() => {
     if (visible) {
@@ -42,10 +47,10 @@ export const ComboToast: React.FC<ComboToastProps> = ({
           useNativeDriver: true,
         }),
       ]).start(() => {
-        onHide?.();
+        onHideRef.current?.();
       });
     }
-  }, [visible, title, pointsEarned, streak]);
+  }, [visible, title, pointsEarned, streak, anim]);
 
   if (!visible) return null;
 

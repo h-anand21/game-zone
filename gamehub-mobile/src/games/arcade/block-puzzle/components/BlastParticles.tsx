@@ -2,7 +2,7 @@
 // Block Puzzle — Golden Line-Clear Sparkle & Wood Dust Particles
 // ============================================================
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Animated } from 'react-native';
 import type { ParticleItem } from '../types';
 
@@ -15,7 +15,12 @@ export const BlastParticles: React.FC<BlastParticlesProps> = ({
   particles,
   onComplete,
 }) => {
-  const progress = useRef(new Animated.Value(0)).current;
+  const [progress] = useState(() => new Animated.Value(0));
+  const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     if (!particles || particles.length === 0) {
@@ -31,12 +36,12 @@ export const BlastParticles: React.FC<BlastParticlesProps> = ({
 
     anim.start(({ finished }) => {
       if (finished) {
-        onComplete?.();
+        onCompleteRef.current?.();
       }
     });
 
     return () => anim.stop();
-  }, [particles]);
+  }, [particles, progress]);
 
   if (!particles || particles.length === 0) return null;
 
