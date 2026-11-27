@@ -8,6 +8,7 @@
 // ============================================================
 
 import type { BubbleLevelConfig, LevelGoalType } from './types';
+import { getHexNeighbors, getRowColCount } from './logic';
 
 export interface WoodlandWorldInfo {
   worldIndex: number;
@@ -328,7 +329,7 @@ export const HANDCRAFTED_LEVELS: BubbleLevelConfig[] = [
       'RR......RR',
       'RXX....XX',
       'GGGGGGGGGG',
-      'BBBBBBBB.',
+      'BBBBBBBBB',
       'OO......OO',
       '.o......o',
       '..YY..YY..',
@@ -415,9 +416,9 @@ export const HANDCRAFTED_LEVELS: BubbleLevelConfig[] = [
       'TTTTGGGTTT',
       '.XXTTTTXX',
       '..OOYYOO..',
-      '..BBGG..B',
+      '..BBGBB..',
       '...RRRR...',
-      '...YY..Y.',
+      '...YYY...',
       '....TT....',
     ],
   },
@@ -485,6 +486,41 @@ function mulberry32(seed: number): () => number {
     x ^= x + Math.imul(x ^ (x >>> 7), 61 | x);
     return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+/**
+ * Removes any disconnected floating ASCII cells not anchored to Row 0.
+ */
+function pruneFloatingFromAsciiRows(rows: string[]): string[] {
+  if (rows.length === 0) return rows;
+  const visited = new Set<string>();
+  const queue: { row: number; col: number }[] = [];
+
+  for (let c = 0; c < Math.min(rows[0].length, getRowColCount(0)); c++) {
+    if (rows[0][c] && rows[0][c] !== '.') {
+      visited.add(`0,${c}`);
+      queue.push({ row: 0, col: c });
+    }
+  }
+
+  while (queue.length > 0) {
+    const curr = queue.shift()!;
+    for (const n of getHexNeighbors(curr.row, curr.col, rows.length)) {
+      const ch = rows[n.row]?.[n.col];
+      const key = `${n.row},${n.col}`;
+      if (ch && ch !== '.' && !visited.has(key)) {
+        visited.add(key);
+        queue.push(n);
+      }
+    }
+  }
+
+  return rows.map((rowStr, r) =>
+    rowStr
+      .split('')
+      .map((ch, c) => (ch === '.' || visited.has(`${r},${c}`) ? ch : '.'))
+      .join('')
+  );
 }
 
 /**
