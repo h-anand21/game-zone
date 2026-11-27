@@ -423,10 +423,6 @@ export const PongGame: React.FC<PongProps> = ({
         });
       }
 
-      if (newParticles.length > 0) setParticles(newParticles);
-      if (newFalling.length > 0) setFallingBubbles(newFalling);
-      if (newPopups.length > 0) setPopups(newPopups);
-
       // Update Streak & Combo Fever Bar
       const hadClear = result.poppedCells.length > 0;
       const nextStreak = hadClear ? snap.comboStreak + 1 : 0;
@@ -452,12 +448,16 @@ export const PongGame: React.FC<PongProps> = ({
         });
         newPopups.push({
           id: `bonus-${nowStamp}`,
-          x: snap.levelConfig ? originX : 160,
+          x: originX,
           y: Math.max(54, impactPt.y + 18),
           text: '+1 POWER ORB!',
           color: '#A7F3D0',
         });
       }
+
+      if (newParticles.length > 0) setParticles(newParticles);
+      if (newFalling.length > 0) setFallingBubbles(newFalling);
+      if (newPopups.length > 0) setPopups(newPopups);
 
       const nextScore = snap.score + result.pointsEarned;
       const nextCamTop = updateCameraTopRow(result.nextGrid, snap.cameraTopRow);

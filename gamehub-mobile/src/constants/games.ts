@@ -126,11 +126,11 @@ export const GAME_REGISTRY: GameConfig[] = [
     saveSupport: 'none', description: 'Classic Snake — eat, grow, survive',
   },
   {
-    id: 'pong', name: 'Pong', category: 'arcade',
+    id: 'pong', name: 'Woodland Bubble Shooter', category: 'arcade',
     offline: true, multiplayer: false, route: '/games/pong',
-    icon: '🏓', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
-    validation: { maxScore: 50, minDuration: 10, maxDuration: 600 },
-    saveSupport: 'none', description: 'Classic Pong — first to 11',
+    icon: '🫧', status: 'available', gameVersion: '2.0.0', scoreVersion: 'v2',
+    validation: { maxScore: 999999999, minDuration: 3, maxDuration: 14400 },
+    saveSupport: 'background', description: 'Aim bank shots in a wooden forest, rescue fireflies, and clear unlimited levels!',
   },
   {
     id: 'sky-jump', name: 'Wood Screw: Nuts & Bolts', category: 'arcade',
