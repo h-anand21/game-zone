@@ -31,6 +31,7 @@ interface WoodlandLevelMapModalProps {
   onClose: () => void;
 }
 
+const HANDCRAFTED_RESCUE_LEVELS = new Set([3, 7, 10, 12, 15, 17, 20]);
 const PAGE_BATCH = 48;
 
 export const WoodlandLevelMapModal: React.FC<WoodlandLevelMapModalProps> = ({
