@@ -65,7 +65,8 @@ export const WoodlandLevelMapModal: React.FC<WoodlandLevelMapModalProps> = ({
     const isUnlocked = lvl <= unlockedLevel;
     const isCurrent = lvl === currentLevel;
     const stars = levelStars[lvl] || 0;
-    const isRescueMilestone = lvl % 3 === 0 || lvl === 7 || lvl === 10 || lvl === 12 || lvl === 15 || lvl === 17 || lvl === 20;
+    const isRescueMilestone =
+      lvl <= 20 ? HANDCRAFTED_RESCUE_LEVELS.has(lvl) : lvl % 3 === 0;
 
     return (
       <Pressable
