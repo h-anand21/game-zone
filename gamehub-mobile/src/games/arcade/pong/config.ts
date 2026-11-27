@@ -1,25 +1,27 @@
 // ============================================================
-// GameHub — Pong Config
+// GameHub — Woodland Bubble Shooter Config (Pong Slot)
+// Replaces Pong while preserving /games/pong route compatibility
 // ============================================================
 
 import type { GameConfig } from '@/constants/types';
 
 export const PONG_CONFIG: GameConfig = {
   id: 'pong',
-  name: 'Pong',
+  name: 'Woodland Bubble Shooter',
   category: 'arcade',
   offline: true,
   multiplayer: false,
   route: '/games/pong',
-  icon: '🏓',
+  icon: '🫧',
   status: 'available',
-  gameVersion: '1.0.0',
-  scoreVersion: 'v1',
+  gameVersion: '2.0.0',
+  scoreVersion: 'v2',
   validation: {
-    maxScore: 50,
-    minDuration: 5,
-    maxDuration: 600,
+    maxScore: 999999999,
+    minDuration: 3,
+    maxDuration: 14400,
   },
-  saveSupport: 'none',
-  description: 'Classic arcade Pong game. Move your paddle to deflect the ball past the AI opponent!',
+  saveSupport: 'background',
+  description:
+    'Aim bank shots in a carved wooden forest! Match glowing crystal bubbles, rescue trapped fireflies, drop spiked iron stones, and blast unlimited levels with Fireball & Lightning orbs!',
 };
