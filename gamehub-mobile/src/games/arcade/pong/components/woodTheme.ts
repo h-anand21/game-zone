@@ -4,7 +4,7 @@
 // dark espresso trays, golden honey, and vibrant nature bubbles.
 // ============================================================
 
-import type { BubbleColor } from './types';
+import type { BubbleColor } from '../types';
 
 export interface BubbleVisualTheme {
   label: string;
