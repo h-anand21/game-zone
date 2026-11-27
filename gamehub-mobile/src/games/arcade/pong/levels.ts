@@ -614,16 +614,14 @@ export function generateBubbleLevel(levelNumber: number): BubbleLevelConfig {
     rows.push(mirrored.join(''));
   }
 
-  // Ensure rescue levels always guarantee at least 2 fireflies even on sparse rolls
-  if (isRescue && firefliesPlaced === 0 && rows.length > 1) {
-    const r1 = rows[1].split('');
-    const replaceIdx = Math.floor(r1.length / 2);
-    if (r1[replaceIdx] !== '.' && r1[replaceIdx] !== 'X') {
-      r1[replaceIdx] = r1[replaceIdx].toLowerCase();
-    } else {
-      r1[replaceIdx] = palette[0].toLowerCase();
-    }
-    rows[1] = r1.join('');
+  const prunedRows = pruneFloatingFromAsciiRows(rows);
+
+  // Ensure rescue levels always guarantee at least 1 anchored firefly even on sparse rolls
+  if (isRescue && !prunedRows.some((r) => /[rgbyto]/.test(r)) && prunedRows.length > 0) {
+    const r0 = prunedRows[0].split('');
+    const idx = Math.floor(r0.length / 2);
+    r0[idx] = (r0[idx] && r0[idx] !== '.' && r0[idx] !== 'X' ? r0[idx] : palette[0]).toLowerCase();
+    prunedRows[0] = r0.join('');
   }
 
   const prefix = PROCEDURAL_TITLE_PREFIXES[levelNumber % PROCEDURAL_TITLE_PREFIXES.length];
@@ -644,6 +642,6 @@ export function generateBubbleLevel(levelNumber: number): BubbleLevelConfig {
     goalType,
     maxShots,
     starThresholds: [baseStar, Math.round(baseStar * 1.55), Math.round(baseStar * 2.2)],
-    rows,
+    rows: prunedRows,
   };
 }
