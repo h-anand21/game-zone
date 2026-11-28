@@ -119,11 +119,11 @@ export const GAME_REGISTRY: GameConfig[] = [
 
   // ── Arcade Games (5) ───────────────────────────────────────
   {
-    id: 'snake', name: 'Snake', category: 'arcade',
+    id: 'snake', name: 'Worms Zone 3D', category: 'arcade',
     offline: true, multiplayer: false, route: '/games/snake',
-    icon: '🐍', status: 'available', gameVersion: '1.0.0', scoreVersion: 'v1',
-    validation: { maxScore: 100000, minDuration: 5, maxDuration: 3600 },
-    saveSupport: 'none', description: 'Classic Snake — eat, grow, survive',
+    icon: '🪱', status: 'available', gameVersion: '2.0.0', scoreVersion: 'v2',
+    validation: { maxScore: 999999999, minDuration: 2, maxDuration: 14400 },
+    saveSupport: 'background', description: 'Slither 3D worms, cut off rival bots for loot feasts, and unlock 3D skins!',
   },
   {
     id: 'pong', name: 'Woodland Bubble Shooter', category: 'arcade',
