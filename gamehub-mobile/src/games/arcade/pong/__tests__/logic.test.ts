@@ -198,6 +198,7 @@ describe('Woodland Bubble Shooter Engine', () => {
 
   it('validates all 20 handcrafted levels and unlimited procedural levels (21..500)', () => {
     expect(HANDCRAFTED_LEVELS.length).toBe(20);
+    const floatingFailures: { lvl: number; floating: { row: number; col: number }[] }[] = [];
 
     for (let lvl = 1; lvl <= 500; lvl += lvl < 25 ? 1 : 23) {
       const cfg = generateBubbleLevel(lvl);
@@ -216,8 +217,13 @@ describe('Woodland Bubble Shooter Engine', () => {
         expect(stats.fireflyCount).toBeGreaterThan(0);
       }
 
-      // Every initial puzzle island must be validly grounded from Row 0
-      expect(findFloatingCells(grid).length).toBe(0);
+      const floating = findFloatingCells(grid);
+      if (floating.length > 0) {
+        floatingFailures.push({ lvl, floating });
+      }
     }
+
+    // Every initial puzzle island must be validly grounded from Row 0
+    expect(floatingFailures).toEqual([]);
   });
 });
