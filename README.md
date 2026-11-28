@@ -30,7 +30,7 @@ GameHub/
   Node.js + Express                        |
       |                                    |
       v                                    |
-  Drizzle ORM                             |
+  Drizzle ORM                              |
       |                                    |
       v                                    |
   Neon PostgreSQL <------------------------+
