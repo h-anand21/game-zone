@@ -15,7 +15,6 @@ import type {
   ArenaMode,
   ArenaState,
   FoodItem,
-  FoodKind,
   LeaderboardEntry,
   Vec2,
   WormEntity,
